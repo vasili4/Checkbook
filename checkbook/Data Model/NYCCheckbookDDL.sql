@@ -1227,6 +1227,9 @@ ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_document_code FO
 ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_agency FOREIGN KEY (agency_id) REFERENCES ref_agency(agency_id);
 ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_award_method FOREIGN KEY (award_method_id) REFERENCES ref_award_method(award_method_id);
 ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_vendor FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id);
+ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_date FOREIGN KEY (effective_begin_date_id) REFERENCES ref_date(date_id);
+ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_date_2 FOREIGN KEY (effective_begin_date_id) REFERENCES ref_date(date_id);
+ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_date_3 FOREIGN KEY (effective_begin_date_id) REFERENCES ref_date(date_id);
 
 CREATE TABLE fact_agreement_accounting_line
 (	
