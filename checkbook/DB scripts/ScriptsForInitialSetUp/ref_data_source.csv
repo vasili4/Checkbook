@@ -1,0 +1,43 @@
+Data_source_code,Data_source_name,document_type,document_name,record_identifier,record_type_name,staging_table_name,etl.archive_table_name,etl.invalid_table_name,Table_order,Data_source_order
+A,COA - Agency,,,,,etl.ext_stg_coa_agency_feed,,,1,1
+A,COA - Agency,,,,,etl.stg_agency,etl.archive_agency,etl.invalid_agency,2,1
+D,COA - Department,,,,,etl.ext_stg_coa_department_feed,,,1,1
+D,COA - Department,,,,,etl.stg_department,etl.archive_department,etl.invalid_department,2,1
+E,COA - Expenditure Object,,,,,etl.ext_stg_coa_expenditure_object_feed,,,1,1
+E,COA - Expenditure Object,,,,,etl.stg_expenditure_object,etl.archive_expenditure_object,etl.invalid_expenditure_object,2,1
+L,COA - Location,,,,,etl.ext_stg_coa_location_feed,,,1,1
+L,COA - Location,,,,,etl.stg_location,etl.archive_location,etl.invalid_location,2,1
+O,COA -Object Class,,,,,etl.ext_stg_coa_object_class_feed,,,1,1
+O,COA -Object Class,,,,,etl.stg_object_class,etl.archive_object_class,etl.invalid_object_class,2,1
+V,FMSV,,,,,etl.ext_stg_fmsv_data_feed,,,1,1
+V,FMSV,,,V,Vendor,etl.stg_fmsv_vendor,etl.archive_ fmsv_vendor,etl.invalid_ fmsv_vendor,2,1
+V,FMSV,,,M,Business Type,etl.stg_fmsv_business_type,etl.archive_ fmsv_business_type,etl.invalid _fmsv_business_type,3,1
+V,FMSV,,,A,Address,etl.stg_fmsv_address,etl.archive_ fmsv_address,etl.invalid _fmsv_address,4,1
+V,FMSV,,,T,Address Type,etl.stg_fmsv_address_type,etl.archive_ fmsv_address_type,etl.invalid _fmsv_address_type,5,1
+M,MAG,,,,,etl.ext_stg_mag_data_feed,,,1,2
+M,MAG,,,H,Header,etl.stg_mag_header,etl.archive_mag_header,etl.invalid_mag_header,2,2
+M,MAG,,,W,Award detail,etl.stg_mag_award_detail,etl.archive_mag_award_detail,etl.invalid_mag_award_detail,3,2
+M,MAG,,,V,Vendor,etl.stg_mag_vendor,etl.archive_mag_vendor,etl.invalid_mag_vendor,4,2
+M,MAG,,,C,Commodity,etl.stg_mag_commodity,etl.archive_mag_commodity,etl.invalid_mag_commodity,5,2
+C,CON,,,,,etl.ext_stg_con_data_feed,,,1,3
+C,CON,"CT1,CTA1,CTA2",Contracts,H,Header,etl.stg_con_ct_header,etl.archive_con_ct_header,etl.invalid_con_ct_header,2,3
+C,CON,"CT1,CTA1,CTA2",Contracts,W,Award detail,etl.stg_con_ct_award_detail,etl.archive_con_ct_award_detail,etl.invalid_con_ct_award_detail,3,3
+C,CON,"CT1,CTA1,CTA2",Contracts,V,Vendor,etl.stg_con_ct_vendor,etl.archive_con_ct_vendor,etl.invalid_con_ct_vendor,4,3
+C,CON,"CT1,CTA1,CTA2",Contracts,C,Commodity,etl.stg_con_ct_commodity,etl.archive_con_ct_commodity,etl.invalid_con_ct_commodity,5,3
+C,CON,"CT1,CTA1,CTA2",Contracts,A,Accounting Line,etl.stg_con_ct_accounting_line,etl.archive_con_ct_accounting_line,etl.invalid_con_ct_accounting_line,6,3
+C,CON,"POC,PCC1,POD",Purchase order,H,Header,etl.stg_con_po_header,etl.archive_con_po_header,etl.invalid_con_po_header,7,3
+C,CON,"POC,PCC1,POD",Purchase order,W,Award detail,etl.stg_con_po_award_detail,etl.archive_con_po_award_detail,etl.invalid_con_po_award_detail,8,3
+C,CON,"POC,PCC1,POD",Purchase order,V,Vendor,etl.stg_con_po_vendor,etl.archive_con_po_vendor,etl.invalid_con_po_vendor,9,3
+C,CON,"POC,PCC1,POD",Purchase order,C,Commodity,etl.stg_con_po_commodity,etl.archive_con_po_commodity,etl.invalid_con_po_commodity,10,3
+C,CON,"POC,PCC1,POD",Purchase order,A,Accounting Line,etl.stg_con_po_accounting_line,etl.archive_con_po_accounting_line,etl.invalid_con_po_accounting_line,11,3
+C,CON,DO1,Delivery Order,H,Header,etl.stg_con_do1_header,etl.archive_con_do1_header,etl.invalid_con_do1_header,12,3
+C,CON,DO1,Delivery Order,V,Vendor,etl.stg_con_do1_vendor,etl.archive_con_do1_vendor,etl.invalid_con_do1_vendor,13,3
+C,CON,DO1,Delivery Order,C,Commodity,etl.stg_con_do1_commodity,etl.archive_con_do1_commodity,etl.invalid_con_do1_commodity,14,3
+C,CON,DO1,Delivery Order,A,Accounting Line,etl.stg_con_do1_accounting_line,etl.archive_con_do1_accounting_line,etl.invalid_con_do1_accounting_line,15,3
+F,FMS,,,,,etl.ext_stg_fms_data_feed,,,1,4
+F,FMS,,,H,Header,etl.stg_fms_header,etl.archive_fms_header,etl.invalid_fms_header,2,4
+F,FMS,,,V,Vendor,etl.stg_fms_vendor,etl.archive_fms_vendor,etl.invalid_fms_vendor,3,4
+F,FMS,,,A,Accounting Line,etl.stg_fms_accounting_line,etl.archive_fms_accounting_line,etl.invalid_fms_accounting_line,4,4
+P,PMS,,,,,etl.ext_stg_pms_data_feed,etl.archive_pms_data_feed,etl.invalid_pms_data_feed,4,
+R,Revenue,,,,,etl.stg_revenue,etl.archive_revenue,etl.invalid_revenue,4,2
+B,Budget,,,,,etl.stg_budget,etl.archive_budget,etl.invalid_budget,4,2
