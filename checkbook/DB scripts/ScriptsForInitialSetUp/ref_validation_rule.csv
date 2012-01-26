@@ -1,8 +1,14 @@
 data_source_code,record_identifier,document_type,rule_name,parent_table_name,component_table_name,staging_column_name,transaction_table_ name,ref_table_name,ref_column_name,invalid_condition,order
 A,,,Missing key elements,,,"agency_code,agency_name",,,,,1
 A,,,Duplicate,,,agency_code,,,,,2
-D,,,Missing key elements,,,"agency_code,fund_class_code,department_code,fiscal_year",,,,,1
-D,,,Duplicate,,,"agency_code,fund_class_code,department_code,fiscal_year",,,,,
+D,,,Missing key elements,,,"agency_code,fund_class_code,department_code,fiscal_year,department_name",,,,,1
+D,,,Duplicate,,,"agency_code,fund_class_code,department_code,fiscal_year",,,,,2
+E,,,Missing key elements,,,"expenditure_object_code,expenditure_object_name,fiscal_year",,,,,1
+E,,,Duplicate,,,"expenditure_object_code,fiscal_year",,,,,2
+L,,,Missing key elements,,,"location_code,location_name,agency_code",,,,,1
+L,,,Duplicate,,,"location_code,agency_code",,,,,2
+O,,,Missing key elements,,,"object_class_code,object_class_name",,,,,1
+O,,,Duplicate,,,object_class_code,,,,,2
 F,H,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,1
 F,H,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,2
 F,H,,Missing vendor,,etl.stg_fms_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,3
