@@ -246,6 +246,13 @@ CREATE TABLE ref_business_type (
   created_date timestamp
 ) DISTRIBUTED BY (business_type_id);
 
+
+CREATE TABLE ref_business_type_status (
+  business_type_status_id smallint PRIMARY KEY ,
+  business_type_status varchar(50) ,
+  created_date timestamp
+) DISTRIBUTED BY (business_type_status_id);
+
 CREATE TABLE ref_commodity_type (
   commodity_type_id smallint PRIMARY KEY default nextval('seq_ref_commodity_type_commodity_type_id'),
   commodity_type_name varchar(50) ,
