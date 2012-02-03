@@ -36,7 +36,7 @@ create sequence seq_stg_location_uniq_id;
 create sequence seq_stg_object_class_uniq_id;
 
 CREATE TABLE ref_data_source (
-    data_source_code character(1),
+    data_source_code varchar(2),
     data_source_name character varying,
     document_type character varying,
     document_name character varying,
@@ -58,7 +58,7 @@ distributed by (data_source_code);
 CREATE TABLE etl_data_load (
     job_id bigint,
     load_id bigint default nextval('seq_etl_data_load_id'),
-    data_source_code CHAR(1),
+    data_source_code varchar(2),
     publish_start_time timestamp,
     publish_end_time timestamp,
     files_available_flag char(1))
