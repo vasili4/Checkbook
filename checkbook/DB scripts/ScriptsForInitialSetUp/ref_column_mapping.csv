@@ -91,7 +91,7 @@ etl.ext_stg_mag_data_feed,col90,varchar,etl.stg_mag_header,doc_appl_last_usid,va
 etl.ext_stg_mag_data_feed,col91,varchar,etl.stg_mag_header,doc_appl_last_dt,date,91
 etl.ext_stg_mag_data_feed,col92,varchar,etl.stg_mag_header,po_repl_dept_cd,varchar,92
 etl.ext_stg_mag_data_feed,col93,varchar,etl.stg_mag_header,po_repl_by_doc_cd,varchar,93
-etl.ext_stg_mag_data_feed,col94,varchar,etl.stg_mag_header,doc_func_cd,varchar,94
+etl.ext_stg_mag_data_feed,col94,varchar,etl.stg_mag_header,doc_func_cd,int,94
 etl.ext_stg_mag_data_feed,doc_cd,varchar,etl.stg_mag_award_detail,doc_cd,varchar,2
 etl.ext_stg_mag_data_feed,doc_dept_cd,varchar,etl.stg_mag_award_detail,doc_dept_cd,varchar,3
 etl.ext_stg_mag_data_feed,doc_id,varchar,etl.stg_mag_award_detail,doc_id,varchar,4
@@ -494,7 +494,7 @@ etl.ext_stg_con_data_feed,col108,varchar,etl.stg_con_ct_header,doc_appl_crea_dt,
 etl.ext_stg_con_data_feed,col109,varchar,etl.stg_con_ct_header,doc_appl_last_usid,varchar,109
 etl.ext_stg_con_data_feed,col110,varchar,etl.stg_con_ct_header,doc_appl_last_dt,date,110
 etl.ext_stg_con_data_feed,col111,varchar,etl.stg_con_ct_header,rl_fl_1,bpchar,111
-etl.ext_stg_con_data_feed,col112,varchar,etl.stg_con_ct_header,doc_func_cd,varchar,112
+etl.ext_stg_con_data_feed,col112,varchar,etl.stg_con_ct_header,doc_func_cd,int,112
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_ct_vendor,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_ct_vendor,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_ct_vendor,doc_id,varchar,4
@@ -931,7 +931,7 @@ etl.ext_stg_con_data_feed,col90,varchar,etl.stg_con_po_header,doc_appl_crea_dt,d
 etl.ext_stg_con_data_feed,col91,varchar,etl.stg_con_po_header,doc_appl_last_usid,varchar,91
 etl.ext_stg_con_data_feed,col92,varchar,etl.stg_con_po_header,doc_appl_last_dt,date,92
 etl.ext_stg_con_data_feed,col93,varchar,etl.stg_con_po_header,rl_fl_1,bpchar,93
-etl.ext_stg_con_data_feed,col94,varchar,etl.stg_con_po_header,doc_func_cd,varchar,94
+etl.ext_stg_con_data_feed,col94,varchar,etl.stg_con_po_header,doc_func_cd,int,94
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_po_award_detail,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_po_award_detail,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_po_award_detail,doc_id,varchar,4
@@ -1325,7 +1325,7 @@ etl.ext_stg_con_data_feed,col85,varchar,etl.stg_con_do1_header,doc_appl_crea_dt,
 etl.ext_stg_con_data_feed,col86,varchar,etl.stg_con_do1_header,doc_appl_last_usid,varchar,86
 etl.ext_stg_con_data_feed,col87,varchar,etl.stg_con_do1_header,doc_appl_last_dt,date,87
 etl.ext_stg_con_data_feed,col88,varchar,etl.stg_con_do1_header,rl_fl_1,bpchar,88
-etl.ext_stg_con_data_feed,col89,varchar,etl.stg_con_do1_header,doc_func_cd,varchar,89
+etl.ext_stg_con_data_feed,col89,varchar,etl.stg_con_do1_header,doc_func_cd,int,89
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_do1_vendor,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_do1_vendor,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_do1_vendor,doc_id,varchar,4
