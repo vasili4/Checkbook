@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>PROCESS_FILES</name>
+    <name>CONSUME_FILES</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -555,7 +555,7 @@ else
 display_type = &apos;F&apos;;
 }
 
-</jsScript_script>
+var consume_flag = &apos;Y&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>feed_type</name>
         <rename>feed_type</rename>
         <type>String</type>
@@ -564,6 +564,12 @@ display_type = &apos;F&apos;;
         <replace>N</replace>
       </field>      <field>        <name>display_type</name>
         <rename>display_type</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>consume_flag</name>
+        <rename>consume_flag</rename>
         <type>String</type>
         <length>-1</length>
         <precision>-1</precision>
@@ -674,6 +680,10 @@ display_type = &apos;F&apos;;
         <field>
           <column_name>display_type</column_name>
           <stream_name>display_type</stream_name>
+        </field>
+        <field>
+          <column_name>consume_flag</column_name>
+          <stream_name>consume_flag</stream_name>
         </field>
     </fields>
      <cluster_schema/>

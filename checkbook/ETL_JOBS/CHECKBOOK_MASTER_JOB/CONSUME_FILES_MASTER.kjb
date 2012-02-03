@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>NYC_Master</name>
+  <name>CONSUME_FILES_MASTER</name>
     <description/>
     <extended_description/>
     <job_version/>
+    <job_status>0</job_status>
   <directory>&#47;</directory>
   <created_user>-</created_user>
-  <created_date>2012&#47;01&#47;24 16:09:28.673</created_date>
+  <created_date>2012&#47;01&#47;31 12:02:57.679</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2012&#47;01&#47;24 16:09:28.673</modified_date>
+  <modified_date>2012&#47;01&#47;31 12:02:57.679</modified_date>
     <parameters>
     </parameters>
     <slaveservers>
@@ -50,48 +51,16 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>125</xloc>
-      <yloc>218</yloc>
+      <xloc>138</xloc>
+      <yloc>189</yloc>
       </entry>
     <entry>
-      <name>Set Job Id</name>
-      <description>Transformation</description>
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;Set_ETL_Jobid.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>300</xloc>
-      <yloc>218</yloc>
-      </entry>
-    <entry>
-      <name>INSERT_DATA_LOAD</name>
+      <name>Loop Transformation</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;INSERT_DATA_LOAD.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}&#47;LOOP_TRANSFORMATION.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -114,20 +83,20 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>465</xloc>
-      <yloc>214</yloc>
+      <xloc>330</xloc>
+      <yloc>189</yloc>
       </entry>
     <entry>
-      <name>CONSUME FILES MASTER</name>
+      <name>Consume Files</name>
       <description/>
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;CONSUME_FILES_MASTER.kjb</filename>
+      <filename>${Internal.Job.Filename.Directory}&#47;LOOP_CONSUME_FILES.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
+      <params_from_previous>Y</params_from_previous>
+      <exec_per_row>Y</exec_per_row>
       <set_logfile>N</set_logfile>
       <logfile/>
       <logext/>
@@ -140,59 +109,128 @@
       <create_parent_folder>N</create_parent_folder>
       <pass_export>N</pass_export>
       <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <set_append_logfile>N</set_append_logfile>
+            <parameter>            <name>loop_dummy</name>
+            <stream_name>dummy_value</stream_name>
+            <value/>
+            </parameter>      </parameters>      <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>685</xloc>
-      <yloc>214</yloc>
+      <xloc>487</xloc>
+      <yloc>190</yloc>
       </entry>
     <entry>
-      <name>Abort NYC MASTER  job</name>
+      <name>Abort CONSUME_FILES_MASTER  job</name>
       <description/>
       <type>ABORT</type>
       <message/>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>851</xloc>
-      <yloc>412</yloc>
+      <xloc>407</xloc>
+      <yloc>376</yloc>
       </entry>
     <entry>
-      <name>PROCESS FILES MASTER</name>
+      <name>ELIGIBLE_FOR_CONSUMPTION</name>
       <description/>
-      <type>JOB</type>
+      <type>TRANS</type>
       <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;PROCESS_FILES_MASTER.kjb</filename>
-      <jobname/>
+      <trans_object_id/>
+      <filename>${Internal.Job.Filename.Directory}&#47;ELIGIBLE_FOR_CONSUMPTION.ktr</filename>
+      <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
       <logfile/>
       <logext/>
       <add_date>N</add_date>
       <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
       <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
       <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <set_append_logfile>N</set_append_logfile>
-      <parallel>N</parallel>
+      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>945</xloc>
-      <yloc>214</yloc>
+      <xloc>678</xloc>
+      <yloc>190</yloc>
+      </entry>
+    <entry>
+      <name>BACKUP FILES</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${Internal.Job.Filename.Directory}&#47;BACKUP_FILES.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>859</xloc>
+      <yloc>186</yloc>
+      </entry>
+    <entry>
+      <name>DELETE GPDIST FILES</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${Internal.Job.Filename.Directory}&#47;DELETE_GPDIST_FILES.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>1043</xloc>
+      <yloc>186</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
       <from>START</from>
-      <to>Set Job Id</to>
+      <to>Loop Transformation</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -200,8 +238,8 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Set Job Id</from>
-      <to>INSERT_DATA_LOAD</to>
+      <from>Loop Transformation</from>
+      <to>Consume Files</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -209,17 +247,8 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>INSERT_DATA_LOAD</from>
-      <to>CONSUME FILES MASTER</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>CONSUME FILES MASTER</from>
-      <to>Abort NYC MASTER  job</to>
+      <from>Loop Transformation</from>
+      <to>Abort CONSUME_FILES_MASTER  job</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -227,8 +256,17 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>CONSUME FILES MASTER</from>
-      <to>PROCESS FILES MASTER</to>
+      <from>Consume Files</from>
+      <to>Abort CONSUME_FILES_MASTER  job</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>Consume Files</from>
+      <to>ELIGIBLE_FOR_CONSUMPTION</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -236,12 +274,21 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>PROCESS FILES MASTER</from>
-      <to>Abort NYC MASTER  job</to>
+      <from>ELIGIBLE_FOR_CONSUMPTION</from>
+      <to>BACKUP FILES</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
-      <evaluation>N</evaluation>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>BACKUP FILES</from>
+      <to>DELETE GPDIST FILES</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
   </hops>

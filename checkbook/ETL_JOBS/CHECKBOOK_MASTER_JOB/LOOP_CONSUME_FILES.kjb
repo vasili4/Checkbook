@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>NYC_Master</name>
+  <name>LOOP_CONSUME_FILES</name>
     <description/>
     <extended_description/>
     <job_version/>
+    <job_status>0</job_status>
   <directory>&#47;</directory>
   <created_user>-</created_user>
-  <created_date>2012&#47;01&#47;24 16:09:28.673</created_date>
+  <created_date>2012&#47;01&#47;31 11:34:05.659</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2012&#47;01&#47;24 16:09:28.673</modified_date>
+  <modified_date>2012&#47;01&#47;31 11:34:05.659</modified_date>
     <parameters>
     </parameters>
     <slaveservers>
@@ -50,48 +51,16 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>125</xloc>
-      <yloc>218</yloc>
+      <xloc>131</xloc>
+      <yloc>172</yloc>
       </entry>
     <entry>
-      <name>Set Job Id</name>
-      <description>Transformation</description>
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;Set_ETL_Jobid.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>300</xloc>
-      <yloc>218</yloc>
-      </entry>
-    <entry>
-      <name>INSERT_DATA_LOAD</name>
+      <name>CONSUME FILES</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;INSERT_DATA_LOAD.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}&#47;CONSUME_FILES.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -114,85 +83,57 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>465</xloc>
-      <yloc>214</yloc>
+      <xloc>359</xloc>
+      <yloc>172</yloc>
       </entry>
     <entry>
-      <name>CONSUME FILES MASTER</name>
+      <name>EXIT CONDITION</name>
       <description/>
-      <type>JOB</type>
+      <type>TRANS</type>
       <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;CONSUME_FILES_MASTER.kjb</filename>
-      <jobname/>
+      <trans_object_id/>
+      <filename>${Internal.Job.Filename.Directory}&#47;EXIT_CONDITION.ktr</filename>
+      <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
       <logfile/>
       <logext/>
       <add_date>N</add_date>
       <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
       <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
       <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <set_append_logfile>N</set_append_logfile>
-      <parallel>N</parallel>
+      </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>685</xloc>
-      <yloc>214</yloc>
+      <xloc>632</xloc>
+      <yloc>172</yloc>
       </entry>
     <entry>
-      <name>Abort NYC MASTER  job</name>
+      <name>Abort  LOOP_CONSUME_FILES job</name>
       <description/>
       <type>ABORT</type>
       <message/>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>851</xloc>
-      <yloc>412</yloc>
-      </entry>
-    <entry>
-      <name>PROCESS FILES MASTER</name>
-      <description/>
-      <type>JOB</type>
-      <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;PROCESS_FILES_MASTER.kjb</filename>
-      <jobname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <slave_server_name/>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <set_append_logfile>N</set_append_logfile>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>945</xloc>
-      <yloc>214</yloc>
+      <xloc>487</xloc>
+      <yloc>402</yloc>
       </entry>
   </entries>
   <hops>
     <hop>
       <from>START</from>
-      <to>Set Job Id</to>
+      <to>CONSUME FILES</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -200,8 +141,8 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Set Job Id</from>
-      <to>INSERT_DATA_LOAD</to>
+      <from>CONSUME FILES</from>
+      <to>EXIT CONDITION</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -209,17 +150,8 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>INSERT_DATA_LOAD</from>
-      <to>CONSUME FILES MASTER</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>CONSUME FILES MASTER</from>
-      <to>Abort NYC MASTER  job</to>
+      <from>CONSUME FILES</from>
+      <to>Abort  LOOP_CONSUME_FILES job</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -227,17 +159,8 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>CONSUME FILES MASTER</from>
-      <to>PROCESS FILES MASTER</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>PROCESS FILES MASTER</from>
-      <to>Abort NYC MASTER  job</to>
+      <from>EXIT CONDITION</from>
+      <to>Abort  LOOP_CONSUME_FILES job</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
