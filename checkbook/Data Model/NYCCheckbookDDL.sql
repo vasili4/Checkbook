@@ -105,7 +105,7 @@ CREATE TABLE etl_data_load (
 
  
 CREATE TABLE ref_data_source (
-  data_source_code varchar(1) ,
+  data_source_code varchar(2) ,
   description varchar(40) ,
   created_date timestamp 
 ) DISTRIBUTED BY (data_source_code);
@@ -254,7 +254,7 @@ CREATE TABLE ref_business_type_status (
 ) DISTRIBUTED BY (business_type_status_id);
 
 CREATE TABLE ref_commodity_type (
-  commodity_type_id smallint PRIMARY KEY default nextval('seq_ref_commodity_type_commodity_type_id'),
+  commodity_type_id smallint PRIMARY KEY,
   commodity_type_name varchar(50) ,
   created_date timestamp
 ) DISTRIBUTED BY (commodity_type_id);
@@ -556,7 +556,7 @@ CREATE TABLE ref_pay_type (
  ALTER TABLE  ref_pay_type ADD constraint fk_ref_pay_type_ref_payroll_object foreign key (payroll_object_id) references ref_payroll_object (payroll_object_id);
 
 CREATE TABLE ref_procurement_type (
-  procurement_type_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_procurement_type_procurement_type_id'),
+  procurement_type_id smallint ,
   procurement_type_name varchar(50) ,
   created_date timestamp
 ) DISTRIBUTED BY (procurement_type_id);
@@ -819,8 +819,8 @@ CREATE TABLE master_agreement (
   ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_8 foreign key (registered_date_id) references ref_date (date_id);
  
  
-CREATE TABLE agreement_commodity (
-    agreement_commodity_id bigint  PRIMARY KEY DEFAULT nextval('seq_agreement_commodity_agreement_commodity_id'::regclass) NOT NULL,
+CREATE TABLE all_agreement_commodity (
+    agreement_commodity_id bigint  DEFAULT nextval('seq_agreement_commodity_agreement_commodity_id'::regclass) NOT NULL,
     agreement_id bigint,
     line_number integer,
     master_agreement_yn character(1),
@@ -835,14 +835,14 @@ CREATE TABLE agreement_commodity (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (agreement_commodity_id);
+) distributed by (agreement_id);
 
 
  ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_ref_commodity_type foreign key (commodity_type_id) references ref_commodity_type (commodity_type_id);
  ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_etl_data_load foreign key (load_id) references etl_data_load (load_id);
 
-CREATE TABLE agreement_worksite (
-    agreement_worksite_id bigint  PRIMARY KEY DEFAULT nextval('seq_agreement_worksite_agreement_worksite_id'::regclass) NOT NULL,
+CREATE TABLE all_agreement_worksite (
+    agreement_worksite_id bigint DEFAULT nextval('seq_agreement_worksite_agreement_worksite_id'::regclass) NOT NULL,
     agreement_id bigint,
     worksite_id integer,
     percentage numeric(17,4),
@@ -851,7 +851,7 @@ CREATE TABLE agreement_worksite (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (agreement_worksite_id);
+) distributed by (agreement_id);
 
 
  ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_ref_commodity_type foreign key (worksite_id) references ref_worksite (worksite_id);
@@ -914,6 +914,7 @@ CREATE TABLE agreement (
     document_name character varying(60),
     original_term_begin_date_id smallint,
     original_term_end_date_id smallint,
+    privacy_flag char(1),
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
@@ -948,8 +949,8 @@ CREATE TABLE agreement (
 
  
 
-CREATE TABLE agreement_accounting_line (
-    agreement_accounting_line_id bigint  PRIMARY KEY DEFAULT nextval('seq_agreement_accounting_line_id'::regclass) NOT NULL,
+CREATE TABLE all_agreement_accounting_line (
+    agreement_accounting_line_id bigint DEFAULT nextval('seq_agreement_accounting_line_id'::regclass) NOT NULL,
     agreement_id bigint,
     line_number integer,
     event_type_id smallint,
@@ -969,7 +970,7 @@ CREATE TABLE agreement_accounting_line (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (agreement_accounting_line_id);
+) distributed by (agreement_id);
 
 
  ALTER TABLE  agreement_accounting_line ADD constraint fk_agreement_accounting_agreement foreign key (agreement_id) references agreement (agreement_id);
@@ -1259,3 +1260,29 @@ ALTER TABLE  fact_revenue ADD CONSTRAINT fk_fact_revenue_ref_revenue_source FORE
 ALTER TABLE  fact_revenue ADD CONSTRAINT fk_fact_revenue_revenue FOREIGN KEY (revenue_id) REFERENCES revenue(revenue_id);
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE history_master_agreement (LIKE master_agreement) DISTRIBUTED BY (master_agreement_id);
+CREATE TABLE all_master_agreement (LIKE master_agreement) DISTRIBUTED BY (master_agreement_id);
+CREATE TABLE history_all_master_agreement (LIKE master_agreement) DISTRIBUTED BY (master_agreement_id);
+
+
+CREATE TABLE history_agreement (LIKE agreement) DISTRIBUTED BY (agreement_id);
+CREATE TABLE all_agreement (LIKE agreement) DISTRIBUTED BY (agreement_id);
+CREATE TABLE history_all_agreement (LIKE agreement) DISTRIBUTED BY (agreement_id);
+
+CREATE TABLE agreement_accounting_line (LIKE all_agreement_accounting_line) DISTRIBUTED BY (agreement_id);
+CREATE TABLE history_agreement_accounting_line (LIKE agreement_accounting_line) DISTRIBUTED BY (agreement_id);
+CREATE TABLE history_all_agreement_accounting_line (LIKE agreement_accounting_line) DISTRIBUTED BY (agreement_id);
+ALTER TABLE history_all_agreement_accounting_line alter COLUMN agreement_accounting_line_id SET DEFAULT NEXTVAL('seq_agreement_accounting_line_id');
+
+
+CREATE TABLE agreement_commodity (LIKE all_agreement_commodity) DISTRIBUTED BY (agreement_id);
+CREATE TABLE history_agreement_commodity (LIKE agreement_commodity) DISTRIBUTED BY (agreement_id);
+CREATE TABLE history_all_agreement_commodity (LIKE agreement_commodity) DISTRIBUTED BY (agreement_id);
+ALTER TABLE history_all_agreement_commodity alter COLUMN agreement_commodity_id SET DEFAULT NEXTVAL('seq_agreement_commodity_agreement_commodity_id');
+
+
+CREATE TABLE agreement_worksite (LIKE all_agreement_worksite) DISTRIBUTED BY (agreement_id);
+CREATE TABLE history_agreement_worksite (LIKE agreement_worksite) DISTRIBUTED BY (agreement_id);
+CREATE TABLE history_all_agreement_worksite (LIKE agreement_worksite) DISTRIBUTED BY (agreement_id);
+ALTER TABLE history_all_agreement_worksite alter COLUMN agreement_worksite_id SET DEFAULT NEXTVAL('seq_agreement_worksite_agreement_worksite_id');
