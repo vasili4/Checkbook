@@ -204,6 +204,7 @@ BEGIN
 		      FROM   etl.ref_data_source a, etl.ref_validation_rule b
 		      WHERE  a.data_source_code = b.data_source_code
 			     AND COALESCE(a.record_identifier,'')=COALESCE(b.record_identifier,'')
+			     AND COALESCE(a.document_type,'')=COALESCE(b.document_type,'')
 		      	     AND a.data_source_code=l_data_source_code
 		      	     AND a.table_order>1
 		      ORDER BY b.rule_order
@@ -263,9 +264,13 @@ BEGIN
 				l_update_str := 'UPDATE '|| l_rule.staging_table_name ||
 						' SET invalid_flag = ''Y'', ' ||
 						'	invalid_reason =''' || l_rule.rule_name || ''' ' ||
-						' WHERE uniq_id IN (' || l_all_uniq_id || ')' || 
-						' AND uniq_id NOT IN (' || l_min_uniq_id || ')';
+						' WHERE uniq_id IN (' || l_all_uniq_id || ')' ;						
 
+				-- Retain the least record for duplicates
+				IF l_rule.rule_name ='Duplicate' THEN
+					l_update_str := l_update_str || 
+							' AND uniq_id NOT IN (' || l_min_uniq_id || ')';
+				END IF;
 				RAISE NOTICE 'l_update_str %',l_update_str;
 				
 				EXECUTE l_update_str;		
@@ -284,21 +289,6 @@ BEGIN
 
 				
 				RAISE NOTICE 'Inside invalid check 1.1';
-				/*l_select_str :=  ' select array_to_string( ' || 
-						 '	 array( ' || 
-						 '		select (case when staging_data_type =''varchar'' then '' coalesce(''||staging_column_name||'','''''''') '' ' || 
-						 '			    when staging_data_type =''int'' or staging_data_type like ''numeric%'' then '' coalesce(''||staging_column_name||'',0) '' ' || 
-						 '			    when staging_data_type =''date'' then '' coalesce(''||staging_column_name||'',''''2000-01-01'''') '' ' || 
-						 '		       end) as sql_condition ' || 
-						 '		from etl.ref_column_mapping ' || 
-						 '		where staging_table_name = ''' || l_rule.staging_table_name||''' ' ||
-						 '			AND staging_column_name IN (''' || replace(l_rule.staging_column_name,',',''',''') ||''' )' ||
-						 '		order by column_order )  ,''|| ''''~'''' ||'') ';
-
-				RAISE notice 'l_select_str %',l_select_str;
-				EXECUTE l_select_str INTO l_where_clause;
-				RAISE notice 'where %',l_where_clause;
-				*/
 				
 				l_select_str :=  ' select array_to_string( ' || 
 						 '	 array( ' || 
@@ -309,16 +299,11 @@ BEGIN
 						 '		from etl.ref_column_mapping ' || 
 						 '		where staging_table_name = ''' || l_rule.staging_table_name||''' ' ||
 						 '			AND staging_column_name IN (''' || replace(l_rule.staging_column_name,',',''',''') ||''' )' ||
-						 '		order by column_order )  ,''|| ''''~'''' ||'') ';
+						 '		order by column_order )  ,''AND'') ';
 
 				-- RAISE notice 'l_select_str %',l_select_str;
 				EXECUTE l_select_str INTO l_where_clause;
 				-- RAISE notice 'where %',l_where_clause;		
-
-				/*l_where_clause := l_where_clause || '  IN (SELECT ' || l_where_clause || 
-									     ' FROM ' || COALESCE( l_rule.parent_table_name,l_rule.component_table_name) || 
-									     ' WHERE invalid_flag = ''Y'' and invalid_reason <> ''Duplicate'') ';
-				*/
 				
 				l_insert_str := 'INSERT INTO tmp_invalid_uniq_id(uniq_id) '||
 						' SELECT a.uniq_id ' ||
@@ -334,7 +319,16 @@ BEGIN
 			ELSIF COALESCE(l_rule.ref_table_name,'') <> '' THEN
 				RAISE NOTICE 'Inside invalid check 1.2';
 				-- Invalid values (Not in the reference table )
-				l_where_clause := l_rule.staging_column_name || ' NOT IN (SELECT ' || l_rule.ref_column_name || 
+
+				l_select_str :=  ' SELECT (CASE WHEN staging_data_type = ''varchar'' THEN ''COALESCE(''||staging_column_name||'','''''''') <> '''''''' '' '||
+						 '	WHEN staging_data_type = ''int'' THEN ''COALESCE('' || staging_column_name || '',0) <> 0 ''   END) '||
+						 '	FROM etl.ref_column_mapping '||
+						 '	WHERE staging_table_name=''' || l_rule.staging_table_name || ''' '||
+						 '	AND staging_column_name=''' || l_rule.staging_column_name || ''' '; 
+
+				EXECUTE l_select_str INTO l_where_clause;
+							
+				l_where_clause := l_where_clause || ' AND ' || l_rule.staging_column_name || ' NOT IN (SELECT ' || l_rule.ref_column_name || 
 										'	  FROM ' || l_rule.ref_table_name || ' ) ';
 
 				l_insert_str := 'INSERT INTO tmp_invalid_uniq_id(uniq_id) '||
@@ -372,19 +366,7 @@ BEGIN
 
 			EXECUTE 'TRUNCATE tmp_invalid_uniq_id ';
 
-			/*
-			l_select_str :=  ' select array_to_string( ' || 
-					 '	 array( ' || 
-					 '		select (case when staging_data_type =''varchar'' then '' coalesce(''||staging_column_name||'','''''''') '' ' || 
-					 '			    when staging_data_type =''int'' or staging_data_type like ''numeric%'' then '' coalesce(''||staging_column_name||'',0) '' ' || 
-					 '			    when staging_data_type =''date'' then '' coalesce(''||staging_column_name||'',''''2000-01-01'''') '' ' || 
-					 '		       end) as sql_condition ' || 
-					 '		from etl.ref_column_mapping ' || 
-					 '		where staging_table_name = ''' || l_rule.staging_table_name||''' ' ||
-					 '			AND staging_column_name IN (''' || replace(l_rule.staging_column_name,',',''',''') ||''' )' ||
-					 '		order by column_order )  ,''|| ''''~'''' ||'') ';
-			*/
-			
+
 			l_select_str :=  ' select array_to_string( ' || 
 					 '	 array( ' || 
 					 '		select (case when staging_data_type =''varchar'' then '' coalesce(a.''||staging_column_name||'','''''''') =coalesce(b.''||staging_column_name||'','''''''') '' ' || 
@@ -401,11 +383,6 @@ BEGIN
 			EXECUTE l_select_str INTO l_where_clause;
 			 --RAISE notice 'where %',l_where_clause;
 			
-
-			/* l_where_clause := l_where_clause || ' NOT IN (SELECT ' || l_where_clause || 
-								     ' FROM ' || COALESCE( l_rule.parent_table_name,l_rule.component_table_name) || ')';
-			
-			*/
 			
 			l_insert_str := 'INSERT INTO tmp_invalid_uniq_id(uniq_id) '||
 					' SELECT a.uniq_id ' ||
@@ -413,11 +390,6 @@ BEGIN
 					' ON ' || l_where_clause || 
 					' WHERE b.uniq_id IS NULL ';
 						
-			/* l_insert_str := 'INSERT INTO tmp_invalid_uniq_id(uniq_id) '||
-					' SELECT uniq_id ' ||
-					' FROM ' || l_rule.staging_table_name ||
-					' WHERE COALESCE(invalid_flag,'''')='''' AND ' || l_where_clause ;		
-			*/
 			
 			RAISE notice 'l_insert_str %',l_insert_str;		
 			EXECUTE l_insert_str;
@@ -508,6 +480,7 @@ EXCEPTION
 END;
 $$ language plpgsql;
 
+
 -----------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION etl.processdata(p_load_file_id_in int) RETURNS INT AS $$
@@ -542,6 +515,8 @@ BEGIN
 	ELSIF 	l_data_source_code ='V' THEN
 		l_processed := etl.processFMSVVendor(p_load_file_id_in,l_load_id);	
 
+	ELSIF 	l_data_source_code ='C' THEN
+		l_processed := etl.processCon(p_load_file_id_in,l_load_id);
 		
 	END IF;
 	
@@ -1405,7 +1380,7 @@ BEGIN
 			AND ((a.file_timestamp::timestamp >= l_timestamp::timestamp) OR 
 			      l_timestamp IS NULL);
 			      
-	-- Update consume_flag to N for the FMSV files which are not with the latest timestamp
+	-- Update consume_flag to 'Y' for the FMSV files which have to be consumed
 	
 	UPDATE etl.etl_data_load_file a
 	SET    consume_flag ='Y'
@@ -1418,6 +1393,7 @@ END;
 $$ language plpgsql;
 
 
+
 SELECT b.load_id,a.data_source_code,c.file_name,(CASE WHEN type_of_feed = 'M' THEN 1 
 						      WHEN type_of_feed = 'W' THEN 2
 						      WHEN type_of_feed = 'D' THEN 3 END ) file_order, file_timestamp
@@ -1426,4 +1402,4 @@ FROM etl.ref_data_source a JOIN etl.etl_data_load b ON a.data_source_code = b.da
 WHERE b.job_id = 1 
 	AND  table_order=1
 	AND consume_flag='Y'
-ORDER BY a.data_source_order, 3,file_timestamp;
+ORDER BY a.data_source_order, 4,file_timestamp;
