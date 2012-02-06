@@ -1,3 +1,15 @@
+/*
+Functions defined
+
+	updateForeignKeysForCTInHeader
+	updateForeignKeysForCTInAwardDetail
+	associateMAGToCT
+	updateForeignKeysForCTVendors
+	updateForeignKeysForCTInAccLine
+	processCONGeneralContracts
+	processCon
+
+*/
 set search_path=etl;
 
 CREATE OR REPLACE FUNCTION updateForeignKeysForCTInHeader() RETURNS INT AS $$
@@ -1094,6 +1106,18 @@ BEGIN
 	
 	l_status := etl.processCONGeneralContracts(p_load_file_id_in,p_load_id_in);
 	
+	IF l_status = 1 THEN 
+		l_status := etl.processCONDeliveryOrders(p_load_file_id_in,p_load_id_in);
+	ELSE 
+		RETURN 0;
+	END IF;	
+	
+	IF l_status = 1 THEN 
+			l_status := etl.processCONPurchaseOrder(p_load_file_id_in,p_load_id_in);
+		ELSE 
+			RETURN 0;
+	END IF;	
+		
 	RETURN 1;
 	
 EXCEPTION

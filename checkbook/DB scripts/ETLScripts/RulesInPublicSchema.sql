@@ -1,3 +1,6 @@
+/* Rules on all_agreement_rule & history_all_agreement_rule 
+   Insert and update rules
+*/
 CREATE RULE all_agreement_rule AS ON INSERT TO all_agreement
 WHERE privacy_flag ='F'
 DO ALSO INSERT INTO agreement(agreement_id,master_agreement_id,document_code_id,
@@ -76,26 +79,6 @@ DO ALSO INSERT INTO history_agreement(agreement_id,master_agreement_id,document_
 		original_contract_amount,new.registered_date_id,new.oca_number,new.
 		number_solicitation,new.document_name,new.original_term_begin_date_id,new.
 		original_term_end_date_id,new.privacy_flag,new.load_id,new.created_date);
-
-
-CREATE RULE all_agreement_acc_line_del_rule AS ON DELETE TO all_agreement_accounting_line
-DO ALSO DELETE FROM agreement_accounting_line WHERE agreement_id = old.agreement_id;
-
-CREATE RULE hist_all_agreement_acc_line_del_rule AS ON DELETE TO history_all_agreement_accounting_line
-DO ALSO DELETE FROM history_agreement_accounting_line WHERE agreement_id = old.agreement_id;
-			
-
-CREATE RULE all_agreement_worksite_del_rule AS ON DELETE TO all_agreement_worksite
-DO ALSO DELETE FROM agreement_worksite WHERE agreement_id = old.agreement_id;
-
-CREATE RULE hist_all_agreement_worksite_del_rule AS ON DELETE TO history_all_agreement_worksite
-DO ALSO DELETE FROM history_agreement_worksite WHERE agreement_id = old.agreement_id;
-
-CREATE RULE all_agreement_commodity_del_rule AS ON DELETE TO all_agreement_commodity
-DO ALSO DELETE FROM agreement_commodity WHERE agreement_id = old.agreement_id;
-
-CREATE RULE hist_all_agreement_commodity_del_rule AS ON DELETE TO history_all_agreement_commodity
-DO ALSO DELETE FROM history_agreement_commodity WHERE agreement_id = old.agreement_id;
 
 CREATE RULE hist_all_agreement_upd_rule_1 AS ON UPDATE TO history_all_agreement
 DO ALSO UPDATE history_agreement SET 
@@ -269,4 +252,46 @@ DO ALSO UPDATE agreement SET
 				privacy_flag = new.privacy_flag,
 				load_id = new.load_id,
 				updated_date = new.updated_date
-			WHERE agreement_id =new.agreement_id;				
+			WHERE agreement_id =new.agreement_id;	
+			
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Rules on all_agreement_accounting_line & history_all_agreement_accounting_line 
+   Delete rule
+*/
+
+CREATE RULE all_agreement_acc_line_del_rule AS ON DELETE TO all_agreement_accounting_line
+DO ALSO DELETE FROM agreement_accounting_line WHERE agreement_id = old.agreement_id;
+
+CREATE RULE hist_all_agreement_acc_line_del_rule AS ON DELETE TO history_all_agreement_accounting_line
+DO ALSO DELETE FROM history_agreement_accounting_line WHERE agreement_id = old.agreement_id;
+			
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Rules on all_agreement_worksite & history_all_agreement_worksite 
+   Delete rule
+*/
+
+CREATE RULE all_agreement_worksite_del_rule AS ON DELETE TO all_agreement_worksite
+DO ALSO DELETE FROM agreement_worksite WHERE agreement_id = old.agreement_id;
+
+CREATE RULE hist_all_agreement_worksite_del_rule AS ON DELETE TO history_all_agreement_worksite
+DO ALSO DELETE FROM history_agreement_worksite WHERE agreement_id = old.agreement_id;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Rules on all_agreement_commodity & history_all_agreement_commodity 
+   Delete rule
+*/
+
+
+CREATE RULE all_agreement_commodity_del_rule AS ON DELETE TO all_agreement_commodity
+DO ALSO DELETE FROM agreement_commodity WHERE agreement_id = old.agreement_id;
+
+CREATE RULE hist_all_agreement_commodity_del_rule AS ON DELETE TO history_all_agreement_commodity
+DO ALSO DELETE FROM history_agreement_commodity WHERE agreement_id = old.agreement_id;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+			
