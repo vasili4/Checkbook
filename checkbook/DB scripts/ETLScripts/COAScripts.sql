@@ -33,8 +33,8 @@ BEGIN
 	FROM   tmp_ref_agency
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id)
-	SELECT a.agency_id,b.agency_code,b.agency_name,now()::timestamp,p_load_id_in
+	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
+	SELECT a.agency_id,b.agency_code,b.agency_name,now()::timestamp,p_load_id_in,b.agency_name
 	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id;
 	
 	-- Generate the agency history id for history records
@@ -60,7 +60,9 @@ BEGIN
 	UPDATE ref_agency a
 	SET	agency_name = b.agency_name,
 		updated_date = now()::timestamp,
-		updated_load_id = p_load_id_in
+		updated_load_id = p_load_id_in,
+		original_agency_name = (CASE WHEN COALESCE(a.original_agency_name,'')='' THEN b.agency_name 
+						ELSE a.original_agency_name END)
 	FROM	tmp_ref_agency_1 b		
 	WHERE	a.agency_id = b.agency_id;
 
@@ -209,8 +211,8 @@ BEGIN
 	FROM   tmp_ref_department
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_department(department_id,department_code,department_name,agency_id,fund_class_id,fiscal_year,created_date,created_load_id)
-	SELECT a.department_id,b.department_code,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
+	INSERT INTO ref_department(department_id,department_code,department_name,agency_id,fund_class_id,fiscal_year,created_date,created_load_id,original_department_name)
+	SELECT a.department_id,b.department_code,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id;
 
 	RAISE NOTICE '3.3';
@@ -291,8 +293,8 @@ BEGIN
 	FROM   tmp_ref_expenditure_object
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_expenditure_object(expenditure_object_id,expenditure_object_code,expenditure_object_name,fiscal_year,created_date,created_load_id)
-	SELECT a.expenditure_object_id,b.expenditure_object_code,b.expenditure_object_name,fiscal_year,now()::timestamp,p_load_id_in
+	INSERT INTO ref_expenditure_object(expenditure_object_id,expenditure_object_code,expenditure_object_name,fiscal_year,created_date,created_load_id,original_expenditure_object_name)
+	SELECT a.expenditure_object_id,b.expenditure_object_code,b.expenditure_object_name,fiscal_year,now()::timestamp,p_load_id_in,b.expenditure_object_name
 	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_ref_expenditure_object b ON a.uniq_id = b.uniq_id;
 	
 	-- Generate the expenditure_object history id for history records
@@ -430,8 +432,8 @@ BEGIN
 	FROM   tmp_ref_location
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_location(location_id,location_code,location_name,agency_id,location_short_name,created_date,created_load_id)
-	SELECT a.location_id,b.location_code,b.location_name,b.agency_id,b.location_short_name,now()::timestamp,p_load_id_in
+	INSERT INTO ref_location(location_id,location_code,location_name,agency_id,location_short_name,created_date,created_load_id,original_location_name)
+	SELECT a.location_id,b.location_code,b.location_name,b.agency_id,b.location_short_name,now()::timestamp,p_load_id_in,b.location_name
 	FROM   etl.ref_location_id_seq a JOIN tmp_ref_location b ON a.uniq_id = b.uniq_id;
 
 	RAISE NOTICE '3.3';
@@ -514,11 +516,11 @@ BEGIN
 	INSERT INTO ref_object_class(object_class_id,object_class_code,object_class_name,object_class_short_name,
 				     active_flag, effective_begin_date_id, effective_end_date_id, budget_allowed_flag, description,
 				     source_updated_date,intra_city_flag,contracts_positions_flag,payroll_type,extended_description,
-				     related_object_class_code,created_date,created_load_id)
+				     related_object_class_code,created_date,created_load_id,original_object_class_name)
 	SELECT a.object_class_id,b.object_class_code,b.object_class_name,c.short_name,
 		act_fl, d.date_id, e.date_id, alw_bud_fl, c.description,
 		c.tbl_last_dt,intr_cty_fl,cntrc_pos_fl,c.pyrl_typ,c.dscr_ext,
-		c.rltd_ocls_cd,now()::timestamp,p_load_id_in
+		c.rltd_ocls_cd,now()::timestamp,p_load_id_in,b.object_class_name
 	FROM   etl.ref_object_class_id_seq a JOIN tmp_ref_object_class b ON a.uniq_id = b.uniq_id
 		JOIN etl.stg_object_class c ON b.uniq_id = c.uniq_id
 		LEFT JOIN ref_date d ON c.effective_begin_date::date = d.date
