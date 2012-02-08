@@ -305,22 +305,24 @@ BEGIN
 	SELECT uniq_id
 	FROM  tmp_new_ct_mag_con;
 	
-	INSERT INTO all_master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version)
-	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,0 as document_version
+	INSERT INTO all_master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag)
+	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,0 as document_version,'F' as privacy_flag
 	FROM	tmp_new_ct_mag_con a JOIN etl.agreement_id_seq b ON a.uniq_id = b.uniq_id;
 	
-	INSERT INTO history_all_master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version)
-	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,0 as document_version
+	INSERT INTO history_all_master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag)
+	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,0 as document_version,'F' as privacy_flag
 	FROM	tmp_new_ct_mag_con a JOIN etl.agreement_id_seq b ON a.uniq_id = b.uniq_id;	
 	
+	/* Rule covers this
 	INSERT INTO master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version)
 	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,0 as document_version
 	FROM	tmp_new_ct_mag_con a JOIN etl.agreement_id_seq b ON a.uniq_id = b.uniq_id;
 	
+	
 	INSERT INTO history_master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version)
 	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,0 as document_version
 	FROM	tmp_new_ct_mag_con a JOIN etl.agreement_id_seq b ON a.uniq_id = b.uniq_id;
-	
+	*/
 	
 	-- Updating the newly created MAG identifier.
 	
@@ -690,7 +692,8 @@ BEGIN
 	UPDATE tmp_ct_con a
 	SET	agreement_id = b.agreement_id,
 		action_flag = b.action_flag,
-		latest_flag = b.latest_flag
+		latest_flag = b.latest_flag,
+		privacy_flag='F'
 	FROM	tmp_new_ct_con b
 	WHERE	a.uniq_id = b.uniq_id;
 	
