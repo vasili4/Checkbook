@@ -1,6 +1,6 @@
 Data_source_code,Data_source_name,document_type,document_name,record_identifier,record_type_name,staging_table_name,etl.archive_table_name,etl.invalid_table_name,Table_order,Data_source_order
-A,COA - Agency,,,,,etl.ext_stg_coa_agency_feed,,,1,1
-A,COA - Agency,,,,,etl.stg_agency,etl.archive_agency,etl.invalid_agency,2,1
+A,COA - Agency,,,,,etl.ext_stg_coa_agency_feed,,,1,0
+A,COA - Agency,,,,,etl.stg_agency,etl.archive_agency,etl.invalid_agency,2,0
 D,COA - Department,,,,,etl.ext_stg_coa_department_feed,,,1,1
 D,COA - Department,,,,,etl.stg_department,etl.archive_department,etl.invalid_department,2,1
 E,COA - Expenditure Object,,,,,etl.ext_stg_coa_expenditure_object_feed,,,1,1
@@ -43,3 +43,5 @@ P,PMS,,,,,etl.stg_payroll_summary,etl.archive_payroll_summary,etl.invalid_payrol
 R,Revenue,,,,,etl.ext_stg_revenue,,,1,2
 R,Revenue,,,,,etl.stg_revenue,etl.archive_revenue,etl.invalid_revenue,2,2
 B,Budget,,,,,etl.ext_stg_budget,etl.archive_budget,etl.invalid_budget,4,2
+RY,Revenue-Category,,,,,etl.ext_stg_coa_revenue_category_feed,,,1,1
+RY,Revenue-Category,,,,,etl.stg_revenue_category,etl.archive_revenue_category,etl.invalid_revenue_category,2,1
