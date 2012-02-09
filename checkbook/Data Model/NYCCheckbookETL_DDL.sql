@@ -34,6 +34,7 @@ create sequence seq_stg_revenue_uniq_id;
 create sequence seq_stg_expenditure_object_uniq_id;
 create sequence seq_stg_location_uniq_id;
 create sequence seq_stg_object_class_uniq_id;
+CREATE SEQUENCE seq_etl_job_id;
 
 CREATE TABLE ref_data_source (
     data_source_code varchar(2),
@@ -52,7 +53,8 @@ CREATE TABLE ref_data_source (
 CREATE TABLE ref_file_name_pattern (
 	data_source_code character(1),
 	directory_listing_pattern character varying,
-	actual_pattern character varying)
+	actual_pattern character varying,
+	standard_file_name character varying)
 distributed by (data_source_code);	
 	
 CREATE TABLE etl_data_load (
@@ -62,7 +64,7 @@ CREATE TABLE etl_data_load (
     publish_start_time timestamp,
     publish_end_time timestamp,
     files_available_flag char(1))
-DISTRIBUTED BY (job_id);
+DISTRIBUTED BY (load_id);
 
 CREATE TABLE etl_data_load_file (
     load_file_id bigint default nextval('seq_etl_data_load_file_id'),
@@ -88,7 +90,7 @@ CREATE TABLE ref_column_mapping (
 
     
 CREATE TABLE ref_validation_rule (
-    data_source_code character(1),
+    data_source_code varchar(2),
     record_identifier character(1),
     document_type character varying,
     rule_name character varying,
@@ -497,10 +499,25 @@ CREATE TABLE stg_mag_header(doc_cd varchar(8),
 	po_repl_dept_cd varchar(4),
 	po_repl_by_doc_cd varchar(8),
 	doc_func_cd  integer,
+	document_code_id smallint,
+	agency_history_id smallint,
+	award_status_id smallint,
+	document_function_code_id smallint, 
+	record_date_id smallint,
+	procurement_type_id smallint,
+	effective_begin_date_id smallint,
+	effective_end_date_id smallint,
+	source_created_date_id smallint,
+	source_updated_date_id smallint,
+	registered_date_id smallint, 
+	original_term_begin_date_id smallint,
+	original_term_end_date_id smallint,		
+	board_approved_award_date_id smallint,
 	uniq_id bigint default nextval('seq_stg_mag_header_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar	
-	);
+	)
+DISTRIBUTED BY (uniq_id)	;
 	
 CREATE TABLE stg_mag_award_detail(doc_cd varchar(8),
 	doc_dept_cd varchar(4),
@@ -569,9 +586,18 @@ CREATE TABLE stg_mag_award_detail(doc_cd varchar(8),
 	percent_08 decimal(17,4),
 	percent_09 decimal(17,4),
 	percent_10 decimal(17,4),
+	award_method_id smallint,
+	award_level_id smallint,
+	agreement_type_id smallint,
+	award_category_id_1 smallint,
+	award_category_id_2 smallint, 
+	award_category_id_3 smallint, 
+	award_category_id_4 smallint,
+	award_category_id_5 smallint,		
 	uniq_id bigint default nextval('seq_stg_mag_award_detail_uniq_id'),
 	invalid_flag char(1),
-	invalid_reason varchar	);	
+	invalid_reason varchar	)
+DISTRIBUTED BY (uniq_id)	;	
 	
 CREATE TABLE stg_mag_vendor(doc_cd varchar(8),
 	doc_dept_cd varchar(4),
@@ -613,9 +639,11 @@ CREATE TABLE stg_mag_vendor(doc_cd varchar(8),
 	disc_alw_2_fl char(1),
 	disc_alw_3_fl char(1),
 	disc_alw_4_fl char(1),
+	vendor_history_id bigint,
 	uniq_id bigint default nextval('seq_stg_mag_vendor_uniq_id'),
 	invalid_flag char(1),
-	invalid_reason varchar	);	
+	invalid_reason varchar	)
+DISTRIBUTED BY (uniq_id)	;	
 	
 CREATE TABLE stg_mag_commodity(
 	doc_cd varchar(8),
@@ -725,9 +753,11 @@ CREATE TABLE stg_mag_commodity(
 	percent_09 decimal(17,4),
 	wk_site_cd_10 varchar(3),
 	percent_10 decimal(17,4),
+	commodity_type_id smallint,
 	uniq_id bigint default nextval('seq_stg_mag_commodity_uniq_id'),
 	invalid_flag char(1),
-	invalid_reason varchar	);	
+	invalid_reason varchar	)
+DISTRIBUTED BY (uniq_id)	;	
 
 CREATE TABLE archive_mag_header (LIKE stg_mag_header) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_mag_header ADD COLUMN load_id bigint;
