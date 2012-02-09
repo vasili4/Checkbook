@@ -114,6 +114,7 @@ CREATE TABLE ref_agency (
     agency_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_agency_agency_id'::regclass) NOT NULL,
     agency_code character varying(20),
     agency_name character varying(50),
+    original_agency_name character varying(50),
     created_date timestamp without time zone,
     updated_date timestamp,
     created_load_id integer,
@@ -136,7 +137,8 @@ CREATE TABLE ref_agency_history (
 
 CREATE TABLE ref_date(
   date_id    smallint PRIMARY KEY default nextval('seq_ref_date_date_id'),
-  date	     DATE
+  date	     DATE,
+  nyc_year   smallint
  );
   
  
@@ -154,6 +156,7 @@ CREATE TABLE ref_department (
     agency_id smallint,
     fund_class_id smallint,
     fiscal_year smallint,
+    original_department_name character varying(50),
     created_date timestamp without time zone,
     updated_date timestamp,
     created_load_id integer,
@@ -328,6 +331,7 @@ CREATE TABLE ref_expenditure_object (
   expenditure_object_code varchar(4) ,
   expenditure_object_name varchar(40) ,
   fiscal_year smallint ,
+  original_expenditure_object_name varchar(40) ,
   created_date timestamp ,
     updated_date timestamp,
     created_load_id integer,
@@ -399,6 +403,7 @@ CREATE TABLE ref_location (
     agency_id smallint,
     location_name character varying(60),
     location_short_name character varying(16),
+    original_location_name character varying(60),
     created_date timestamp without time zone,
     updated_date timestamp,
     created_load_id integer,
@@ -448,6 +453,7 @@ CREATE TABLE ref_object_class (
     payroll_type integer,
     extended_description character varying,
     related_object_class_code character varying(4),
+    original_object_class_name character varying(60),
     created_date timestamp without time zone,
     updated_date timestamp,
     created_load_id integer,
@@ -556,7 +562,7 @@ CREATE TABLE ref_pay_type (
  ALTER TABLE  ref_pay_type ADD constraint fk_ref_pay_type_ref_payroll_object foreign key (payroll_object_id) references ref_payroll_object (payroll_object_id);
 
 CREATE TABLE ref_procurement_type (
-  procurement_type_id smallint ,
+  procurement_type_id smallint PRIMARY KEY ,
   procurement_type_name varchar(50) ,
   created_date timestamp
 ) DISTRIBUTED BY (procurement_type_id);
@@ -788,6 +794,7 @@ CREATE TABLE master_agreement (
     contract_class_code character varying(2),
     number_solicitation integer,
     document_name character varying(60),
+    privacy_flag char(1),
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
@@ -838,9 +845,7 @@ CREATE TABLE all_agreement_commodity (
 ) distributed by (agreement_id);
 
 
- ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_ref_commodity_type foreign key (commodity_type_id) references ref_commodity_type (commodity_type_id);
- ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_etl_data_load foreign key (load_id) references etl_data_load (load_id);
-
+ 
 CREATE TABLE all_agreement_worksite (
     agreement_worksite_id bigint DEFAULT nextval('seq_agreement_worksite_agreement_worksite_id'::regclass) NOT NULL,
     agreement_id bigint,
@@ -854,9 +859,7 @@ CREATE TABLE all_agreement_worksite (
 ) distributed by (agreement_id);
 
 
- ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_ref_commodity_type foreign key (worksite_id) references ref_worksite (worksite_id);
- ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_etl_data_load foreign key (load_id) references etl_data_load (load_id);
-
+ 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /* CON data feed */
@@ -971,20 +974,6 @@ CREATE TABLE all_agreement_accounting_line (
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (agreement_id);
-
-
- ALTER TABLE  agreement_accounting_line ADD constraint fk_agreement_accounting_agreement foreign key (agreement_id) references agreement (agreement_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_etl_data_load FOREIGN KEY (load_id) REFERENCES etl_data_load(load_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_budget_code FOREIGN KEY (budget_code_id) REFERENCES ref_budget_code(budget_code_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_event_type FOREIGN KEY (event_type_id) REFERENCES ref_event_type(event_type_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_acc_line_ref_exp_object_history FOREIGN KEY (expenditure_object_history_id) REFERENCES ref_expenditure_object_history(expenditure_object_history_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_fund_class FOREIGN KEY (fund_class_id) REFERENCES ref_fund_class(fund_class_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
-
- 
-
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE disbursement (
@@ -1286,3 +1275,19 @@ CREATE TABLE agreement_worksite (LIKE all_agreement_worksite) DISTRIBUTED BY (ag
 CREATE TABLE history_agreement_worksite (LIKE agreement_worksite) DISTRIBUTED BY (agreement_id);
 CREATE TABLE history_all_agreement_worksite (LIKE agreement_worksite) DISTRIBUTED BY (agreement_id);
 ALTER TABLE history_all_agreement_worksite alter COLUMN agreement_worksite_id SET DEFAULT NEXTVAL('seq_agreement_worksite_agreement_worksite_id');
+
+ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_ref_commodity_type foreign key (commodity_type_id) references ref_commodity_type (commodity_type_id);
+ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+
+ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_ref_commodity_type foreign key (worksite_id) references ref_worksite (worksite_id);
+ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+
+ ALTER TABLE  agreement_accounting_line ADD constraint fk_agreement_accounting_agreement foreign key (agreement_id) references agreement (agreement_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_etl_data_load FOREIGN KEY (load_id) REFERENCES etl_data_load(load_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_budget_code FOREIGN KEY (budget_code_id) REFERENCES ref_budget_code(budget_code_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_event_type FOREIGN KEY (event_type_id) REFERENCES ref_event_type(event_type_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_acc_line_ref_exp_object_history FOREIGN KEY (expenditure_object_history_id) REFERENCES ref_expenditure_object_history(expenditure_object_history_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_fund_class FOREIGN KEY (fund_class_id) REFERENCES ref_fund_class(fund_class_id);
+ ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
