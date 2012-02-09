@@ -592,7 +592,7 @@ $$ language plpgsql;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-CREATE OR REPLACE FUNCTION etl.isEligibleForConsumption(p_job_id_in integer) RETURNS integer AS $$
+CREATE OR REPLACE FUNCTION etl.iseligibleforconsumption(p_job_id_in integer) RETURNS integer AS $$
 DECLARE
 	l_monthly_timestamp VARCHAR;
 	l_weekly_timestamp VARCHAR;
@@ -652,14 +652,19 @@ BEGIN
 	-- Identifying weekly FMSV files uploaded.
 	
 	INSERT INTO tmp_files_consumption
-	SELECT a.load_id,load_file_id
+	SELECT c.load_id, max(load_file_id) as load_file_id
+	FROM etl.etl_data_load_file c JOIN
+	(SELECT a.load_id,max(file_timestamp) as file_timestamp
 		FROM	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
 		WHERE 	b.job_id = p_job_id_in
 			AND b.data_source_code ='V'
 			AND a.type_of_feed ='W'
 			AND a.pattern_matched_flag ='Y'
 			AND ((a.file_timestamp::timestamp >= l_monthly_timestamp::timestamp) OR 
-			      l_monthly_timestamp IS NULL);
+			      l_monthly_timestamp IS NULL)
+		GROUP BY 1) tbl_timestamp ON c.load_id = tbl_timestamp.load_id AND c.file_timestamp = tbl_timestamp.file_timestamp
+	WHERE 	c.pattern_matched_flag ='Y'
+	GROUP BY 1;	
 		
 	SELECT 	max(file_timestamp)
 	FROM   	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
@@ -673,24 +678,29 @@ BEGIN
 	-- Identifying daily FMSV files uploaded.
 	
 	INSERT INTO tmp_files_consumption
-	SELECT a.load_id,load_file_id
+	SELECT c.load_id, max(load_file_id) as load_file_id
+	FROM etl.etl_data_load_file c JOIN
+	(SELECT a.load_id,max(file_timestamp) as file_timestamp
 		FROM	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
 		WHERE 	b.job_id = p_job_id_in
 			AND b.data_source_code ='V'
 			AND a.type_of_feed ='D'
 			AND a.pattern_matched_flag ='Y'
 			AND ((a.file_timestamp::timestamp >= l_timestamp::timestamp) OR 
-			      l_timestamp IS NULL);
+			      l_timestamp IS NULL)
+			      GROUP BY 1) tbl_timestamp ON c.load_id = tbl_timestamp.load_id AND c.file_timestamp = tbl_timestamp.file_timestamp
+	WHERE 	c.pattern_matched_flag ='Y'
+	GROUP BY 1;	
 			      
-	-- Update consume_flag to 'Y' for the FMSV files which have to be consumed
+	-- Update consume_flag to N for the FMSV files which are not with the latest timestamp
 	
 	UPDATE etl.etl_data_load_file a
 	SET    consume_flag ='Y'
 	FROM	tmp_files_consumption b
 	WHERE	a.load_id = b.load_id
 		AND a.load_file_id = b.load_file_id;
-	
-	RETURN 1;
+
+	RETURN 1;	
 END;
 $$ language plpgsql;
 
