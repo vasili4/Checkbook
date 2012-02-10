@@ -182,7 +182,7 @@ EXCEPTION
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	
-	l_exception :=  etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	-- l_exception :=  etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
 	
 	
 	RETURN 0;
@@ -516,7 +516,7 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in validatedatanew';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 	
-	l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	-- l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
 	
 	RETURN 0;
 END;
@@ -583,7 +583,7 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in processdata';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
-	l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	-- l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
 	
 	RETURN 0;
 END;
@@ -706,12 +706,22 @@ $$ language plpgsql;
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.errorhandler(p_job_id_in bigint, p_data_source_code_in VARCHAR , p_load_id_in bigint,p_load_file_id_in int) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.errorhandler(p_load_file_id_in int) RETURNS INT AS $$
 DECLARE
+	l_data_source_code etl.ref_data_source.data_source_code%TYPE;
+	l_load_id bigint;
+	l_job_id etl.etl_data_load.job_id%TYPE;
+
 BEGIN
 
 	
-	RAISE NOTICE 'inside error handler % % % %'  , p_job_id_in,p_data_source_code_in,p_load_id_in, p_load_file_id_in;
+	RAISE NOTICE 'inside error handler % % % %'  , p_load_file_id_in;
+
+	SELECT b.data_source_code , a.load_id,b.job_id
+	FROM   etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id	       
+	WHERE  a.load_file_id = p_load_file_id_in     
+	INTO   l_data_source_code, l_load_id,l_job_id;
+
 	
 	-- Updating the processed flag to E for the data file which resulted in an error
 	UPDATE etl.etl_data_load_file
@@ -720,7 +730,7 @@ BEGIN
 
 	RAISE NOTICE 'inside error handler 1';
 	
-	IF p_data_source_code_in IN ('A','D','E','L','O') THEN
+	IF l_data_source_code IN ('A','D','E','L','O') THEN
 		-- Updating the processed flag to C for all non processed data files for the job
 
 		UPDATE  etl.etl_data_load_file a
@@ -728,7 +738,7 @@ BEGIN
 		FROM	etl.etl_data_load b
 		WHERE	a.processed_flag = 'N'
 			AND a.load_id = b.load_id
-			AND b.job_id = p_job_id_in;		
+			AND b.job_id = l_job_id;		
 		
 		
 		RAISE NOTICE 'inside error handler 1.2';	
@@ -740,7 +750,7 @@ BEGIN
 		FROM	etl.etl_data_load b
 		WHERE	a.processed_flag = 'N'
 			AND a.load_id = b.load_id
-			AND b.load_id = p_load_id_in;		
+			AND b.load_id = l_load_id;		
 
 		RAISE NOTICE 'inside error handler 1.3';
 
