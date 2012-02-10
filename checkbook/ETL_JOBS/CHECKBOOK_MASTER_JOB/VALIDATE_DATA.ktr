@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ELIGIBLE_FOR_CONSUMPTION</name>
+    <name>VALIDATE_DATA</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -91,10 +91,10 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Get Variables</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value</from><to>Get System Info</to><enabled>Y</enabled> </hop>  <hop> <from>Execute row SQL script</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>  <hop> <from>Mail 1</from><to>Abort Eligible for consumption Transformation1</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2</from><to>Mail 1</to><enabled>Y</enabled> </hop>  <hop> <from>Get System Info</from><to>Execute row SQL script</to><enabled>Y</enabled> </hop>  <hop> <from>Get System Info 2</from><to>Text file output 2</to><enabled>Y</enabled> </hop>  <hop> <from>Execute row SQL script</from><to>Get System Info 2</to><enabled>Y</enabled> </hop>  </order>
+  <hop> <from>Get System Info</from><to>Execute row SQL script</to><enabled>Y</enabled> </hop>  <hop> <from>Get System Info 2</from><to>Text file output 2</to><enabled>Y</enabled> </hop>  <hop> <from>Execute row SQL script</from><to>Get System Info 2</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Database lookup</to><enabled>Y</enabled> </hop>  <hop> <from>Database lookup</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value</from><to>Filter rows</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Get System Info</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Modified Java Script Value 1</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 1</from><to>Mail 1 2</to><enabled>Y</enabled> </hop>  <hop> <from>Mail 1 3</from><to>Abort validate data Transformation</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2 2</from><to>Mail 1 3</to><enabled>Y</enabled> </hop>  <hop> <from>Database lookup 2</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2</from><to>Execute row SQL script 2</to><enabled>Y</enabled> </hop>  <hop> <from>Text file output 2</from><to>Database lookup 2</to><enabled>Y</enabled> </hop>  <hop> <from>Execute row SQL script 2</from><to>Modified Java Script Value 2 2</to><enabled>Y</enabled> </hop>  </order>
   <step>
-    <name>Abort Eligible for consumption Transformation1</name>
-    <type>Abort</type>
+    <name>Database lookup</name>
+    <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
@@ -102,13 +102,39 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-      <row_threshold>0</row_threshold>
-      <message/>
-      <always_log_rows>Y</always_log_rows>
+    <connection>GP DB</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema>etl</schema>
+      <table>etl_data_load_file</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>load_file_id</name>
+        <field>load_file_id</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>processed_flag</name>
+        <rename>processed_flag</rename>
+        <default/>
+        <type>String</type>
+      </value>
+      <value>
+        <name>file_name</name>
+        <rename>file_name</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>621</xloc>
-      <yloc>517</yloc>
+      <xloc>203</xloc>
+      <yloc>256</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -132,8 +158,36 @@
     <read_field/>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>620</xloc>
-      <yloc>142</yloc>
+      <xloc>853</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Get System Info</send_true_to>
+<send_false_to>Modified Java Script Value 1</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>processed_flag</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>S</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>522</xloc>
+      <yloc>256</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -156,8 +210,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>425</xloc>
-      <yloc>143</yloc>
+      <xloc>677</xloc>
+      <yloc>256</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -180,8 +234,8 @@
       </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>803</xloc>
-      <yloc>142</yloc>
+      <xloc>1032</xloc>
+      <yloc>255</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -269,17 +323,29 @@
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
+      <field>
+        <name>load_file_id</name>
+        <variable>${loop_load_file_id}</variable>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>49</xloc>
-      <yloc>143</yloc>
+      <xloc>43</xloc>
+      <yloc>256</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Mail 1</name>
+    <name>Mail 1 2</name>
     <type>Mail</type>
     <description/>
     <distribute>Y</distribute>
@@ -328,8 +394,8 @@
       </embeddedimages>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>621</xloc>
-      <yloc>387</yloc>
+      <xloc>520</xloc>
+      <yloc>6</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -349,11 +415,28 @@
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var sql=&apos;select etl.isEligibleForConsumption(p_jobid)&apos;;
+var sql=&apos;select etl.validatedata(p_load_file_id)&apos;;
 
-sql=replace(sql,&apos;p_jobid&apos;,nextval);
+sql=replace(sql,&apos;p_load_file_id&apos;,load_file_id);
 
-var name=&apos;isEligibleForConsumption&apos;;</jsScript_script>
+var name=&apos;validatedata&apos;;
+
+var processed_flag_status = &apos;&apos;;
+
+if(processed_flag == &apos;Y&apos;) 
+processed_flag_status = &apos;Already Processed &apos;;
+else if(processed_flag == &apos;C&apos;) 
+processed_flag_status = &apos;Cancelled because of error in other related file&apos;;
+else if(processed_flag == &apos;E&apos;) 
+processed_flag_status = &apos;Error in the file&apos;;
+else if(processed_flag == &apos;N&apos;) 
+processed_flag_status = &apos;Pending Stage and Archive &apos;;
+else if(processed_flag == &apos;V&apos;) 
+processed_flag_status = &apos;Already Validated &apos;;
+
+
+var error_sql = &apos;select etl.errorhandler(p_load_file_id_in)&apos;;
+error_sql=replace(error_sql,&apos;p_load_file_id_in&apos;,load_file_id);</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>sql</name>
         <rename>sql</rename>
         <type>String</type>
@@ -366,16 +449,28 @@ var name=&apos;isEligibleForConsumption&apos;;</jsScript_script>
         <length>-1</length>
         <precision>-1</precision>
         <replace>N</replace>
+      </field>      <field>        <name>processed_flag_status</name>
+        <rename>processed_flag_status</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>error_sql</name>
+        <rename>error_sql</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>229</xloc>
-      <yloc>143</yloc>
+      <xloc>353</xloc>
+      <yloc>256</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Modified Java Script Value 2</name>
+    <name>Modified Java Script Value 1</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -389,8 +484,8 @@ var name=&apos;isEligibleForConsumption&apos;;</jsScript_script>
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;Error in job &apos;+nextval+&apos; while executing etl.isEligibleForConsumption&apos;;
-var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;+err+&quot; Error No - &quot;+err1;</jsScript_script>
+var title=&apos;Not Validating the date in file&apos; + file_name ;
+var body=&apos;Not Validating the data in file&apos; + file_name + &apos;. as the status of file is &apos;+processed_flag_status ;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>
         <type>String</type>
@@ -405,8 +500,8 @@ var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>620</xloc>
-      <yloc>251</yloc>
+      <xloc>521</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -425,7 +520,7 @@ var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;
     <enclosure>&quot;</enclosure>
     <enclosure_forced>Y</enclosure_forced>
     <enclosure_fix_disabled>Y</enclosure_fix_disabled>
-    <header>Y</header>
+    <header>N</header>
     <footer>N</footer>
     <format>DOS</format>
     <compression>None</compression>
@@ -440,7 +535,7 @@ var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;
       <servlet_output>N</servlet_output>
       <do_not_open_new_file_init>N</do_not_open_new_file_init>
       <extention>csv</extention>
-      <append>N</append>
+      <append>Y</append>
       <split>N</split>
       <haspartno>N</haspartno>
       <add_date>N</add_date>
@@ -492,8 +587,234 @@ var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>973</xloc>
-      <yloc>142</yloc>
+      <xloc>1200</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Abort validate data Transformation</name>
+    <type>Abort</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <row_threshold>0</row_threshold>
+      <message/>
+      <always_log_rows>Y</always_log_rows>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1156</xloc>
+      <yloc>811</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Mail 1 3</name>
+    <type>Mail</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <server>EMAIL_SERVER</server>
+      <port>EMAIL_PORT</port>
+      <destination>EMAIL_TO</destination>
+      <destinationCc>EMAIL_CC</destinationCc>
+      <destinationBCc/>
+      <replyToAddresses/>
+      <replyto>EMAIL_FROM</replyto>
+      <replytoname/>
+      <subject>title</subject>
+      <include_date>N</include_date>
+      <include_subfolders>N</include_subfolders>
+      <zipFilenameDynamic>N</zipFilenameDynamic>
+      <isFilenameDynamic>N</isFilenameDynamic>
+      <dynamicFieldname/>
+      <dynamicWildcard/>
+      <dynamicZipFilename/>
+      <sourcefilefoldername/>
+      <sourcewildcard/>
+      <contact_person/>
+      <contact_phone/>
+      <comment>body</comment>
+      <include_files>N</include_files>
+      <zip_files>N</zip_files>
+      <zip_name/>
+      <zip_limit_size>0</zip_limit_size>
+      <use_auth>N</use_auth>
+      <use_secure_auth>N</use_secure_auth>
+      <auth_user/>
+      <auth_password>Encrypted </auth_password>
+      <only_comment>N</only_comment>
+      <use_HTML>N</use_HTML>
+      <use_Priority>N</use_Priority>
+    <encoding>UTF-8</encoding>
+    <priority>normal</priority>
+    <importance>normal</importance>
+    <secureconnectiontype>SSL</secureconnectiontype>
+      <embeddedimages>
+      </embeddedimages>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1156</xloc>
+      <yloc>681</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Modified Java Script Value 2 2</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+var title=&apos;Error in job &apos;+nextval+&apos; while executing etl.errorhandler  after validate data&apos;;
+var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;+err+&quot; Error No - &quot;+err1;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
+        <rename>title</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>body</name>
+        <rename>body</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1155</xloc>
+      <yloc>545</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Database lookup 2</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <connection>GP DB</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema>etl</schema>
+      <table>etl_data_load_file</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>load_file_id</name>
+        <field>load_file_id</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>processed_flag</name>
+        <rename>new_processed_flag</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1389</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Filter rows 2</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+<send_true_to>Dummy (do nothing)</send_true_to>
+<send_false_to>Execute row SQL script 2</send_false_to>
+    <compare>
+<condition>
+ <negated>N</negated>
+ <leftvalue>new_processed_flag</leftvalue>
+ <function>=</function>
+ <rightvalue/>
+ <value><name>constant</name><type>String</type><text>V</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
+    </compare>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1389</xloc>
+      <yloc>399</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy (do nothing)</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1393</xloc>
+      <yloc>543</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Execute row SQL script 2</name>
+    <type>ExecSQLRow</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <commit>100</commit>
+    <connection>GP DB</connection>
+    <sql_field>error_sql</sql_field>
+    <insert_field/>
+    <update_field/>
+    <delete_field/>
+    <read_field/>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1148</xloc>
+      <yloc>399</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -502,6 +823,18 @@ var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;
       <error>
         <source_step>Execute row SQL script</source_step>
         <target_step>Modified Java Script Value 2</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename>err</descriptions_valuename>
+        <fields_valuename/>
+        <codes_valuename>err1</codes_valuename>
+        <max_errors/>
+        <max_pct_errors/>
+        <min_pct_rows/>
+      </error>
+      <error>
+        <source_step>Execute row SQL script 2</source_step>
+        <target_step>Modified Java Script Value 2 2</target_step>
         <is_enabled>Y</is_enabled>
         <nr_valuename/>
         <descriptions_valuename>err</descriptions_valuename>

@@ -116,7 +116,7 @@
     </attributes>
   </connection>
   <order>
-  <hop> <from>Get System Info</from><to>Get Variables</to><enabled>Y</enabled> </hop>  <hop> <from>Total Feed Available Count</from><to>COA Feed Available Count</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Create SQL</to><enabled>Y</enabled> </hop>  <hop> <from>Create SQL</from><to>Total Feed Available Count</to><enabled>Y</enabled> </hop>  <hop> <from>COA Feed Available Count</from><to>Filter rows</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Delay row</to><enabled>Y</enabled> </hop>  <hop> <from>Delay row</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2</from><to>Delay row 2 2</to><enabled>Y</enabled> </hop>  <hop> <from>Delay row 2 2</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>Delay row 2</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>COA Feed Available Count</from><to>Text file output</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2</from><to>Filter rows 2 2</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2 2</from><to>Delay row 2</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2</from><to>Mail 1</to><enabled>N</enabled> </hop>  <hop> <from>Filter rows 2 2</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>  <hop> <from>Mail 1</from><to>Abort time  GT 8</to><enabled>Y</enabled> </hop>  </order>
+  <hop> <from>Get System Info</from><to>Get Variables</to><enabled>Y</enabled> </hop>  <hop> <from>Total Feed Available Count</from><to>COA Feed Available Count</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Create SQL</to><enabled>Y</enabled> </hop>  <hop> <from>Create SQL</from><to>Total Feed Available Count</to><enabled>Y</enabled> </hop>  <hop> <from>COA Feed Available Count</from><to>Filter rows</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Filter rows 2</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Delay row</to><enabled>Y</enabled> </hop>  <hop> <from>Delay row</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2</from><to>Delay row 2 2</to><enabled>Y</enabled> </hop>  <hop> <from>Delay row 2 2</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>Delay row 2</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>COA Feed Available Count</from><to>Text file output</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2</from><to>Filter rows 2 2</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2 2</from><to>Delay row 2</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2</from><to>Mail 1</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows 2 2</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>  <hop> <from>Mail 1</from><to>Abort time  GT 8</to><enabled>Y</enabled> </hop>  </order>
   <step>
     <name>Abort time  GT 8</name>
     <type>Abort</type>
@@ -132,8 +132,8 @@
       <always_log_rows>Y</always_log_rows>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>940</xloc>
-      <yloc>14</yloc>
+      <xloc>933</xloc>
+      <yloc>11</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -220,7 +220,7 @@ var coa_available_sql = &quot;select count(*) as coa_available_count from etl.et
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <timeout>2</timeout>
+    <timeout>10</timeout>
     <scaletime>seconds</scaletime>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
