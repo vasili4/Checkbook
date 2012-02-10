@@ -715,7 +715,7 @@ DECLARE
 BEGIN
 
 	
-	RAISE NOTICE 'inside error handler % % % %'  , p_load_file_id_in;
+	RAISE NOTICE 'inside error handler % '  , p_load_file_id_in;
 
 	SELECT b.data_source_code , a.load_id,b.job_id
 	FROM   etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id	       
