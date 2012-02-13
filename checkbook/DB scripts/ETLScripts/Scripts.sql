@@ -43,9 +43,14 @@ DECLARE
 	l_processed_flag etl.etl_data_load_file.processed_flag%TYPE;
 	l_job_id etl.etl_data_load.job_id%TYPE;
 	l_exception int;
+	l_start_time  timestamp;
+	l_end_time  timestamp;
 BEGIN
 
 	-- Initialize all the variables
+
+	l_start_time := timeofday()::timestamp;
+	
 	l_data_source_code :='';
 	l_target_columns :='';
 	l_source_columns :='';
@@ -141,7 +146,7 @@ BEGIN
 				l_insert_sql := l_insert_sql || ' AND doc_cd IN (''' || replace (l_document_type_array[l_array_ctr],',',''',''') || ''') ';
 			END IF;
 
-			-- raise notice 'l_insert_sql %',l_insert_sql;
+			 raise notice 'l_insert_sql %',l_insert_sql;
 
 			EXECUTE 'TRUNCATE ' || l_staging_table_array[l_array_ctr];
 
@@ -172,6 +177,11 @@ BEGIN
 	WHERE	load_file_id = p_load_file_id_in;
 			
 	END IF;
+
+	l_end_time := timeofday()::timestamp;
+
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_load_file_id_in,'etl.stageandarchivedata',1,l_start_time,l_end_time);
 		
 	RETURN 1;
 	
@@ -181,9 +191,12 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in stageandarchivedata';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
-	
+
 	-- l_exception :=  etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
 	
+	l_end_time := timeofday()::timestamp;
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_load_file_id_in,'etl.stageandarchivedata',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
 	
 	RETURN 0;
 	
@@ -209,9 +222,14 @@ DECLARE
 	l_processed_flag etl.etl_data_load_file.processed_flag%TYPE;
 	l_job_id etl.etl_data_load.job_id%TYPE;	
 	l_exception int;
+	l_start_time  timestamp;
+	l_end_time  timestamp;
 BEGIN
 
 	-- Initialize the variables
+
+	l_start_time := timeofday()::timestamp;
+	
 	l_update_str :='';
 	l_insert_str :='';
 	l_delete_str :='';
@@ -449,6 +467,8 @@ BEGIN
 						' WHERE ' || l_rule.invalid_condition ;
 
 
+				RAISE NOTICE 'l_insert_str %', l_insert_str;
+				
 				EXECUTE l_insert_str;
 
 				l_update_str := 'UPDATE ' || l_rule.staging_table_name || ' a' ||
@@ -509,6 +529,11 @@ BEGIN
 	WHERE	load_file_id = p_load_file_id_in;
 			
 	END IF;
+
+	l_end_time := timeofday()::timestamp;
+
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_load_file_id_in,'etl.validatedata',1,l_start_time,l_end_time);
 		     	
 	RETURN 1;
 EXCEPTION
@@ -517,6 +542,10 @@ EXCEPTION
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 	
 	-- l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_load_file_id_in,'etl.validatedata',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
 	
 	RETURN 0;
 END;
@@ -533,8 +562,13 @@ DECLARE
 	l_processed_flag etl.etl_data_load_file.processed_flag%TYPE;
 	l_job_id etl.etl_data_load.job_id%TYPE;
 	l_exception int;
+	l_start_time  timestamp;
+	l_end_time  timestamp;
+	
 BEGIN
 
+	l_start_time := timeofday()::timestamp;
+	
 	-- Determine the type of data load - F/V/A etc and assign it to l_data_source_code
 	
 	SELECT b.data_source_code , a.load_id,a.processed_flag,b.job_id
@@ -574,6 +608,11 @@ BEGIN
 	WHERE	load_file_id = p_load_file_id_in;
 			
 	END IF;
+
+	l_end_time := timeofday()::timestamp;
+
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_load_file_id_in,'etl.processdata',1,l_start_time,l_end_time);
 		
 	RETURN 1;
 
@@ -584,6 +623,10 @@ EXCEPTION
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	-- l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_load_file_id_in,'etl.processdata',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
 	
 	RETURN 0;
 END;
