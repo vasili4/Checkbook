@@ -2839,6 +2839,18 @@ DISTRIBUTED BY (uniq_id);
 CREATE TABLE seq_disbursement_line_item_id(uniq_id bigint,disbursement_line_item_id bigint default nextval('public.seq_disbursement_line_item_id'))
 DISTRIBUTED BY (uniq_id);
 
+
+CREATE TABLE etl.etl_script_execution_status
+(
+  load_file_id bigint,
+  script_name character varying,
+  completed_flag integer,
+  start_time timestamp without time zone,
+  end_time timestamp without time zone,
+  errno character varying,
+  errmsg character varying
+)
+DISTRIBUTED BY (load_file_id);
 -----------------------------------------------------------------------------------------------------------------------------
 /* PMS data feed */
 
