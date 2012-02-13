@@ -138,7 +138,9 @@ CREATE TABLE ref_agency_history (
 CREATE TABLE ref_date(
   date_id    smallint PRIMARY KEY default nextval('seq_ref_date_date_id'),
   date	     DATE,
-  nyc_year   smallint
+  nyc_year   smallint,
+  calendar_month smallint,
+  calendar_year smallint
  );
   
  
@@ -976,7 +978,7 @@ CREATE TABLE all_agreement_accounting_line (
 ) distributed by (agreement_id);
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE disbursement (
+CREATE TABLE all_disbursement (
     disbursement_id integer  PRIMARY KEY DEFAULT nextval('seq_expenditure_expenditure_id'::regclass) NOT NULL,
     document_code_id smallint,
     agency_history_id smallint,
@@ -995,23 +997,15 @@ CREATE TABLE disbursement (
     total_accounting_line_amount numeric(16,2),
     vendor_history_id integer,
     retainage_amount numeric(16,2),
+    privacy_flag char(1),
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (disbursement_id);
 
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_reason FOREIGN KEY (expenditure_cancel_reason_id) REFERENCES ref_expenditure_cancel_reason(expenditure_cancel_reason_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_type FOREIGN KEY (expenditure_cancel_type_id) REFERENCES ref_expenditure_cancel_type(expenditure_cancel_type_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_status FOREIGN KEY (expenditure_status_id) REFERENCES ref_expenditure_status(expenditure_status_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
-ALTER TABLE  disbursement ADD constraint fk_disbursement_etl_data_load foreign key (load_id) references etl_data_load (load_id);
-ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date foreign key (record_date_id) references ref_date (date_id);
-ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_1 foreign key (check_eft_issued_date_id) references ref_date (date_id);
-ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_2 foreign key (check_eft_record_date_id) references ref_date (date_id);
 
-CREATE TABLE disbursement_line_item (
+
+CREATE TABLE all_disbursement_line_item (
     disbursement_line_item_id bigint  PRIMARY KEY DEFAULT nextval('seq_disbursement_line_item_id'::regclass) NOT NULL,
     disbursement_id integer,
     line_number integer,
@@ -1036,16 +1030,6 @@ CREATE TABLE disbursement_line_item (
 ) distributed by (disbursement_line_item_id);
 
 
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_expenditure foreign key (disbursement_id) references disbursement (disbursement_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_fund_class foreign key (fund_class_id) references ref_fund_class (fund_class_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disb_line_item_ref_exp_object_history foreign key (expenditure_object_history_id) references ref_expenditure_object_history (expenditure_object_history_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_fund foreign key (fund_id) references ref_fund (fund_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_agreement foreign key (agreement_id) references agreement (agreement_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_etl_data_load foreign key (load_id) references etl_data_load (load_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_location_history foreign key (location_history_id) references ref_location_history (location_history_id);
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE payroll_summary (
@@ -1291,3 +1275,48 @@ ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_etl_data_lo
  ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_acc_line_ref_exp_object_history FOREIGN KEY (expenditure_object_history_id) REFERENCES ref_expenditure_object_history(expenditure_object_history_id);
  ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_fund_class FOREIGN KEY (fund_class_id) REFERENCES ref_fund_class(fund_class_id);
  ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
+
+CREATE TABLE disbursement (LIKE all_disbursement) DISTRIBUTED BY (disbursement_id);
+
+ALTER TABLE  disbursement ADD CONSTRAINT pk_disbursement PRIMARY KEY(disbursement_id);
+
+ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
+ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
+ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_reason FOREIGN KEY (expenditure_cancel_reason_id) REFERENCES ref_expenditure_cancel_reason(expenditure_cancel_reason_id);
+ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_type FOREIGN KEY (expenditure_cancel_type_id) REFERENCES ref_expenditure_cancel_type(expenditure_cancel_type_id);
+ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_status FOREIGN KEY (expenditure_status_id) REFERENCES ref_expenditure_status(expenditure_status_id);
+ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
+ALTER TABLE  disbursement ADD constraint fk_disbursement_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date foreign key (record_date_id) references ref_date (date_id);
+ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_1 foreign key (check_eft_issued_date_id) references ref_date (date_id);
+ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_2 foreign key (check_eft_record_date_id) references ref_date (date_id);
+
+CREATE TABLE disbursement_line_item (LIKE all_disbursement_line_item) DISTRIBUTED BY (disbursement_line_item_id);
+
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_expenditure foreign key (disbursement_id) references disbursement (disbursement_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_fund_class foreign key (fund_class_id) references ref_fund_class (fund_class_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disb_line_item_ref_exp_object_history foreign key (expenditure_object_history_id) references ref_expenditure_object_history (expenditure_object_history_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_fund foreign key (fund_id) references ref_fund (fund_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_agreement foreign key (agreement_id) references agreement (agreement_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_location_history foreign key (location_history_id) references ref_location_history (location_history_id);
+
+
+CREATE TABLE fact_disbursement_line_item(
+	disbursement_line_item_id bigint,
+	disbursement_id integer,
+	line_number integer,
+	check_eft_issued_date_id smallint,
+	agreement_id bigint,
+	master_agreement_id bigint,
+	fund_class_id smallint,
+	check_amount numeric(16,2),
+	agency_id smallint,
+	expenditure_object_id integer,
+	vendor_id integer,
+	maximum_contract_amount numeric(16,2),
+	maximum_spending_limit numeric(16,2))
+DISTRIBUTED BY (disbursement_line_item_id);
