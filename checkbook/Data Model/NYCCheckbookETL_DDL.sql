@@ -2726,9 +2726,18 @@ CREATE TABLE stg_fms_header(
 	bkup_whld_am decimal(24,2),
 	inct_am decimal(24,2),
 	rtg_am decimal(24,2),
+	document_code_id smallint,
+	agency_history_id smallint,
+	record_date_id smallint,
+	check_eft_issued_date_id smallint,
+	check_eft_record_date_id smallint, 
+	expenditure_status_id smallint,
+	expenditure_cancel_type_id smallint, 
+	expenditure_cancel_reason_id smallint,	
 	uniq_id bigint default nextval('seq_stg_fms_header_uniq_id'),
 	invalid_flag char(1),
-	invalid_reason varchar		);	
+	invalid_reason varchar		)
+DISTRIBUTED BY (uniq_id)	;	
 	
 CREATE TABLE stg_fms_vendor(
 	doc_cd varchar(8),
@@ -2742,6 +2751,7 @@ CREATE TABLE stg_fms_vendor(
 	ad_id varchar(20),
 	org_cls integer,
 	misc_acct_fl integer,
+	vendor_history_id integer,
 	uniq_id bigint default nextval('seq_stg_fms_vendor_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar		)
@@ -2795,9 +2805,18 @@ CREATE TABLE stg_fms_accounting_line(
 	actv_cd varchar(10),
 	func_cd varchar(10),
 	rpt_cd varchar(15),
+	fund_class_id smallint,
+	agency_history_id smallint,
+	department_history_id int, 
+	expenditure_object_history_id integer,
+	budget_code_id integer,
+	fund_id smallint, 
+	location_history_id int,
+	agreement_id bigint,
 	uniq_id bigint default nextval('seq_stg_fms_accounting_line_uniq_id'),
 	invalid_flag char(1),
-	invalid_reason varchar		);
+	invalid_reason varchar		)
+DISTRIBUTED BY (uniq_id)	;
 	
 CREATE TABLE archive_fms_header (LIKE stg_fms_header) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_fms_header ADD COLUMN load_id bigint;
@@ -2813,6 +2832,12 @@ CREATE TABLE archive_fms_accounting_line (LIKE stg_fms_accounting_line) DISTRIBU
 ALTER TABLE archive_fms_accounting_line ADD COLUMN load_id bigint;
 
 CREATE TABLE invalid_fms_accounting_line (LIKE archive_fms_accounting_line) DISTRIBUTED BY (uniq_id);	
+
+CREATE TABLE seq_expenditure_expenditure_id(uniq_id bigint,disbursement_id integer default nextval('public.seq_expenditure_expenditure_id'))
+DISTRIBUTED BY (uniq_id);
+
+CREATE TABLE seq_disbursement_line_item_id(uniq_id bigint,disbursement_line_item_id bigint default nextval('public.seq_disbursement_line_item_id'))
+DISTRIBUTED BY (uniq_id);
 
 -----------------------------------------------------------------------------------------------------------------------------
 /* PMS data feed */
