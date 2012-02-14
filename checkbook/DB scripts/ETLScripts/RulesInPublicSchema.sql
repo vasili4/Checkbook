@@ -561,5 +561,56 @@ CREATE RULE hist_all_agreement_commodity_del_rule AS ON DELETE TO history_all_ag
 DO ALSO DELETE FROM history_agreement_commodity WHERE agreement_id = old.agreement_id;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/* 
+Insert into disbursement only when disbursement can be fully displayed and not associated to document of type DC
 
+*/
 			
+CREATE OR REPLACE RULE disbursement_ins_rule AS ON INSERT TO all_disbursement
+WHERE new.privacy_flag IN ('F', 'P')
+DO ALSO INSERT INTO disbursement(disbursement_id,document_code_id,agency_history_id,
+				document_id,document_version,record_date_id,
+				budget_fiscal_year,document_fiscal_year,document_period,
+				check_eft_amount,check_eft_issued_date_id,check_eft_record_date_id,
+				expenditure_status_id,expenditure_cancel_type_id,expenditure_cancel_reason_id,
+				total_accounting_line_amount,vendor_history_id,retainage_amount,
+				privacy_flag,load_id,created_date)
+SELECT 	new.disbursement_id,new.document_code_id,new.agency_history_id,
+				new.document_id,new.document_version,new.record_date_id,
+				new.budget_fiscal_year,new.document_fiscal_year,new.document_period,
+				new.check_eft_amount,new.check_eft_issued_date_id,new.check_eft_record_date_id,
+				new.expenditure_status_id,new.expenditure_cancel_type_id,new.expenditure_cancel_reason_id,
+				new.total_accounting_line_amount,(CASE WHEN new.privacy_flag = 'P' THEN f.vendor_history_id ELSE new.vendor_history_id END),new.retainage_amount,
+				new.privacy_flag,new.load_id,new.created_date
+				FROM ref_document_code b , vendor d , vendor_history f
+				WHERE b.document_code_id = new.document_code_id AND b.document_code <> 'DC'										
+					AND d.vendor_customer_code = 'N/A'
+					AND d.legal_name = '(PRIVACY/SECURITY)'
+					AND d.vendor_id = f.vendor_id;	
+				
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Delete rule on agreement
+*/
+
+CREATE RULE agreement_del_rule_1 AS ON DELETE TO agreement
+DO ALSO DELETE FROM agreement_commodity WHERE agreement_id = old.agreement_id;
+
+CREATE RULE agreement_del_rule_2 AS ON DELETE TO agreement
+DO ALSO DELETE FROM agreement_worksite WHERE agreement_id = old.agreement_id;
+
+CREATE RULE agreement_del_rule_3 AS ON DELETE TO agreement
+DO ALSO DELETE FROM agreement_accounting_line WHERE agreement_id = old.agreement_id;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Delete rule on master_agreement
+*/
+
+CREATE RULE master_agreement_del_rule_1 AS ON DELETE TO master_agreement
+DO ALSO DELETE FROM agreement_commodity WHERE agreement_id = old.master_agreement_id;
+
+CREATE RULE master_agreement_del_rule_2 AS ON DELETE TO master_agreement
+DO ALSO DELETE FROM agreement_worksite WHERE agreement_id = old.master_agreement_id;
+
