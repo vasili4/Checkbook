@@ -2851,6 +2851,17 @@ CREATE TABLE etl.etl_script_execution_status
   errmsg character varying
 )
 DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE etl.etl_data_load_verification
+(
+  load_file_id bigint,
+  data_source_code varchar(2),
+  record_identifier character(1),
+  document_type character varying,
+  num_transactions bigint,
+  description character varying
+)
+DISTRIBUTED BY (load_file_id);
 -----------------------------------------------------------------------------------------------------------------------------
 /* PMS data feed */
 

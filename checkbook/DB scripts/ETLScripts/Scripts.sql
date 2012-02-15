@@ -45,6 +45,8 @@ DECLARE
 	l_exception int;
 	l_start_time  timestamp;
 	l_end_time  timestamp;
+	l_ins_staging_cnt int:=0;
+	l_count int:=0;
 BEGIN
 
 	-- Initialize all the variables
@@ -152,6 +154,13 @@ BEGIN
 
 			EXECUTE l_insert_sql;				
 
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+
+		l_ins_staging_cnt := l_count;
+
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,record_identifier,document_type,num_transactions,description)
+		VALUES(p_load_file_id_in,l_data_source_code,l_record_identifiers[l_array_ctr],l_document_type_array[l_array_ctr],l_ins_staging_cnt, 'staging');
+		
 			-- Archiving the records
 
 			IF COALESCE(l_archive_table_array[l_array_ctr],'') <> ''  THEN
