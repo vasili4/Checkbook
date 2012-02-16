@@ -169,7 +169,7 @@ BEGIN
 
 
 				l_insert_sql :=  'INSERT INTO ' || l_archive_table_array[l_array_ctr] ||
-						 ' SELECT *,' || l_load_id ||
+						 ' SELECT *,' || p_load_file_id_in ||
 						 ' FROM ' ||l_staging_table_array[l_array_ctr] ;
 
 				-- RAISE NOTICE 'insert %',l_insert_sql;
@@ -233,6 +233,10 @@ DECLARE
 	l_exception int;
 	l_start_time  timestamp;
 	l_end_time  timestamp;
+	l_record_identifiers varchar ARRAY[15];
+	l_document_type_array varchar ARRAY[15];
+	l_ins_invalid_cnt int:=0;
+	l_count int:=0;
 BEGIN
 
 	-- Initialize the variables
@@ -506,6 +510,18 @@ BEGIN
 				   AND table_order > 1
 			     ORDER BY table_order) INTO l_invalid_table_array;
 
+		SELECT ARRAY(SELECT record_identifier
+			     FROM etl.ref_data_source
+			     WHERE data_source_code=l_data_source_code
+				   AND table_order > 1
+			     ORDER BY table_order) INTO l_record_identifiers;	
+
+		SELECT ARRAY(SELECT document_type
+			     FROM etl.ref_data_source
+			     WHERE data_source_code=l_data_source_code
+				   AND table_order > 1
+			     ORDER BY table_order) INTO l_document_type_array;
+			     
 
 		FOR l_array_ctr IN 1..array_upper(l_staging_table_array,1) LOOP
 
@@ -515,7 +531,7 @@ BEGIN
 
 
 				l_insert_str :=  'INSERT INTO ' || l_invalid_table_array[l_array_ctr] ||
-						 ' SELECT *,' || l_load_id ||
+						 ' SELECT *,' || p_load_file_id_in ||
 						 ' FROM ' ||l_staging_table_array[l_array_ctr] ||
 						 ' WHERE invalid_flag = ''Y'' ';
 
@@ -523,6 +539,15 @@ BEGIN
 
 				EXECUTE l_insert_str;															
 
+
+			GET DIAGNOSTICS l_count = ROW_COUNT;
+
+			l_ins_invalid_cnt := l_count;
+
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,record_identifier,document_type,num_transactions,description)
+			VALUES(p_load_file_id_in,l_data_source_code,l_record_identifiers[l_array_ctr],l_document_type_array[l_array_ctr],l_ins_invalid_cnt, 'invalid');
+
+		
 			END IF;	
 
 			l_delete_str := ' DELETE FROM ' || l_staging_table_array[l_array_ctr] ||
