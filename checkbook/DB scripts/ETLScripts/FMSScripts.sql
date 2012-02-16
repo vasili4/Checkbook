@@ -3,8 +3,9 @@ set search_path=public;
 	updateForeignKeysForFMSInHeader
 	updateForeignKeysForFMSVendors
 	updateForeignKeysForFMSInAccLine
+	processFMS
 */
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInHeader() RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInHeader(p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
@@ -27,6 +28,51 @@ BEGIN
 	FROM etl.stg_fms_header a JOIN ref_agency b ON a.doc_dept_cd = b.agency_code
 		 JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1;
+	
+	CREATE TEMPORARY TABLE tmp_fk_fms_values_new_agencies(dept_cd varchar,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_fms_values_new_agencies
+	SELECT doc_dept_cd,MIN(b.uniq_id) as uniq_id
+	FROM etl.stg_fms_header a join (SELECT uniq_id
+						 FROM tmp_fk_fms_values
+						 GROUP BY 1
+						 HAVING max(agency_history_id) is null) b on a.uniq_id=b.uniq_id
+	GROUP BY 1;
+
+	RAISE NOTICE '1';
+	
+	TRUNCATE etl.ref_agency_id_seq;
+	
+	INSERT INTO etl.ref_agency_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_fms_values_new_agencies;
+	
+	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
+	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
+	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_fms_values_new_agencies b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.1';
+
+	-- Generate the agency history id for history records
+	
+	TRUNCATE etl.ref_agency_history_id_seq;
+	
+	INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_fms_values_new_agencies;
+
+	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
+	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
+	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.3';
+	INSERT INTO tmp_fk_fms_values(uniq_id,agency_history_id)
+	SELECT	a.uniq_id, max(c.agency_history_id) 
+	FROM etl.stg_fms_header a JOIN ref_agency b ON a.doc_dept_cd = b.agency_code
+		JOIN ref_agency_history c ON b.agency_id = c.agency_id
+		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
+	GROUP BY 1	;	
 	
 	-- FK:record_date_id
 	
@@ -98,21 +144,32 @@ $$ language plpgsql;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSVendors() RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSVendors(p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 
 BEGIN
 
 	-- UPDATING FK VALUES IN VENDOR
 
-	CREATE TEMPORARY TABLE tmp_fk_fms_values_vendor(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer)
+	CREATE TEMPORARY TABLE tmp_fk_fms_values_vendor(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer,miscellaneous_vendor_flag bit,
+				lgl_nm varchar,alias_nm varchar )
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_fms_values_vendor
-	SELECT uniq_id,a.vend_cust_cd,MAX(c.vendor_history_id) as vendor_history_id
+	SELECT uniq_id,a.vend_cust_cd,MAX(c.vendor_history_id) as vendor_history_id,COALESCE(b.miscellaneous_vendor_flag,0::bit),
+		MIN(a.lgl_nm),MIN(a.alias_nm)
+	FROM	etl.stg_fms_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code	
+			LEFT JOIN vendor_history c ON b.vendor_id=c.vendor_id
+	WHERE b.miscellaneous_vendor_flag = 0::bit OR b.miscellaneous_vendor_flag IS NULL	
+	GROUP BY 1,2,4;
+
+	INSERT INTO tmp_fk_fms_values_vendor
+	SELECT uniq_id,a.vend_cust_cd,NULL as vendor_history_id,1::bit,
+		a.lgl_nm,a.alias_nm
 	FROM	etl.stg_fms_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code
-		LEFT JOIN vendor_history c ON b.vendor_id = c.vendor_id
-	GROUP BY 1,2;
+	WHERE  b.miscellaneous_vendor_flag = 1::bit;
+	
+	RAISE NOTICE 'Vend 1';
 	
 	-- Identify the new vendors
 	
@@ -122,16 +179,28 @@ BEGIN
 	INSERT INTO tmp_fms_vendor_new
 	SELECT min(uniq_id) as uniq_id, vendor_customer_code
 	FROM	tmp_fk_fms_values_vendor
-	WHERE   vendor_history_id IS NULL
+	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 0::bit
 	GROUP BY 2;
+	
+	INSERT INTO tmp_fms_vendor_new
+	SELECT  uniq_id as uniq_id, vendor_customer_code
+	FROM	tmp_fk_fms_values_vendor
+	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 1::bit;
+
+	RAISE NOTICE 'Vend 1.1';
 	
 	TRUNCATE etl.vendor_id_seq;
 	
 	INSERT INTO etl.vendor_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM tmp_fms_vendor_new;
-	
 
+	INSERT INTO vendor(vendor_id,vendor_customer_code,legal_name,alias_name,miscellaneous_vendor_flag,load_id,created_date)
+	SELECT  a.vendor_id,b.vendor_customer_code,b.lgl_nm,b.alias_nm,b.miscellaneous_vendor_flag, p_load_id_in,now()::timestamp
+	FROM	etl.vendor_id_seq a JOIN tmp_fk_fms_values_vendor b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE 'Vend 1.3';
+	
 	TRUNCATE etl.vendor_history_id_seq;
 	
 	INSERT INTO etl.vendor_history_id_seq(uniq_id)
@@ -139,21 +208,34 @@ BEGIN
 	FROM tmp_fms_vendor_new;
 
 
+	INSERT INTO vendor_history(vendor_history_id,vendor_id,legal_name,alias_name,miscellaneous_vendor_flag,load_id,created_date)
+	SELECT  a.vendor_history_id,c.vendor_id,b.lgl_nm,b.alias_nm,b.miscellaneous_vendor_flag, p_load_id_in,now()::timestamp
+	FROM	etl.vendor_history_id_seq a JOIN tmp_fk_fms_values_vendor b ON a.uniq_id = b.uniq_id
+		JOIN etl.vendor_id_seq c ON a.uniq_id = c.uniq_id;
+
+	RAISE NOTICE 'Vend 1.4';
+	
 	CREATE TEMPORARY TABLE tmp_fms_vendor(uniq_id bigint,vendor_history_id int)
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fms_vendor
 	SELECT c.uniq_id, d.vendor_history_id
-	FROM tmp_fk_fms_values_vendor a JOIN tmp_fms_vendor_new b ON a.uniq_id = b.uniq_id		
+	FROM tmp_fk_fms_values_vendor a JOIN tmp_fms_vendor_new b ON a.uniq_id = b.uniq_id AND a.miscellaneous_vendor_flag=0::bit
 		JOIN tmp_fk_fms_values_vendor c ON a.vendor_customer_code = c.vendor_customer_code
 		JOIN etl.vendor_history_id_seq d ON b.uniq_id = d.uniq_id;
-	
+
+	INSERT INTO tmp_fms_vendor
+	SELECT a.uniq_id, d.vendor_history_id
+	FROM tmp_fk_fms_values_vendor a JOIN tmp_fms_vendor_new b ON a.uniq_id = b.uniq_id AND a.miscellaneous_vendor_flag=1::bit		
+		JOIN etl.vendor_history_id_seq d ON b.uniq_id = d.uniq_id;
+			
 	
 	UPDATE tmp_fk_fms_values_vendor a
 	SET	vendor_history_id = b.vendor_history_id
 	FROM	tmp_fms_vendor b 
 	WHERE	a.uniq_id = b.uniq_id;
 					
+	RAISE NOTICE 'Vend 1.5';
 	
 	UPDATE etl.stg_fms_vendor a
 	SET	vendor_history_id = b.vendor_history_id
@@ -170,7 +252,7 @@ EXCEPTION
 END;
 $$ language plpgsql;
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInAccLine() RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInAccLine(p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
 	-- UPDATING FK VALUES IN ETL.STG_FMS_ACCOUNTING_LINE
@@ -194,30 +276,209 @@ BEGIN
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1	;	
 
+	RAISE NOTICE '1';
+	
+	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line_new_agencies(dept_cd varchar,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_values_fms_acc_line_new_agencies
+	SELECT dept_cd,MIN(b.uniq_id) as uniq_id
+	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
+						 FROM tmp_fk_values_fms_acc_line
+						 GROUP BY 1
+						 HAVING max(agency_history_id) is null) b on a.uniq_id=b.uniq_id
+	GROUP BY 1;
+	
+	TRUNCATE etl.ref_agency_id_seq;
+
+	RAISE NOTICE '1.1';
+	
+	INSERT INTO etl.ref_agency_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_agencies;
+	
+	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
+	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
+	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_values_fms_acc_line_new_agencies b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.2';
+	
+	-- Generate the agency history id for history records
+	
+	TRUNCATE etl.ref_agency_history_id_seq;
+	
+	INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_agencies;
+
+	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
+	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
+	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
+
+	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,agency_history_id)
+	SELECT	a.uniq_id, max(c.agency_history_id) 
+	FROM etl.stg_fms_accounting_line a JOIN ref_agency b ON a.dept_cd = b.agency_code
+		JOIN ref_agency_history c ON b.agency_id = c.agency_id
+		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
+	GROUP BY 1	;	
+
+	RAISE NOTICE '1.3';
+	
 	-- FK:department_history_id
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.bfy = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
-	GROUP BY 1	;		
+	GROUP BY 1;
+	
+	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line_new_dept(agency_history_id integer,agency_id integer,appr_cd varchar,
+						fund_class_id smallint,fiscal_year smallint, uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_values_fms_acc_line_new_dept
+	SELECT d.agency_history_id,c.agency_id,appr_cd,e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
+	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
+						 FROM tmp_fk_values_fms_acc_line
+						 GROUP BY 1
+						 HAVING max(department_history_id) IS NULL) b on a.uniq_id=b.uniq_id
+		JOIN ref_agency c ON a.dept_cd = c.agency_code
+		JOIN ref_agency_history d ON c.agency_id = d.agency_id
+		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code
+	GROUP BY 1,2,3,4,5;
+
+	RAISE NOTICE '1.4';
+						
+	-- Generate the department id for new records
+		
+	TRUNCATE etl.ref_department_id_seq;
+	
+	INSERT INTO etl.ref_department_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_dept;
+
+	INSERT INTO ref_department(department_id,department_code,
+				   department_name,
+				   agency_id,fund_class_id,
+				   fiscal_year,created_date,created_load_id,original_department_name)
+	SELECT a.department_id,COALESCE(b.appr_cd,'---------') as department_code,
+		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+			ELSE 'Non-Applicable Department' END) as department_name,
+		b.agency_id,b.fund_class_id,b.fiscal_year,
+		now()::timestamp,p_load_id_in,
+		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+			ELSE 'Non-Applicable Department' END) as original_department_name
+	FROM   etl.ref_department_id_seq a JOIN tmp_fk_values_fms_acc_line_new_dept b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.5';
+	-- Generate the department history id for history records
+	
+	TRUNCATE etl.ref_department_history_id_seq;
+	
+	INSERT INTO etl.ref_department_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_dept;
+
+	INSERT INTO ref_department_history(department_history_id,department_id,
+					   department_name,agency_id,fund_class_id,
+					   fiscal_year,created_date,load_id)
+	SELECT a.department_history_id,c.department_id,	
+		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		      ELSE 'Non-Applicable Department' END) as department_name,
+		b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
+	FROM   etl.ref_department_history_id_seq a JOIN tmp_fk_values_fms_acc_line_new_dept b ON a.uniq_id = b.uniq_id
+		JOIN etl.ref_department_id_seq  c ON a.uniq_id = c.uniq_id ;
+
+
+	RAISE NOTICE '1.6';
+	
+	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,department_history_id)
+	SELECT	a.uniq_id, max(c.department_history_id) 
+	FROM etl.stg_fms_accounting_line a JOIN ref_department b  ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
+		JOIN ref_department_history c ON b.department_id = c.department_id
+		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
+		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN etl.ref_department_history_id_seq f ON c.department_history_id = f.department_history_id
+	GROUP BY 1	;	
+
+	RAISE NOTICE '1.7';
 	
 	-- FK:expenditure_object_history_id
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,expenditure_object_history_id)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_expenditure_object b ON a.obj_cd = b.expenditure_object_code AND a.bfy = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_expenditure_object b ON a.obj_cd = b.expenditure_object_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 	GROUP BY 1	;
 
 
+	RAISE NOTICE '1.8';
+	
+	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line_new_exp_object(obj_cd varchar,fiscal_year smallint,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_values_fms_acc_line_new_exp_object
+	SELECT (CASE WHEN COALESCE(obj_cd,'')='' THEN '----' ELSE obj_cd END) as obj_cd,fy_dc,MIN(a.uniq_id) as uniq_id
+	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
+						 FROM tmp_fk_values_fms_acc_line
+						 GROUP BY 1
+						 HAVING max(expenditure_object_history_id) is null) b on a.uniq_id=b.uniq_id
+	GROUP BY 1,2;
+
+	-- Generate the expenditure_object id for new records
+		
+	TRUNCATE etl.ref_expenditure_object_id_seq;
+	
+	INSERT INTO etl.ref_expenditure_object_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_exp_object;
+
+	RAISE NOTICE '1.9';
+	
+	INSERT INTO ref_expenditure_object(expenditure_object_id,expenditure_object_code,
+		expenditure_object_name,fiscal_year,created_date,created_load_id,original_expenditure_object_name)
+	SELECT a.expenditure_object_id,b.obj_cd,
+		(CASE WHEN b.obj_cd <> '----' THEN '<Unknown Expenditure Object>'
+			ELSE '<Non-Applicable Expenditure Object>' END) as expenditure_object_name,
+		b.fiscal_year,now()::timestamp,p_load_id_in,
+		(CASE WHEN b.obj_cd <> '----' THEN '<Unknown Expenditure Object>'
+			ELSE '<Non-Applicable Expenditure Object>' END) as original_expenditure_object_name
+	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_fk_values_fms_acc_line_new_exp_object b ON a.uniq_id = b.uniq_id;
+
+	-- Generate the expenditure_object history id for history records
+	
+	TRUNCATE etl.ref_expenditure_object_history_id_seq;
+	
+	INSERT INTO etl.ref_expenditure_object_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_exp_object;
+
+	RAISE NOTICE '1.10';
+	
+	INSERT INTO ref_expenditure_object_history(expenditure_object_history_id,expenditure_object_id,fiscal_year,expenditure_object_name,created_date,load_id)
+	SELECT a.expenditure_object_history_id,c.expenditure_object_id,b.fiscal_year,
+		(CASE WHEN b.obj_cd <> '----' THEN '<Unknown Expenditure Object>'
+			ELSE '<Non-Applicable Expenditure Object>' END) as expenditure_object_name,now()::timestamp,p_load_id_in
+	FROM   etl.ref_expenditure_object_history_id_seq a JOIN tmp_fk_values_fms_acc_line_new_exp_object b ON a.uniq_id = b.uniq_id
+		JOIN etl.ref_expenditure_object_id_seq c ON a.uniq_id = c.uniq_id;
+
+	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,expenditure_object_history_id)
+	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
+	FROM etl.stg_fms_accounting_line a JOIN ref_expenditure_object b ON (COALESCE(a.obj_cd,'----') = b.expenditure_object_code 
+										OR (a.obj_cd='' AND b.expenditure_object_code='----')
+									     ) 
+									     AND a.fy_dc = b.fiscal_year
+		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
+		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
+	GROUP BY 1	;
+		
 	-- FK:budget_code_id
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,budget_code_id)
 	SELECT	a.uniq_id, b.budget_code_id
-	FROM etl.stg_fms_accounting_line a JOIN ref_budget_code b ON a.func_cd = b.budget_code AND a.bfy=b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_budget_code b ON a.func_cd = b.budget_code AND a.fy_dc=b.fiscal_year
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id;	
 		
@@ -229,13 +490,71 @@ BEGIN
 		
 	-- FK:location_history_id
 
-	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,agency_history_id)
+	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,location_history_id)
 	SELECT	a.uniq_id, max(c.location_history_id) 
 	FROM etl.stg_fms_accounting_line a JOIN ref_location b ON a.loc_cd = b.location_code
 		JOIN ref_location_history c ON b.location_id = c.location_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 	GROUP BY 1	;	
 	
+	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line_new_loc(loc_cd varchar,agency_history_id integer,agency_id integer, fiscal_year smallint,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+
+	INSERT INTO tmp_fk_values_fms_acc_line_new_loc
+	SELECT (CASE WHEN COALESCE(loc_cd,'') ='' THEN '----' ELSE loc_cd END) as loc_cd,
+		d.agency_history_id,c.agency_id,a.fy_dc,min(b.uniq_id)
+	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
+						 FROM tmp_fk_values_fms_acc_line
+						 GROUP BY 1
+						 HAVING max(location_history_id) is null) b on a.uniq_id=b.uniq_id
+	     JOIN ref_agency c ON a.dept_cd = c.agency_code
+	     JOIN ref_agency_history d ON c.agency_id = d.agency_id					 
+	GROUP BY 1,2,3,4;
+	
+	-- Generate the location id for new records
+		
+	TRUNCATE etl.ref_location_id_seq;
+	
+	INSERT INTO etl.ref_location_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_loc;
+
+	INSERT INTO ref_location(location_id,location_code,location_name,agency_id,created_date,created_load_id,original_location_name)
+	SELECT a.location_id,b.loc_cd,(CASE WHEN COALESCE(b.loc_cd,'') <> '' THEN '<Unknown Location>'
+			ELSE 'Non-Applicable Location' END) as location_name,b.agency_id,now()::timestamp,p_load_id_in,
+			(CASE WHEN COALESCE(b.loc_cd,'') <> '' THEN '<Unknown Location>'
+			ELSE 'Non-Applicable Location' END) as original_location_name
+	FROM   etl.ref_location_id_seq a JOIN tmp_fk_values_fms_acc_line_new_loc b ON a.uniq_id = b.uniq_id;
+	
+
+	RAISE NOTICE '1.5';
+	-- Generate the location history id for history records
+	
+	TRUNCATE etl.ref_location_history_id_seq;
+	
+	INSERT INTO etl.ref_location_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_fms_acc_line_new_loc;
+
+	INSERT INTO ref_location_history(location_history_id,location_id,location_name,
+					 created_date,load_id)
+	SELECT a.location_history_id,c.location_id,	
+		(CASE WHEN COALESCE(b.loc_cd,'') <> '' THEN '<Unknown Location>'
+			ELSE 'Non-Applicable Location' END) as location_name,
+		now()::timestamp,p_load_id_in
+	FROM   etl.ref_location_history_id_seq a JOIN tmp_fk_values_fms_acc_line_new_loc b ON a.uniq_id = b.uniq_id
+		JOIN etl.ref_location_id_seq  c ON a.uniq_id = c.uniq_id ;
+
+
+	RAISE NOTICE '1.6';
+	
+	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,location_history_id)
+	SELECT	a.uniq_id, max(c.location_history_id) 
+	FROM etl.stg_fms_accounting_line a JOIN ref_location b ON COALESCE(a.loc_cd,'----') = b.location_code OR (a.loc_cd ='' AND b.location_code='----')
+		JOIN ref_location_history c ON b.location_id = c.location_id
+		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
+		JOIN etl.ref_location_history_id_seq f ON c.location_history_id = f.location_history_id
+	GROUP BY 1	;		
 
 	-- FK:masked_agency_history_id
 	-- If dept_cd is 096 in stg_fms_accounting_line, public_agency_id is updated to the one corresponding to 069.	
@@ -275,7 +594,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,masked_department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.bfy = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -286,7 +605,7 @@ BEGIN
 	--FK:masked_department_history_id
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,masked_department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.bfy = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -299,7 +618,7 @@ BEGIN
 	--FK:masked_department_history_id
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,masked_department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.bfy = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -520,12 +839,12 @@ BEGIN
 		AND b.legal_name='(PRIVACY/SECURITY)'
 	INTO	l_masked_vendor_history_id;	
 		
-	l_fk_update := etl.updateForeignKeysForFMSInHeader();
+	l_fk_update := etl.updateForeignKeysForFMSInHeader(p_load_id_in);
 
 	RAISE NOTICE 'CON 1';
 	
 	IF l_fk_update = 1 THEN
-		l_fk_update := etl.updateForeignKeysForFMSVendors();
+		l_fk_update := etl.updateForeignKeysForFMSVendors(p_load_id_in);
 	ELSE
 		RETURN -1;
 	END IF;
@@ -533,7 +852,7 @@ BEGIN
 	RAISE NOTICE 'CON 2';
 	
 	IF l_fk_update = 1 THEN
-		l_fk_update := etl.updateForeignKeysForFMSInAccLine();
+		l_fk_update := etl.updateForeignKeysForFMSInAccLine(p_load_id_in);
 	ELSE
 		RETURN -1;
 	END IF;
@@ -622,7 +941,7 @@ BEGIN
 		a.fund_class_id,(CASE WHEN l_display_type='P' THEN a.masked_agency_history_id ELSE a.agency_history_id END) as agency_history_id,
 		(CASE WHEN l_display_type='P' THEN a.masked_department_history_id ELSE a.department_history_id END) as department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_id,
-		a.rpt_cd,a.chk_amt,(CASE WHEN l_display_type='P' THEN l_masked_agreement_id ELSE a.agreement_id END) as agreement_id,
+		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -a.chk_amt ELSE a.chk_amt END),(CASE WHEN l_display_type='P' THEN l_masked_agreement_id ELSE a.agreement_id END) as agreement_id,
 		a.rqporf_actg_ln_no,a.location_history_id,a.rtg_ln_am,
 		p_load_id_in, now()::timestamp
 	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
@@ -716,16 +1035,17 @@ BEGIN
 	INSERT INTO agreement_accounting_line
 	SELECT a.* FROM all_agreement_accounting_line a JOIN tmp_con_deletion_fms_1 b ON a.agreement_id = b.agreement_id;	
 	
-	RETURN 1;
 	
 	-- Inserting into the fact_disbursement_line_item
 
 	RAISE NOTICE 'CON 16';
-	INSERT INTO fact_disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,
+	INSERT INTO fact_disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
+						check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
 						agreement_id,master_agreement_id,fund_class_id,
 						check_amount,agency_id,expenditure_object_id,
 						vendor_id,maximum_contract_amount,maximum_spending_limit)
 	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
+		f.nyc_year_id,f.calendar_month_id,
 		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
 		b.check_amount,c.agency_id,d.expenditure_object_id,
 		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit
@@ -733,6 +1053,7 @@ BEGIN
 			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
 			JOIN ref_expenditure_object_history d ON b.expenditure_object_history_id = d.expenditure_object_history_id
 			JOIN vendor_history e ON a.vendor_history_id = e.vendor_history_id
+			JOIN ref_date f ON a.check_eft_issued_date_id = f.date_id
 	WHERE a.load_id = p_load_id_in;
 	
 
@@ -766,6 +1087,8 @@ BEGIN
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
 
+	RETURN 1;
+	
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in processFMS';
