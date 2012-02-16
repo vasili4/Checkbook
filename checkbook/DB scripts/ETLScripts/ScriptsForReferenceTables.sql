@@ -1,13 +1,45 @@
-CREATE OR REPLACE FUNCTION etl.initializedate(p_start_date_in date, p_end_date_in date) RETURNS INT AS $$
+COPY etl.ref_data_source FROM '/home/gpadmin/athiagarajan/NYC/ref_data_source.csv' CSV QUOTE as '"';
+
+COPY etl.ref_column_mapping FROM '/home/gpadmin/athiagarajan/NYC/ref_column_mapping.csv' CSV QUOTE as '"';
+
+COPY etl.ref_validation_rule FROM '/home/gpadmin/athiagarajan/NYC/ref_validation_rule.csv' CSV QUOTE as '"';
+
+COPY etl.ref_file_name_pattern FROM '/home/gpadmin/athiagarajan/NYC/ref_file_name_pattern.csv' CSV QUOTE as '"';
+---------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION initializedate(p_start_date_in date, p_end_date_in date) RETURNS INT AS $$
 DECLARE
 	l_no_of_days int;
+	l_no_of_years int;
 BEGIN
 	l_no_of_days := p_end_date_in - p_start_date_in;
 	
 	IF l_no_of_days > 0 THEN
-		INSERT INTO ref_date(date)
-		SELECT p_start_date_in + s.a as dates 
-		FROM   generate_series(1,l_no_of_days,1) as s(a);
+	
+		INSERT INTO ref_year(year_value)
+		SELECT s.a as year_value
+		FROM GENERATE_SERIES(EXTRACT(year from p_start_date_in)::int,EXTRACT(year from p_end_date_in)::int,1) as s(a);
+		
+		INSERT INTO ref_month(month_value, year_id)
+		SELECT EXTRACT(month from p_start_date_in) + series_month.month as month_value,
+			 to_char(to_timestamp(to_char(EXTRACT(month from p_start_date_in) + series_month.month, '99'), 'MM'), 'Month') as month_name
+			ref_year.year_id
+		FROM GENERATE_SERIES(0,11,1) as series_month(month)
+		     CROSS JOIN generate_series(EXTRACT(year from p_start_date_in)::int,EXTRACT(year from p_end_date_in)::int,1) as series_year(year)
+		     JOIN ref_year ON series_year.year = ref_year.year_value;		
+		
+		INSERT INTO ref_date(date,nyc_year_id,calendar_month_id)
+		SELECT dates,b.year_id,c.month_id
+		FROM
+			(
+			SELECT p_start_date_in + series_days.day_count as dates , (CASE WHEN EXTRACT(MONTH FROM p_start_date_in + series_days.day_count) >= 7 THEN extract(year from p_start_date_in + series_days.day_count)+1 
+						ELSE EXTRACT(YEAR FROM p_start_date_in + series_days.day_count) END) as year_value,
+						EXTRACT(MONTH FROM p_start_date_in + series_days.day_count) as calendar_month,
+						EXTRACT(YEAR FROM p_start_date_in + series_days.day_count) as calendar_year
+			FROM   generate_series(1,l_no_of_days,1) as series_days(day_count)
+			) inner_tbl JOIN ref_year b ON inner_tbl.year_value = b.year_value
+			JOIN ref_month c ON  inner_tbl.calendar_month = c.month_value
+			JOIN ref_year d ON inner_tbl.calendar_year = d.year_value AND d.year_id = c.year_id ;
 
 		RETURN 1;
 	ELSE
@@ -51,3 +83,56 @@ INSERT INTO ref_minority_type values (1,'Unspecified MWBE',now()::timestamp),
 INSERT INTO ref_business_type_status values (1,'Requested',now()::timestamp),
 					(2,'Accepted',now()::timestamp),
 					(3,'Rejected',now()::timestamp);
+					
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+COPY etl.stg_award_method FROM '/home/gpadmin/athiagarajan/NYC/datafiles/AwardMethodFromSQLServer.csv' CSV QUOTE as '"' ;
+
+INSERT INTO ref_award_method(award_method_code,award_method_name,created_date) SELECT  award_method_code,award_method_name,now()::timestamp  FROM etl.stg_award_method;
+
+COPY etl.stg_agreement_type FROM '/home/gpadmin/athiagarajan/NYC/datafiles/AgreementTypeFromSQLServer.csv' DELIMITER AS ',' ;
+  
+insert into ref_agreement_type(agreement_type_code,agreement_type_name,created_date) SELECT agreement_type_code,name,now()::timestamp from etl.stg_agreement_type;											
+
+
+COPY etl.stg_award_category FROM '/home/gpadmin/athiagarajan/NYC/datafiles/AgreementCategoryFromSQLServer.csv' CSV QUOTE as '"' ;
+
+INSERT INTO ref_award_category(award_category_code,award_category_name,created_date) SELECT award_category_code, award_method_name,now()::timestamp  from etl.stg_award_category;  
+
+
+INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES ('CT1','General Contract',now()::timestamp),
+										('CTA1', 'Multiple Award Contract',now()::timestamp),
+										('CTA2',NULL,now()::timestamp),
+										('DO1', 'Delivery Order',now()::timestamp),
+										('MA1', 'Master agreement',now()::timestamp),
+										('MMA1','Multiple Award Master Agreement',now()::timestamp),
+										('RCT1',NULL,now()::timestamp),
+										('MAC1',NULL,now()::timestamp),
+										('POC',NULL,now()::timestamp),
+										('POD',NULL,now()::timestamp),
+										('PCC1',NULL,now()::timestamp),
+										('AD',NULL,now()::timestamp),
+										('EFT',NULL,now()::timestamp);
+
+-- Dummy values
+
+insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
+
+insert into ref_document_function_code(document_function_code_id) select distinct doc_func_cd::int from etl.stg_con_ct_header where coalesce(doc_func_cd::int,0) <> 0;
+
+insert into ref_procurement_type(procurement_type_id) select distinct PRCU_TYP_ID from etl.stg_con_ct_header where coalesce(PRCU_TYP_ID,0) <> 0;
+
+insert into ref_award_level(award_level_code) select distinct AWD_LVL_CD from etl.stg_con_ct_award_detail where coalesce(AWD_LVL_CD,'') <> '';
+
+insert into ref_event_type(event_type_code) select distinct EVNT_TYP_ID from etl.stg_con_ct_accounting_line where coalesce(EVNT_TYP_ID,'')<>'';
+
+insert into ref_commodity_type (commodity_type_id ) select distinct LN_TYP from etl.stg_con_ct_commodity where coalesce(ln_typ,0)<>0;
+
+insert into ref_worksite(worksite_code)  select distinct wk_site_cd_01 from etl.stg_con_ct_award_detail where coalesce(wk_site_cd_01,'') <> '';
+
+insert into ref_expenditure_status(expenditure_status_id) values (1),(4);
+
+insert into ref_expenditure_cancel_type(expenditure_cancel_type_id) values (1),(8);
+
+insert into ref_expenditure_cancel_reason(expenditure_cancel_reason_id) values (9),(11);
+
