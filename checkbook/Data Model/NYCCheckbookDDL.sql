@@ -58,6 +58,8 @@ CREATE SEQUENCE seq_ref_agency_history_id;
 CREATE SEQUENCE seq_ref_expenditure_object_history_id;
 CREATE SEQUENCE seq_ref_location_history_id;
 CREATE SEQUENCE seq_ref_object_class_history_id;
+CREATE SEQUENCE seq_ref_year_year_id;
+CREATE SEQUENCE seq_ref_month_month_id;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /*Sequences for FMSV data feed*/
@@ -135,6 +137,32 @@ CREATE TABLE ref_agency_history (
  ALTER TABLE  ref_agency_history ADD constraint fk_ref_agency_history_etl_data_load FOREIGN KEY(load_id) references etl_data_load(load_id);
  ALTER TABLE  ref_agency_history ADD constraint fk_ref_agency_history_ref_agency FOREIGN KEY(agency_id) references ref_agency(agency_id);
 
+CREATE TABLE ref_year(
+	year_id smallint PRIMARY KEY default nextval('seq_ref_year_year_id'),
+	year_value smallint
+	)
+DISTRIBUTED BY (year_id);
+	
+CREATE TABLE ref_month(
+	month_id smallint PRIMARY KEY default nextval('seq_ref_month_month_id'),
+	month_value smallint,
+	month_name varchar,
+	year_id smallint
+	)
+DISTRIBUTED BY (month_id);
+ALTER TABLE  ref_month ADD constraint fk_ref_month_ref_year FOREIGN KEY(year_id) references ref_year(year_id);
+
+CREATE TABLE ref_date(
+  date_id    smallint PRIMARY KEY default nextval('seq_ref_date_date_id'),
+  date	     DATE,
+  nyc_year_id   smallint,
+  calendar_month_id smallint
+ )
+DISTRIBUTED BY (date_id);
+ALTER TABLE  ref_date ADD constraint fk_ref_date_ref_month FOREIGN KEY(calendar_month_id) references ref_month(month_id);
+ALTER TABLE  ref_date ADD constraint fk_ref_date_ref_year FOREIGN KEY(nyc_year_id) references ref_year(year_id);
+  
+  
 CREATE TABLE ref_date(
   date_id    smallint PRIMARY KEY default nextval('seq_ref_date_date_id'),
   date	     DATE,
@@ -1310,6 +1338,8 @@ CREATE TABLE fact_disbursement_line_item(
 	disbursement_id integer,
 	line_number integer,
 	check_eft_issued_date_id smallint,
+	check_eft_issued_nyc_year_id smallint,
+	check_eft_issued_cal_month_id smallint,
 	agreement_id bigint,
 	master_agreement_id bigint,
 	fund_class_id smallint,
