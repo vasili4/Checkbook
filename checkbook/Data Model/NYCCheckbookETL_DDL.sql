@@ -261,7 +261,7 @@ CREATE TABLE stg_agency(
 DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_agency (LIKE stg_agency) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_agency ADD COLUMN load_id bigint;
+ALTER TABLE archive_agency ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_agency (LIKE archive_agency) DISTRIBUTED BY (uniq_id);
 
@@ -283,7 +283,7 @@ CREATE TABLE stg_department(
 DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_department (LIKE stg_department) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_department ADD COLUMN load_id bigint;
+ALTER TABLE archive_department ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_department (LIKE archive_department) DISTRIBUTED BY (uniq_id);
 
@@ -307,7 +307,7 @@ DISTRIBUTED BY (uniq_id);
 
 
 CREATE TABLE archive_expenditure_object (LIKE stg_expenditure_object) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_expenditure_object ADD COLUMN load_id bigint;
+ALTER TABLE archive_expenditure_object ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_expenditure_object (LIKE archive_expenditure_object) DISTRIBUTED BY (uniq_id);
 
@@ -328,7 +328,7 @@ DISTRIBUTED BY (uniq_id);
    	) DISTRIBUTED BY (uniq_id);
   
 CREATE TABLE archive_location (LIKE stg_location) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_location ADD COLUMN load_id bigint;
+ALTER TABLE archive_location ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_location (LIKE archive_location) DISTRIBUTED BY (uniq_id); 
   
@@ -361,7 +361,7 @@ DISTRIBUTED BY (uniq_id);
    	) DISTRIBUTED BY (uniq_id);	
 	
 CREATE TABLE archive_object_class (LIKE stg_object_class) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_object_class ADD COLUMN load_id bigint;
+ALTER TABLE archive_object_class ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_object_class (LIKE archive_object_class) DISTRIBUTED BY (uniq_id); 
 
@@ -760,23 +760,23 @@ CREATE TABLE stg_mag_commodity(
 DISTRIBUTED BY (uniq_id)	;	
 
 CREATE TABLE archive_mag_header (LIKE stg_mag_header) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_mag_header ADD COLUMN load_id bigint;
+ALTER TABLE archive_mag_header ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_mag_header (LIKE archive_mag_header) DISTRIBUTED BY (uniq_id);
 
 
 CREATE TABLE archive_mag_award_detail (LIKE stg_mag_award_detail) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_mag_award_detail ADD COLUMN load_id bigint;
+ALTER TABLE archive_mag_award_detail ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_mag_award_detail (LIKE archive_mag_award_detail) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_mag_vendor (LIKE stg_mag_vendor) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_mag_vendor ADD COLUMN load_id bigint;
+ALTER TABLE archive_mag_vendor ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_mag_vendor (LIKE archive_mag_vendor) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_mag_commodity (LIKE stg_mag_commodity) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_mag_commodity ADD COLUMN load_id bigint;
+ALTER TABLE archive_mag_commodity ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_mag_commodity (LIKE archive_mag_commodity) DISTRIBUTED BY (uniq_id);
 
@@ -1001,24 +1001,24 @@ DISTRIBUTED BY (uniq_id)	;
 
 
 CREATE TABLE archive_fmsv_vendor (LIKE stg_fmsv_vendor) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fmsv_vendor ADD COLUMN load_id bigint;
+ALTER TABLE archive_fmsv_vendor ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fmsv_vendor (LIKE archive_fmsv_vendor) DISTRIBUTED BY (uniq_id);
 
 
 CREATE TABLE archive_fmsv_business_type (LIKE stg_fmsv_business_type) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fmsv_business_type ADD COLUMN load_id bigint;
+ALTER TABLE archive_fmsv_business_type ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fmsv_business_type (LIKE archive_fmsv_business_type) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_fmsv_address (LIKE stg_fmsv_address) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fmsv_address ADD COLUMN load_id bigint;
+ALTER TABLE archive_fmsv_address ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fmsv_address (LIKE archive_fmsv_address) DISTRIBUTED BY (uniq_id);
 
 
 CREATE TABLE archive_fmsv_address_type (LIKE stg_fmsv_address_type) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fmsv_address_type ADD COLUMN load_id bigint;
+ALTER TABLE archive_fmsv_address_type ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fmsv_address_type (LIKE archive_fmsv_address_type) DISTRIBUTED BY (uniq_id);
 
@@ -2576,72 +2576,72 @@ CREATE TABLE stg_con_do1_accounting_line(
 	DISTRIBUTED BY (uniq_id);	
 	
 CREATE TABLE archive_con_ct_header (LIKE stg_con_ct_header) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_ct_header ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_ct_header ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_ct_header (LIKE archive_con_ct_header) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_ct_award_detail (LIKE stg_con_ct_award_detail) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_ct_award_detail ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_ct_award_detail ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_ct_award_detail (LIKE archive_con_ct_award_detail) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_ct_vendor (LIKE stg_con_ct_vendor) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_ct_vendor ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_ct_vendor ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_ct_vendor (LIKE archive_con_ct_vendor) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_ct_commodity (LIKE stg_con_ct_commodity) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_ct_commodity ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_ct_commodity ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_ct_commodity (LIKE archive_con_ct_commodity) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_ct_accounting_line (LIKE stg_con_ct_accounting_line) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_ct_accounting_line ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_ct_accounting_line ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_ct_accounting_line (LIKE archive_con_ct_accounting_line) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_po_header (LIKE stg_con_po_header) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_po_header ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_po_header ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_po_header (LIKE archive_con_po_header) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_po_award_detail (LIKE stg_con_po_award_detail) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_po_award_detail ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_po_award_detail ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_po_award_detail (LIKE archive_con_po_award_detail) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_po_vendor (LIKE stg_con_po_vendor) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_po_vendor ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_po_vendor ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_po_vendor (LIKE archive_con_po_vendor) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_po_commodity (LIKE stg_con_po_commodity) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_po_commodity ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_po_commodity ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_po_commodity (LIKE archive_con_po_commodity) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_po_accounting_line (LIKE stg_con_po_accounting_line) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_po_accounting_line ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_po_accounting_line ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_po_accounting_line (LIKE archive_con_po_accounting_line) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_do1_header (LIKE stg_con_do1_header) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_do1_header ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_do1_header ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_do1_header (LIKE archive_con_do1_header) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_do1_vendor (LIKE stg_con_do1_vendor) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_do1_vendor ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_do1_vendor ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_do1_vendor (LIKE archive_con_do1_vendor) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_do1_commodity (LIKE stg_con_do1_commodity) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_do1_commodity ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_do1_commodity ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_do1_commodity (LIKE archive_con_do1_commodity) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_con_do1_accounting_line (LIKE stg_con_do1_accounting_line) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_con_do1_accounting_line ADD COLUMN load_id bigint;
+ALTER TABLE archive_con_do1_accounting_line ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_do1_accounting_line (LIKE archive_con_do1_accounting_line) DISTRIBUTED BY (uniq_id);
 
@@ -2819,17 +2819,17 @@ CREATE TABLE stg_fms_accounting_line(
 DISTRIBUTED BY (uniq_id)	;
 	
 CREATE TABLE archive_fms_header (LIKE stg_fms_header) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fms_header ADD COLUMN load_id bigint;
+ALTER TABLE archive_fms_header ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fms_header (LIKE archive_fms_header) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_fms_vendor (LIKE stg_fms_vendor) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fms_vendor ADD COLUMN load_id bigint;
+ALTER TABLE archive_fms_vendor ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fms_vendor (LIKE archive_fms_vendor) DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE archive_fms_accounting_line (LIKE stg_fms_accounting_line) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fms_accounting_line ADD COLUMN load_id bigint;
+ALTER TABLE archive_fms_accounting_line ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fms_accounting_line (LIKE archive_fms_accounting_line) DISTRIBUTED BY (uniq_id);	
 
@@ -2907,7 +2907,7 @@ CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
 
 
 CREATE TABLE archive_payroll_summary (LIKE stg_payroll_summary) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_payroll_summary ADD COLUMN load_id bigint;
+ALTER TABLE archive_payroll_summary ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_payroll_summary (LIKE archive_payroll_summary) DISTRIBUTED BY (uniq_id);	
 	
@@ -3257,7 +3257,7 @@ CREATE TABLE stg_revenue(
 	invalid_reason varchar			);
 	
 CREATE TABLE archive_revenue (LIKE stg_revenue) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_revenue ADD COLUMN load_id bigint;
+ALTER TABLE archive_revenue ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_revenue (LIKE archive_revenue) DISTRIBUTED BY (uniq_id);		
 
