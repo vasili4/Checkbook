@@ -605,7 +605,8 @@ CREATE TABLE ref_revenue_category (
     active_flag bit(1),
     budget_allowed_flag bit(1),
     description character varying(100),
-    created_date timestamp without time zone
+    created_date timestamp without time zone,
+    updated_load_id integer
 ) distributed by (revenue_category_id);
 
 CREATE TABLE ref_revenue_class (
@@ -616,7 +617,8 @@ CREATE TABLE ref_revenue_class (
   active_flag bit ,
   budget_allowed_flag bit ,
   description varchar(100),
-  created_date timestamp
+  created_date timestamp,
+    updated_load_id integer
 ) DISTRIBUTED BY (revenue_class_id);
 
 CREATE TABLE ref_revenue_source (
@@ -651,7 +653,8 @@ CREATE TABLE ref_revenue_source (
     federal_agency_suffix character varying(3),
     federal_name character varying(60),
     srsrc_req character(1),
-    created_date timestamp without time zone
+    created_date timestamp without time zone,
+    updated_load_id integer
 ) distributed by (revenue_source_id);
 
 
