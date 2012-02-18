@@ -2842,6 +2842,11 @@ CREATE TABLE seq_disbursement_line_item_id(uniq_id bigint,disbursement_line_item
 DISTRIBUTED BY (uniq_id);
 
 
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+/* verification and execution status tables */
+
 CREATE TABLE etl.etl_script_execution_status
 (
   load_file_id bigint,
@@ -2864,7 +2869,74 @@ CREATE TABLE etl.etl_data_load_verification
   description character varying
 )
 DISTRIBUTED BY (load_file_id);
+
 -----------------------------------------------------------------------------------------------------------------------------
+
+/* Budget Data Feed */
+
+create sequence etl.seq_stg_budget_uniq_id;
+
+CREATE EXTERNAL TABLE etl.ext_stg_budget_feed
+(
+  budget_fiscal_year character varying(10),
+  fund_class_code character varying(4),
+  agency_code  character varying(4),
+  dept_code character varying(9),
+  budget_code character varying(10),
+  object_class_code character varying(4),
+  adopted_amount character varying(60),
+  current_budget_amount character varying(60),
+  pre_encumbered_amount character varying(60),
+  encumbered_amount character varying(60),
+  accrued_expense_amount  character varying(60),
+  cash_expense_amount  character varying(60),
+  post_closing_adjustment_amount character varying(60),
+  updated_date character varying(60)
+)
+ LOCATION (
+    'gpfdist://mdw1:8081/datafiles/BUDGET_feed.txt'
+)
+ FORMAT 'text' (delimiter '|' null E'\\N' escape '~' fill missing fields)
+ENCODING 'UTF8';
+
+
+CREATE TABLE etl.stg_budget
+(
+  budget_fiscal_year smallint,
+  fund_class_code character varying(4),
+  agency_code  character varying(4),
+  dept_code character varying(9),
+  budget_code character varying(10),
+  object_class_code character varying(4),
+  adopted_amount numeric(20,2),
+  current_budget_amount numeric(20,2),
+  pre_encumbered_amount numeric(20,2),
+  encumbered_amount numeric(20,2),
+  accrued_expense_amount  numeric(20,2),
+  cash_expense_amount  numeric(20,2),
+  post_closing_adjustment_amount numeric(20,2),
+  updated_date timestamp without time zone,
+  fund_class_id smallint,
+  agency_history_id smallint,
+  department_history_id integer,
+  budget_code_id integer,
+  object_class_history_id integer,
+  updated_date_id smallint,
+  total_expenditure_amount numeric(20,2),
+  uniq_id bigint DEFAULT nextval('etl.seq_stg_budget_uniq_id'::regclass),
+  invalid_flag character(1),
+  invalid_reason character varying
+)
+DISTRIBUTED BY (uniq_id);
+
+
+CREATE TABLE etl.archive_budget (LIKE etl.stg_budget) DISTRIBUTED BY (uniq_id);
+ALTER TABLE etl.archive_budget ADD COLUMN load_file_id bigint;
+
+CREATE TABLE etl.invalid_budget (LIKE etl.archive_budget) DISTRIBUTED BY (uniq_id);
+
+----------------------------------------------------------------------------------------------------------------
+
 /* PMS data feed */
 
 CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
