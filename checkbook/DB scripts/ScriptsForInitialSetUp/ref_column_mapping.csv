@@ -2148,3 +2148,17 @@ etl.ext_stg_coa_revenue_category_feed,rscat_dscr,varchar,etl.stg_revenue_categor
 etl.ext_stg_coa_revenue_category_feed,cntac_cd,varchar,etl.stg_revenue_category,cntac_cd,int,10
 etl.ext_stg_coa_revenue_category_feed,rscat_nm_up,varchar,etl.stg_revenue_category,rscat_nm_up,varchar,11
 etl.ext_stg_coa_revenue_category_feed,tbl_last_dt,varchar,etl.stg_revenue_category,tbl_last_dt,date,12
+etl.ext_stg_budget_feed,budget_fiscal_year,varchar,etl.stg_budget,budget_fiscal_year,smallint,1
+etl.ext_stg_budget_feed,fund_class_code,varchar,etl.stg_budget,fund_class_code,varchar,2
+etl.ext_stg_budget_feed,agency_code,varchar,etl.stg_budget,agency_code,varchar,3
+etl.ext_stg_budget_feed,dept_code,varchar,etl.stg_budget,dept_code,varchar,4
+etl.ext_stg_budget_feed,budget_code,varchar,etl.stg_budget,budget_code,varchar,5
+etl.ext_stg_budget_feed,object_class_code,varchar,etl.stg_budget,object_class_code,varchar,6
+etl.ext_stg_budget_feed,adopted_amount,varchar,etl.stg_budget,adopted_amount,"numeric(20,2)",7
+etl.ext_stg_budget_feed,current_budget_amount,varchar,etl.stg_budget,current_budget_amount,"numeric(20,2)",8
+etl.ext_stg_budget_feed,pre_encumbered_amount,varchar,etl.stg_budget,pre_encumbered_amount,"numeric(20,2)",9
+etl.ext_stg_budget_feed,encumbered_amount,varchar,etl.stg_budget,encumbered_amount,"numeric(20,2)",10
+etl.ext_stg_budget_feed,accrued_expense_amount,varchar,etl.stg_budget,accrued_expense_amount,"numeric(20,2)",11
+etl.ext_stg_budget_feed,cash_expense_amount,varchar,etl.stg_budget,cash_expense_amount,"numeric(20,2)",12
+etl.ext_stg_budget_feed,post_closing_adjustment_amount,varchar,etl.stg_budget,post_closing_adjustment_amount,"numeric(20,2)",13
+etl.ext_stg_budget_feed,updated_date,varchar,etl.stg_budget,updated_date,timestamp,14

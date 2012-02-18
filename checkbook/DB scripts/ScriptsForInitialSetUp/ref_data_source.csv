@@ -42,7 +42,8 @@ P,PMS,,,,,etl.ext_stg_pms_data_feed,,,1,4
 P,PMS,,,,,etl.stg_payroll_summary,etl.archive_payroll_summary,etl.invalid_payroll_summary,2,4
 R,Revenue,,,,,etl.ext_stg_revenue,,,1,2
 R,Revenue,,,,,etl.stg_revenue,etl.archive_revenue,etl.invalid_revenue,2,2
-B,Budget,,,,,etl.ext_stg_budget,etl.archive_budget,etl.invalid_budget,4,2
+B,Budget,,,,,etl.ext_stg_budget_feed,,,1,2
+B,Budget,,,,,etl.stg_budget,etl.archive_budget,etl.invalid_budget,2,2
 RY,Revenue-Category,,,,,etl.ext_stg_coa_revenue_category_feed,,,1,1
 RY,Revenue-Category,,,,,etl.stg_revenue_category,etl.archive_revenue_category,etl.invalid_revenue_category,2,1
 RC,Revenue_Class,,,,,etl.ext_stg_coa_revenue_class_feed,,,1,1
