@@ -632,6 +632,9 @@ BEGIN
 
 		ELSIF 	l_data_source_code ='C' THEN
 			l_processed := etl.processCon(p_load_file_id_in,l_load_id);
+		
+		ELSIF 	l_data_source_code ='B' THEN
+			l_processed := etl.processbudget(p_load_file_id_in,l_load_id);
 
 		END IF;
 
