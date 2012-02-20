@@ -50,3 +50,5 @@ RC,Revenue_Class,,,,,etl.ext_stg_coa_revenue_class_feed,,,1,1
 RC,Revenue_Class,,,,,etl.stg_revenue_class,etl.archive_revenue_class ,etl.invalid_revenue_class ,2,1
 RS,Revenue_Source,,,,,etl.ext_stg_coa_revenue_source_feed,,,1,2
 RS,Revenue_Source,,,,,etl.stg_revenue_source,etl.archive_revenue_source ,etl.invalid_revenue_source ,2,2
+BC,Budget_Code,,,,,etl.ext_stg_coa_budget_code_feed,,,1,1
+BC,Budget_Code,,,,,etl.stg_budget_code,etl.archive_budget_code,etl.invalid_budget_code,2,1
