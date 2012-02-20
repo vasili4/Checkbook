@@ -167,7 +167,7 @@ RY,,,Missing key elements,,,rscat_cd,,,,,1
 RY,,,Duplicate,,,rscat_cd,,,,,2
 RC,,,Missing key elements,,,rscls_cd,,,,,1
 RC,,,Duplicate,,,rscls_cd,,,,,2
-RS,,,Missing key elements,,,rsrc_cd,,,,,1
+RS,,,Missing key elements,,,"rsrc_cd,fy",,,,,1
 RS,,,Duplicate,,,rsrc_cd,,,,,2
 M,H,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,1
 M,H,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,2
@@ -200,5 +200,7 @@ M,C,,Missing header,etl.stg_mag_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",
 M,C,,Invalid component - header,etl.stg_mag_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,57
 M,C,,Invalid component - vendor,,etl.stg_mag_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,58
 M,C,,Invalid component - commodity,,etl.stg_mag_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,59
+BC,,,Missing key elements,,,"func_cd,fy,fcls_cd,dept_cd",,,,,1
+BC,,,Duplicate,,,"func_cd,fy,fcls_cd,dept_cd",,,,,2
 B,,,Missing key elements,,,"budget_fiscal_year,fund_class_code,agency_code,department_code,budget_code,object_class_code",,,,,1
 B,,,Duplicate,,,"budget_fiscal_year,fund_class_code,agency_code,department_code,budget_code,object_class_code",,,,,2
