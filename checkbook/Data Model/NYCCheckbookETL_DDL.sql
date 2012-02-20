@@ -2905,7 +2905,7 @@ CREATE TABLE etl.stg_budget
   budget_fiscal_year smallint,
   fund_class_code character varying(4),
   agency_code  character varying(4),
-  dept_code character varying(9),
+  department_code character varying(9),
   budget_code character varying(10),
   object_class_code character varying(4),
   adopted_amount numeric(20,2),
@@ -2923,6 +2923,7 @@ CREATE TABLE etl.stg_budget
   object_class_history_id integer,
   updated_date_id smallint,
   total_expenditure_amount numeric(20,2),
+  action_flag character(1),
   uniq_id bigint DEFAULT nextval('etl.seq_stg_budget_uniq_id'::regclass),
   invalid_flag character(1),
   invalid_reason character varying
