@@ -2881,7 +2881,7 @@ CREATE EXTERNAL TABLE etl.ext_stg_budget_feed
   budget_fiscal_year character varying(10),
   fund_class_code character varying(4),
   agency_code  character varying(4),
-  dept_code character varying(9),
+  department_code character varying(9),
   budget_code character varying(10),
   object_class_code character varying(4),
   adopted_amount character varying(60),
