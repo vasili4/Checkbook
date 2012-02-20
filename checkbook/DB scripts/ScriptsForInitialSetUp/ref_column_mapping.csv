@@ -2148,7 +2148,6 @@ etl.ext_stg_coa_revenue_category_feed,rscat_dscr,varchar,etl.stg_revenue_categor
 etl.ext_stg_coa_revenue_category_feed,cntac_cd,varchar,etl.stg_revenue_category,cntac_cd,int,10
 etl.ext_stg_coa_revenue_category_feed,rscat_nm_up,varchar,etl.stg_revenue_category,rscat_nm_up,varchar,11
 etl.ext_stg_coa_revenue_category_feed,tbl_last_dt,varchar,etl.stg_revenue_category,tbl_last_dt,date,12
-<<<<<<< .mine,,,,,,
 etl.ext_stg_coa_budget_code_feed,fy,varchar,etl.stg_budget_code,fy,int,1
 etl.ext_stg_coa_budget_code_feed,fcls_cd,varchar,etl.stg_budget_code,fcls_cd,varchar(4),2
 etl.ext_stg_coa_budget_code_feed,fcls_nm,varchar,etl.stg_budget_code,fcls_nm,varchar(60),3
