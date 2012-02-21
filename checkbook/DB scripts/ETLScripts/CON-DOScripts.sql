@@ -30,6 +30,51 @@ BEGIN
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1;
 	
+	CREATE TEMPORARY TABLE tmp_fk_values_do1_new_agencies(dept_cd varchar,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_values_do1_new_agencies
+	SELECT doc_dept_cd,MIN(b.uniq_id) as uniq_id
+	FROM etl.tmp_fk_values_do1 a join (SELECT uniq_id
+						 FROM tmp_fk_values_do1
+						 GROUP BY 1
+						 HAVING max(agency_history_id) is null) b on a.uniq_id=b.uniq_id
+	GROUP BY 1;
+
+	RAISE NOTICE '1';
+	
+	TRUNCATE etl.ref_agency_id_seq;
+	
+	INSERT INTO etl.ref_agency_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_do1_new_agencies;
+	
+	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
+	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
+	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_values_do1_new_agencies b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.1';
+
+	-- Generate the agency history id for history records
+	
+	TRUNCATE etl.ref_agency_history_id_seq;
+	
+	INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_do1_new_agencies;
+
+	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
+	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
+	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.3';
+	INSERT INTO tmp_fk_values_do1(uniq_id,agency_history_id)
+	SELECT	a.uniq_id, max(c.agency_history_id) 
+	FROM etl.tmp_fk_values_do1 a JOIN ref_agency b ON a.doc_dept_cd = b.agency_code
+		JOIN ref_agency_history c ON b.agency_id = c.agency_id
+		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
+	GROUP BY 1	;	
+	
 	-- FK:document_function_code_id
 	
 	INSERT INTO tmp_fk_values_do1(uniq_id,document_function_code_id)
@@ -528,22 +573,19 @@ BEGIN
 		
 	/* Identify the agreements which have to be deleted since the latest version has been recieved in the data feed.*/
 	
-	CREATE TEMPORARY TABLE tmp_do1_deletion(agreement_id bigint)
+	CREATE TEMPORARY TABLE tmp_do1_deletion(agreement_id bigint,new_agreement_id bigint, uniq_id bigint)
 	DISTRIBUTED BY (agreement_id);
 	
 	INSERT INTO tmp_do1_deletion
-	SELECT  unnest(string_to_array(old_agreement_ids,','))::int
+	SELECT  unnest(string_to_array(old_agreement_ids,','))::int as agreement_id, agreement_id as new_agreement_id, uniq_id
 	FROM	tmp_do1_con
 	WHERE	action_flag = 'I'
 		AND latest_flag ='Y';	
-		
-	DELETE FROM agreement_accounting_line WHERE agreement_id IN (select agreement_id from tmp_do1_deletion);
+			
 	DELETE FROM all_agreement_accounting_line WHERE agreement_id IN (select agreement_id from tmp_do1_deletion);
 	
-	DELETE FROM agreement_commodity WHERE agreement_id IN (select agreement_id from tmp_do1_deletion);
 	DELETE FROM all_agreement_commodity WHERE agreement_id IN (select agreement_id from tmp_do1_deletion);
 	
-	DELETE FROM agreement_worksite WHERE agreement_id IN (select agreement_id from tmp_do1_deletion) AND master_agreement_yn='N';
 	DELETE FROM all_agreement_worksite WHERE agreement_id IN (select agreement_id from tmp_do1_deletion) AND master_agreement_yn='N';	
 	
 	DELETE FROM agreement WHERE agreement_id IN (select agreement_id from tmp_do1_deletion);
@@ -561,7 +603,7 @@ BEGIN
 				source_created_date_id,source_updated_date_id,document_function_code_id,
 				vendor_history_id,vendor_preference_level,
 				document_name,original_term_begin_date_id,
-				original_term_end_date_id,privacy_flag,load_id,created_date)
+				original_term_end_date_id,privacy_flag,created_load_id,created_date)
 	SELECT	d.agreement_id,a.master_agreement_id,a.document_code_id,
 		a.agency_history_id,a.doc_id,a.doc_vers_no,
 		a.trkg_no,a.record_date_id,a.doc_bfy,
@@ -596,7 +638,7 @@ BEGIN
 				source_created_date_id,source_updated_date_id,document_function_code_id,
 				vendor_history_id,vendor_preference_level,
 				document_name,original_term_begin_date_id,
-				original_term_end_date_id,privacy_flag,load_id,created_date)
+				original_term_end_date_id,privacy_flag,created_load_id,created_date)
 	SELECT	d.agreement_id,a.master_agreement_id,a.document_code_id,
 		a.agency_history_id,a.doc_id,a.doc_vers_no,
 		a.trkg_no,a.record_date_id,a.doc_bfy,
@@ -662,10 +704,34 @@ BEGIN
 		original_term_begin_date_id = b.original_term_begin_date_id,
 		original_term_end_date_id = b.original_term_end_date_id,
 		privacy_flag = b.privacy_flag,
-		load_id = b.load_id,		
+		updated_load_id = b.load_id,		
 		updated_date = b.updated_date
 	FROM	tmp_con_do1_update b
 	WHERE	a.agreement_id = b.agreement_id;
+	
+	-- Associate Disbursement line item to the latest version of the agreement
+	
+	CREATE TEMPORARY TABLE tmp_do1_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint)
+	DISTRIBUTED BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_do1_fms_line_item
+	SELECT disbursement_line_item_id, b.new_agreement_id
+	FROM disbursement_line_item a JOIN tmp_do1_deletion b ON a.agreement_id = b.agreement_id;
+	
+	UPDATE disbursement_line_item a
+	SET	agreement_id = b.agreement_id,
+		updated_load_id = p_load_id_in,
+		updated_date = now()::timestamp
+	FROM	tmp_do1_fms_line_item b
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	UPDATE fact_disbursement_line_item a
+	SET	agreement_id = b.agreement_id
+	FROM	tmp_do1_fms_line_item b
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	-- End of associating Disbursement line item to the latest version of an agreement
+
 	
 	/* Delete the existing agreement line items
 	Rule is set up on all_agreement_accounting_line to delete from agreement_accounting_line
@@ -803,6 +869,22 @@ BEGIN
 	WHERE	privacy_flag = 'F';	
 
 	RAISE NOTICE 'CON 13';
+	
+	------------ Insering into the fact table----------------------------------------------------------------------------------------------------
+
+	DELETE FROM fact_agreement WHERE agreement_id IN (SELECT agreement_id FROM tmp_do1_deletion);
+	
+	INSERT INTO fact_agreement(agreement_id,master_agreement_id,document_code_id,agency_id,
+				document_id,document_version,effective_begin_date_id,effective_end_date_id,
+				registered_date_id,maximum_contract_amount,award_method_id,
+				vendor_id,original_contract_amount,master_agreement_yn)
+	SELECT a.agreement_id,a.master_agreement_id,a.document_code_id,b.agency_id,
+		a.document_id,a.document_version,a.effective_begin_date_id,a.effective_end_date_id,
+		a.registered_date_id,a.maximum_contract_amount,a.award_method_id,
+		c.vendor_id,a.original_contract_amount,'N' as master_agreement_yn
+	FROM   agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+		JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
+		JOIN tmp_do1_con d ON a.agreement_id = b.agreement_id;				
 	
 	RETURN 1;
 	
