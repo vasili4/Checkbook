@@ -42,7 +42,7 @@ BEGIN
 	-- Inserting new vendor records
 	
 	INSERT INTO vendor(vendor_id,vendor_customer_code,legal_name,alias_name,miscellaneous_vendor_flag,
-			   vendor_sub_code,load_id,created_date)
+			   vendor_sub_code,created_load_id,created_date)
 	SELECT 	b.vendor_id,a.vendor_customer_code,a.legal_name,a.alias_name,a.miscellaneous_vendor_flag,
 		NULL as vendor_sub_code,p_load_id_in as load_id, now()::timestamp
 	FROM	tmp_vendor a JOIN etl.vendor_id_seq b ON a.uniq_id = b.uniq_id;
@@ -57,7 +57,9 @@ BEGIN
 	
 	UPDATE vendor a
 	SET    legal_name = b.legal_name,
-		alias_name = b.alias_name
+		alias_name = b.alias_name,
+		updated_load_id = p_load_id_in,
+		updated_date = now()::timestamp
 	FROM	tmp_vendor_update b
 	WHERE	a.vendor_id = b.vendor_id;
 	
