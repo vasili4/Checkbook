@@ -710,7 +710,9 @@ CREATE TABLE vendor (
     alias_name character varying(60),
     miscellaneous_vendor_flag bit(1),
     vendor_sub_code integer DEFAULT nextval('seq_vendor_vendor_sub_code'::regclass),
-    load_id integer,
+    display_flag CHAR(1) DEFAULT 'Y',
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (vendor_id);
@@ -955,7 +957,8 @@ CREATE TABLE agreement (
     original_term_begin_date_id smallint,
     original_term_end_date_id smallint,
     privacy_flag char(1),
-    load_id integer,
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (agreement_id);
@@ -1059,7 +1062,8 @@ CREATE TABLE all_disbursement_line_item (
     agreement_accounting_line_number integer,
     location_history_id integer,
     retainage_amount numeric(16,2),
-    load_id integer,
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (disbursement_line_item_id);
