@@ -72,8 +72,10 @@ BEGIN
 	
 	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
 	SELECT a.agency_history_id,c.agency_id,b.agency_name,now()::timestamp,p_load_id_in
-	FROM   etl.ref_agency_history_id_seq a JOIN tmp_ref_agency_1 b ON a.uniq_id = b.uniq_id
-		JOIN ref_agency c ON b.agency_code = c.agency_code;
+	FROM   etl.ref_agency_history_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id
+		JOIN ref_agency c ON b.agency_code = c.agency_code
+	WHERE   exists_flag ='N'
+		OR (exists_flag ='Y' and modified_flag='Y') 	;
 
 	RETURN 1;
 EXCEPTION
@@ -132,7 +134,7 @@ BEGIN
 	SELECT min(uniq_id)
 	FROM   tmp_ref_department
 	WHERE  exists_flag ='N'
-	       AND agency_id =0
+	       AND COALESCE(agency_id,0) =0
 	GROUP BY agency_code;
 	
 	CREATE TEMPORARY TABLE tmp_agency_id(uniq_id bigint, agency_id smallint)
@@ -180,7 +182,7 @@ BEGIN
 	SELECT min(uniq_id)
 	FROM   tmp_ref_department
 	WHERE  exists_flag ='N'
-	       AND fund_class_id =0
+	       AND COALESCE(fund_class_id,0) =0
 	GROUP BY fund_class_code;
 
 	RAISE NOTICE '3.1';
@@ -255,7 +257,9 @@ BEGIN
 	SELECT a.department_history_id,c.department_id,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id
 		JOIN ref_department c ON b.department_code = c.department_code AND b.agency_id = c.agency_id 
-			AND b.fund_class_id = c.fund_class_id AND b.fiscal_year=c.fiscal_year;
+			AND b.fund_class_id = c.fund_class_id AND b.fiscal_year=c.fiscal_year
+	WHERE	exists_flag ='N'
+		OR (exists_flag ='Y' and modified_flag='Y');			
 
 	RETURN 1;
 EXCEPTION
@@ -331,8 +335,10 @@ BEGIN
 	INSERT INTO ref_expenditure_object_history(expenditure_object_history_id,expenditure_object_id,fiscal_year,expenditure_object_name,created_date,load_id)
 	SELECT a.expenditure_object_history_id,c.expenditure_object_id,b.fiscal_year,b.expenditure_object_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_expenditure_object_history_id_seq a JOIN tmp_ref_expenditure_object b ON a.uniq_id = b.uniq_id
-		JOIN ref_expenditure_object c ON b.expenditure_object_code = c.expenditure_object_code AND b.fiscal_year = c.fiscal_year;
-
+		JOIN ref_expenditure_object c ON b.expenditure_object_code = c.expenditure_object_code AND b.fiscal_year = c.fiscal_year
+	WHERE	exists_flag ='N'
+		OR (exists_flag ='Y' and modified_flag='Y');
+		
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
@@ -385,7 +391,7 @@ BEGIN
 	SELECT min(uniq_id)
 	FROM   tmp_ref_location
 	WHERE  exists_flag ='N'
-	       AND agency_id =0
+	       AND COALESCE(agency_id,0) =0
 	GROUP BY agency_code;
 	
 	CREATE TEMPORARY TABLE tmp_agency_id(uniq_id bigint, agency_id smallint)
@@ -474,8 +480,10 @@ BEGIN
 	INSERT INTO ref_location_history(location_history_id,location_id,location_name,agency_id,location_short_name,created_date,load_id)
 	SELECT a.location_history_id,c.location_id,b.location_name,b.agency_id,b.location_short_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_location_history_id_seq a JOIN tmp_ref_location b ON a.uniq_id = b.uniq_id
-		JOIN ref_location c ON b.location_code = c.location_code AND b.agency_id = c.agency_id;
-
+		JOIN ref_location c ON b.location_code = c.location_code AND b.agency_id = c.agency_id
+	WHERE	exists_flag ='N'
+		OR (exists_flag ='Y' and modified_flag='Y');
+		
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
@@ -571,8 +579,10 @@ BEGIN
 		JOIN ref_object_class c ON b.object_class_code = c.object_class_code
 		JOIN etl.stg_object_class d ON b.uniq_id = d.uniq_id
 		LEFT JOIN ref_date e ON d.effective_begin_date::date = e.date
-		LEFT JOIN ref_date f ON d.effective_end_date::date = f.date;
-
+		LEFT JOIN ref_date f ON d.effective_end_date::date = f.date
+	WHERE 	exists_flag ='N'
+		OR (exists_flag ='Y' and modified_flag='Y');
+		
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
