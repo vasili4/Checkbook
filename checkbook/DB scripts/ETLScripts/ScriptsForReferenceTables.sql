@@ -13,6 +13,8 @@ DECLARE
 	l_no_of_years int;
 BEGIN
 	l_no_of_days := p_end_date_in - p_start_date_in;
+
+	RAISE NOTICE 'l_no_of_days %',l_no_of_days;
 	
 	IF l_no_of_days > 0 THEN
 	
@@ -20,10 +22,10 @@ BEGIN
 		SELECT s.a as year_value
 		FROM GENERATE_SERIES(EXTRACT(year from p_start_date_in)::int,EXTRACT(year from p_end_date_in)::int,1) as s(a);
 		
-		INSERT INTO ref_month(month_value, year_id)
+		INSERT INTO ref_month(month_value, month_name,year_id)
 		SELECT EXTRACT(month from p_start_date_in) + series_month.month as month_value,
-			 to_char(to_timestamp(to_char(EXTRACT(month from p_start_date_in) + series_month.month, '99'), 'MM'), 'Month') as month_name
-			ref_year.year_id
+			 to_char(to_timestamp(to_char(EXTRACT(month from p_start_date_in) + series_month.month, '99'), 'MM'), 'Month') as month_name,
+			ref_year.year_id			
 		FROM GENERATE_SERIES(0,11,1) as series_month(month)
 		     CROSS JOIN generate_series(EXTRACT(year from p_start_date_in)::int,EXTRACT(year from p_end_date_in)::int,1) as series_year(year)
 		     JOIN ref_year ON series_year.year = ref_year.year_value;		
@@ -83,7 +85,34 @@ INSERT INTO ref_minority_type values (1,'Unspecified MWBE',now()::timestamp),
 INSERT INTO ref_business_type_status values (1,'Requested',now()::timestamp),
 					(2,'Accepted',now()::timestamp),
 					(3,'Rejected',now()::timestamp);
-					
+			
+CREATE TABLE etl.stg_funding_class(
+	fy int,
+	funding_class_code varchar(5),
+	name varchar(52),
+	short_name varchar(50),
+	category_name varchar(52),
+	cty_fund_fl int,
+	intr_cty_fl int,
+	fund_aloc_req_fl int,	
+	tbl_last_dt varchar(20),
+	ams_row_vers_no char(1),
+	rsfcls_nm_up  varchar(52),
+	fund_category  varchar(50));
+	
+COPY etl.stg_funding_class FROM '/home/gpadmin/athiagarajan/NYC/FundingClass.txt' DELIMITER AS '|' ESCAPE '~' FILL MISSING FIELDS;		
+
+
+INSERT INTO   ref_funding_class(funding_class_code,funding_class_name,funding_class_short_name,category_name,city_fund_flag,intra_city_flag,fund_allocation_required_flag,category_code,created_date)
+SELECT funding_class_code,name,short_name,category_name,
+	(case when cty_fund_fl='1' then 1::bit else 0::bit end),
+	(case when intr_cty_fl ='1' then 1::bit else 0::bit end),
+	(case when fund_aloc_req_fl='1' then 1::bit else 0::bit end)  ,fund_category,
+	now()::timestamp     
+from etl.stg_funding_class;
+
+select initializedate('1990-01-01'::date,'2020-12-31'::date);
+
 --------------------------------------------------------------------------------------------------------------------------------------------
 
 COPY etl.stg_award_method FROM '/home/gpadmin/athiagarajan/NYC/datafiles/AwardMethodFromSQLServer.csv' CSV QUOTE as '"' ;
@@ -116,7 +145,7 @@ INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES (
 
 -- Dummy values
 
-insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
+/*insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
 
 insert into ref_document_function_code(document_function_code_id) select distinct doc_func_cd::int from etl.stg_con_ct_header where coalesce(doc_func_cd::int,0) <> 0;
 
@@ -135,4 +164,5 @@ insert into ref_expenditure_status(expenditure_status_id) values (1),(4);
 insert into ref_expenditure_cancel_type(expenditure_cancel_type_id) values (1),(8);
 
 insert into ref_expenditure_cancel_reason(expenditure_cancel_reason_id) values (9),(11);
+*/
 
