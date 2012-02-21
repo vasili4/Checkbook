@@ -3,6 +3,9 @@ set search_path=public;
 	updateForeignKeysForFMSInHeader
 	updateForeignKeysForFMSVendors
 	updateForeignKeysForFMSInAccLine
+	changeVisibilityOfAgreements
+	changeVisibilityOfVendor
+	refreshFactsForFMS
 	processFMS
 */
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInHeader(p_load_id_in bigint) RETURNS INT AS $$
@@ -810,6 +813,408 @@ $$ language plpgsql;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+CREATE OR REPLACE FUNCTION etl.changeVisibilityOfAgreements(p_load_id_in int)  RETURNS INT AS $$
+DECLARE
+BEGIN
+	-- Deleting the con/mag associated with partially displayed or not to be displayed disbursements
+	
+	CREATE TEMPORARY TABLE tmp_con_changes_fms(agreement_id bigint, full_visible_count smallint, document_code_id smallint,
+						document_id varchar, agency_id smallint)
+	DISTRIBUTED BY (agreement_id);
+
+	-- identify the con/mag directly associated with disbursement
+	
+	INSERT INTO tmp_con_changes_fms(agreement_id, full_visible_count, document_code_id,document_id, agency_id)
+	SELECT b.agreement_id, SUM(CASE WHEN c.privacy_flag IN ('X','P') AND d.document_code='DC' THEN 0 ELSE 1 END) as full_visible_count,
+		min(e.document_code_id) as document_code_id, 
+		min(e.document_id) as document_id,
+		min(e.agency_id) as agency_id
+	FROM   etl.stg_fms_accounting_line a JOIN disbursement_line_item b ON a.agreement_id = b.agreement_id
+		JOIN disbursement c ON b.disbursement_id = c.disbursement_id
+		JOIN ref_document_code d ON c.document_code_id = d.document_code_id
+		JOIN fact_agreement e ON b.agreement_id = e.agreement_id		
+	WHERE	a.agreement_id > 0
+	GROUP BY 1;
+
+	RAISE NOTICE 'CON 14';
+	
+	-- identify the mag  indirectly associated with disbursement	
+	
+	INSERT INTO tmp_con_changes_fms(agreement_id, full_visible_count, document_code_id,document_id, agency_id)
+	SELECT e.master_agreement_id, SUM(CASE WHEN c.privacy_flag IN ('X','P') AND d.document_code='DC' THEN 0 ELSE 1 END) as full_visible_count,
+		min(e.document_code_id) as document_code_id, 
+		min(e.document_id) as document_id,
+		min(e.agency_id) as agency_id
+	FROM   etl.stg_fms_accounting_line a JOIN disbursement_line_item b ON a.agreement_id = b.agreement_id
+		JOIN disbursement c ON b.disbursement_id = c.disbursement_id
+		JOIN ref_document_code d ON c.document_code_id = d.document_code_id
+		JOIN fact_agreement e ON b.agreement_id = e.agreement_id		
+	WHERE	a.agreement_id > 0		
+		AND coalesce(e.master_agreement_id,0) > 0
+	GROUP BY 1	;
+
+	RAISE NOTICE 'CON 14.1';
+		
+	CREATE TEMPORARY TABLE tmp_con_changes_fms_1(agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);
+
+	INSERT INTO tmp_con_changes_fms_1(agreement_id)	
+	SELECT  a.agreement_id
+	FROM	history_agreement a ,
+		(SELECT document_code_id,document_id,agency_id,sum(full_visible_count) as full_visible_count
+		FROM	tmp_con_changes_fms
+		GROUP BY 1,2,3
+		HAVING SUM(full_visible_count) = 0 ) inner_tbl,
+		ref_agency_history b
+	WHERE	a.document_id = inner_tbl.document_id
+		AND a.document_code_id = inner_tbl.document_code_id
+		AND a.agency_history_id = b.agency_history_id
+		AND b.agency_id = inner_tbl.agency_id;
+
+	RAISE NOTICE 'CON 14.1.1';
+	
+	INSERT INTO tmp_con_changes_fms_1(agreement_id)	
+	SELECT  a.master_agreement_id
+	FROM	history_master_agreement a ,
+		(SELECT document_code_id,document_id,agency_id,sum(full_visible_count) as full_visible_count
+		FROM	tmp_con_changes_fms
+		GROUP BY 1,2,3
+		HAVING SUM(full_visible_count) = 0 ) inner_tbl,
+		ref_agency_history b
+	WHERE	a.document_id = inner_tbl.document_id
+		AND a.document_code_id = inner_tbl.document_code_id
+		AND a.agency_history_id = b.agency_history_id
+		AND b.agency_id = inner_tbl.agency_id;
+
+	RAISE NOTICE 'CON 14.1.2';
+		
+	DELETE FROM history_agreement WHERE agreement_id IN (SELECT agreement_id FROM tmp_con_changes_fms_1);
+	DELETE FROM history_master_agreement WHERE master_agreement_id IN (SELECT agreement_id FROM tmp_con_changes_fms_1);
+		
+	-- Insert the agreements/master agreements which are now associated to fully displayed disbursements
+	-- This is required when agreement/master agreement was deleted from the public table because of being associated only to partially/not displayed disbursements 
+	-- and is now having fully displayed disbursements
+	
+	TRUNCATE tmp_con_changes_fms_1;
+	
+	INSERT INTO tmp_con_changes_fms_1(agreement_id)		
+	SELECT  a.agreement_id
+	FROM	history_all_agreement a ,
+		(SELECT document_code_id,document_id,agency_id,sum(full_visible_count) as full_visible_count
+		FROM	tmp_con_changes_fms
+		GROUP BY 1,2,3
+		HAVING SUM(full_visible_count) > 0 ) inner_tbl,
+		ref_agency_history b
+	WHERE	a.document_id = inner_tbl.document_id
+		AND a.document_code_id = inner_tbl.document_code_id
+		AND a.agency_history_id = b.agency_history_id
+		AND b.agency_id = inner_tbl.agency_id;
+	
+
+	INSERT INTO tmp_con_changes_fms_1(agreement_id)		
+	SELECT  a.master_agreement_id
+	FROM	history_all_master_agreement a ,
+		(SELECT document_code_id,document_id,agency_id,sum(full_visible_count) as full_visible_count
+		FROM	tmp_con_changes_fms
+		GROUP BY 1,2,3
+		HAVING SUM(full_visible_count) > 0 ) inner_tbl,
+		ref_agency_history b
+	WHERE	a.document_id = inner_tbl.document_id
+		AND a.document_code_id = inner_tbl.document_code_id
+		AND a.agency_history_id = b.agency_history_id
+		AND b.agency_id = inner_tbl.agency_id;
+
+	select * from tmp_con_changes_fms_1;
+	
+	DELETE FROM tmp_con_changes_fms_1 WHERE agreement_id in (SELECT agreement_id FROM history_agreement);
+
+	DELETE FROM tmp_con_changes_fms_1 WHERE agreement_id in (SELECT master_agreement_id FROM history_master_agreement);
+	
+	-- Inserting the agreement
+
+	RAISE NOTICE 'CON 15';
+	
+	INSERT INTO agreement
+	SELECT a.* FROM all_agreement a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+	
+	RAISE NOTICE 'CON 15.1';
+	
+	INSERT INTO master_agreement
+	SELECT a.* FROM all_master_agreement a JOIN tmp_con_changes_fms_1 b ON a.master_agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.2';
+	
+	INSERT INTO agreement_worksite
+	SELECT a.* FROM all_agreement_worksite a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.3';
+	
+	INSERT INTO agreement_commodity
+	SELECT a.* FROM all_agreement_commodity a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+
+	INSERT INTO agreement_accounting_line
+	SELECT a.* FROM all_agreement_accounting_line a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+	
+	-- Inserting the history records
+	
+	INSERT INTO history_agreement
+	SELECT a.* FROM history_all_agreement a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.1';
+	
+	INSERT INTO history_master_agreement
+	SELECT a.* FROM history_all_master_agreement a JOIN tmp_con_changes_fms_1 b ON a.master_agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.2';
+	
+	INSERT INTO history_agreement_worksite
+	SELECT a.* FROM history_all_agreement_worksite a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.3';
+	
+	INSERT INTO history_agreement_commodity
+	SELECT a.* FROM history_all_agreement_commodity a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+
+	INSERT INTO history_agreement_accounting_line
+	SELECT a.* FROM history_all_agreement_accounting_line a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
+	
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in changeVisibilityOfAgreements';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
+END;
+$$ language plpgsql;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.changeVisibilityOfVendor(p_load_id_in int) RETURNS INT AS
+$$
+DECLARE
+BEGIN
+	-- Deleting the vendor associated with partially displayed or not to be displayed disbursements
+	
+	CREATE TEMPORARY TABLE tmp_vendor_changes_fms(vendor_id int, full_visible_count smallint,orig_display_flag char(1), new_display_flag char(1))
+	DISTRIBUTED BY (vendor_id);
+
+	-- identify the vendor associated with disbursement
+	
+	INSERT INTO tmp_vendor_changes_fms
+	SELECT b.vendor_id, SUM(CASE WHEN d.privacy_flag IN ('X','P') AND e.document_code='DC' THEN 0 ELSE 1 END) as full_visible_count,
+		min(f.display_flag) as orig_display_flag,'' as new_display_flag
+	FROM   etl.stg_fms_vendor a JOIN vendor_history b ON a.vendor_history_id = b.vendor_history_id
+		JOIN vendor_history c ON b.vendor_id = c.vendor_id
+		JOIN disbursement d ON c.vendor_history_id = d.vendor_history_id
+		JOIN ref_document_code e ON d.document_code_id = e.document_code_id	
+		JOIN vendor f ON c.vendor_id = f.vendor_id
+	GROUP BY 1;
+
+
+	RAISE NOTICE 'Vendor 1.1';
+	
+	UPDATE tmp_vendor_changes_fms
+	SET	new_display_flag = 'Y'
+	WHERE	full_visible_count >0;
+	
+	UPDATE tmp_vendor_changes_fms
+	SET	new_display_flag = 'N'
+	WHERE	full_visible_count =0;
+	
+	UPDATE vendor a
+	SET    	display_flag = 'N',
+		updated_load_id = p_load_id_in,
+		updated_date = now()::timestamp
+	FROM	tmp_vendor_changes_fms b
+	WHERE a.vendor_id = b.vendor_id
+		AND b.new_display_flag ='N' 
+		AND b.orig_display_flag ='Y';
+	
+	RAISE NOTICE 'Vendor 1.2';
+	
+	CREATE TEMPORARY TABLE tmp_con_changed_fms_1(agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_con_changed_fms_1(agreement_id)
+	SELECT agreement_id
+	FROM	history_agreement a JOIN vendor_history b ON a.vendor_history_id = b.vendor_history_id
+		JOIN vendor c ON b.vendor_id = c.vendor_id
+		JOIN tmp_vendor_changes_fms d ON c.vendor_id = d.vendor_id
+	WHERE 	d.new_display_flag ='N' 	;
+
+	RAISE NOTICE 'Vendor 1.3';	
+	
+	INSERT INTO tmp_con_changed_fms_1(agreement_id)
+	SELECT master_agreement_id
+	FROM	history_master_agreement a JOIN vendor_history b ON a.vendor_history_id = b.vendor_history_id
+		JOIN vendor c ON b.vendor_id = c.vendor_id
+		JOIN tmp_vendor_changes_fms d ON c.vendor_id = d.vendor_id
+	WHERE 	d.new_display_flag ='N' 	;
+		
+	DELETE FROM history_agreement WHERE agreement_id IN (SELECT agreement_id FROM tmp_con_changed_fms_1);
+	DELETE FROM history_master_agreement WHERE master_agreement_id IN (SELECT agreement_id FROM tmp_con_changed_fms_1);		
+	
+	DELETE FROM tmp_vendor_changes_fms WHERE full_visible_count =0;
+
+	RAISE NOTICE 'Vendor 1.4';
+	
+	UPDATE  vendor a
+	SET     display_flag = 'Y',
+		updated_load_id = p_load_id_in,
+		updated_date = now()::timestamp
+	FROM	tmp_vendor_changes_fms b
+	WHERE a.vendor_id = b.vendor_id
+		AND b.new_display_flag ='Y' 
+		AND b.orig_display_flag = 'N';
+		
+	CREATE TEMPORARY TABLE tmp_con_changes_fms_2(agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);		
+
+	
+	INSERT INTO tmp_con_changes_fms_2
+	SELECT a.agreement_id
+	FROM 	history_all_agreement a JOIN vendor_history b ON a.vendor_history_id = b.vendor_history_id
+		JOIN tmp_vendor_changes_fms c ON b.vendor_id = c.vendor_id
+	WHERE c.new_display_flag ='Y' 
+		AND c.orig_display_flag = 'N';
+
+	RAISE NOTICE 'Vendor 1.5';
+	
+	INSERT INTO tmp_con_changes_fms_2
+	SELECT a.master_agreement_id
+	FROM 	history_all_agreement a JOIN vendor_history b ON a.vendor_history_id = b.vendor_history_id
+		JOIN tmp_vendor_changes_fms c ON b.vendor_id = c.vendor_id
+	WHERE c.new_display_flag ='Y' 
+		AND c.orig_display_flag = 'N';
+		
+	INSERT INTO agreement
+	SELECT a.* FROM all_agreement a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.1';
+	
+	INSERT INTO master_agreement
+	SELECT a.* FROM all_master_agreement a JOIN tmp_con_changes_fms_2 b ON a.master_agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.2';
+	
+	INSERT INTO agreement_worksite
+	SELECT a.* FROM all_agreement_worksite a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.3';
+	
+	INSERT INTO agreement_commodity
+	SELECT a.* FROM all_agreement_commodity a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+
+	INSERT INTO agreement_accounting_line
+	SELECT a.* FROM all_agreement_accounting_line a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+
+	-- Inserting the history records ---
+	
+	INSERT INTO history_agreement
+	SELECT a.* FROM history_all_agreement a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.1';
+	
+	INSERT INTO history_master_agreement
+	SELECT a.* FROM history_all_master_agreement a JOIN tmp_con_changes_fms_2 b ON a.master_agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.2';
+	
+	INSERT INTO history_agreement_worksite
+	SELECT a.* FROM history_all_agreement_worksite a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+
+	RAISE NOTICE 'CON 15.3';
+	
+	INSERT INTO history_agreement_commodity
+	SELECT a.* FROM history_all_agreement_commodity a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+
+	INSERT INTO history_agreement_accounting_line
+	SELECT a.* FROM history_all_agreement_accounting_line a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
+	
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in changeVisibilityOfVendor';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
+END;
+$$ language plpgsql;	
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_load_id_in int) RETURNS INT AS
+$$
+DECLARE
+BEGIN
+	-- Inserting into the fact_disbursement_line_item
+
+	RAISE NOTICE 'CON 16';
+	INSERT INTO fact_disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
+						check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
+						agreement_id,master_agreement_id,fund_class_id,
+						check_amount,agency_id,expenditure_object_id,
+						vendor_id,maximum_contract_amount,maximum_spending_limit)
+	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
+		f.nyc_year_id,f.calendar_month_id,
+		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
+		b.check_amount,c.agency_id,d.expenditure_object_id,
+		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit
+	FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
+			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
+			JOIN ref_expenditure_object_history d ON b.expenditure_object_history_id = d.expenditure_object_history_id
+			JOIN vendor_history e ON a.vendor_history_id = e.vendor_history_id
+			JOIN ref_date f ON a.check_eft_issued_date_id = f.date_id
+	WHERE a.load_id = p_load_id_in;
+	
+
+	CREATE TEMPORARY TABLE tmp_agreement_con(disbursement_line_item_id bigint,agreement_id bigint,master_agreement_id bigint, maximum_contract_amount numeric(16,2), master_agreement_yn char(1))
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con
+	SELECT a.disbursement_line_item_id, b.agreement_id,b.master_agreement_id,b.maximum_contract_amount, b.master_agreement_yn
+	FROM fact_disbursement_line_item a JOIN fact_agreement b ON a.agreement_id = b.agreement_id
+		JOIN etl.seq_disbursement_line_item_id c ON a.disbursement_line_item_id = c.disbursement_line_item_id;
+
+	UPDATE fact_disbursement_line_item a
+	SET	master_agreement_id = (CASE WHEN b.master_agreement_yn = 'Y' THEN b.agreement_id ELSE b.master_agreement_id END),
+		agreement_id = (CASE WHEN b.master_agreement_yn = 'Y' THEN NULL ELSE a.agreement_id END),
+		maximum_contract_amount =(CASE WHEN b.master_agreement_yn = 'N' THEN b.maximum_contract_amount ELSE NULL END),
+		maximum_spending_limit =(CASE WHEN b.master_agreement_yn = 'Y' THEN b.maximum_contract_amount ELSE NULL END)
+	FROM	tmp_agreement_con  b
+	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
+
+	TRUNCATE tmp_agreement_con;
+	
+	-- To fetch the maximum spending limit of the MAG associated with CON
+	
+	INSERT INTO tmp_agreement_con(disbursement_line_item_id,master_agreement_id,maximum_contract_amount)
+	SELECT a.disbursement_line_item_id, b.agreement_id,b.maximum_contract_amount
+	FROM	fact_disbursement_line_item a JOIN fact_agreement b ON	a.master_agreement_id = b.agreement_id AND COALESCE(a.agreement_id) > 0
+		JOIN etl.seq_disbursement_line_item_id c ON a.disbursement_line_item_id = c.disbursement_line_item_id;
+
+	UPDATE fact_disbursement_line_item a
+	SET maximum_spending_limit = b.maximum_contract_amount
+	FROM	tmp_agreement_con  b
+	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in refreshFactsForFMS';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
+END;
+$$ language plpgsql;	
+------------------------------------------------------------------------------------------------------------------------------------------------
+
 CREATE OR REPLACE FUNCTION etl.processFMS(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 
@@ -913,7 +1318,7 @@ BEGIN
 						expenditure_object_history_id,budget_code_id,fund_id,
 						reporting_code,check_amount,agreement_id,
 						agreement_accounting_line_number,location_history_id,retainage_amount,
-						load_id,created_date)
+						created_load_id,created_date)
 	SELECT  c.disbursement_line_item_id,d.disbursement_id,a.DOC_ACTG_LN_NO,
 		a.bfy,a.fy_dc,a.per_dc,
 		a.fund_class_id,a.agency_history_id,a.department_history_id,
@@ -935,7 +1340,7 @@ BEGIN
 						expenditure_object_history_id,budget_code_id,fund_id,
 						reporting_code,check_amount,agreement_id,
 						agreement_accounting_line_number,location_history_id,retainage_amount,
-						load_id,created_date)
+						created_load_id,created_date)
 	SELECT  c.disbursement_line_item_id,d.disbursement_id,a.DOC_ACTG_LN_NO,
 		a.bfy,a.fy_dc,a.per_dc,
 		a.fund_class_id,(CASE WHEN l_display_type='P' THEN a.masked_agency_history_id ELSE a.agency_history_id END) as agency_history_id,
@@ -950,143 +1355,21 @@ BEGIN
 		JOIN etl.seq_expenditure_expenditure_id d ON b.uniq_id = d.uniq_id
 	WHERE	b.doc_cd <> 'DC'
 		AND l_display_type <> 'X';
-		
-	-- Deleting the con/mag associated with partially displayed or not to be displayed disbursements
-	
-	CREATE TEMPORARY TABLE tmp_con_deletion_fms(agreement_id bigint, full_visbile_count smallint)
-	DISTRIBUTED BY (agreement_id);
 
-	-- identify the con/mag directly associated with disbursement
+	l_fk_update := etl.changeVisibilityOfAgreements(p_load_id_in);
 	
-	INSERT INTO tmp_con_deletion_fms
-	SELECT b.agreement_id, SUM(CASE WHEN c.privacy_flag ='F' THEN 1 ELSE 0 END) as full_visible_count
-	FROM   etl.stg_fms_accounting_line a JOIN disbursement_line_item b ON a.agreement_id = b.agreement_id
-		JOIN disbursement c ON b.disbursement_id = c.disbursement_id
-	WHERE	a.agreement_id > 0
-	GROUP BY 1;
-
-	RAISE NOTICE 'CON 14';
+	IF l_fk_update = 1 THEN
+		l_fk_update := etl.changeVisibilityOfVendor(p_load_id_in);
+	ELSE
+		RETURN -2;
+	END IF;	
 	
-	-- identify the mag  indirectly associated with disbursement	
-	INSERT INTO tmp_con_deletion_fms
-	SELECT d.master_agreement_id, SUM(CASE WHEN c.privacy_flag ='F' THEN 1 ELSE 0 END) as full_visible_count
-	FROM   etl.stg_fms_accounting_line a JOIN disbursement_line_item b ON a.agreement_id = b.agreement_id
-		JOIN disbursement c ON b.disbursement_id = c.disbursement_id
-		JOIN agreement d ON a.agreement_id = d.agreement_id
-	WHERE	a.agreement_id > 0
-		AND coalesce(d.master_agreement_id,0) >0
-	GROUP BY 1	;
-
-	RAISE NOTICE 'CON 14.1';
-		
-	CREATE TEMPORARY TABLE tmp_con_deletion_fms_1(agreement_id bigint,full_visbile_count smallint)
-	DISTRIBUTED BY (agreement_id);
-
-	INSERT INTO tmp_con_deletion_fms_1	
-	SELECT agreement_id,sum(full_visbile_count) as full_visbile_count
-	FROM	tmp_con_deletion_fms
-	GROUP BY 1
-	HAVING SUM(full_visbile_count) = 0;
+	IF l_fk_update = 1 THEN
+		l_fk_update := etl.refreshFactsForFMS(p_load_id_in);
+	ELSE
+		RETURN -2;
+	END IF;	
 	
-	DELETE FROM agreement WHERE agreement_id IN (SELECT agreement_id FROM tmp_con_deletion_fms_1);
-	DELETE FROM master_agreement WHERE master_agreement_id IN (SELECT agreement_id FROM tmp_con_deletion_fms_1);
-		
-	-- Insert the agreements/master agreements which are now associated to fully displayed disbursements
-	-- This is required when agreement/master agreement was deleted from the public table because of being associated only to partially/not displayed disbursements 
-	-- and is now having fully displayed disbursements
-	
-	TRUNCATE tmp_con_deletion_fms_1;
-	
-	INSERT INTO tmp_con_deletion_fms_1	
-	SELECT agreement_id,sum(full_visbile_count) as full_visbile_count
-	FROM	tmp_con_deletion_fms
-	GROUP BY 1
-	HAVING SUM(full_visbile_count) > 0;
-	
-	DELETE FROM tmp_con_deletion_fms_1
-	WHERE agreement_id IN (SELECT agreement_id FROM agreement);
-	
-
-	DELETE FROM tmp_con_deletion_fms_1
-	WHERE agreement_id IN (SELECT master_agreement_id FROM master_agreement);
-
-	-- Inserting the agreement
-
-	RAISE NOTICE 'CON 15';
-	
-	INSERT INTO agreement
-	SELECT a.* FROM all_agreement a JOIN tmp_con_deletion_fms_1 b ON a.agreement_id = b.agreement_id;
-
-	RAISE NOTICE 'CON 15.1';
-	
-	INSERT INTO master_agreement
-	SELECT a.* FROM all_master_agreement a JOIN tmp_con_deletion_fms_1 b ON a.master_agreement_id = b.agreement_id;
-
-	RAISE NOTICE 'CON 15.2';
-	
-	INSERT INTO agreement_worksite
-	SELECT a.* FROM all_agreement_worksite a JOIN tmp_con_deletion_fms_1 b ON a.agreement_id = b.agreement_id;
-
-	RAISE NOTICE 'CON 15.3';
-	
-	INSERT INTO agreement_commodity
-	SELECT a.* FROM all_agreement_commodity a JOIN tmp_con_deletion_fms_1 b ON a.agreement_id = b.agreement_id;
-
-	INSERT INTO agreement_accounting_line
-	SELECT a.* FROM all_agreement_accounting_line a JOIN tmp_con_deletion_fms_1 b ON a.agreement_id = b.agreement_id;	
-	
-	
-	-- Inserting into the fact_disbursement_line_item
-
-	RAISE NOTICE 'CON 16';
-	INSERT INTO fact_disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
-						check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
-						agreement_id,master_agreement_id,fund_class_id,
-						check_amount,agency_id,expenditure_object_id,
-						vendor_id,maximum_contract_amount,maximum_spending_limit)
-	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
-		f.nyc_year_id,f.calendar_month_id,
-		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
-		b.check_amount,c.agency_id,d.expenditure_object_id,
-		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit
-	FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
-			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
-			JOIN ref_expenditure_object_history d ON b.expenditure_object_history_id = d.expenditure_object_history_id
-			JOIN vendor_history e ON a.vendor_history_id = e.vendor_history_id
-			JOIN ref_date f ON a.check_eft_issued_date_id = f.date_id
-	WHERE a.load_id = p_load_id_in;
-	
-
-	CREATE TEMPORARY TABLE tmp_agreement_con(disbursement_line_item_id bigint,agreement_id bigint,master_agreement_id bigint, maximum_contract_amount numeric(16,2), master_agreement_yn char(1))
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	INSERT INTO tmp_agreement_con
-	SELECT a.disbursement_line_item_id, b.agreement_id,b.master_agreement_id,b.maximum_contract_amount, b.master_agreement_yn
-	FROM fact_disbursement_line_item a JOIN fact_agreement b ON a.agreement_id = b.agreement_id
-		JOIN etl.seq_disbursement_line_item_id c ON a.disbursement_line_item_id = c.disbursement_line_item_id;
-
-	UPDATE fact_disbursement_line_item a
-	SET	master_agreement_id = (CASE WHEN b.master_agreement_yn = 'Y' THEN b.agreement_id ELSE b.master_agreement_id END),
-		agreement_id = (CASE WHEN b.master_agreement_yn = 'Y' THEN NULL ELSE a.agreement_id END),
-		maximum_contract_amount =(CASE WHEN b.master_agreement_yn = 'N' THEN b.maximum_contract_amount ELSE NULL END),
-		maximum_spending_limit =(CASE WHEN b.master_agreement_yn = 'Y' THEN b.maximum_contract_amount ELSE NULL END)
-	FROM	tmp_agreement_con  b
-	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
-
-	TRUNCATE tmp_agreement_con;
-	
-	-- To fetch the maximum spending limit of the MAG associated with CON
-	
-	INSERT INTO tmp_agreement_con(disbursement_line_item_id,master_agreement_id,maximum_contract_amount)
-	SELECT a.disbursement_line_item_id, b.agreement_id,b.maximum_contract_amount
-	FROM	fact_disbursement_line_item a JOIN fact_agreement b ON	a.master_agreement_id = b.agreement_id AND COALESCE(a.agreement_id) > 0
-		JOIN etl.seq_disbursement_line_item_id c ON a.disbursement_line_item_id = c.disbursement_line_item_id;
-
-	UPDATE fact_disbursement_line_item a
-	SET maximum_spending_limit = b.maximum_contract_amount
-	FROM	tmp_agreement_con  b
-	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
-
 	RETURN 1;
 	
 EXCEPTION
@@ -1097,3 +1380,5 @@ EXCEPTION
 	RETURN 0;
 END;
 $$ language plpgsql;
+
+
