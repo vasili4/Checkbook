@@ -306,7 +306,7 @@ DO ALSO INSERT INTO agreement(agreement_id,master_agreement_id,document_code_id,
 		council_district_code,new.vendor_history_id,new.vendor_preference_level,new.
 		original_contract_amount,new.registered_date_id,new.oca_number,new.
 		number_solicitation,new.document_name,new.original_term_begin_date_id,new.
-		original_term_end_date_id,new.privacy_flag,new.load_id,new.created_date);
+		original_term_end_date_id,new.privacy_flag,new.created_load_id,new.created_date);
 			
 
 CREATE RULE history_all_agreement_rule AS ON INSERT TO history_all_agreement
@@ -328,7 +328,7 @@ DO ALSO INSERT INTO history_agreement(agreement_id,master_agreement_id,document_
 				council_district_code,vendor_history_id,vendor_preference_level,
 				original_contract_amount,registered_date_id,oca_number,
 				number_solicitation,document_name,original_term_begin_date_id,
-				original_term_end_date_id,privacy_flag,load_id,created_date)
+				original_term_end_date_id,privacy_flag,created_load_id,created_date)
 	 VALUES( new.agreement_id,new.master_agreement_id,new.document_code_id,new.
 		agency_history_id,new.document_id,new.document_version,new.
 		tracking_number,new.record_date_id,new.budget_fiscal_year,new.
