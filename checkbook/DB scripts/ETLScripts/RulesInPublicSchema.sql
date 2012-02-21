@@ -21,7 +21,7 @@ DO ALSO INSERT INTO master_agreement(master_agreement_id,document_code_id,
 					original_term_begin_date_id,original_term_end_date_id,registered_date_id,
 					maximum_amount,maximum_spending_limit,award_level_id,
 					contract_class_code,number_solicitation,document_name,
-					privacy_flag,load_id,created_date)
+					privacy_flag,created_load_id,created_date)
 	VALUES(new.master_agreement_id,new.document_code_id,
 		new.agency_history_id,new.document_id,new.document_version,
 		new.tracking_number,new.record_date_id,new.budget_fiscal_year,
@@ -40,7 +40,7 @@ DO ALSO INSERT INTO master_agreement(master_agreement_id,document_code_id,
 		new.original_term_begin_date_id,new.original_term_end_date_id,new.registered_date_id,
 		new.maximum_amount,new.maximum_spending_limit,new.award_level_id,
 		new.contract_class_code,new.number_solicitation,new.document_name,
-		new.privacy_flag,new.load_id,new.created_date);
+		new.privacy_flag,new.created_load_id,new.created_date);
 		
 
 CREATE RULE history_all_master_agreement_rule AS ON INSERT TO history_all_master_agreement
@@ -63,7 +63,7 @@ DO ALSO INSERT INTO history_master_agreement(master_agreement_id,document_code_i
 					original_term_begin_date_id,original_term_end_date_id,registered_date_id,
 					maximum_amount,maximum_spending_limit,award_level_id,
 					contract_class_code,number_solicitation,document_name,
-					privacy_flag,load_id,created_date)
+					privacy_flag,created_load_id,created_date)
 	VALUES(new.master_agreement_id,new.document_code_id,
 		new.agency_history_id,new.document_id,new.document_version,
 		new.tracking_number,new.record_date_id,new.budget_fiscal_year,
@@ -82,7 +82,7 @@ DO ALSO INSERT INTO history_master_agreement(master_agreement_id,document_code_i
 		new.original_term_begin_date_id,new.original_term_end_date_id,new.registered_date_id,
 		new.maximum_amount,new.maximum_spending_limit,new.award_level_id,
 		new.contract_class_code,new.number_solicitation,new.document_name,
-		new.privacy_flag,new.load_id,new.created_date);
+		new.privacy_flag,new.created_load_id,new.created_date);
 
 
 CREATE RULE hist_all_master_agreement_upd_rule_1 AS ON UPDATE TO history_all_master_agreement
@@ -139,7 +139,7 @@ DO ALSO UPDATE history_master_agreement SET
 				contract_class_code = new.contract_class_code,
 				number_solicitation = new.number_solicitation,
 				document_name = new.document_name,
-				load_id = new.load_id,
+				updated_load_id = new.updated_load_id,
 				privacy_flag = new. privacy_flag,
 				created_date = new.created_date,
 				updated_date = new.updated_date
@@ -199,7 +199,7 @@ DO ALSO UPDATE master_agreement SET
 				contract_class_code = new.contract_class_code,
 				number_solicitation = new.number_solicitation,
 				document_name = new.document_name,
-				load_id = new.load_id,
+				updated_load_id = new.updated_load_id,
 				privacy_flag = new. privacy_flag,
 				created_date = new.created_date,
 				updated_date = new.updated_date
@@ -259,7 +259,7 @@ DO ALSO UPDATE all_master_agreement SET
 				contract_class_code = new.contract_class_code,
 				number_solicitation = new.number_solicitation,
 				document_name = new.document_name,
-				load_id = new.load_id,
+				updated_load_id = new.updated_load_id,
 				privacy_flag = new. privacy_flag,
 				created_date = new.created_date,
 				updated_date = new.updated_date
@@ -288,7 +288,7 @@ DO ALSO INSERT INTO agreement(agreement_id,master_agreement_id,document_code_id,
 				council_district_code,vendor_history_id,vendor_preference_level,
 				original_contract_amount,registered_date_id,oca_number,
 				number_solicitation,document_name,original_term_begin_date_id,
-				original_term_end_date_id,privacy_flag,load_id,created_date)
+				original_term_end_date_id,privacy_flag,created_load_id,created_date)
 	 VALUES( new.agreement_id,new.master_agreement_id,new.document_code_id,new.
 		agency_history_id,new.document_id,new.document_version,new.
 		tracking_number,new.record_date_id,new.budget_fiscal_year,new.
@@ -346,7 +346,7 @@ DO ALSO INSERT INTO history_agreement(agreement_id,master_agreement_id,document_
 		council_district_code,new.vendor_history_id,new.vendor_preference_level,new.
 		original_contract_amount,new.registered_date_id,new.oca_number,new.
 		number_solicitation,new.document_name,new.original_term_begin_date_id,new.
-		original_term_end_date_id,new.privacy_flag,new.load_id,new.created_date);
+		original_term_end_date_id,new.privacy_flag,new.created_load_id,new.created_date);
 
 CREATE RULE hist_all_agreement_upd_rule_1 AS ON UPDATE TO history_all_agreement
 DO ALSO UPDATE history_agreement SET 
@@ -402,7 +402,7 @@ DO ALSO UPDATE history_agreement SET
 				original_term_begin_date_id = new.original_term_begin_date_id,
 				original_term_end_date_id = new.original_term_end_date_id,
 				privacy_flag = new.privacy_flag,
-				load_id = new.load_id,
+				updated_load_id = new.updated_load_id,
 				updated_date = new.updated_date
 			WHERE agreement_id =new.agreement_id;	
 			
@@ -460,7 +460,7 @@ DO ALSO UPDATE all_agreement SET
 				original_term_begin_date_id = new.original_term_begin_date_id,
 				original_term_end_date_id = new.original_term_end_date_id,
 				privacy_flag = new.privacy_flag,
-				load_id = new.load_id,
+				updated_load_id = new.updated_load_id,
 				updated_date = new.updated_date
 			WHERE agreement_id =new.agreement_id;		
 			
@@ -518,7 +518,7 @@ DO ALSO UPDATE agreement SET
 				original_term_begin_date_id = new.original_term_begin_date_id,
 				original_term_end_date_id = new.original_term_end_date_id,
 				privacy_flag = new.privacy_flag,
-				load_id = new.load_id,
+				updated_load_id = new.updated_load_id,
 				updated_date = new.updated_date
 			WHERE agreement_id =new.agreement_id;	
 			
@@ -603,6 +603,9 @@ DO ALSO DELETE FROM agreement_worksite WHERE agreement_id = old.agreement_id;
 CREATE RULE agreement_del_rule_3 AS ON DELETE TO agreement
 DO ALSO DELETE FROM agreement_accounting_line WHERE agreement_id = old.agreement_id;
 
+CREATE RULE agreement_del_rule_4 AS ON DELETE TO agreement
+DO ALSO DELETE FROM fact_agreement WHERE agreement_id = old.agreement_id;
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /* Delete rule on master_agreement
@@ -614,3 +617,35 @@ DO ALSO DELETE FROM agreement_commodity WHERE agreement_id = old.master_agreemen
 CREATE RULE master_agreement_del_rule_2 AS ON DELETE TO master_agreement
 DO ALSO DELETE FROM agreement_worksite WHERE agreement_id = old.master_agreement_id;
 
+CREATE RULE master_agreement_del_rule_3 AS ON DELETE TO master_agreement
+DO ALSO DELETE FROM fact_agreement WHERE agreement_id = old.master_agreement_id;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Delete rule on agreement
+*/
+
+CREATE RULE history_agreement_del_rule_1 AS ON DELETE TO history_agreement
+DO ALSO DELETE FROM agreement WHERE agreement_id = old.agreement_id;
+
+CREATE RULE history_agreement_del_rule_2 AS ON DELETE TO history_agreement
+DO ALSO DELETE FROM history_agreement_worksite WHERE agreement_id = old.agreement_id;
+
+CREATE RULE history_agreement_del_rule_3 AS ON DELETE TO history_agreement
+DO ALSO DELETE FROM history_agreement_accounting_line WHERE agreement_id = old.agreement_id;
+
+CREATE RULE history_agreement_del_rule_4 AS ON DELETE TO history_agreement
+DO ALSO DELETE FROM history_agreement_commodity WHERE agreement_id = old.agreement_id;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+/* Delete rule on master agreement
+*/
+
+CREATE RULE history_master_agreement_del_rule_1 AS ON DELETE TO history_master_agreement
+DO ALSO DELETE FROM master_agreement WHERE master_agreement_id = old.master_agreement_id;
+
+CREATE RULE history_master_agreement_del_rule_2 AS ON DELETE TO history_master_agreement
+DO ALSO DELETE FROM history_agreement_worksite WHERE agreement_id = old.master_agreement_id;
+
+CREATE RULE history_master_agreement_del_rule_4 AS ON DELETE TO history_master_agreement
+DO ALSO DELETE FROM history_agreement_commodity WHERE agreement_id = old.master_agreement_id;
