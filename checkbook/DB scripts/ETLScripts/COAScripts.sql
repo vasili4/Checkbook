@@ -5,6 +5,8 @@ Functions defined
 	processCOAExpenditureObject	
 	processCOALocation
 	processCOAObjectClass
+	processrevenuecategory
+	processrevenueclass
 */
 
 CREATE OR REPLACE FUNCTION etl.processCOAAgency(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
@@ -578,5 +580,272 @@ EXCEPTION
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	RETURN 0;
+END;
+$$ language plpgsql;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION etl.processrevenuecategory(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
+DECLARE
+BEGIN
+
+
+	CREATE TEMPORARY TABLE tmp_ref_revenue_category(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar, exists_flag char(1), modified_flag char(1))
+	DISTRIBUTED BY (uniq_id);
+	
+	-- For all records check if data is modified/new
+
+
+	
+	INSERT INTO tmp_ref_revenue_category
+	SELECT  a.uniq_id,
+		a.rscat_cd, 
+	       a.rscat_nm,
+	       (CASE WHEN b.revenue_category_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
+	       (CASE WHEN b.revenue_category_code IS NOT NULL AND a.rscat_nm <> b.revenue_category_name THEN 'Y' ELSE 'N' END) as modified_flag
+	FROM   etl.stg_revenue_category a LEFT JOIN ref_revenue_category b ON a.rscat_cd = b.revenue_category_code;
+	
+	
+	-- Generate the revenue category id for new records
+		
+	TRUNCATE etl.ref_revenue_category_id_seq;
+	
+	INSERT INTO etl.ref_revenue_category_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_ref_revenue_category
+	WHERE  exists_flag ='N';
+
+	
+	
+	INSERT INTO ref_revenue_category(revenue_category_id,revenue_category_code,revenue_category_name,created_date)
+	SELECT a.revenue_category_id,b.rscat_cd,b.rscat_nm, now()::timestamp
+	FROM   etl.ref_revenue_category_id_seq a JOIN tmp_ref_revenue_category b ON a.uniq_id = b.uniq_id;
+	
+
+
+
+
+CREATE TEMPORARY TABLE tmp_ref_revenue_category_1(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar, exists_flag char(1), modified_flag char(1), revenue_category_id smallint)
+	DISTRIBUTED BY (revenue_category_id);
+
+	INSERT INTO tmp_ref_revenue_category_1
+	SELECT a.*,b.revenue_category_id FROM tmp_ref_revenue_category a JOIN ref_revenue_category b ON a.rscat_cd = b.revenue_category_code
+	WHERE exists_flag ='Y' and modified_flag='Y';
+
+	RAISE NOTICE '1';
+	
+	UPDATE ref_revenue_category a
+	SET	revenue_category_name = b.rscat_nm,
+		updated_date = now()::timestamp,
+		updated_load_id = p_load_id_in
+	FROM	tmp_ref_agency_1 b		
+	WHERE	a.revenue_category_id = b.revenue_category_id;
+
+	
+END;
+$$ language plpgsql;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION etl.processrevenueclass(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
+DECLARE
+BEGIN
+
+
+	CREATE TEMPORARY TABLE tmp_ref_revenue_class(uniq_id bigint,rscls_cd varchar(20),rscls_nm varchar, exists_flag char(1), modified_flag char(1))
+	DISTRIBUTED BY (uniq_id);
+	
+	-- For all records check if data is modified/new
+
+
+	
+	INSERT INTO tmp_ref_revenue_class
+	SELECT  a.uniq_id,
+		a.rscls_cd, 
+	       a.rscls_nm,
+	       (CASE WHEN b.revenue_class_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
+	       (CASE WHEN b.revenue_class_code IS NOT NULL AND a.rscls_nm <> b.revenue_class_name THEN 'Y' ELSE 'N' END) as modified_flag
+	FROM   etl.stg_revenue_class a LEFT JOIN ref_revenue_class b ON a.rscls_cd = b.revenue_class_code;
+	
+	
+	-- Generate the revenue class id for new records
+		
+	TRUNCATE etl.ref_revenue_class_id_seq;
+	
+	INSERT INTO etl.ref_revenue_class_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_ref_revenue_class
+	WHERE  exists_flag ='N';
+
+	
+	
+	INSERT INTO ref_revenue_class(revenue_class_id,revenue_class_code,revenue_class_name,created_date)
+	SELECT a.revenue_class_id,b.rscls_cd,b.rscls_nm, now()::timestamp
+	FROM   etl.ref_revenue_class_id_seq a JOIN tmp_ref_revenue_class b ON a.uniq_id = b.uniq_id;
+	
+
+
+
+
+CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),rscls_nm varchar, exists_flag char(1), modified_flag char(1), revenue_class_id smallint)
+	DISTRIBUTED BY (revenue_class_id);
+
+	INSERT INTO tmp_ref_revenue_class_1
+	SELECT a.*,b.revenue_class_id FROM tmp_ref_revenue_class a JOIN ref_revenue_class b ON a.rscls_cd = b.revenue_class_code
+	WHERE exists_flag ='Y' and modified_flag='Y';
+
+	
+	UPDATE ref_revenue_class a
+	SET	revenue_class_name = b.rscls_nm,
+		updated_date = now()::timestamp,
+		updated_load_id = p_load_id_in
+	FROM	tmp_ref_revenue_class_1b		
+	WHERE	a.revenue_class_id = b.revenue_class_id;
+
+
+
+	
+END;
+$$ language plpgsql;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION etl.processrevenuesource(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
+DECLARE
+BEGIN
+
+CREATE TEMPORARY TABLE tmp_ref_revenue_source(uniq_id bigint,fy integer,
+rsrc_cd varchar(20),rsrc_nm varchar, exists_flag char(1), modified_flag char(1),
+		rsrc_sh_nm varchar,
+		act_fl bit(1),   
+		alw_bud_fl bit(1), 
+		oper_ind integer, 
+		fasb_cls_ind integer,
+		fhwa_rev_cr_fl integer, 
+		usetax_coll_fl integer,
+		rsrc_dscr varchar,	 
+		apy_intr_lat_fee integer,
+		apy_intr_admn_fee integer,
+		apy_intr_nsf_fee integer,
+		apy_intr_othr_fee integer,
+		elg_inct_fl integer,
+		earn_rcvb_cd VarChar, 
+		fin_fee_ov_fl integer,
+		apy_intr_ov integer,     
+		bill_lag_dy integer,
+		bill_freq integer,
+		bill_fy_strt_mnth integer,
+		bill_fy_strt_dy integer,
+		fed_agcy_cd VarChar,
+		fed_agcy_sfx VarChar,
+		fed_nm VarChar,
+		srsrc_req VarChar
+)
+	DISTRIBUTED BY (uniq_id);	
+	-- For all records check if data is modified/new
+
+
+	
+	INSERT INTO tmp_ref_revenue_source
+	SELECT  a.uniq_id,
+		a.fy,
+		a.rsrc_cd, 
+	       a.rsrc_nm,
+		(CASE WHEN b.revenue_source_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
+	       (CASE WHEN b.revenue_source_code IS NOT NULL AND a.rsrc_nm <> b.revenue_source_name THEN 'Y' ELSE 'N' END) as modified_flag,
+	       a.rsrc_sh_nm,
+	       a.act_fl,   
+		a.alw_bud_fl, 
+		a.oper_ind, 
+		a.fasb_cls_ind,
+		a.fhwa_rev_cr_fl, 
+		a.usetax_coll_fl,
+		a.rsrc_dscr,  
+		a.apy_intr_lat_fee,
+		a.apy_intr_admn_fee,
+		a.apy_intr_nsf_fee,
+		a.apy_intr_othr_fee,
+		a.elg_inct_fl,
+		a.earn_rcvb_cd, 
+		a.fin_fee_ov_fl,
+		a.apy_intr_ov,     
+		a.bill_lag_dy,
+		a.bill_freq,
+		a.bill_fy_strt_mnth,
+		a.bill_fy_strt_dy,
+		a.fed_agcy_cd,
+		a.fed_agcy_sfx,
+		a.fed_nm,
+		a.srsrc_req
+	       	FROM   etl.stg_revenue_source a LEFT JOIN ref_revenue_source b ON a.rsrc_cd = b.revenue_source_code and a.fy= fiscal_year;
+
+RAISE NOTICE 'RS -2';
+
+
+	
+	-- Generate the revenue source id for new records
+		
+	TRUNCATE etl.ref_revenue_source_id_seq;
+	
+	INSERT INTO etl.ref_revenue_source_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_ref_revenue_source
+	WHERE  exists_flag ='N';
+
+	
+
+   RAISE NOTICE 'RS - 3';
+	
+	INSERT INTO ref_revenue_source(revenue_source_id,fiscal_year,revenue_source_code,revenue_source_name,revenue_source_short_name,description,
+	active_flag,budget_allowed_flag,operating_indicator,fasb_class_indicator,fhwa_revenue_credit_flag ,usetax_collection_flag ,
+	apply_interest_late_fee ,apply_interest_admin_fee ,apply_interest_nsf_fee ,apply_interest_other_fee,eligible_intercept_process,
+	earned_receivable_code,finance_fee_override_flag,allow_override_interest, billing_lag_days, billing_frequency , billing_fiscal_year_start_month ,
+ 	 billing_fiscal_year_start_day , federal_agency_code ,	 federal_agency_suffix , federal_name ,srsrc_req ,created_date)
+
+	SELECT a.revenue_source_id,b.fy,b.rsrc_cd,b.rsrc_nm,
+	        b.rsrc_sh_nm,
+		b.rsrc_dscr,
+	        b.act_fl,   
+		b.alw_bud_fl, 
+		b.oper_ind, 
+		b.fasb_cls_ind,
+		b.fhwa_rev_cr_fl, 
+		b.usetax_coll_fl,
+		b.apy_intr_lat_fee,
+		b.apy_intr_admn_fee,
+		b.apy_intr_nsf_fee,
+		b.apy_intr_othr_fee,
+		b.elg_inct_fl,
+		b.earn_rcvb_cd, 
+		b.fin_fee_ov_fl,
+		b.apy_intr_ov,     
+		b.bill_lag_dy,
+		b.bill_freq,
+		b.bill_fy_strt_mnth,
+		b.bill_fy_strt_dy,
+		b.fed_agcy_cd,
+		b.fed_agcy_sfx,
+		b.fed_nm,
+		b.srsrc_req,
+		 now()::timestamp
+	FROM   etl.ref_revenue_source_id_seq a JOIN tmp_ref_revenue_source b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE 'RS - 4';
+
+CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar, revenue_source_id smallint)
+	DISTRIBUTED BY (revenue_source_id);
+
+	INSERT INTO tmp_ref_revenue_source_1
+	SELECT a.rsrc_nm,b.revenue_source_id FROM tmp_ref_revenue_source a JOIN ref_revenue_source b ON a.rsrc_cd = b.revenue_source_code AND a.fy = b.fiscal_year
+	WHERE exists_flag ='Y' and modified_flag='Y';
+
+	
+	UPDATE ref_revenue_source a
+	SET	revenue_source_name = b.rsrc_nm,
+		updated_date = now()::timestamp,
+		updated_load_id = p_load_id_in
+	FROM	tmp_ref_revenue_source_1 b		
+	WHERE	a.revenue_source_id = b.revenue_source_id;
+
+
+Return 1;
+	
 END;
 $$ language plpgsql;
