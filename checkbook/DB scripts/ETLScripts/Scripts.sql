@@ -632,10 +632,19 @@ BEGIN
 
 		ELSIF 	l_data_source_code ='C' THEN
 			l_processed := etl.processCon(p_load_file_id_in,l_load_id);
-		
+			
+		ELSIF 	l_data_source_code ='RC' THEN
+			l_processed := etl.processrevenueclass(p_load_file_id_in,l_load_id);	
+
 		ELSIF 	l_data_source_code ='B' THEN
 			l_processed := etl.processbudget(p_load_file_id_in,l_load_id);
 
+		ELSIF 	l_data_source_code ='RY' THEN
+			l_processed := etl.processrevenuecategory(p_load_file_id_in,l_load_id);	
+			
+		ELSIF 	l_data_source_code ='RS' THEN
+			l_processed := etl.processrevenuesource(p_load_file_id_in,l_load_id);	
+			
 		END IF;
 
 	-- Updating the processed flag to Y to indicate that the data is posted to the transaction table.
