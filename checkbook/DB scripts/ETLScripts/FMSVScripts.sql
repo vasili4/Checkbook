@@ -148,7 +148,7 @@ BEGIN
 			   AND COALESCE(a.ctry,'') = COALESCE(e.country,'')	
 		JOIN etl.stg_fmsv_address_type f ON a.vend_cust_cd = f.vend_cust_cd AND a.ad_id = f.ad_id 
 		JOIN etl.vendor_address_id_seq c ON f.uniq_id = c.uniq_id	   
-		LEFT JOIN ref_address_type g ON a.ad_typ = g.address_type_code	   
+		LEFT JOIN ref_address_type g ON f.ad_typ = g.address_type_code	   
 		LEFT JOIN ref_date h ON f.efbgn_dt = h.date
 		LEFT JOIN ref_date i ON f.efend_dt = i.date;
 
