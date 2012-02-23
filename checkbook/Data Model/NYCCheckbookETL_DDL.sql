@@ -3311,6 +3311,27 @@ CREATE TABLE etl.etl_data_load_verification
 )
 DISTRIBUTED BY (load_file_id);
 
+---------------------------------------------------------------------------------------------------------------------------
+/* Refreshing shards status */
+
+CREATE TABLE etl.refresh_shards_status
+(
+  shard_name character(5),
+  latest_flag smallint,
+  sql_flag smallint,
+  sql_start_date timestamp without time zone,
+  sql_end_date timestamp without time zone,
+  fix_flag smallint,
+  fix_start_date timestamp without time zone,
+  fix_end_date timestamp without time zone,
+  rsync_flag smallint,
+  rsync_start_date timestamp without time zone,
+  rsync_end_date timestamp without time zone,
+  refresh_start_date timestamp without time zone,
+  refresh_end_date timestamp without time zone
+)
+DISTRIBUTED BY (shard_name);
+
 -----------------------------------------------------------------------------------------------------------------------------
 
 /* Budget Data Feed */
