@@ -25,6 +25,84 @@ BEGIN
 
 	RAISE NOTICE '1';
 	
+	-- Identify the vendors whose business type has been changed without any change to the legal/alias name
+		
+	CREATE TEMPORARY TABLE tmp_vendor_bus_type(uniq_id bigint,vendor_customer_code varchar(20),business_type_code varchar,
+						   status smallint, minority_type_id smallint, modified_flag char(1) )
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_vendor_bus_type
+	SELECT z.uniq_id, COALESCE(z.vendor_customer_code,a.vend_cust_cd), a.bus_typ,a.bus_typ_sta,a.min_typ,
+		(CASE WHEN vendor_business_type_id IS NOT NULL AND a.uniq_id IS NOT NULL THEN 'N' 
+			WHEN vendor_business_type_id IS NOT NULL AND a.uniq_id IS NULL  THEN 'Y'
+			WHEN vendor_business_type_id IS NULL AND a.uniq_id IS NOT NULL  THEN 'Y'
+			ELSE NULL END) as modified_flag
+	FROM etl.stg_fmsv_business_type a 
+		FULL OUTER JOIN (SELECT f.vendor_customer_code, g.uniq_id,f.vendor_id, d.vendor_business_type_id,b.business_type_code, status, minority_type_id
+		                 FROM vendor_business_type d JOIN ref_business_type b ON d.business_type_id = b.business_type_id
+		                 JOIN vendor_history e ON e.vendor_history_id = d.vendor_history_id
+		                 JOIN vendor f ON e.vendor_id = f.vendor_id
+		                 JOIN tmp_vendor g ON g.vendor_customer_code = f.vendor_customer_code ) as z ON a.vend_cust_cd = z.vendor_customer_code AND a.bus_typ=z.business_type_code
+						AND a.bus_typ_sta = z.status AND COALESCE(a.min_typ,0) = COALESCE(z.minority_type_id,0);
+	
+	CREATE TEMPORARY TABLE tmp_vendor_bus_type_1(uniq_id bigint);
+	
+	INSERT INTO tmp_vendor_bus_type_1
+	SELECT  DISTINCT b.uniq_id
+	FROM	tmp_vendor_bus_type a JOIN tmp_vendor b ON a.vendor_customer_code = b.vendor_customer_code
+	WHERE 	a.modified_flag = 'Y';
+	
+	UPDATE tmp_vendor a
+	SET	modified_flag ='Y'
+	FROM	tmp_vendor_bus_type_1 b
+	WHERE 	a.uniq_id = b.uniq_id;
+	
+	-- Identify the vendors whose address/address type has been changed without any change to the legal/alias name
+
+	CREATE TEMPORARY TABLE tmp_vendor_address(uniq_id bigint,vendor_customer_code varchar(20),ad_id varchar,
+						   ad_typ varchar ,modified_flag char(1) )
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_vendor_address
+	SELECT z.uniq_id, COALESCE(z.vendor_customer_code, m.vend_cust_cd), m.ad_id,n.ad_typ,
+		(CASE WHEN vendor_address_id IS NOT NULL AND m.uniq_id IS NOT NULL THEN 'N' 
+			WHEN vendor_address_id IS NOT NULL AND m.uniq_id IS NULL  THEN 'Y'
+			WHEN vendor_address_id IS NULL AND m.uniq_id IS NOT NULL  THEN 'Y'
+			ELSE NULL END) as modified_flag
+			--m.str_1_nm,m.str_2_nm,m.city_nm,m.st,m.zip,m.ctry,n.ad_typ
+			--z.address_line_1,z.address_line_2,z.city,z.state,z.zip,z.country
+	FROM etl.stg_fmsv_address m JOIN etl.stg_fmsv_address_type n ON m.vend_cust_cd = n.vend_cust_cd AND m.ad_id = n.ad_id 
+			FULL OUTER JOIN
+			          (SELECT  a.vendor_address_id,h.vendor_customer_code, h.uniq_id,b.address_type_code,c.address_line_1,c.address_line_2,c.city,c.state,c.zip,c.country, 
+					d.date as effective_begin_date, e.date as  effective_end_date
+					FROM	vendor_address a JOIN ref_address_type b ON a.address_type_id = b.address_type_id
+					JOIN address c ON a.address_id = c.address_id
+					JOIN ref_date d ON a.effective_begin_date_id = d.date_id
+					LEFT JOIN ref_date e ON a.effective_end_date_id = e.date_id 
+					JOIN vendor_history f ON a.vendor_history_id = f.vendor_history_id
+					JOIN vendor g ON f.vendor_id = g.vendor_id
+					JOIN tmp_vendor h ON g.vendor_customer_code = h.vendor_customer_code 
+					) z on m.vend_cust_cd = z.vendor_customer_code 
+						AND COALESCE(m.str_1_nm,'') = COALESCE(z.address_line_1,'')
+						AND COALESCE(m.str_2_nm,'') = COALESCE(z.address_line_2,'')
+						AND COALESCE(m.city_nm,'') = COALESCE(z.city,'')
+						AND COALESCE(m.st,'') = COALESCE(z.state,'')
+						AND COALESCE(m.zip,'') = COALESCE(z.zip,'')
+						AND COALESCE(m.ctry,'') = COALESCE(z.country,'')
+						AND n.ad_typ = z.address_type_code;
+
+	TRUNCATE tmp_vendor_bus_type_1;
+	
+	INSERT INTO tmp_vendor_bus_type_1
+	SELECT  DISTINCT b.uniq_id
+	FROM	tmp_vendor_address a JOIN tmp_vendor b ON a.vendor_customer_code = b.vendor_customer_code
+	WHERE 	a.modified_flag = 'Y';
+	
+	UPDATE tmp_vendor a
+	SET	modified_flag ='Y'
+	FROM	tmp_vendor_bus_type_1 b
+	WHERE 	a.uniq_id = b.uniq_id;
+	
 	-- Generate the vendor id for new records
 	
 	TRUNCATE etl.vendor_id_seq;
@@ -54,6 +132,11 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_vendor_update(vendor_id int, legal_name varchar, alias_name varchar)
 	DISTRIBUTED BY (vendor_id);
+	
+	INSERT INTO tmp_vendor_update(vendor_id,legal_name,alias_name)
+	SELECT vendor_id,legal_name,alias_name
+	FROM	tmp_vendor
+	WHERE	exists_flag ='Y' and modified_flag='Y';
 	
 	UPDATE vendor a
 	SET    legal_name = b.legal_name,
@@ -146,7 +229,7 @@ BEGIN
 			   AND COALESCE(a.st,'') = COALESCE(e.state,'') 
 			   AND COALESCE(a.zip,'') = COALESCE(e.zip,'') 
 			   AND COALESCE(a.ctry,'') = COALESCE(e.country,'')	
-		JOIN etl.stg_fmsv_address_type f ON a.vend_cust_cd = f.vend_cust_cd AND a.ad_id = f.ad_id 
+		JOIN etl.stg_fmsv_address_type f ON a.vend_cust_cd = f.vend_cust_cd AND a.ad_id = f.ad_id
 		JOIN etl.vendor_address_id_seq c ON f.uniq_id = c.uniq_id	   
 		LEFT JOIN ref_address_type g ON f.ad_typ = g.address_type_code	   
 		LEFT JOIN ref_date h ON f.efbgn_dt = h.date
