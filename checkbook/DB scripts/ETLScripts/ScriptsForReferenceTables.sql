@@ -143,6 +143,9 @@ INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES (
 										('AD',NULL,now()::timestamp),
 										('EFT',NULL,now()::timestamp);
 
+										
+INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values ('JUDGCLAIMS',now()::timestamp),('MISCPAYVEN',now()::timestamp);
+
 -- Dummy values
 
 /*insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
