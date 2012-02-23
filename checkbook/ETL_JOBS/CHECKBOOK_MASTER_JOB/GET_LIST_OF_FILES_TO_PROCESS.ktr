@@ -196,7 +196,7 @@
 
 var files_to_process_sql1 = replace(files_to_process_sql,&apos;replace_job_id&apos;,nextval);
 
-Alert(files_to_process_sql1);
+
 </jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>files_to_process_sql1</name>
         <rename>files_to_process_sql1</rename>
