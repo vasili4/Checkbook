@@ -41,6 +41,7 @@ CREATE SEQUENCE seq_ref_pay_cycle_pay_cycle_id;
 CREATE SEQUENCE seq_ref_revenue_category_revenue_category_id;
 CREATE SEQUENCE seq_ref_revenue_class_revenue_class_id;
 CREATE SEQUENCE seq_ref_revenue_source_revenue_source_id;
+CREATE SEQUENCE seq_ref_budget_budget_code_id;
 CREATE SEQUENCE seq_ref_worksite_worksite_id;
 CREATE SEQUENCE seq_ref_address_type_address_type_id;
 CREATE SEQUENCE seq_ref_date_date_id;
