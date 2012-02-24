@@ -417,10 +417,6 @@ FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
 encoding 'utf8';
 
 
-
-
-
-
 CREATE EXTERNAL TABLE ext_stg_coa_budget_code_feed
 (
 fy character varying,
@@ -452,9 +448,6 @@ location
 )
 FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
 encoding 'utf8';
-
-
-
 
 CREATE TABLE ref_fund_class_id_seq(uniq_id bigint,fund_class_id int default nextval('public.seq_ref_fund_class_fund_class_id'))
 DISTRIBUTED BY (uniq_id);
@@ -579,7 +572,6 @@ DISTRIBUTED BY (uniq_id);
 CREATE TABLE ref_object_class_history_id_seq(uniq_id bigint,object_class_history_id int default nextval('public.seq_ref_object_class_history_id'))
 DISTRIBUTED BY (uniq_id);
 
-
 CREATE TABLE stg_revenue_category
 	(doc_dept_cd character varying(4),
 	rscat_cd character varying(4),
@@ -601,157 +593,148 @@ CREATE TABLE stg_revenue_category
 CREATE TABLE archive_revenue_category (LIKE stg_revenue_category) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_revenue_category ADD COLUMN load_id bigint;
 
-
 CREATE TABLE invalid_revenue_category (LIKE archive_revenue_category) DISTRIBUTED BY (uniq_id);
 
 
-
-
-
 CREATE TABLE stg_revenue_class
-(doc_dept_cd character varying(4),
-rscls_cd character varying(4),
-rscls_nm character varying(60),
-rscls_sh_nm character varying(15),
-act_fl integer,
-efbgn_dt date, 
-efend_dt date, 
-alw_bud_fl integer,
-rscls_dscr character varying(100),
-cntac_cd integer,
-rscls_nm_up character varying(60),
-tbl_last_dt date,
-uniq_id bigint default nextval('etl.seq_stg_rs_class_uniq_id'),
-invalid_flag character(1),
-invalid_reason character varying)
+	(doc_dept_cd character varying(4),
+	rscls_cd character varying(4),
+	rscls_nm character varying(60),
+	rscls_sh_nm character varying(15),
+	act_fl integer,
+	efbgn_dt date, 
+	efend_dt date, 
+	alw_bud_fl integer,
+	rscls_dscr character varying(100),
+	cntac_cd integer,
+	rscls_nm_up character varying(60),
+	tbl_last_dt date,
+	uniq_id bigint default nextval('etl.seq_stg_rs_class_uniq_id'),
+	invalid_flag character(1),
+	invalid_reason character varying)
 distributed by (uniq_id);
 
 
 
 
-CREATE TABLE archive_revenue_class (LIKE stg_revenue_class) DISTRIBUTED BY (uniq_id)
-alter table archive_revenue_class ADD COLUMN load_id bigint
+CREATE TABLE archive_revenue_class (LIKE stg_revenue_class) DISTRIBUTED BY (uniq_id);
+alter table archive_revenue_class ADD COLUMN load_id bigint;
 
 
 CREATE TABLE invalid_revenue_class (LIKE archive_revenue_class) DISTRIBUTED BY (uniq_id);
 
-CREATE TABLE etl.stg_revenue_source
+CREATE TABLE stg_revenue_source
 (
-  doc_dept_cd character varying(4),
-  fy integer,
-  rsrc_cd character varying(5),
-  rsrc_nm character varying(60),
-  rsrc_sh_nm character varying(15),
-  act_fl bit(1),
-  efbgn_dt date,
-  efend_dt date,
-  alw_bud_fl bit(1),
-  oper_ind integer,
-  fasb_cls_ind integer,
-  fhwa_rev_cr_fl integer,
-  usetax_coll_fl integer,
-  rscls_cd character varying(4),
-  rscat_cd character varying(4),
-  rstyp_cd character varying(4),
-  rsgrp_cd character varying(4),
-  mjr_crtyp_cd character varying(4),
-  mnr_crtyp_cd character varying(4),
-  rsrc_dscr character varying(100),
-  cntac_cd integer,
-  billu_rcvb_cd character varying(4),
-  billu_rcvb_s character varying(4),
-  bille_rcvb_cd character varying(4),
-  bille_rcvb_s character varying(4),
-  billu_rev_cd character varying(4),
-  billu_rev_s character varying(4),
-  collu_rev_cd character varying(4),
-  collu_rev_s character varying(4),
-  alw_bdebt_cd character varying(4),
-  alw_bdebt_s character varying(4),
-  bdebt_exp_obj character varying(4),
-  bdebt_exp_obj_s character varying(4),
-  bill_dps_cd character varying(4),
-  bill_dps_s character varying(4),
-  coll_dps_cd character varying(4),
-  coll_dps_s character varying(4),
-  nsf_ckcg_rsrc character varying(5),
-  nsf_ckcg_rsrc_s character varying(5),
-  intch_rsrc character varying(5),
-  intch_rsrc_s character varying(5),
-  lat_chrg_rsrc character varying(5),
-  lat_chrg_rsrc_s character varying(5),
-  cc_fee_rsrc character varying(5),
-  cc_fee_rsrc_s character varying(5),
-  cc_fee_obj character varying(4),
-  cc_fee_obj_s character varying(4),
-  fin_chrg_fee1_cd character varying(5),
-  fin_chrg_fee2_cd character varying(5),
-  fin_chrg_fee3_cd character varying(5),
-  fin_chrg_fee4_cd character varying(5),
-  fin_chrg_fee5_cd character varying(5),
-  apy_intr_lat_fee integer,
-  apy_intr_admn_fee integer,
-  apy_intr_nsf_fee integer,
-  apy_intr_othr_fee integer,
-  elg_inct_fl integer,
-  rsrc_xfer_fl integer,
-  bill_vend_rfnd_cd character varying(4),
-  bill_vend_rfnd_s character varying(4),
-  uern_rcvb_wo_cd character varying(4),
-  uern_rcvb_wo_s character varying(4),
-  dps_rcvb_wo_cd character varying(4),
-  dps_rcvb_wo_s character varying(4),
-  uern_rev_wo_cd character varying(4),
-  uern_rev_wo_s character varying(4),
-  dps_wo_cd character varying(4),
-  dps_wo_s character varying(4),
-  vrfnd_rcvb_wo_cd character varying(4),
-  vrfnd_rcvb_wo_s character varying(4),
-  vrfnd_wo_cd character varying(4),
-  vrfnd_wo_s character varying(4),
-  ernrev_to_coll_cd character varying(4),
-  ernrev_to_coll_s character varying(4),
-  vrfnd_to_coll_cd character varying(4),
-  vrfnd_to_coll_s character varying(4),
-  vend_rha_cd character varying(4),
-  vend_rha_s character varying(4),
-  rs_opay_cd character varying(4),
-  rs_opay_s character varying(4),
-  urs_opay_cd character varying(4),
-  urs_opay_s character varying(4),
-  bill_dps_rec_cd character varying(4),
-  bill_dps_rec_s character varying(4),
-  earn_rcvb_cd character varying(4),
-  earn_rcvb_s character varying(4),
-  rsrc_nm_up character varying(60),
-  rsrc_sh_nm_up character varying(15),
-  fin_fee_ov_fl integer,
-  apy_intr_ov integer,
-  tbl_last_dt date,
-  ext_rep_nm character varying(10),
-  fund_cls character varying(4),
-  fund_cls_nm character varying(60),
-  grnt_id character varying(12),
-  bill_lag_dy integer,
-  bill_freq integer,
-  bill_fy_strt_mnth integer,
-  bill_fy_strt_dy integer,
-  fed_agcy_cd character varying(2),
-  fed_agcy_sfx character varying(3),
-  fed_nm character varying(60),
-  ext_rep_num character varying(10),
-  dscr_ext character varying(1500),
-  srsrc_req character varying(1),
-  uniq_id bigint DEFAULT nextval('etl.seq_stg_rs_source_uniq_id'::regclass),
-  invalid_flag character(1),
-  invalid_reason character varying
-)
-WITH (
-  OIDS=FALSE
+	  doc_dept_cd character varying(4),
+	  fy integer,
+	  rsrc_cd character varying(5),
+	  rsrc_nm character varying(60),
+	  rsrc_sh_nm character varying(15),
+	  act_fl bit(1),
+	  efbgn_dt date,
+	  efend_dt date,
+	  alw_bud_fl bit(1),
+	  oper_ind integer,
+	  fasb_cls_ind integer,
+	  fhwa_rev_cr_fl integer,
+	  usetax_coll_fl integer,
+	  rscls_cd character varying(4),
+	  rscat_cd character varying(4),
+	  rstyp_cd character varying(4),
+	  rsgrp_cd character varying(4),
+	  mjr_crtyp_cd character varying(4),
+	  mnr_crtyp_cd character varying(4),
+	  rsrc_dscr character varying(100),
+	  cntac_cd integer,
+	  billu_rcvb_cd character varying(4),
+	  billu_rcvb_s character varying(4),
+	  bille_rcvb_cd character varying(4),
+	  bille_rcvb_s character varying(4),
+	  billu_rev_cd character varying(4),
+	  billu_rev_s character varying(4),
+	  collu_rev_cd character varying(4),
+	  collu_rev_s character varying(4),
+	  alw_bdebt_cd character varying(4),
+	  alw_bdebt_s character varying(4),
+	  bdebt_exp_obj character varying(4),
+	  bdebt_exp_obj_s character varying(4),
+	  bill_dps_cd character varying(4),
+	  bill_dps_s character varying(4),
+	  coll_dps_cd character varying(4),
+	  coll_dps_s character varying(4),
+	  nsf_ckcg_rsrc character varying(5),
+	  nsf_ckcg_rsrc_s character varying(5),
+	  intch_rsrc character varying(5),
+	  intch_rsrc_s character varying(5),
+	  lat_chrg_rsrc character varying(5),
+	  lat_chrg_rsrc_s character varying(5),
+	  cc_fee_rsrc character varying(5),
+	  cc_fee_rsrc_s character varying(5),
+	  cc_fee_obj character varying(4),
+	  cc_fee_obj_s character varying(4),
+	  fin_chrg_fee1_cd character varying(5),
+	  fin_chrg_fee2_cd character varying(5),
+	  fin_chrg_fee3_cd character varying(5),
+	  fin_chrg_fee4_cd character varying(5),
+	  fin_chrg_fee5_cd character varying(5),
+	  apy_intr_lat_fee integer,
+	  apy_intr_admn_fee integer,
+	  apy_intr_nsf_fee integer,
+	  apy_intr_othr_fee integer,
+	  elg_inct_fl integer,
+	  rsrc_xfer_fl integer,
+	  bill_vend_rfnd_cd character varying(4),
+	  bill_vend_rfnd_s character varying(4),
+	  uern_rcvb_wo_cd character varying(4),
+	  uern_rcvb_wo_s character varying(4),
+	  dps_rcvb_wo_cd character varying(4),
+	  dps_rcvb_wo_s character varying(4),
+	  uern_rev_wo_cd character varying(4),
+	  uern_rev_wo_s character varying(4),
+	  dps_wo_cd character varying(4),
+	  dps_wo_s character varying(4),
+	  vrfnd_rcvb_wo_cd character varying(4),
+	  vrfnd_rcvb_wo_s character varying(4),
+	  vrfnd_wo_cd character varying(4),
+	  vrfnd_wo_s character varying(4),
+	  ernrev_to_coll_cd character varying(4),
+	  ernrev_to_coll_s character varying(4),
+	  vrfnd_to_coll_cd character varying(4),
+	  vrfnd_to_coll_s character varying(4),
+	  vend_rha_cd character varying(4),
+	  vend_rha_s character varying(4),
+	  rs_opay_cd character varying(4),
+	  rs_opay_s character varying(4),
+	  urs_opay_cd character varying(4),
+	  urs_opay_s character varying(4),
+	  bill_dps_rec_cd character varying(4),
+	  bill_dps_rec_s character varying(4),
+	  earn_rcvb_cd character varying(4),
+	  earn_rcvb_s character varying(4),
+	  rsrc_nm_up character varying(60),
+	  rsrc_sh_nm_up character varying(15),
+	  fin_fee_ov_fl integer,
+	  apy_intr_ov integer,
+	  tbl_last_dt date,
+	  ext_rep_nm character varying(10),
+	  fund_cls character varying(4),
+	  fund_cls_nm character varying(60),
+	  grnt_id character varying(12),
+	  bill_lag_dy integer,
+	  bill_freq integer,
+	  bill_fy_strt_mnth integer,
+	  bill_fy_strt_dy integer,
+	  fed_agcy_cd character varying(2),
+	  fed_agcy_sfx character varying(3),
+	  fed_nm character varying(60),
+	  ext_rep_num character varying(10),
+	  dscr_ext character varying(1500),
+	  srsrc_req character varying(1),
+	  uniq_id bigint DEFAULT nextval('etl.seq_stg_rs_source_uniq_id'::regclass),
+	  invalid_flag character(1),
+	  invalid_reason character varying
 )
 DISTRIBUTED BY (uniq_id);
-ALTER TABLE etl.stg_revenue_source
-  OWNER TO gpadmin;
 
 ---archive and invalid tables
 
@@ -760,8 +743,6 @@ ALTER TABLE archive_revenue_source ADD COLUMN load_id bigint;
 
 
 CREATE TABLE invalid_revenue_source (LIKE archive_revenue_source) DISTRIBUTED BY (uniq_id);
-
-
 
 CREATE TABLE etl.stg_budget_code
 (
@@ -791,27 +772,12 @@ CREATE TABLE etl.stg_budget_code
 		invalid_flag character(1),
 		invalid_reason character varying
 		
-)
-WITH (
-  OIDS=FALSE
-)
-DISTRIBUTED BY (uniq_id);
-ALTER TABLE etl.stg_budget_code
-  OWNER TO gpadmin;
-
-
+) DISTRIBUTED BY (uniq_id);
 
 ---archive and invalid tables
 
 CREATE TABLE archive_budget_code (LIKE etl.stg_budget_code) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_budget_code ADD COLUMN load_id bigint;
-
-
-
-
-
-
-
 
 -- End of COA related tables
  
@@ -3086,7 +3052,8 @@ ALTER TABLE archive_con_do1_accounting_line ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_con_do1_accounting_line (LIKE archive_con_do1_accounting_line) DISTRIBUTED BY (uniq_id);
 
-CREATE TABLE agreement_id_seq(uniq_id bigint, agreement_id bigint default nextval('public.seq_agreement_agreement_id'));
+CREATE TABLE agreement_id_seq(uniq_id bigint, agreement_id bigint default nextval('public.seq_agreement_agreement_id'))
+DISTRIBUTED BY (uniq_id);
 
 ------------------------------------------------------------------------------------------------------------------------------------
 /* FMS data feed */
