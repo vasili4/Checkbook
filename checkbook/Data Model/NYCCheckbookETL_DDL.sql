@@ -815,7 +815,7 @@ CREATE TABLE invalid_budget_code (LIKE archive_budget_code) DISTRIBUTED BY (uniq
 CREATE TABLE etl.ref_budget_code_id_seq
 (
   uniq_id bigint,
-  budget_code_id integer DEFAULT nextval('public.seq_ref_budget_budget_code_id'::regclass)
+  budget_code_id integer DEFAULT nextval('public.seq_ref_budget_code_budget_code_id'::regclass)
 )
 
 
