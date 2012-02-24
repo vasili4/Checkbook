@@ -256,7 +256,7 @@ LOCATION (
   	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
  ENCODING 'UTF8';	
 
-CREATE EXTERNAL TABLE etl.ext_stg_coa_revenue_category_feed
+CREATE EXTERNAL TABLE ext_stg_coa_revenue_category_feed
 (
 doc_dept_cd character varying,
 rscat_cd character varying,
@@ -452,6 +452,8 @@ encoding 'utf8';
 CREATE TABLE ref_fund_class_id_seq(uniq_id bigint,fund_class_id int default nextval('public.seq_ref_fund_class_fund_class_id'))
 DISTRIBUTED BY (uniq_id);
 
+
+
 CREATE TABLE stg_agency(
 	agency_code varchar(20),
 	agency_name varchar(50),
@@ -595,6 +597,14 @@ ALTER TABLE archive_revenue_category ADD COLUMN load_id bigint;
 
 CREATE TABLE invalid_revenue_category (LIKE archive_revenue_category) DISTRIBUTED BY (uniq_id);
 
+CREATE TABLE etl.ref_revenue_category_id_seq
+(
+  uniq_id bigint,
+  revenue_category_id integer DEFAULT nextval('seq_ref_revenue_category_revenue_category_id'::regclass)
+)
+
+DISTRIBUTED BY (uniq_id);
+
 
 CREATE TABLE stg_revenue_class
 	(doc_dept_cd character varying(4),
@@ -622,6 +632,16 @@ alter table archive_revenue_class ADD COLUMN load_id bigint;
 
 
 CREATE TABLE invalid_revenue_class (LIKE archive_revenue_class) DISTRIBUTED BY (uniq_id);
+
+CREATE TABLE etl.ref_revenue_class_id_seq
+(
+  uniq_id bigint,
+  revenue_class_id integer DEFAULT nextval('seq_ref_revenue_class_revenue_class_id'::regclass)
+)
+
+
+DISTRIBUTED BY (uniq_id);
+
 
 CREATE TABLE stg_revenue_source
 (
@@ -744,6 +764,17 @@ ALTER TABLE archive_revenue_source ADD COLUMN load_id bigint;
 
 CREATE TABLE invalid_revenue_source (LIKE archive_revenue_source) DISTRIBUTED BY (uniq_id);
 
+CREATE TABLE etl.ref_revenue_source_id_seq
+(
+  uniq_id bigint,
+  revenue_source_id integer DEFAULT nextval('seq_ref_revenue_source_revenue_source_id'::regclass)
+)
+
+
+DISTRIBUTED BY (uniq_id);
+
+
+
 CREATE TABLE etl.stg_budget_code
 (
 		fy integer,
@@ -778,6 +809,17 @@ CREATE TABLE etl.stg_budget_code
 
 CREATE TABLE archive_budget_code (LIKE etl.stg_budget_code) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_budget_code ADD COLUMN load_id bigint;
+
+CREATE TABLE invalid_budget_code (LIKE archive_budget_code) DISTRIBUTED BY (uniq_id);
+
+CREATE TABLE etl.ref_budget_code_id_seq
+(
+  uniq_id bigint,
+  budget_code_id integer DEFAULT nextval('seq_ref_budget_budget_code_id'::regclass)
+)
+
+
+DISTRIBUTED BY (uniq_id);
 
 -- End of COA related tables
  
