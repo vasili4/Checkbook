@@ -600,7 +600,7 @@ CREATE TABLE invalid_revenue_category (LIKE archive_revenue_category) DISTRIBUTE
 CREATE TABLE etl.ref_revenue_category_id_seq
 (
   uniq_id bigint,
-  revenue_category_id integer DEFAULT nextval('seq_ref_revenue_category_revenue_category_id'::regclass)
+  revenue_category_id integer DEFAULT nextval('public.seq_ref_revenue_category_revenue_category_id'::regclass)
 )
 
 DISTRIBUTED BY (uniq_id);
@@ -636,7 +636,7 @@ CREATE TABLE invalid_revenue_class (LIKE archive_revenue_class) DISTRIBUTED BY (
 CREATE TABLE etl.ref_revenue_class_id_seq
 (
   uniq_id bigint,
-  revenue_class_id integer DEFAULT nextval('seq_ref_revenue_class_revenue_class_id'::regclass)
+  revenue_class_id integer DEFAULT nextval('public.seq_ref_revenue_class_revenue_class_id'::regclass)
 )
 
 
@@ -767,7 +767,7 @@ CREATE TABLE invalid_revenue_source (LIKE archive_revenue_source) DISTRIBUTED BY
 CREATE TABLE etl.ref_revenue_source_id_seq
 (
   uniq_id bigint,
-  revenue_source_id integer DEFAULT nextval('seq_ref_revenue_source_revenue_source_id'::regclass)
+  revenue_source_id integer DEFAULT nextval('public.seq_ref_revenue_source_revenue_source_id'::regclass)
 )
 
 
@@ -815,7 +815,7 @@ CREATE TABLE invalid_budget_code (LIKE archive_budget_code) DISTRIBUTED BY (uniq
 CREATE TABLE etl.ref_budget_code_id_seq
 (
   uniq_id bigint,
-  budget_code_id integer DEFAULT nextval('seq_ref_budget_budget_code_id'::regclass)
+  budget_code_id integer DEFAULT nextval('public.seq_ref_budget_budget_code_id'::regclass)
 )
 
 
