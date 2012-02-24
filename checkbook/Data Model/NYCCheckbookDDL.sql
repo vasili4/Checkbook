@@ -160,17 +160,7 @@ CREATE TABLE ref_date(
  )
 DISTRIBUTED BY (date_id);
 ALTER TABLE  ref_date ADD constraint fk_ref_date_ref_month FOREIGN KEY(calendar_month_id) references ref_month(month_id);
-ALTER TABLE  ref_date ADD constraint fk_ref_date_ref_year FOREIGN KEY(nyc_year_id) references ref_year(year_id);
-  
-  
-CREATE TABLE ref_date(
-  date_id    smallint PRIMARY KEY default nextval('seq_ref_date_date_id'),
-  date	     DATE,
-  nyc_year   smallint,
-  calendar_month smallint,
-  calendar_year smallint
- );
-  
+ALTER TABLE  ref_date ADD constraint fk_ref_date_ref_year FOREIGN KEY(nyc_year_id) references ref_year(year_id);  
  
 CREATE TABLE ref_fund_class (
   fund_class_id smallint PRIMARY KEY default nextval('seq_ref_fund_class_fund_class_id'),
@@ -237,7 +227,7 @@ CREATE TABLE ref_award_method (
 ) DISTRIBUTED BY (award_method_id);
 
 CREATE TABLE ref_award_status (
-  award_status_id smallint PRIMARY KEY default nextval('seq_ref_award_status_award_status_id'),
+  award_status_id smallint PRIMARY KEY,
   award_status_name varchar(50),
   created_date timestamp
 ) DISTRIBUTED BY (award_status_id);
@@ -300,7 +290,7 @@ CREATE TABLE ref_document_code (
 ) DISTRIBUTED BY (document_code_id);
 
 CREATE TABLE ref_document_function_code (
-  document_function_code_id smallint PRIMARY KEY default nextval('seq_ref_document_function_code_document_function_code_id'),
+  document_function_code_id smallint PRIMARY KEY,
   document_function_name varchar(50) ,
   created_date timestamp 
 ) DISTRIBUTED BY (document_function_code_id);
@@ -698,9 +688,9 @@ CREATE TABLE address (
   address_line_1 varchar(75) ,
   address_line_2 varchar(75) ,
   city varchar(60) ,
-  state char(2) ,
+  state varchar(2) ,
   zip varchar(10) ,
-  country char(3) 
+  country varchar(3) 
 ) distributed by(address_id);
 
 CREATE TABLE vendor (
@@ -717,7 +707,7 @@ CREATE TABLE vendor (
     updated_date timestamp without time zone
 ) distributed by (vendor_id);
 
-ALTER TABLE vendor ADD constraint fk_vendor_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+ALTER TABLE vendor ADD constraint fk_vendor_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 
 CREATE TABLE vendor_history (
     vendor_history_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_history_vendor_history_id'::regclass) NOT NULL,
@@ -834,12 +824,13 @@ CREATE TABLE master_agreement (
     number_solicitation integer,
     document_name character varying(60),
     privacy_flag char(1),
-    load_id integer,
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (master_agreement_id);
 
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_etl_data_load FOREIGN KEY (load_id) REFERENCES etl_data_load(load_id);
+ ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load(load_id);
  ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
  ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_agreement_type FOREIGN KEY (agreement_type_id) REFERENCES ref_agreement_type(agreement_type_id);
  ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_category_1 FOREIGN KEY (award_category_id_1) REFERENCES ref_award_category(award_category_id);
@@ -977,7 +968,7 @@ CREATE TABLE agreement (
  ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_category_4 foreign key (award_category_id_4) references ref_award_category (award_category_id);
  ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_category_5 foreign key (award_category_id_5) references ref_award_category (award_category_id);
  ALTER TABLE  agreement ADD constraint fk_agreement_vendor_history foreign key (vendor_history_id) references vendor_history (vendor_history_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+ ALTER TABLE  agreement ADD constraint fk_agreement_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
  ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_level foreign key (award_level_id) references ref_award_level (award_level_id);
  ALTER TABLE  agreement ADD constraint fk_agreement_ref_date foreign key (award_level_id) references ref_award_level (award_level_id);
  ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date foreign key (record_date_id) references ref_date (date_id);
@@ -1340,7 +1331,7 @@ CREATE TABLE disbursement_line_item (LIKE all_disbursement_line_item) DISTRIBUTE
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_fund foreign key (fund_id) references ref_fund (fund_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_agreement foreign key (agreement_id) references agreement (agreement_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_location_history foreign key (location_history_id) references ref_location_history (location_history_id);
 
 
