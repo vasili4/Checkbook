@@ -16,7 +16,7 @@ V,A,,Invalid component - vendor,,etl.stg_fmsv_vendor,vend_cust_cd,,,,,58
 V,A,,Invalid component - business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,59
 V,A,,Invalid component - address,,etl.stg_fmsv_address,vend_cust_cd,,,,,60
 V,A,,Invalid component - address type,,etl.stg_fmsv_address_type,vend_cust_cd,,,,,61
-V,M,,Missing key elements,,,"vend_cust_cd,bus_typ,bus_typ_sta",,,,,4
+V,M,,Missing key elements,,,"vend_cust_cd,bus_typ,bus_typ_sta,disp_cert_strt_dt",,,,,4
 V,M,,Duplicate,,,"vend_cust_cd,bus_typ",,,,,5
 V,M,,Invalid business type,,,bus_typ,,public.ref_business_type,business_type_code,,6
 V,M,,Invalid minority type,,,min_typ,,public.ref_minority_type,minority_type_id,,7
@@ -24,6 +24,7 @@ V,M,,Invalid business type status,,,bus_typ_sta,,public.ref_business_type_status
 V,M,,Inconsistent minority type,,,,,,,"bus_typ='MNRT' AND bus_typ_sta=2 AND COALESCE(min_typ,0)=0",9
 V,M,,Inconsistent business type,,,,,,,"COALESCE(bus_typ,'')<>'MNRT' AND  COALESCE(min_typ,0) >0",10
 V,M,,Missing vendor,etl.stg_fmsv_vendor,,vend_cust_cd,,,,,11
+V,M,,Invalid start date,,,,,,,disp_cert_strt_dt>cert_end_dt,12
 V,M,,Invalid component - vendor,,etl.stg_fmsv_vendor,vend_cust_cd,,,,,54
 V,M,,Invalid component - business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,55
 V,M,,Invalid component - address,,etl.stg_fmsv_address,vend_cust_cd,,,,,56
@@ -43,8 +44,8 @@ F,H,,Missing disbursement line item,,etl.stg_fms_accounting_line,"doc_cd,doc_dep
 F,H,,Invalid vendor,,etl.stg_fms_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,12
 F,H,,Invalid disbursement line item,,etl.stg_fms_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,13
 F,H,,Inter-load duplicate,,,,public.disbursement,"public.ref_agency, public.ref_document_code,public.ref_agency_history",,stg_fms_header.doc_id = disbursement.document_id AND stg_fms_header.doc_dept_cd = ref_agency.agency_code and stg_fms_header.doc_cd = ref_document_code.document_code AND disbursement.agency_history_id = ref_agency_history.agency_history_id AND disbursement.document_code_id = ref_document_code.document_code_id AND ref_agency.agency_id = ref_agency_history.agency_id,5
-F,V,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,vend_cust_cd",,,,,6
-F,V,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,vend_cust_cd",,,,,7
+F,V,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,vend_cust_cd,doc_vend_ln_no",,,,,6
+F,V,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,vend_cust_cd,doc_vend_ln_no",,,,,7
 F,V,,Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,8
 F,A,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_actg_ln_no,dept_cd,bfy,fy_dc,per_dc,chk_amt,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_actg_ln_no",,,,,9
 F,A,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_actg_ln_no",,,,,10
@@ -121,7 +122,7 @@ C,V,"POC,PCC1,POD",Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,69
 C,C,"POC,PCC1,POD",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,70
 C,C,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,71
 C,C,"POC,PCC1,POD",Missing header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,72
-C,C,"POC,PCC1,POD",Invalid component - vendor,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,84
+C,C,"POC,PCC1,POD",Invalid component - header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,84
 C,C,"POC,PCC1,POD",Invalid component - award detail,,etl.stg_con_po_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,85
 C,C,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,86
 C,C,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,87
@@ -129,7 +130,7 @@ C,C,"POC,PCC1,POD",Invalid component - accounting line,,etl.stg_con_po_accountin
 C,A,"POC,PCC1,POD",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,73
 C,A,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,74
 C,A,"POC,PCC1,POD",Missing header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,75
-C,A,"POC,PCC1,POD",Invalid component - vendor,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,89
+C,A,"POC,PCC1,POD",Invalid component - header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,89
 C,A,"POC,PCC1,POD",Invalid component - award detail,,etl.stg_con_po_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,90
 C,A,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,91
 C,A,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,92
@@ -201,6 +202,7 @@ M,C,,Missing header,etl.stg_mag_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",
 M,C,,Invalid component - header,etl.stg_mag_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,57
 M,C,,Invalid component - vendor,,etl.stg_mag_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,58
 M,C,,Invalid component - commodity,,etl.stg_mag_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,59
+M,C,,Invalid component - award detail,,etl.stg_mag_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,60
 RY,,,Missing key elements,,,rscat_cd,,,,,1
 RY,,,Duplicate,,,rscat_cd,,,,,2
 RC,,,Missing key elements,,,rscls_cd,,,,,1
