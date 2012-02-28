@@ -1355,3 +1355,38 @@ CREATE TABLE fact_disbursement_line_item(
 	maximum_contract_amount numeric(16,2),
 	maximum_spending_limit numeric(16,2))
 DISTRIBUTED BY (disbursement_line_item_id);
+
+
+
+ ----------------------------------------------------------------------------------------------------------------------------------------
+ 
+ /* aggregate tables  */
+
+CREATE TABLE aggregateon_spending_coa_entities (
+	department_id integer,
+	agency_id smallint,
+	category character varying(2),
+	expenditure_object_id integer,
+	month_value smallint,
+	year_value smallint,
+	total_spending_amount numeric(16,2), 
+	total_contract_amount numeric(16,2)
+	) DISTRIBUTED BY (department_id) ;
+	
+CREATE TABLE aggregateon_spending_vendor (
+	vendor_id integer,
+	agency_id smallint,
+	year_value smallint,
+	total_spending_amount numeric(16,2), 
+	total_contract_amount numeric(16,2)
+	) DISTRIBUTED BY (vendor_id) ;
+	
+CREATE TABLE aggregateon_spending_contract (
+    agreement_id bigint,
+	vendor_id integer,
+	agency_id smallint,
+	description character varying(60),
+	year_value smallint,
+	total_spending_amount numeric(16,2), 
+	total_contract_amount numeric(16,2)
+	) DISTRIBUTED BY (agreement_id) ;

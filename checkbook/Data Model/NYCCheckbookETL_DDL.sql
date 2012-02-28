@@ -3868,3 +3868,26 @@ CREATE EXTERNAL TABLE ext_stg_pension_fund(
   	    'gpfdist://mdw1:8081/datafiles/police_pension_fund.txt')
   	    FORMAT 'text' (delimiter ',' escape '"' fill missing fields)
  ENCODING 'UTF8';		
+ 
+ ----------------------------------------------------------------------------------------------------------------------------------------
+ 
+ /* aggregate tables  */
+ 
+ CREATE TABLE etl.aggregate_tables
+(
+  widget_name character varying(150),
+  aggregate_table_name character varying(150),
+  query text
+)
+DISTRIBUTED BY (aggregate_table_name);
+
+TRUNCATE TABLE etl.aggregate_tables;
+
+INSERT INTO etl.aggregate_tables(widget_name,aggregate_table_name,query) VALUES ('SpendingByCOAEntitiesAndFiscalYear','aggregateon_spending_coa_entities','SELECT agency_id, (CASE WHEN agreement_id IS NOT NULL AND fund_class_id = 400 THEN "cc" WHEN agreement_id IS NOT NULL AND fund_class_id <> 400 THEN "c" ELSE "o" END) as category, expenditure_object_id, department_id, c.month_value as month_value, b.year_value as nyc_fiscal_year, sum(maximum_spending_limit) as total_spending_amount, sum(maximum_contract_amount) as total_contract_amount FROM fact_disbursement_line_item a JOIN ref_year b ON a.check_eft_issued_nyc_year_id = b.year_id JOIN ref_month c ON a.check_eft_issued_cal_month_id = month_id GROUP BY agency_id, category, expenditure_object_id, department_id, month_value, nyc_fiscal_year'),
+('SpendingByVendorId','aggregateon_spending_vendor','SELECT agency_id, vendor_id,  b.year_value as nyc_fiscal_year, sum(maximum_spending_limit) as total_spending_amount, sum(maximum_contract_amount) as total_contract_amount FROM fact_disbursement_line_item a JOIN ref_year b ON a.check_eft_issued_nyc_year_id = b.year_id  GROUP BY agency_id, vendor_id, nyc_fiscal_year'),
+('SpendingByContractId','aggregateon_spending_contract','SELECT agency_id, vendor_id,  agreement_id, description, c.year_value as nyc_fiscal_year, sum(CASE WHEN master_agreement_id IS NOT NULL THEN maximum_contract_amount ELSE 0 END) as total_spending_amount, sum(maximum_contract_amount) as total_contract_amount FROM fact_agreement a JOIN ref_date b ON a.registered_date_id = b.date_id JOIN ref_year c ON b.nyc_year_id = c.year_id  GROUP BY agency_id, vendor_id, agreement_id, description, nyc_fiscal_year');
+
+
+
+
+
