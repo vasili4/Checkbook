@@ -1232,7 +1232,8 @@ CREATE TABLE fact_agreement
 	award_method_id smallint,
 	vendor_id integer,
 	original_contract_amount  numeric(16,2),
-	master_agreement_yn char(1)	
+	master_agreement_yn char(1),
+	description character varying(60)
 ) DISTRIBUTED BY (agreement_id);
 
 ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
@@ -1350,6 +1351,7 @@ CREATE TABLE fact_disbursement_line_item(
 	agency_id smallint,
 	expenditure_object_id integer,
 	vendor_id integer,
+	department_id integer,
 	maximum_contract_amount numeric(16,2),
 	maximum_spending_limit numeric(16,2))
 DISTRIBUTED BY (disbursement_line_item_id);
