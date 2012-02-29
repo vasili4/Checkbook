@@ -3184,6 +3184,7 @@ CREATE TABLE stg_fms_header(
 	expenditure_status_id smallint,
 	expenditure_cancel_type_id smallint, 
 	expenditure_cancel_reason_id smallint,	
+	check_eft_issued_nyc_year_id smallint,
 	uniq_id bigint default nextval('seq_stg_fms_header_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar		)
