@@ -5,7 +5,7 @@
 	updateForeignKeysForDOInAccLine
 	processCONDeliveryOrders
 */
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForDO1InHeader() RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForDO1InHeader(p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
@@ -35,7 +35,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_values_do1_new_agencies
 	SELECT doc_dept_cd,MIN(b.uniq_id) as uniq_id
-	FROM etl.tmp_fk_values_do1 a join (SELECT uniq_id
+	FROM etl.stg_con_do1_header a join (SELECT uniq_id
 						 FROM tmp_fk_values_do1
 						 GROUP BY 1
 						 HAVING max(agency_history_id) is null) b on a.uniq_id=b.uniq_id
@@ -70,7 +70,7 @@ BEGIN
 	RAISE NOTICE '1.3';
 	INSERT INTO tmp_fk_values_do1(uniq_id,agency_history_id)
 	SELECT	a.uniq_id, max(c.agency_history_id) 
-	FROM etl.tmp_fk_values_do1 a JOIN ref_agency b ON a.doc_dept_cd = b.agency_code
+	FROM etl.stg_con_do1_header a JOIN ref_agency b ON a.doc_dept_cd = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
 	GROUP BY 1	;	
@@ -259,21 +259,30 @@ END;
 $$ language plpgsql;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForDO1Vendors() RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForDO1Vendors(p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 
 BEGIN
 
 	-- UPDATING FK VALUES IN VENDOR
 
-	CREATE TEMPORARY TABLE tmp_fk_values_do1_vendor(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer)
-	DISTRIBUTED BY (uniq_id);
+	CREATE TEMPORARY TABLE tmp_fk_values_do1_vendor(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer,miscellaneous_vendor_flag bit,
+							lgl_nm varchar,alias_nm varchar)	
+	DISTRIBUTED BY (uniq_id);	
 	
 	INSERT INTO tmp_fk_values_do1_vendor
-	SELECT uniq_id,a.vend_cust_cd,MAX(c.vendor_history_id) as vendor_history_id
+	SELECT uniq_id,a.vend_cust_cd,MAX(c.vendor_history_id) as vendor_history_id,COALESCE(b.miscellaneous_vendor_flag,0::bit),
+		MIN(a.lgl_nm),NULL as alias_name
 	FROM	etl.stg_con_do1_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code
 		LEFT JOIN vendor_history c ON b.vendor_id = c.vendor_id
-	GROUP BY 1,2;
+	WHERE b.miscellaneous_vendor_flag = 0::bit OR b.miscellaneous_vendor_flag IS NULL	
+	GROUP BY 1,2,4;
+	
+	INSERT INTO tmp_fk_values_do1_vendor
+	SELECT DISTINCT uniq_id,a.vend_cust_cd,0 as vendor_history_id,1::bit,
+		a.lgl_nm,NULL as alias_name
+	FROM	etl.stg_con_do1_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code
+	WHERE  b.miscellaneous_vendor_flag = 1::bit;
 	
 	-- Identify the new vendors
 	
@@ -283,8 +292,15 @@ BEGIN
 	INSERT INTO tmp_do1_vendor_new
 	SELECT min(uniq_id) as uniq_id, vendor_customer_code
 	FROM	tmp_fk_values_do1_vendor
-	WHERE   vendor_history_id IS NULL
-	GROUP BY 2;
+	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 0::bit
+	GROUP BY 2
+	HAVING COUNT(*) = 1; -- Miscellaneous one will be considered twice
+	
+
+	INSERT INTO tmp_do1_vendor_new
+	SELECT  uniq_id as uniq_id, vendor_customer_code
+	FROM	tmp_fk_values_do1_vendor
+	WHERE   vendor_history_id =0 AND miscellaneous_vendor_flag = 1::bit;
 	
 	TRUNCATE etl.vendor_id_seq;
 	
@@ -292,7 +308,10 @@ BEGIN
 	SELECT uniq_id
 	FROM tmp_do1_vendor_new;
 	
-
+	INSERT INTO vendor(vendor_id,vendor_customer_code,legal_name,alias_name,miscellaneous_vendor_flag,created_load_id,created_date)
+	SELECT  a.vendor_id,b.vendor_customer_code,b.lgl_nm,b.alias_nm,b.miscellaneous_vendor_flag,  p_load_id_in,now()::timestamp
+	FROM	etl.vendor_id_seq a JOIN tmp_fk_values_do1_vendor b ON a.uniq_id = b.uniq_id;
+	
 	TRUNCATE etl.vendor_history_id_seq;
 	
 	INSERT INTO etl.vendor_history_id_seq(uniq_id)
@@ -300,16 +319,26 @@ BEGIN
 	FROM tmp_do1_vendor_new;
 
 
+	INSERT INTO vendor_history(vendor_history_id,vendor_id,legal_name,alias_name,miscellaneous_vendor_flag,load_id,created_date)
+	SELECT  a.vendor_history_id,c.vendor_id,b.lgl_nm,b.alias_nm,b.miscellaneous_vendor_flag, p_load_id_in,now()::timestamp
+	FROM	etl.vendor_history_id_seq a JOIN tmp_fk_values_do1_vendor b ON a.uniq_id = b.uniq_id
+		JOIN etl.vendor_id_seq c ON a.uniq_id = c.uniq_id;
+		
 	CREATE TEMPORARY TABLE tmp_do1_vendor(uniq_id bigint,vendor_history_id int)
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_do1_vendor
 	SELECT c.uniq_id, d.vendor_history_id
-	FROM tmp_fk_values_do1_vendor a JOIN tmp_do1_vendor_new b ON a.uniq_id = b.uniq_id		
+	FROM tmp_fk_values_do1_vendor a JOIN tmp_do1_vendor_new b ON a.uniq_id = b.uniq_id AND a.miscellaneous_vendor_flag=0::bit		
 		JOIN tmp_fk_values_do1_vendor c ON a.vendor_customer_code = c.vendor_customer_code
 		JOIN etl.vendor_history_id_seq d ON b.uniq_id = d.uniq_id;
 	
-	
+
+	INSERT INTO tmp_do1_vendor
+	SELECT a.uniq_id, d.vendor_history_id
+	FROM tmp_fk_values_do1_vendor a JOIN tmp_do1_vendor_new b ON a.uniq_id = b.uniq_id AND a.miscellaneous_vendor_flag=1::bit		
+		JOIN etl.vendor_history_id_seq d ON b.uniq_id = d.uniq_id;
+		
 	UPDATE tmp_fk_values_do1_vendor a
 	SET	vendor_history_id = b.vendor_history_id
 	FROM	tmp_do1_vendor b 
@@ -428,7 +457,7 @@ DECLARE
 	l_fk_update int;
 BEGIN
 				      
-	l_fk_update := etl.updateForeignKeysForDO1InHeader();
+	l_fk_update := etl.updateForeignKeysForDO1InHeader(p_load_id_in);
 
 	RAISE NOTICE 'CON 1';
 	
@@ -441,7 +470,7 @@ BEGIN
 	RAISE NOTICE 'CON 3';
 	
 	IF l_fk_update = 1 THEN
-		l_fk_update := etl.updateForeignKeysForDO1Vendors();
+		l_fk_update := etl.updateForeignKeysForDO1Vendors(p_load_id_in);
 	ELSE
 		RETURN -1;
 	END IF;
@@ -454,6 +483,11 @@ BEGIN
 		RETURN -1;
 	END IF;
 
+
+	IF l_fk_update <> 1 THEN
+		RETURN -1;
+	END IF;
+	
 	RAISE NOTICE 'CON 5';
 	-- UPDATING FK VALUES IN ETL.STG_CON_do1_COMMODITY
 	
@@ -534,7 +568,7 @@ BEGIN
 	SELECT inner_tbl.uniq_id,
 		0 as agreement_id,
 		'I' as action_flag,
-		(CASE WHEN c.doc_vers_no = inner_tbl.staging_max_doc_vers_no THEN 'Y' ELSE 'N' END) as latest_flag
+		(CASE WHEN COALESCE(latest_flag,'Y') ='Y' AND c.doc_vers_no = inner_tbl.staging_max_doc_vers_no THEN 'Y' ELSE 'N' END) as latest_flag
 	FROM	
 	(SELECT  a.uniq_id,
 		max(b.doc_vers_no) as staging_max_doc_vers_no
@@ -884,7 +918,7 @@ BEGIN
 		c.vendor_id,a.original_contract_amount,'N' as master_agreement_yn,a.description
 	FROM   agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
 		JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
-		JOIN tmp_do1_con d ON a.agreement_id = b.agreement_id;				
+		JOIN tmp_do1_con d ON a.agreement_id = d.agreement_id;				
 	
 	RETURN 1;
 	
