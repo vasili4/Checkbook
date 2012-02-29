@@ -15,7 +15,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_fk_fms_values (uniq_id bigint, document_code_id smallint,agency_history_id smallint,record_date_id smallint,
 						check_eft_issued_date_id smallint,check_eft_record_date_id smallint, expenditure_status_id smallint,
-						expenditure_cancel_type_id smallint, expenditure_cancel_reason_id smallint)
+						expenditure_cancel_type_id smallint, expenditure_cancel_reason_id smallint,check_eft_issued_nyc_year_id smallint)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:Document_Code_id
@@ -89,6 +89,12 @@ BEGIN
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_fms_header a JOIN ref_date b ON a.chk_eft_iss_dt = b.date;
 	
+	-- FK:check_eft_issued_nyc_year_id
+	
+	INSERT INTO tmp_fk_fms_values(uniq_id,check_eft_issued_nyc_year_id)
+	SELECT	a.uniq_id, b.nyc_year_id
+	FROM etl.stg_fms_header a JOIN ref_date b ON a.chk_eft_iss_dt = b.date;
+	
 	-- FK:check_eft_record_date_id
 	
 	INSERT INTO tmp_fk_fms_values(uniq_id,check_eft_record_date_id)
@@ -124,12 +130,14 @@ BEGIN
 		check_eft_record_date_id = ct_table.check_eft_record_date_id,
 		expenditure_status_id = ct_table.expenditure_status_id,
 		expenditure_cancel_type_id = ct_table.expenditure_cancel_type_id,
-		expenditure_cancel_reason_id = ct_table.expenditure_cancel_reason_id
+		expenditure_cancel_reason_id = ct_table.expenditure_cancel_reason_id,
+		check_eft_issued_nyc_year_id = ct_table.check_eft_issued_nyc_year_id
 	FROM	(SELECT uniq_id, max(document_code_id) as document_code_id ,
 				 max(agency_history_id) as agency_history_id,max(record_date_id) as record_date_id,
 				 max(check_eft_issued_date_id) as check_eft_issued_date_id, max(check_eft_record_date_id) as check_eft_record_date_id,
 				 max(expenditure_status_id) as expenditure_status_id, max(expenditure_cancel_type_id) as expenditure_cancel_type_id,
-				max(expenditure_cancel_reason_id) as expenditure_cancel_reason_id
+				max(expenditure_cancel_reason_id) as expenditure_cancel_reason_id,
+				max(check_eft_issued_nyc_year_id) as check_eft_issued_nyc_year_id
 		 FROM	tmp_fk_fms_values
 		 GROUP BY 1) ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
@@ -1318,14 +1326,14 @@ BEGIN
 						fund_class_id,agency_history_id,department_history_id,
 						expenditure_object_history_id,budget_code_id,fund_id,
 						reporting_code,check_amount,agreement_id,
-						agreement_accounting_line_number,location_history_id,retainage_amount,
+						agreement_accounting_line_number,location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
 						created_load_id,created_date)
 	SELECT  c.disbursement_line_item_id,d.disbursement_id,a.DOC_ACTG_LN_NO,
 		a.bfy,a.fy_dc,a.per_dc,
 		a.fund_class_id,a.agency_history_id,a.department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_id,
 		a.RPT_CD,a.CHK_AMT,a.agreement_id,
-		a.RQPORF_ACTG_LN_NO,a.location_history_id,a.RTG_LN_AM,
+		a.RQPORF_ACTG_LN_NO,a.location_history_id,a.RTG_LN_AM,b.check_eft_issued_nyc_year_id,
 		p_load_id_in, now()::timestamp
 	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -1340,7 +1348,7 @@ BEGIN
 						department_history_id,
 						expenditure_object_history_id,budget_code_id,fund_id,
 						reporting_code,check_amount,agreement_id,
-						agreement_accounting_line_number,location_history_id,retainage_amount,
+						agreement_accounting_line_number,location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
 						created_load_id,created_date)
 	SELECT  c.disbursement_line_item_id,d.disbursement_id,a.DOC_ACTG_LN_NO,
 		a.bfy,a.fy_dc,a.per_dc,
@@ -1348,7 +1356,7 @@ BEGIN
 		(CASE WHEN l_display_type='P' THEN a.masked_department_history_id ELSE a.department_history_id END) as department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_id,
 		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -a.chk_amt ELSE a.chk_amt END),(CASE WHEN l_display_type='P' THEN l_masked_agreement_id ELSE a.agreement_id END) as agreement_id,
-		a.rqporf_actg_ln_no,a.location_history_id,a.rtg_ln_am,
+		a.rqporf_actg_ln_no,a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
 		p_load_id_in, now()::timestamp
 	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
