@@ -1391,6 +1391,7 @@ CREATE TABLE aggregateon_spending_vendor (
 	
 CREATE TABLE aggregateon_spending_contract (
     agreement_id bigint,
+    document_id character varying(20),
 	vendor_id integer,
 	agency_id smallint,
 	description character varying(60),

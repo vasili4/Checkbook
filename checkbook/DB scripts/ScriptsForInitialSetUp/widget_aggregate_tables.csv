@@ -9,11 +9,11 @@ SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,"SELECT dep
   FROM (SELECT agency_id,
                (CASE
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
-                        AND fund_class_id = 400
+                        AND fund_class_code = 400
                    THEN
                       1
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
-                        AND fund_class_id <> 400
+                        AND fund_class_code <> 400
                    THEN
                       2
                    ELSE
@@ -34,6 +34,7 @@ SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,"SELECT dep
                   END)
                   AS contract_amount
           FROM fact_disbursement_line_item a
+          JOIN ref_fund_class b ON a.fund_class_id = b.fund_class_id 
   GROUP BY 1,2,3,4,5,6,7) X
   GROUP BY 1,2,3,4,5,6"
 SpendingByVendorId,aggregateon_spending_vendor,"SELECT vendor_id, agency_id,       
@@ -56,8 +57,9 @@ SpendingByVendorId,aggregateon_spending_vendor,"SELECT vendor_id, agency_id,
 GROUP BY 1,2,3,4) X
 GROUP BY 1,2,3"
 SpendingByContractId,aggregateon_spending_contract,"SELECT a.agreement_id, 
-	   a.vendor_id,
-	   a.agency_id,
+	a.document_id,
+	a.vendor_id,
+	a.agency_id,
        a.description,
        b.check_eft_issued_nyc_year_id AS year_id,
        sum(b.check_amount) AS total_spending_amount,
@@ -66,4 +68,4 @@ SpendingByContractId,aggregateon_spending_contract,"SELECT a.agreement_id,
        JOIN fact_disbursement_line_item b
           ON COALESCE(a.master_agreement_id, a.agreement_id) =
                 COALESCE(b.master_agreement_id, b.agreement_id)
-GROUP BY 1,2,3,4,5"
+GROUP BY 1,2,3,4,5,6"
