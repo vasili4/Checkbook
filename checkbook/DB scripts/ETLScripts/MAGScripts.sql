@@ -859,7 +859,7 @@ BEGIN
 	FOR l_array_ctr IN 1..array_upper(l_worksite_col_array,1) LOOP
 	
 		l_insert_sql := ' INSERT INTO all_agreement_worksite(agreement_id,worksite_id,percentage,amount,master_agreement_yn,load_id,created_date) '||
-				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.MA_PRCH_LMT_AM *b.'||l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''N'',' ||p_load_id_in || ', now()::timestamp '||
+				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.MA_PRCH_LMT_AM *b.'||l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''Y'',' ||p_load_id_in || ', now()::timestamp '||
 				' FROM	etl.stg_mag_header a JOIN etl.stg_mag_award_detail b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd '||
 				'			     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no '||
 				'			     JOIN ref_worksite c ON b.' || l_worksite_col_array[l_array_ctr] || ' = c.worksite_code ' ||
@@ -869,7 +869,7 @@ BEGIN
 		EXECUTE l_insert_sql;		
 		
 		l_insert_sql := ' INSERT INTO history_all_agreement_worksite(agreement_id,worksite_id,percentage,amount,master_agreement_yn,load_id,created_date) '||
-				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.MA_PRCH_LMT_AM *b.'|| l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''N'',' ||p_load_id_in || ', now()::timestamp '||
+				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.MA_PRCH_LMT_AM *b.'|| l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''Y'',' ||p_load_id_in || ', now()::timestamp '||
 				' FROM	etl.stg_mag_header a JOIN etl.stg_mag_award_detail b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd '||
 				'			     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no '||
 				'			     JOIN ref_worksite c ON b.' || l_worksite_col_array[l_array_ctr] || ' = c.worksite_code ' ||
@@ -906,7 +906,7 @@ BEGIN
 					    quantity,unit_of_measurement,unit_price,
 					    contract_amount,commodity_specification,load_id,
 					    created_date)
-	SELECT	d.agreement_id,b.doc_comm_ln_no,'N' as master_agreement_yn,
+	SELECT	d.agreement_id,b.doc_comm_ln_no,'Y' as master_agreement_yn,
 		b.cl_dscr,b.comm_cd,b.commodity_type_id,
 		b.qty,b.unit_meas_cd,b.unit_price,
 		b.cntrc_am,b.comm_cd_spfn,p_load_id_in,
@@ -934,7 +934,7 @@ BEGIN
 					    quantity,unit_of_measurement,unit_price,
 					    contract_amount,commodity_specification,load_id,
 					    created_date)
-	SELECT	d.agreement_id,b.doc_comm_ln_no,'N' as master_agreement_yn,
+	SELECT	d.agreement_id,b.doc_comm_ln_no,'Y' as master_agreement_yn,
 		b.cl_dscr,b.comm_cd,b.commodity_type_id,
 		b.qty,b.unit_meas_cd,b.unit_price,
 		b.cntrc_am,b.comm_cd_spfn,p_load_id_in,
