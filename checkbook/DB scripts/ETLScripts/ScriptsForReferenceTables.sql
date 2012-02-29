@@ -152,6 +152,11 @@ INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values (
 INSERT INTO ref_spending_category(spending_category_id, spending_category_code, spending_category_name) values(1,'cc','Capital Contract'),(2,'c','Contract'),(3,'o','Other'),(4,'p','Payroll');
 
 -- Dummy values
+insert into ref_award_status(award_status_id) values (1),(2),(3),(4);
+insert into ref_award_level(award_level_code) values ('1'),('2'),('3');
+insert into ref_procurement_type(procurement_type_id,procurement_type_name) values ('1','Unclassified');
+insert into ref_document_function_code(document_function_code_id) values (1),(2);
+insert into ref_commodity_type (commodity_type_id ) values (1),(2);
 
 /*insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
 
