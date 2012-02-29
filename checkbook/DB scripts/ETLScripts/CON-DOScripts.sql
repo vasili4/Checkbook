@@ -877,11 +877,11 @@ BEGIN
 	INSERT INTO fact_agreement(agreement_id,master_agreement_id,document_code_id,agency_id,
 				document_id,document_version,effective_begin_date_id,effective_end_date_id,
 				registered_date_id,maximum_contract_amount,award_method_id,
-				vendor_id,original_contract_amount,master_agreement_yn)
+				vendor_id,original_contract_amount,master_agreement_yn,description)
 	SELECT a.agreement_id,a.master_agreement_id,a.document_code_id,b.agency_id,
 		a.document_id,a.document_version,a.effective_begin_date_id,a.effective_end_date_id,
 		a.registered_date_id,a.maximum_contract_amount,a.award_method_id,
-		c.vendor_id,a.original_contract_amount,'N' as master_agreement_yn
+		c.vendor_id,a.original_contract_amount,'N' as master_agreement_yn,a.description
 	FROM   agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
 		JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
 		JOIN tmp_do1_con d ON a.agreement_id = b.agreement_id;				
