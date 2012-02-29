@@ -5,6 +5,9 @@ COPY etl.ref_column_mapping FROM '/home/gpadmin/athiagarajan/NYC/ref_column_mapp
 COPY etl.ref_validation_rule FROM '/home/gpadmin/athiagarajan/NYC/ref_validation_rule.csv' CSV QUOTE as '"';
 
 COPY etl.ref_file_name_pattern FROM '/home/gpadmin/athiagarajan/NYC/ref_file_name_pattern.csv' CSV QUOTE as '"';
+
+COPY etl.aggregate_tables FROM '/home/gpadmin/athiagarajan/NYC/widget_aggregate_tables.csv' CSV QUOTE as '"';
+
 ---------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION initializedate(p_start_date_in date, p_end_date_in date) RETURNS INT AS $$
@@ -145,6 +148,8 @@ INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES (
 
 										
 INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values ('JUDGCLAIMS',now()::timestamp),('MISCPAYVEN',now()::timestamp);
+
+INSERT INTO ref_spending_category(spending_category_id, spending_category_code, spending_category_name) values(1,'cc','Capital Contract'),(2,'c','Contract'),(3,'o','Other'),(4,'p','Payroll');
 
 -- Dummy values
 
