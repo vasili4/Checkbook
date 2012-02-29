@@ -1054,6 +1054,7 @@ CREATE TABLE all_disbursement_line_item (
     agreement_accounting_line_number integer,
     location_history_id integer,
     retainage_amount numeric(16,2),
+    check_eft_issued_nyc_year_id smallint,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
