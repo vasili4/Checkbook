@@ -223,8 +223,8 @@ var directory_listing_regex = &quot;.*(&quot; + directory_listing_pattern + &quo
            </partitioning>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>962</xloc>
-      <yloc>402</yloc>
+      <xloc>773</xloc>
+      <yloc>403</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -269,8 +269,8 @@ var directory_listing_regex = &quot;.*(&quot; + directory_listing_pattern + &quo
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>1114</xloc>
-      <yloc>362</yloc>
+      <xloc>925</xloc>
+      <yloc>363</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -769,8 +769,8 @@ var processed_flag = &apos;N&apos;;</jsScript_script>
     <connection>GP DB</connection>
     <sql>SELECT
   data_source_code
-, directory_listing_pattern::varchar(500)
-, actual_pattern::varchar(500)
+, directory_listing_pattern::varchar(50)
+, actual_pattern::varchar(200)
 FROM etl.ref_file_name_pattern 
 </sql>
     <limit>0</limit>
@@ -1190,8 +1190,8 @@ FROM etl.ref_file_name_pattern
       </lookup>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>962</xloc>
-      <yloc>289</yloc>
+      <xloc>773</xloc>
+      <yloc>290</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

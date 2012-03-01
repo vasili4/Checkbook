@@ -144,8 +144,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>587</xloc>
-      <yloc>138</yloc>
+      <xloc>529</xloc>
+      <yloc>139</yloc>
       </entry>
     <entry>
       <name>Abort NYC MASTER  job</name>
@@ -155,8 +155,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>731</xloc>
-      <yloc>316</yloc>
+      <xloc>673</xloc>
+      <yloc>317</yloc>
       </entry>
     <entry>
       <name>PROCESS FILES MASTER</name>
@@ -185,8 +185,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>847</xloc>
-      <yloc>138</yloc>
+      <xloc>744</xloc>
+      <yloc>135</yloc>
       </entry>
     <entry>
       <name>SEND_EMAIL_LOAD_STATISTICS</name>
@@ -217,11 +217,11 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>732</xloc>
-      <yloc>482</yloc>
+      <xloc>674</xloc>
+      <yloc>483</yloc>
       </entry>
     <entry>
-      <name>SEND_EMAIL_LOAD_STATISTICS 2</name>
+      <name>SEND_EMAIL_LOAD_STATISTICS 1</name>
       <description/>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
@@ -249,8 +249,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1099</xloc>
-      <yloc>138</yloc>
+      <xloc>1237</xloc>
+      <yloc>134</yloc>
       </entry>
     <entry>
       <name>REFRESH SHARDS</name>
@@ -279,8 +279,40 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1307</xloc>
-      <yloc>140</yloc>
+      <xloc>1458</xloc>
+      <yloc>133</yloc>
+      </entry>
+    <entry>
+      <name>REFRESH_AGGREGATES</name>
+      <description/>
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${Internal.Job.Filename.Directory}&#47;REFRESH_AGGREGATES.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>965</xloc>
+      <yloc>133</yloc>
       </entry>
   </entries>
   <hops>
@@ -348,8 +380,17 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
+      <from>SEND_EMAIL_LOAD_STATISTICS 1</from>
+      <to>REFRESH SHARDS</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>N</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
       <from>PROCESS FILES MASTER</from>
-      <to>SEND_EMAIL_LOAD_STATISTICS 2</to>
+      <to>REFRESH_AGGREGATES</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -357,11 +398,11 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>SEND_EMAIL_LOAD_STATISTICS 2</from>
-      <to>REFRESH SHARDS</to>
+      <from>REFRESH_AGGREGATES</from>
+      <to>SEND_EMAIL_LOAD_STATISTICS 1</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
