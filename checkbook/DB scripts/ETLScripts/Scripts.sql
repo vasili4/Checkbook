@@ -709,7 +709,7 @@ BEGIN
 		(SELECT a.load_id,max(file_timestamp) as file_timestamp
 		FROM	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
 		WHERE 	b.job_id = p_job_id_in
-			AND b.data_source_code IN ('A','D','E','L','O')
+			AND b.data_source_code IN ('A','D','E','L','O','RC','RY','RS','BC')
 			AND a.pattern_matched_flag ='Y'
 		GROUP BY 1 ) tbl_timestamp ON c.load_id = tbl_timestamp.load_id AND c.file_timestamp = tbl_timestamp.file_timestamp
 	WHERE 	c.pattern_matched_flag ='Y'
