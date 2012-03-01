@@ -58,7 +58,7 @@ CREATE TABLE ref_data_source (
 ) distributed by (data_source_code);
 
 CREATE TABLE ref_file_name_pattern (
-	data_source_code character(2),
+	data_source_code varchar(2),
 	directory_listing_pattern character varying,
 	actual_pattern character varying,
 	standard_file_name character varying)
