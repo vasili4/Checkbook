@@ -39,7 +39,7 @@ BEGIN
 
 	-- FK:budget_code_id
 
-	INSERT INTO tmp_fk_budget_values(uniq_id,fund_class_id)
+	INSERT INTO tmp_fk_budget_values(uniq_id,budget_code_id)
 	SELECT	a.uniq_id, b.budget_code_id as budget_code_id
 	FROM etl.stg_budget a JOIN ref_budget_code b ON a.budget_code = b.budget_code;
 
