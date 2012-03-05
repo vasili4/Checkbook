@@ -256,7 +256,9 @@ CREATE TABLE ref_budget_code (
     budget_function character varying(5),
     description character varying,
     created_date timestamp without time zone,
-    load_id integer
+    load_id integer,
+    updated_date timestamp without time zone,
+    updated_load_id integer
 ) distributed by (budget_code_id);
 
  ALTER TABLE  ref_budget_code ADD constraint fk_ref_budget_code_ref_fund_class foreign key (fund_class_id) references ref_fund_class (fund_class_id);
