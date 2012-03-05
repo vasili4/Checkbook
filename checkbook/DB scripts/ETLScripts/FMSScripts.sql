@@ -165,7 +165,7 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_fk_fms_values_vendor(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer,miscellaneous_vendor_flag bit,
 				lgl_nm varchar,alias_nm varchar )
 	DISTRIBUTED BY (uniq_id);
-	
+
 	INSERT INTO tmp_fk_fms_values_vendor
 	SELECT uniq_id,a.vend_cust_cd,MAX(c.vendor_history_id) as vendor_history_id,COALESCE(b.miscellaneous_vendor_flag,0::bit),
 		MIN(a.lgl_nm),MIN(a.alias_nm)
@@ -173,12 +173,11 @@ BEGIN
 			LEFT JOIN vendor_history c ON b.vendor_id=c.vendor_id
 	WHERE b.miscellaneous_vendor_flag = 0::bit OR b.miscellaneous_vendor_flag IS NULL	
 	GROUP BY 1,2,4;
-
+	
 	INSERT INTO tmp_fk_fms_values_vendor
-	SELECT uniq_id,a.vend_cust_cd,NULL as vendor_history_id,1::bit,
+	SELECT uniq_id,a.vend_cust_cd,0 as vendor_history_id,1::bit,
 		a.lgl_nm,a.alias_nm
-	FROM	etl.stg_fms_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code
-	WHERE  b.miscellaneous_vendor_flag = 1::bit;
+	FROM	etl.stg_fms_vendor a JOIN (SELECT DISTINCT vendor_customer_code FROM vendor WHERE miscellaneous_vendor_flag = 1::bit) b ON a.vend_cust_cd = b.vendor_customer_code;
 	
 	RAISE NOTICE 'Vend 1';
 	
@@ -191,12 +190,13 @@ BEGIN
 	SELECT min(uniq_id) as uniq_id, vendor_customer_code
 	FROM	tmp_fk_fms_values_vendor
 	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 0::bit
-	GROUP BY 2;
+	GROUP BY 2
+	HAVING COUNT(*) = 1; -- Miscellaneous one will be considered twice
 	
 	INSERT INTO tmp_fms_vendor_new
 	SELECT  uniq_id as uniq_id, vendor_customer_code
 	FROM	tmp_fk_fms_values_vendor
-	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 1::bit;
+	WHERE   vendor_history_id =0 AND miscellaneous_vendor_flag = 1::bit;
 
 	RAISE NOTICE 'Vend 1.1';
 	
@@ -206,7 +206,7 @@ BEGIN
 	SELECT uniq_id
 	FROM tmp_fms_vendor_new;
 
-	INSERT INTO vendor(vendor_id,vendor_customer_code,legal_name,alias_name,miscellaneous_vendor_flag,load_id,created_date)
+	INSERT INTO vendor(vendor_id,vendor_customer_code,legal_name,alias_name,miscellaneous_vendor_flag,created_load_id,created_date)
 	SELECT  a.vendor_id,b.vendor_customer_code,b.lgl_nm,b.alias_nm,b.miscellaneous_vendor_flag, p_load_id_in,now()::timestamp
 	FROM	etl.vendor_id_seq a JOIN tmp_fk_fms_values_vendor b ON a.uniq_id = b.uniq_id;
 
@@ -821,7 +821,7 @@ $$ language plpgsql;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.changeVisibilityOfAgreements(p_load_id_in int)  RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.changeVisibilityOfAgreements(p_load_id_in bigint)  RETURNS INT AS $$
 DECLARE
 BEGIN
 	-- Deleting the con/mag associated with partially displayed or not to be displayed disbursements
@@ -844,7 +844,7 @@ BEGIN
 	WHERE	a.agreement_id > 0
 	GROUP BY 1;
 
-	RAISE NOTICE 'CON 14';
+	RAISE NOTICE 'FMS 14';
 	
 	-- identify the mag  indirectly associated with disbursement	
 	
@@ -861,7 +861,7 @@ BEGIN
 		AND coalesce(e.master_agreement_id,0) > 0
 	GROUP BY 1	;
 
-	RAISE NOTICE 'CON 14.1';
+	RAISE NOTICE 'FMS 14.1';
 		
 	CREATE TEMPORARY TABLE tmp_con_changes_fms_1(agreement_id bigint)
 	DISTRIBUTED BY (agreement_id);
@@ -879,7 +879,7 @@ BEGIN
 		AND a.agency_history_id = b.agency_history_id
 		AND b.agency_id = inner_tbl.agency_id;
 
-	RAISE NOTICE 'CON 14.1.1';
+	RAISE NOTICE 'FMS 14.1.1';
 	
 	INSERT INTO tmp_con_changes_fms_1(agreement_id)	
 	SELECT  a.master_agreement_id
@@ -894,7 +894,7 @@ BEGIN
 		AND a.agency_history_id = b.agency_history_id
 		AND b.agency_id = inner_tbl.agency_id;
 
-	RAISE NOTICE 'CON 14.1.2';
+	RAISE NOTICE 'FMS 14.1.2';
 		
 	DELETE FROM history_agreement WHERE agreement_id IN (SELECT agreement_id FROM tmp_con_changes_fms_1);
 	DELETE FROM history_master_agreement WHERE master_agreement_id IN (SELECT agreement_id FROM tmp_con_changes_fms_1);
@@ -931,8 +931,6 @@ BEGIN
 		AND a.document_code_id = inner_tbl.document_code_id
 		AND a.agency_history_id = b.agency_history_id
 		AND b.agency_id = inner_tbl.agency_id;
-
-	select * from tmp_con_changes_fms_1;
 	
 	DELETE FROM tmp_con_changes_fms_1 WHERE agreement_id in (SELECT agreement_id FROM history_agreement);
 
@@ -940,22 +938,22 @@ BEGIN
 	
 	-- Inserting the agreement
 
-	RAISE NOTICE 'CON 15';
+	RAISE NOTICE 'FMS 15';
 	
 	INSERT INTO agreement
 	SELECT a.* FROM all_agreement a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
 	
-	RAISE NOTICE 'CON 15.1';
+	RAISE NOTICE 'FMS 15.1';
 	
 	INSERT INTO master_agreement
 	SELECT a.* FROM all_master_agreement a JOIN tmp_con_changes_fms_1 b ON a.master_agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.2';
+	RAISE NOTICE 'FMS 15.2';
 	
 	INSERT INTO agreement_worksite
 	SELECT a.* FROM all_agreement_worksite a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.3';
+	RAISE NOTICE 'FMS 15.3';
 	
 	INSERT INTO agreement_commodity
 	SELECT a.* FROM all_agreement_commodity a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
@@ -968,17 +966,17 @@ BEGIN
 	INSERT INTO history_agreement
 	SELECT a.* FROM history_all_agreement a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.1';
+	RAISE NOTICE 'FMS 15.1';
 	
 	INSERT INTO history_master_agreement
 	SELECT a.* FROM history_all_master_agreement a JOIN tmp_con_changes_fms_1 b ON a.master_agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.2';
+	RAISE NOTICE 'FMS 15.2';
 	
 	INSERT INTO history_agreement_worksite
 	SELECT a.* FROM history_all_agreement_worksite a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.3';
+	RAISE NOTICE 'FMS 15.3';
 	
 	INSERT INTO history_agreement_commodity
 	SELECT a.* FROM history_all_agreement_commodity a JOIN tmp_con_changes_fms_1 b ON a.agreement_id = b.agreement_id;
@@ -1000,7 +998,7 @@ $$ language plpgsql;
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.changeVisibilityOfVendor(p_load_id_in int) RETURNS INT AS
+CREATE OR REPLACE FUNCTION etl.changeVisibilityOfVendor(p_load_id_in bigint) RETURNS INT AS
 $$
 DECLARE
 BEGIN
@@ -1101,17 +1099,17 @@ BEGIN
 	INSERT INTO agreement
 	SELECT a.* FROM all_agreement a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.1';
+	RAISE NOTICE 'FMS 15.1';
 	
 	INSERT INTO master_agreement
 	SELECT a.* FROM all_master_agreement a JOIN tmp_con_changes_fms_2 b ON a.master_agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.2';
+	RAISE NOTICE 'FMS 15.2';
 	
 	INSERT INTO agreement_worksite
 	SELECT a.* FROM all_agreement_worksite a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.3';
+	RAISE NOTICE 'FMS 15.3';
 	
 	INSERT INTO agreement_commodity
 	SELECT a.* FROM all_agreement_commodity a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
@@ -1124,17 +1122,17 @@ BEGIN
 	INSERT INTO history_agreement
 	SELECT a.* FROM history_all_agreement a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.1';
+	RAISE NOTICE 'FMS 15.1';
 	
 	INSERT INTO history_master_agreement
 	SELECT a.* FROM history_all_master_agreement a JOIN tmp_con_changes_fms_2 b ON a.master_agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.2';
+	RAISE NOTICE 'FMS 15.2';
 	
 	INSERT INTO history_agreement_worksite
 	SELECT a.* FROM history_all_agreement_worksite a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
 
-	RAISE NOTICE 'CON 15.3';
+	RAISE NOTICE 'FMS 15.3';
 	
 	INSERT INTO history_agreement_commodity
 	SELECT a.* FROM history_all_agreement_commodity a JOIN tmp_con_changes_fms_2 b ON a.agreement_id = b.agreement_id;
@@ -1155,13 +1153,13 @@ END;
 $$ language plpgsql;	
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_load_id_in int) RETURNS INT AS
+CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_load_id_in bigint) RETURNS INT AS
 $$
 DECLARE
 BEGIN
 	-- Inserting into the fact_disbursement_line_item
 
-	RAISE NOTICE 'CON 16';
+	RAISE NOTICE 'FMS 16';
 	INSERT INTO fact_disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
 						check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
 						agreement_id,master_agreement_id,fund_class_id,
@@ -1255,7 +1253,7 @@ BEGIN
 		
 	l_fk_update := etl.updateForeignKeysForFMSInHeader(p_load_id_in);
 
-	RAISE NOTICE 'CON 1';
+	RAISE NOTICE 'FMS 1';
 	
 	IF l_fk_update = 1 THEN
 		l_fk_update := etl.updateForeignKeysForFMSVendors(p_load_id_in);
@@ -1263,7 +1261,7 @@ BEGIN
 		RETURN -1;
 	END IF;
 
-	RAISE NOTICE 'CON 2';
+	RAISE NOTICE 'FMS 2';
 	
 	IF l_fk_update = 1 THEN
 		l_fk_update := etl.updateForeignKeysForFMSInAccLine(p_load_id_in);
@@ -1271,7 +1269,7 @@ BEGIN
 		RETURN -1;
 	END IF;
 
-	RAISE NOTICE 'CON 3';
+	RAISE NOTICE 'FMS 3';
 	
 	IF l_fk_update = 1 THEN
 		l_fk_update := etl.associateCONToFMS(l_display_type);
@@ -1279,7 +1277,7 @@ BEGIN
 		RETURN -1;
 	END IF;
 
-	RAISE NOTICE 'CON 5';
+	RAISE NOTICE 'FMS 5';
 	
 	/*
 	1.Pull the key information such as document code, document id, document version etc for all agreements
@@ -1287,7 +1285,7 @@ BEGIN
 	3. Identify the new agreements. Determine the latest version for each of it.
 	*/
 	
-	RAISE NOTICE 'CON 6';
+	RAISE NOTICE 'FMS 6';
 	
 	TRUNCATE etl.seq_expenditure_expenditure_id;
 	
@@ -1313,7 +1311,7 @@ BEGIN
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 		JOIN etl.seq_expenditure_expenditure_id c ON a.uniq_id = c.uniq_id;
 		
-	RAISE NOTICE 'CON 13';
+	RAISE NOTICE 'FMS 13';
 	
 	TRUNCATE etl.seq_disbursement_line_item_id;
 	
@@ -1340,7 +1338,7 @@ BEGIN
 		JOIN etl.seq_disbursement_line_item_id c ON a.uniq_id = c.uniq_id
 		JOIN etl.seq_expenditure_expenditure_id d ON b.uniq_id = d.uniq_id;
 
-	RAISE NOTICE 'CON 13.1';
+	RAISE NOTICE 'FMS 13.1';
 	
 	INSERT INTO disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,
 						budget_fiscal_year,fiscal_year,fiscal_period,
