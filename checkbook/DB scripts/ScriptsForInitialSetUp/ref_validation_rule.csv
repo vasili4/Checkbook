@@ -213,3 +213,4 @@ BC,,,Missing key elements,,,"func_cd,fy,fcls_cd,dept_cd",,,,,1
 BC,,,Duplicate,,,"func_cd,fy,fcls_cd,dept_cd",,,,,2
 B,,,Missing key elements,,,"budget_fiscal_year,fund_class_code,agency_code,department_code,budget_code,object_class_code",,,,,1
 B,,,Duplicate,,,"budget_fiscal_year,fund_class_code,agency_code,department_code,budget_code,object_class_code",,,,,2
+R,,,Missing key elements,,,"bfy,dept_cd,fcls_cd,func_cd",,,,,1
