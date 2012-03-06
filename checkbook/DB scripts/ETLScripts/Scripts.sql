@@ -882,3 +882,77 @@ WHERE b.job_id = 1
 	AND  table_order=1
 	AND consume_flag='Y'
 ORDER BY a.data_source_order, 4,file_timestamp;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.refreshaggregates(p_load_file_id_in integer)   RETURNS integer AS $$
+DECLARE
+	l_aggregate_table_array varchar ARRAY[15];
+	l_array_ctr smallint;	
+	l_query etl.aggregate_tables.query%TYPE;
+	l_insert_sql varchar;
+	l_truncate_sql varchar;	
+	l_start_time  timestamp;
+	l_end_time  timestamp;
+	
+BEGIN
+
+	-- Initialize all the variables
+
+	l_start_time := timeofday()::timestamp;
+	
+	l_query :='';
+
+	SELECT ARRAY(SELECT aggregate_table_name
+		FROM etl.aggregate_tables) INTO l_aggregate_table_array;
+
+
+		FOR l_array_ctr IN 1..array_upper(l_aggregate_table_array,1) LOOP
+			RAISE NOTICE '%', l_aggregate_table_array[l_array_ctr];
+
+			l_insert_sql := '';
+			l_truncate_sql := '';
+
+			l_truncate_sql := 'TRUNCATE TABLE ' || l_aggregate_table_array[l_array_ctr] ;
+
+			EXECUTE l_truncate_sql ;
+
+			SELECT query
+			FROM   etl.aggregate_tables	       
+			WHERE  aggregate_table_name = l_aggregate_table_array[l_array_ctr]     
+			INTO   l_query;
+			
+			l_insert_sql := 'INSERT INTO ' || l_aggregate_table_array[l_array_ctr] || '  ' || l_query;
+
+			EXECUTE l_insert_sql;				
+
+		
+		END LOOP; 
+
+	
+
+	l_end_time := timeofday()::timestamp;
+
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_load_file_id_in,'etl.refreshaggregates',1,l_start_time,l_end_time);
+		
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	
+	RAISE NOTICE 'Exception Occurred in refreshaggregates';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+
+	-- l_exception :=  etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	
+	l_end_time := timeofday()::timestamp;
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_load_file_id_in,'etl.refreshaggregates',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
+	RETURN 0;
+	
+END;
+
+$$ language plpgsql;
