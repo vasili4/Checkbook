@@ -107,9 +107,11 @@ BEGIN
 
 	INSERT INTO tmp_budget_unique_keys(uniq_id, budget_fiscal_year, fund_class_id, agency_history_id,  department_history_id, budget_code_id, object_class_history_id, action_flag, budget_id)
 	SELECT a.uniq_id, a.budget_fiscal_year, a.fund_class_id, a.agency_history_id,  a.department_history_id, a.budget_code_id, a.object_class_history_id, 'U' as action_flag, b.budget_id
-	FROM etl.stg_budget a, budget b
-	WHERE a.budget_fiscal_year = b.budget_fiscal_year AND a.fund_class_id = b.fund_class_id  AND a.agency_history_id = b.agency_history_id AND a.department_history_id = b.department_history_id
-	AND a.budget_code_id = b.budget_code_id AND a.object_class_history_id = b.object_class_history_id ;
+	FROM etl.stg_budget a, budget b, ref_agency c, ref_agency_history d, ref_department e, ref_department_history f, ref_object_class g, ref_object_class_history h
+	WHERE a.budget_fiscal_year = b.budget_fiscal_year AND a.fund_class_id = b.fund_class_id  AND a.budget_code_id = b.budget_code_id 
+	 AND a.agency_history_id = d.agency_history_id AND  b.agency_history_id = d.agency_history_id  AND d.agency_id = c.agency_id 
+	 AND a.department_history_id = f.department_history_id AND b.department_history_id = f.department_history_id AND e.department_id = f.department_id
+	 AND a.object_class_history_id = h.object_class_history_id  AND b.object_class_history_id = h.object_class_history_id AND g.object_class_id = h.object_class_id;
 
 	UPDATE etl.stg_budget a
 	SET	action_flag = b.action_flag,
