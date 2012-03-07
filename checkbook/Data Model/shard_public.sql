@@ -511,7 +511,22 @@ CREATE TABLE fact_agreement (
     vendor_id integer,
     original_contract_amount numeric(16,2),
     master_agreement_yn character(1),
-    description character varying(60)
+    description character varying(60),
+    	document_code varchar,
+    	master_document_id  varchar,
+    	amount_spent numeric(16,2),
+    	agency_history_id smallint,
+    	agency_name varchar,
+    	vendor_history_id integer,
+    	vendor_name varchar,
+    	worksites_name varchar,
+    	agreement_type_id smallint,
+    	award_category_id_1 smallint,
+    	expenditure_objects_name varchar,
+    	record_date date,
+    	effective_begin_date date,
+    	effective_end_date date,
+	tracking_number varchar    
 ) DISTRIBUTED BY (agreement_id);
 
 
@@ -547,9 +562,9 @@ CREATE TABLE fact_disbursement_line_item (
     agency_id smallint,
     expenditure_object_id integer,
     vendor_id integer,
+    department_id integer,
     maximum_contract_amount numeric(16,2),
-    maximum_spending_limit numeric(16,2),
-    department_id integer
+    maximum_spending_limit numeric(16,2)    
 ) DISTRIBUTED BY (disbursement_line_item_id);
 
 
