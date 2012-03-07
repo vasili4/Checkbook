@@ -1209,6 +1209,33 @@ BEGIN
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
+	-- Updating YTD spent in fact_agreement
+	
+	CREATE TEMPORARY TABLE tmp_fact_agreement_ytd_spent_1(agreement_id bigint, amount_spent numeric(18,2))
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_fact_agreement_ytd_spent_1
+	SELECT agreement_id, SUM(check_amount)
+	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT agreement_id
+					    FROM   fact_disbursement_line_item b JOIN etl.seq_disbursement_line_item_id c 
+					    ON b.disbursement_line_item_id = c.disbursement_line_item_id) d
+		ON a.agreement_id = b.agreement_id
+	GROUP BY 1;
+	
+	INSERT INTO tmp_fact_agreement_ytd_spent_1
+	SELECT master_agreement_id, SUM(check_amount)
+	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT master_agreement_id
+					    FROM   fact_disbursement_line_item b JOIN etl.seq_disbursement_line_item_id c 
+					    ON b.disbursement_line_item_id = c.disbursement_line_item_id
+					    WHERE COALESCE(b.master_agreement_id,0) <> 0) d
+		ON a.master_agreement_id = b.master_agreement_id
+	GROUP BY 1;
+
+	UPDATE fact_agreement a
+	SET	amount_spent = b.amount_spent
+	FROM	tmp_fact_agreement_ytd_spent_1 b
+	WHERE	a.agreement_id = b.agreement_id;
+	
 	RETURN 1;
 	
 EXCEPTION
