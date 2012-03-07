@@ -650,6 +650,13 @@ BEGIN
 			
 		ELSIF 	l_data_source_code ='RS' THEN
 			l_processed := etl.processrevenuesource(p_load_file_id_in,l_load_id);	
+
+		ELSIF 	l_data_source_code ='F' THEN
+			l_processed := etl.processFMS(p_load_file_id_in,l_load_id);	
+			
+
+		ELSIF 	l_data_source_code ='BC' THEN
+			l_processed := etl.processbudgetcode(p_load_file_id_in,l_load_id);	
 			
 		ELSIF 	l_data_source_code ='R' THEN
 			l_processed := etl.processrevenue(p_load_file_id_in,l_load_id);	
@@ -834,7 +841,7 @@ BEGIN
 
 	RAISE NOTICE 'inside error handler 1';
 	
-	IF l_data_source_code IN ('A','D','E','L','O') THEN
+	IF l_data_source_code IN ('A','D','E','L','O','RC','RY','RS','BC') THEN
 		-- Updating the processed flag to C for all non processed data files for the job
 
 		UPDATE  etl.etl_data_load_file a
