@@ -477,7 +477,22 @@ CREATE EXTERNAL WEB TABLE fact_agreement__0 (
     vendor_id integer,
     original_contract_amount numeric,
     master_agreement_yn bpchar,
-    description character varying
+    description character varying,
+	document_code varchar,
+	master_document_id  varchar,
+	amount_spent numeric(16,2),
+	agency_history_id smallint,
+	agency_name varchar,
+	vendor_history_id integer,
+	vendor_name varchar,
+	worksites_name varchar,
+	agreement_type_id smallint,
+	award_category_id_1 smallint,
+	expenditure_objects_name varchar,
+	record_date date,
+	effective_begin_date date,
+	effective_end_date date,
+	tracking_number varchar    
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_agreement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -490,7 +505,8 @@ ALTER EXTERNAL TABLE staging.fact_agreement__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW fact_agreement AS
-    SELECT fact_agreement__0.agreement_id, fact_agreement__0.master_agreement_id, fact_agreement__0.document_code_id, fact_agreement__0.agency_id, fact_agreement__0.document_id, fact_agreement__0.document_version, fact_agreement__0.effective_begin_date_id, fact_agreement__0.effective_end_date_id, fact_agreement__0.registered_date_id, fact_agreement__0.maximum_contract_amount, fact_agreement__0.award_method_id, fact_agreement__0.vendor_id, fact_agreement__0.original_contract_amount, fact_agreement__0.master_agreement_yn, fact_agreement__0.description FROM ONLY fact_agreement__0;
+    SELECT fact_agreement__0.agreement_id, fact_agreement__0.master_agreement_id, fact_agreement__0.document_code_id, fact_agreement__0.agency_id, fact_agreement__0.document_id, fact_agreement__0.document_version, fact_agreement__0.effective_begin_date_id, fact_agreement__0.effective_end_date_id, fact_agreement__0.registered_date_id, fact_agreement__0.maximum_contract_amount, fact_agreement__0.award_method_id, fact_agreement__0.vendor_id, fact_agreement__0.original_contract_amount, fact_agreement__0.master_agreement_yn, fact_agreement__0.description ,
+    fact_agreement__0.document_code,fact_agreement__0.master_document_id,fact_agreement__0.amount_spent,fact_agreement__0.agency_history_id,fact_agreement__0.agency_name,fact_agreement__0.vendor_history_id,fact_agreement__0.vendor_name,fact_agreement__0.worksites_name,fact_agreement__0.agreement_type_id,fact_agreement__0.award_category_id_1,fact_agreement__0.expenditure_objects_name,fact_agreement__0.record_date,fact_agreement__0.effective_begin_date,fact_agreement__0.effective_end_date,fact_agreement__0.tracking_number FROM ONLY fact_agreement__0;
 
 
 ALTER TABLE staging.fact_agreement OWNER TO gpadmin;
@@ -537,9 +553,9 @@ CREATE EXTERNAL WEB TABLE fact_disbursement_line_item__0 (
     agency_id smallint,
     expenditure_object_id integer,
     vendor_id integer,
+    department_id integer,
     maximum_contract_amount numeric,
-    maximum_spending_limit numeric,
-    department_id integer
+    maximum_spending_limit numeric    
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_disbursement_line_item to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -552,7 +568,7 @@ ALTER EXTERNAL TABLE staging.fact_disbursement_line_item__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW fact_disbursement_line_item AS
-    SELECT fact_disbursement_line_item__0.disbursement_line_item_id, fact_disbursement_line_item__0.disbursement_id, fact_disbursement_line_item__0.line_number, fact_disbursement_line_item__0.check_eft_issued_date_id, fact_disbursement_line_item__0.check_eft_issued_nyc_year_id, fact_disbursement_line_item__0.check_eft_issued_cal_month_id, fact_disbursement_line_item__0.agreement_id, fact_disbursement_line_item__0.master_agreement_id, fact_disbursement_line_item__0.fund_class_id, fact_disbursement_line_item__0.check_amount, fact_disbursement_line_item__0.agency_id, fact_disbursement_line_item__0.expenditure_object_id, fact_disbursement_line_item__0.vendor_id, fact_disbursement_line_item__0.maximum_contract_amount, fact_disbursement_line_item__0.maximum_spending_limit, fact_disbursement_line_item__0.department_id FROM ONLY fact_disbursement_line_item__0;
+    SELECT fact_disbursement_line_item__0.disbursement_line_item_id, fact_disbursement_line_item__0.disbursement_id, fact_disbursement_line_item__0.line_number, fact_disbursement_line_item__0.check_eft_issued_date_id, fact_disbursement_line_item__0.check_eft_issued_nyc_year_id, fact_disbursement_line_item__0.check_eft_issued_cal_month_id, fact_disbursement_line_item__0.agreement_id, fact_disbursement_line_item__0.master_agreement_id, fact_disbursement_line_item__0.fund_class_id, fact_disbursement_line_item__0.check_amount, fact_disbursement_line_item__0.agency_id, fact_disbursement_line_item__0.expenditure_object_id, fact_disbursement_line_item__0.vendor_id, fact_disbursement_line_item__0.department_id,fact_disbursement_line_item__0.maximum_contract_amount, fact_disbursement_line_item__0.maximum_spending_limit FROM ONLY fact_disbursement_line_item__0;
 
 
 ALTER TABLE staging.fact_disbursement_line_item OWNER TO gpadmin;
