@@ -148,7 +148,8 @@ CREATE TABLE ref_month(
 	month_id smallint PRIMARY KEY default nextval('seq_ref_month_month_id'),
 	month_value smallint,
 	month_name varchar,
-	year_id smallint
+	year_id smallint,
+	display_order smallint
 	)
 DISTRIBUTED BY (month_id);
 ALTER TABLE  ref_month ADD constraint fk_ref_month_ref_year FOREIGN KEY(year_id) references ref_year(year_id);
@@ -1236,7 +1237,22 @@ CREATE TABLE fact_agreement
 	vendor_id integer,
 	original_contract_amount  numeric(16,2),
 	master_agreement_yn char(1),
-	description character varying(60)
+	description character varying(60),
+	document_code varchar,
+	master_document_id  varchar,
+	amount_spent numeric(16,2),
+	agency_history_id smallint,
+	agency_name varchar,
+	vendor_history_id integer,
+	vendor_name varchar,
+	worksites_name varchar,
+	agreement_type_id smallint,
+	award_category_id_1 smallint,
+	expenditure_objects_name varchar,
+	record_date date,
+	effective_begin_date date,
+	effective_end_date date,
+	tracking_number varchar
 ) DISTRIBUTED BY (agreement_id);
 
 ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
