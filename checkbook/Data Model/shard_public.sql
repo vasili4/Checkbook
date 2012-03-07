@@ -2706,7 +2706,7 @@ CREATE TABLE revenue (
     balance_sheet_account_class_code character varying(4),
     balance_sheet_account_category_code character varying(4),
     balance_sheet_account_group_code character varying(4),
-    balance_sheet_account_override_flag bit(1),
+    balance_sheet_account_override_flag character(1),
     object_class_history_id integer,
     object_category_code character varying(4),
     object_type_code character varying(4),

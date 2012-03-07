@@ -245,7 +245,7 @@ BEGIN
 	RAISE NOTICE '1.3';
 	
 	INSERT INTO tmp_fk_revenue_values_new_dept
-	SELECT d.agency_history_id,c.agency_id,appr_cd,e.fund_class_id,fy_dc::smallint,MIN(b.uniq_id) as uniq_id
+	SELECT d.agency_history_id,c.agency_id,appr_cd,e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_revenue a join (SELECT uniq_id
 						 FROM tmp_fk_revenue_values
 						 GROUP BY 1
@@ -327,7 +327,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_revenue_values_new_exp_object
-	SELECT (CASE WHEN COALESCE(obj_cd,'')='' THEN '----' ELSE obj_cd END) as obj_cd,fy_dc::smallint,MIN(a.uniq_id) as uniq_id
+	SELECT (CASE WHEN COALESCE(obj_cd,'')='' THEN '----' ELSE obj_cd END) as obj_cd,fy_dc,MIN(a.uniq_id) as uniq_id
 	FROM etl.stg_revenue a join (SELECT uniq_id
 						 FROM tmp_fk_revenue_values
 						 GROUP BY 1
@@ -399,7 +399,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_revenue_values_new_budget_codes
-	SELECT c.agency_id,func_cd,e.fund_class_id,fy_dc::smallint,MIN(b.uniq_id) as uniq_id
+	SELECT c.agency_id,func_cd,e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_revenue a join (SELECT uniq_id
 						 FROM tmp_fk_revenue_values
 						 GROUP BY 1
@@ -582,7 +582,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_revenue_values_new_rev_source
-	SELECT rsrc_cd, revenue_class_id, revenue_category_id, fy_dc::smallint , MIN(b.uniq_id) as uniq_id
+	SELECT rsrc_cd, revenue_class_id, revenue_category_id, fy_dc , MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_revenue a join (SELECT uniq_id
 						 FROM tmp_fk_revenue_values
 						 GROUP BY 1
@@ -652,7 +652,7 @@ BEGIN
 	FROM etl.stg_revenue a JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code 
 			       JOIN vendor_history c ON b.vendor_id = c.vendor_id ;
 		
-	RAISE notice 'populating revenue_source_id 1.1';
+	RAISE notice 'populating vendor_history_id 1.1';
 	
 	
 	CREATE TEMPORARY TABLE tmp_fk_revenue_values1 (uniq_id bigint, agency_history_id smallint, document_agency_history_id smallint, ref_document_agency_history_id smallint, budget_code_id integer, record_date_id smallint,service_start_date_id smallint,
@@ -688,6 +688,7 @@ $$ language plpgsql;
 
 
 CREATE OR REPLACE FUNCTION etl.processrevenue(p_load_file_id_in integer, p_load_id_in bigint)   RETURNS integer AS $$
+
 DECLARE
 
 
@@ -704,7 +705,7 @@ BEGIN
 	END IF;
 
 	INSERT INTO revenue(record_date_id, fiscal_period, fiscal_year,  budget_fiscal_year, fiscal_quarter,  event_category,  event_type,  bank_account_code,  posting_pair_type,  posting_code,  debit_credit_indicator,  line_function, posting_amount,  increment_decrement_indicator,  time_of_occurence,  balance_sheet_account_code,  balance_sheet_account_type,  expenditure_object_history_id,  government_branch_code,  cabinet_code,  agency_history_id, department_history_id,  reporting_activity_code,  budget_code_id,  fund_category,  fund_type,  fund_group,  balance_sheet_account_class_code,  balance_sheet_account_category_code,  balance_sheet_account_group_code, balance_sheet_account_override_flag,  object_class_history_id,  object_category_code,  object_type_code,  object_group_code,  document_category,  document_type,  document_code_id,  document_agency_history_id,  document_id, document_version_number,  document_function_code_id,  document_unit,  commodity_line,  accounting_line,  document_posting_line,  ref_document_code_id,  ref_document_agency_history_id,  ref_document_id,  ref_commodity_line, ref_accounting_line,  ref_posting_line,  reference_type,  line_description,  service_start_date_id,  service_end_date_id,  reason_code,  reclassification_flag,  closing_classification_code,  closing_classification_name, revenue_category_id,  revenue_class_id,  revenue_source_id,  funding_source_id,  fund_class_id,  reporting_code,  major_cafr_revenue_type,  minor_cafr_revenue_type,  vendor_history_id,  load_id,  created_date)
-	SELECT b.record_date_id, a.per_dc, a.fy_dc, a.bfy, a.fqtr, a.evnt_cat_id, a.evnt_typ_id, a.bank_acct_cd, a.pstng_pr_typ, a.pstng_cd_id, a.drcr_ind, a.ln_func_cd, a.pstng_am, a.incr_dcrs_ind, a.run_tmdt, a.bsa_cd, a.bsa_typ_ind, b.expenditure_object_history_id, a.govt_brn_cd, a.cab_cd, b.agency_history_id, b.department_history_id, a.actv_cd, b.budget_code_id, a.fcat_cd, a.ftyp_cd, a.fgrp_cd, a.bscl_cd, a.bsct_cd, a.bsg_cd, a.bsa_ov_fl::bit(1), b.object_class_history_id, a.ocat_cd, a.otyp_cd, a.ogrp_cd, a.doc_cat, a.doc_typ, b.document_code_id, b.document_agency_history_id, a.doc_id, a.doc_vers_no, b.document_function_code_id, a.doc_unit_cd, a.doc_comm_ln_no, a.doc_actg_ln_no, a.doc_pstng_ln_no, b.ref_document_code_id, b.ref_document_agency_history_id, a.rfed_doc_id, a.rfed_comm_ln_no, a.rfed_actg_ln_no, a.rfed_pstng_ln_no, a.rf_typ, a.actg_ln_dscr, b.service_start_date_id, b.service_end_date_id, a.reas_cd, a.reclass_ind_fl, a.pscd_clos_cl_cd, a.pscd_clos_cl_nm, b.revenue_category_id, b.revenue_class_id, b.revenue_source_id, b.funding_source_id, b.fund_class_id, a.actv_cd, a.mjr_crtyp_cd, a.mnr_crtyp_cd, b.vendor_history_id, p_load_id_in, now()::timestamp
+	SELECT b.record_date_id, a.per_dc, a.fy_dc, a.bfy, a.fqtr, a.evnt_cat_id, a.evnt_typ_id, a.bank_acct_cd, a.pstng_pr_typ, a.pstng_cd_id, a.drcr_ind, a.ln_func_cd, a.pstng_am, a.incr_dcrs_ind, a.run_tmdt, a.bsa_cd, a.bsa_typ_ind, b.expenditure_object_history_id, a.govt_brn_cd, a.cab_cd, b.agency_history_id, b.department_history_id, a.actv_cd, b.budget_code_id, a.fcat_cd, a.ftyp_cd, a.fgrp_cd, a.bscl_cd, a.bsct_cd, a.bsg_cd, a.bsa_ov_fl, b.object_class_history_id, a.ocat_cd, a.otyp_cd, a.ogrp_cd, a.doc_cat, a.doc_typ, b.document_code_id, b.document_agency_history_id, a.doc_id, a.doc_vers_no, a.doc_func_cd, a.doc_unit_cd, a.doc_comm_ln_no, a.doc_actg_ln_no, a.doc_pstng_ln_no, b.ref_document_code_id, b.ref_document_agency_history_id, a.rfed_doc_id, a.rfed_comm_ln_no, a.rfed_actg_ln_no, a.rfed_pstng_ln_no, a.rf_typ, a.actg_ln_dscr, b.service_start_date_id, b.service_end_date_id, a.reas_cd, a.reclass_ind_fl, a.pscd_clos_cl_cd, a.pscd_clos_cl_nm, b.revenue_category_id, b.revenue_class_id, b.revenue_source_id, b.funding_source_id, b.fund_class_id, a.actv_cd, a.mjr_crtyp_cd, a.mnr_crtyp_cd, b.vendor_history_id, p_load_id_in, now()::timestamp
 	FROM etl.stg_revenue a JOIN tmp_fk_revenue_values1 b ON a.uniq_id = b.uniq_id;
 	
 	RETURN 1;
