@@ -4,6 +4,7 @@
 	processdata
 	isEligibleForConsumption
 	errorhandler
+	refreshaggregates
 */
 
 CREATE FUNCTION concat(text, text) RETURNS text
@@ -649,6 +650,9 @@ BEGIN
 			
 		ELSIF 	l_data_source_code ='RS' THEN
 			l_processed := etl.processrevenuesource(p_load_file_id_in,l_load_id);	
+			
+		ELSIF 	l_data_source_code ='R' THEN
+			l_processed := etl.processrevenue(p_load_file_id_in,l_load_id);	
 			
 		END IF;
 
