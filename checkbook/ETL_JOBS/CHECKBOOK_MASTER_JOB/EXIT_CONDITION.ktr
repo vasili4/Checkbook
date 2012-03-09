@@ -338,7 +338,7 @@ var coa_available_sql = &quot;select count(*) as coa_available_count from etl.et
    <leftvalue>time_hours</leftvalue>
    <function>&gt;=</function>
    <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>8</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value>   </condition>
+   <value><name>constant</name><type>Integer</type><text>20</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value>   </condition>
   </conditions>
  </condition>
     </compare>
