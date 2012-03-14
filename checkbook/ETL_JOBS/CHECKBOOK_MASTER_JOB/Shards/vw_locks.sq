@@ -1,0 +1,9 @@
+PGOPTIONS='-c gp_session_role=utility' psql -e -p 50002 -h sdw1-2
+
+psql USASpending -Atc "select 'echo dbid:' || dbid || E'\n' || 'PGOPTIONS=''-c gp_session_role=utility'' psql -e -p '|| port || ' -h ' || hostname || E' -c \'select * from vw_locks; \' USASpending' from gp_configuration where content != -1 and isprimary = 't' and valid = 't' order by dbid"  > vw_locks1.out
+
+psql USASpending -Atc "select 'echo dbid:' || dbid || E'\n' || 'PGOPTIONS=''-c gp_session_role=utility'' psql -e -p '|| port || ' -h ' || hostname || E' -c \'select * from vw_locks;  \' USASpending' from gp_configuration where content != -1 and isprimary = 't' and valid = 't'  order by dbid" | bash > vw_locks.out
+
+psql USASpending -Atc "select 'echo dbid:' || dbid || E'\n' || 'PGOPTIONS=''-c gp_session_role=utility'' psql -e -p '|| port || ' -h ' || hostname || E' -c \'select * from vw_locks;  \' USASpending' from gp_configuration where content != -1  order by dbid" | bash > vw_locks.out
+
+psql USASpending -Atc "select 'echo dbid:' || dbid || E'\n' || 'PGOPTIONS=''-c gp_session_role=utility'' psql -e -p '|| port || ' -h ' || hostname || E' -c \'drop table IF EXISTS fpds_award_getlist; \' USASpending' from gp_configuration where content != -1 and isprimary = 't' and valid = 't' order by dbid" | bash > drop_awd_getlist.out
