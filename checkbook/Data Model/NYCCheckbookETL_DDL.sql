@@ -3397,6 +3397,7 @@ CREATE TABLE etl.stg_budget
   total_expenditure_amount numeric(20,2),
   action_flag character(1),
   budget_id integer,
+  budget_fiscal_year_id smallint,
   uniq_id bigint DEFAULT nextval('etl.seq_stg_budget_uniq_id'::regclass),
   invalid_flag character(1),
   invalid_reason character varying
