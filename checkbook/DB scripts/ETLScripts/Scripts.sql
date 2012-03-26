@@ -673,6 +673,9 @@ BEGIN
 			SET	processed_flag ='E' 
 			WHERE	load_file_id = p_load_file_id_in;
 
+			INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+			VALUES(p_load_file_id_in,'etl.processdata',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+
 			RETURN -1;	
 		END IF;		
 	END IF;
@@ -966,4 +969,35 @@ EXCEPTION
 	
 END;
 
+$$ language plpgsql;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION getStatisticsBeforeETL(p_job_id_in integer) RETURNS integer AS $$
+DECLARE
+	l_table_names_array varchar ARRAY[15];
+BEGIN
+	l_table_names_array := ARRAY['master_agreement',
+					'agreement',
+					'agreement_accounting_line',
+					'agreement_worksite',
+					'all_agreement',
+					'all_agreement_accounting_line',
+					'all_agreement_worksite',
+					'all_disbursement',
+					'all_disbursement_line_item',
+					'all_master_agreement',
+					'history_agreement',
+					'history_agreement_accounting_line',
+					'history_agreement_worksite',
+					'history_all_agreement',
+					'history_all_agreement_accounting_line',
+					'history_all_agreement_worksite',
+					'history_all_master_agreement',
+					'history_master_agreement',
+					'vendor',
+					'vendor_address',
+					'vendor_business_type',
+					'vendor_history'];
+END;
 $$ language plpgsql;
