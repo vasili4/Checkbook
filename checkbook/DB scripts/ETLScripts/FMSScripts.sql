@@ -174,10 +174,18 @@ BEGIN
 	WHERE b.miscellaneous_vendor_flag = 0::bit OR b.miscellaneous_vendor_flag IS NULL	
 	GROUP BY 1,2,4;
 	
-	INSERT INTO tmp_fk_fms_values_vendor
-	SELECT uniq_id,a.vend_cust_cd,0 as vendor_history_id,1::bit,
-		a.lgl_nm,a.alias_nm
+	CREATE TEMPORARY TABLE tmp_fk_fms_values_vendor_1(uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_fms_values_vendor_1
+	SELECT uniq_id
 	FROM	etl.stg_fms_vendor a JOIN (SELECT DISTINCT vendor_customer_code FROM vendor WHERE miscellaneous_vendor_flag = 1::bit) b ON a.vend_cust_cd = b.vendor_customer_code;
+	
+	UPDATE tmp_fk_fms_values_vendor a
+	SET 	miscellaneous_vendor_flag = 1::bit,
+		vendor_history_id =0
+	FROM	tmp_fk_fms_values_vendor_1 b
+	WHERE	a.uniq_id = b.uniq_id;
 	
 	RAISE NOTICE 'Vend 1';
 	
@@ -190,9 +198,8 @@ BEGIN
 	SELECT min(uniq_id) as uniq_id, vendor_customer_code
 	FROM	tmp_fk_fms_values_vendor
 	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 0::bit
-	GROUP BY 2
-	HAVING COUNT(*) = 1; -- Miscellaneous one will be considered twice
-	
+	GROUP BY 2;
+		
 	INSERT INTO tmp_fms_vendor_new
 	SELECT  uniq_id as uniq_id, vendor_customer_code
 	FROM	tmp_fk_fms_values_vendor
@@ -1215,20 +1222,20 @@ BEGIN
 	DISTRIBUTED BY (agreement_id);
 	
 	INSERT INTO tmp_fact_agreement_ytd_spent_1
-	SELECT agreement_id, SUM(check_amount)
+	SELECT a.agreement_id, SUM(check_amount)
 	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT agreement_id
 					    FROM   fact_disbursement_line_item b JOIN etl.seq_disbursement_line_item_id c 
 					    ON b.disbursement_line_item_id = c.disbursement_line_item_id) d
-		ON a.agreement_id = b.agreement_id
+		ON a.agreement_id = d.agreement_id
 	GROUP BY 1;
 	
 	INSERT INTO tmp_fact_agreement_ytd_spent_1
-	SELECT master_agreement_id, SUM(check_amount)
+	SELECT a.master_agreement_id, SUM(check_amount)
 	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT master_agreement_id
 					    FROM   fact_disbursement_line_item b JOIN etl.seq_disbursement_line_item_id c 
 					    ON b.disbursement_line_item_id = c.disbursement_line_item_id
 					    WHERE COALESCE(b.master_agreement_id,0) <> 0) d
-		ON a.master_agreement_id = b.master_agreement_id
+		ON a.master_agreement_id = d.master_agreement_id
 	GROUP BY 1;
 
 	UPDATE fact_agreement a

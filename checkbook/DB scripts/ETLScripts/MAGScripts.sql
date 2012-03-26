@@ -307,12 +307,19 @@ BEGIN
 
 	RAISE NOTICE 'MAG VEN 1';
 	
-	INSERT INTO tmp_fk_mag_values_vendor
-	SELECT DISTINCT uniq_id,a.vend_cust_cd,0 as vendor_history_id,1::bit,
-		a.lgl_nm,a.alias_nm
-	FROM	etl.stg_mag_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code
-	WHERE  b.miscellaneous_vendor_flag = 1::bit;
+	CREATE TEMPORARY TABLE tmp_fk_mag_values_vendor_1(uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_mag_values_vendor_1
+	SELECT DISTINCT uniq_id
+	FROM	etl.stg_mag_vendor a  JOIN (SELECT DISTINCT vendor_customer_code FROM vendor WHERE miscellaneous_vendor_flag = 1::bit)  b ON a.vend_cust_cd = b.vendor_customer_code;
 
+	UPDATE tmp_fk_mag_values_vendor a
+	SET 	miscellaneous_vendor_flag = 1::bit,
+		vendor_history_id =0
+	FROM	tmp_fk_mag_values_vendor_1 b
+	WHERE	a.uniq_id = b.uniq_id;
+	
 	RAISE NOTICE 'MAG VEN 1.2';
 		
 	-- Identify the new vendors
@@ -324,8 +331,7 @@ BEGIN
 	SELECT min(uniq_id) as uniq_id, vendor_customer_code
 	FROM	tmp_fk_mag_values_vendor
 	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 0::bit
-	GROUP BY 2
-	HAVING COUNT(*) = 1; -- Miscellaneous one will be considered twice
+	GROUP BY 2;	
 
 	INSERT INTO tmp_vendor_new
 	SELECT  uniq_id as uniq_id, vendor_customer_code
@@ -406,6 +412,7 @@ DECLARE
 	l_fk_update int;
 	l_worksite_per_array VARCHAR ARRAY[10];
 	l_insert_sql VARCHAR;
+	l_count int;
 BEGIN
 	l_worksite_col_array := ARRAY['wk_site_cd_01',
 				      'wk_site_cd_02',
@@ -453,7 +460,7 @@ BEGIN
 	END IF;
 	
 	RAISE NOTICE 'MAG CON 5';
-	-- UPDATING FK VALUES IN ETL.stg_mag_commodity
+	/************************************************************************-- UPDATING FK VALUES IN ETL.stg_mag_commodity
 	
 	CREATE TEMPORARY TABLE tmp_fk_values_mag_commodity(uniq_id bigint,commodity_type_id int)
 	DISTRIBUTED BY (uniq_id);	
@@ -469,6 +476,7 @@ BEGIN
 	FROM	tmp_fk_values_mag_commodity b
 	WHERE 	a.uniq_id = b.uniq_id;
 	
+	*****************************************************************************************/
 	/*
 	1.Pull the key information such as document code, document id, document version etc for all agreements
 	2. For the existing contracts gather details on max version in the transaction, staging tables..Determine if the staged agreement is latest version...
@@ -540,7 +548,14 @@ BEGIN
 	WHERE	COALESCE(a.agreement_id,0) =0 
 	GROUP BY 1) inner_tbl JOIN tmp_mag_con c ON inner_tbl.uniq_id = c.uniq_id;
 	
-
+	INSERT INTO tmp_new_mag_con
+	SELECT uniq_id,0 as agreement_id,
+		action_flag,
+		latest_flag
+	FROM	tmp_mag_con
+	WHERE	action_flag ='I' 
+		AND COALESCE(agreement_id,0) =0 ;
+		
 	TRUNCATE etl.agreement_id_seq;
 	
 	
@@ -580,12 +595,26 @@ BEGIN
 	WHERE	action_flag = 'I'
 		AND latest_flag ='Y';	
 		
-	DELETE FROM all_agreement_commodity WHERE agreement_id IN (select agreement_id from tmp_mag_deletion);
+	--DELETE FROM all_agreement_commodity WHERE agreement_id IN (select agreement_id from tmp_mag_deletion);
 	
 	DELETE FROM all_agreement_worksite WHERE agreement_id IN (select agreement_id from tmp_mag_deletion) AND master_agreement_yn='N';	
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of worksites deleted on receiving a new version of the document  from all_agreement_worksite table');
+	
 	DELETE FROM master_agreement WHERE master_agreement_id IN (select agreement_id from tmp_mag_deletion);
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreement deleted on receiving a new version of the document from master_agreement');
+
 	DELETE FROM all_master_agreement WHERE master_agreement_id IN (select agreement_id from tmp_mag_deletion);	
+
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreement deleted on receiving a new version of the document from all_master_agreement');
 
 	RAISE NOTICE 'MAG CON 9';
 	INSERT INTO all_master_agreement(master_agreement_id,document_code_id,agency_history_id,
@@ -633,6 +662,9 @@ BEGIN
 					 JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag='I' and latest_flag='Y';							
 			 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreement inserted in all_master_agreement table');
 
 	/* Insert new contracts into history_all_agreement
 	identified by action flag as I 
@@ -683,6 +715,10 @@ BEGIN
 					     AND a.doc_id = c.doc_id AND a.doc_vers_no = c.doc_vers_no
 					 JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag='I';				 
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreements inserted in history_all_master_agreement');
 	
 	/* Updates */
 	CREATE TEMPORARY TABLE tmp_mag_update AS
@@ -772,6 +808,10 @@ BEGIN
 	FROM	tmp_mag_update b
 	WHERE	a.master_agreement_id = b.agreement_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreements updated in history_all_master_agreement');
+
 	-- Associate Disbursement line item to the latest version of the agreement
 	
 	CREATE TEMPORARY TABLE tmp_mag_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_spending_limit numeric(16,2))
@@ -852,9 +892,16 @@ BEGIN
 	-- Capturing worksite information
 	
 	DELETE FROM all_agreement_worksite WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of records deleted on recieving same version of master_agreement in all_agreement_worksite ');
 		
 	DELETE FROM history_all_agreement_worksite WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of records deleted on recieving same version of master_agreement in history_all_agreement_worksite ');
 	
 	FOR l_array_ctr IN 1..array_upper(l_worksite_col_array,1) LOOP
 	
@@ -868,6 +915,10 @@ BEGIN
 
 		EXECUTE l_insert_sql;		
 		
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in all_agreement_worksite ');
+		
 		l_insert_sql := ' INSERT INTO history_all_agreement_worksite(agreement_id,worksite_id,percentage,amount,master_agreement_yn,load_id,created_date) '||
 				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.MA_PRCH_LMT_AM *b.'|| l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''Y'',' ||p_load_id_in || ', now()::timestamp '||
 				' FROM	etl.stg_mag_header a JOIN etl.stg_mag_award_detail b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd '||
@@ -877,25 +928,40 @@ BEGIN
 				' WHERE latest_flag=''N'' ';	
 
 		EXECUTE l_insert_sql;			
+		
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in history_all_agreement_worksite ');		
 	END LOOP; 
 	
 	INSERT INTO agreement_worksite
 	SELECT a.* 
 	FROM 	all_agreement_worksite a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id
 	WHERE	b.privacy_flag ='F';
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in agreement_worksite ');	
 	
 	INSERT INTO history_all_agreement_worksite
 	SELECT a.* 
 	FROM 	all_agreement_worksite a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of records(for latest version) inserted in history_all_agreement_worksite ');
 
 	INSERT INTO history_agreement_worksite
 	SELECT a.* 
 	FROM 	history_all_agreement_worksite a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id
 	WHERE	b.privacy_flag ='F';
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in history_agreement_worksite ');
+
 	RAISE NOTICE 'MAG CON 12';
-	-- Capturing commodity
+	/***************************************************************************************************************-- Capturing commodity
 
 	DELETE FROM all_agreement_commodity WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
 		
@@ -951,6 +1017,8 @@ BEGIN
 
 	RAISE NOTICE 'MAG CON 13';
 	
+	***************************************************************************/
+	
 	------------ Insering into the fact table----------------------------------------------------------------------------------------------------
 
 	DELETE FROM fact_agreement WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
@@ -958,14 +1026,57 @@ BEGIN
 	INSERT INTO fact_agreement(agreement_id,document_code_id,agency_id,
 				document_id,document_version,effective_begin_date_id,effective_end_date_id,
 				registered_date_id,maximum_contract_amount,award_method_id,
-				vendor_id,original_contract_amount,master_agreement_yn,description)
-	SELECT a.master_agreement_id,document_code_id,b.agency_id,
+				vendor_id,original_contract_amount,master_agreement_yn,description,
+				document_code,agency_history_id,agency_name,vendor_history_id, vendor_name,
+				agreement_type_id,award_category_id_1,record_date,effective_begin_date,effective_end_date,
+				tracking_number,registered_date,has_parent_yn )
+	SELECT a.master_agreement_id,a.document_code_id,b.agency_id,
 		document_id,document_version,effective_begin_date_id,effective_end_date_id,
 		registered_date_id,maximum_spending_limit,award_method_id,
-		c.vendor_id,original_contract_amount,'Y' as master_agreement_yn, a.description
+		c.vendor_id,original_contract_amount,'Y' as master_agreement_yn, a.description,
+		e.document_code,a.agency_history_id,b.agency_name,c.vendor_history_id,COALESCE(c.legal_name,c.alias_name),
+		a.agreement_type_id,a.award_category_id_1,f.date as record_date,g.date as effective_begin_date, h.date as effective_end_date,
+		a.tracking_number,j.date as registered_date,'N' as has_parent_yn		
 	FROM   master_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
-		JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
-		JOIN tmp_mag_con d ON a.master_agreement_id = d.agreement_id;
+		LEFT JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
+		JOIN tmp_mag_con d ON a.master_agreement_id = d.agreement_id
+		JOIN ref_document_code e ON e.document_code_id = a.document_code_id
+		LEFT JOIN ref_date f ON a.record_date_id = f.date_id
+		LEFT JOIN ref_date g ON a.effective_begin_date_id = g.date_id
+		LEFT JOIN ref_date h ON a.effective_end_date_id = h.date_id		
+		LEFT JOIN ref_date j ON a.registered_date_id = j.date_id;
+		
+	CREATE TEMPORARY TABLE tmp_fact_agreement_worksite_mag(agreement_id bigint, worksites_name varchar)
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_fact_agreement_worksite_mag(agreement_id,worksites_name)
+	SELECT a.agreement_id,group_concat(DISTINCT worksite_code)
+	FROM   agreement_worksite a JOIN ref_worksite b ON a.worksite_id = b.worksite_id
+		JOIN tmp_mag_con d ON a.agreement_id = d.agreement_id			
+	GROUP BY 1;
+	
+	
+	UPDATE fact_agreement a
+	SET 	worksites_name = b.worksites_name
+	FROM	tmp_fact_agreement_worksite_mag b
+	WHERE 	a.agreement_id = b.agreement_id;
+	
+	
+	-- Updating YTD spent in fact_agreement
+
+	CREATE TEMPORARY TABLE tmp_fact_agreement_ytd_spent_mag(agreement_id bigint, amount_spent numeric(18,2))
+	DISTRIBUTED BY (agreement_id);
+
+	INSERT INTO tmp_fact_agreement_ytd_spent_mag
+	SELECT master_agreement_id, SUM(check_amount)
+	FROM fact_disbursement_line_item a JOIN tmp_mag_con b
+		ON a.master_agreement_id = b.agreement_id
+	GROUP BY 1;
+
+	UPDATE fact_agreement a
+	SET	amount_spent = b.amount_spent
+	FROM	tmp_fact_agreement_ytd_spent_mag b
+	WHERE	a.agreement_id = b.agreement_id;
 	
 	RETURN 1;
 	
