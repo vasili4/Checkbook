@@ -28,7 +28,7 @@ BEGIN
 		INSERT INTO ref_month(month_value, month_name,year_id)
 		SELECT EXTRACT(month from p_start_date_in) + series_month.month as month_value,
 			 to_char(to_timestamp(to_char(EXTRACT(month from p_start_date_in) + series_month.month, '99'), 'MM'), 'Month') as month_name,
-			ref_year.year_id			
+			ref_year.year_id
 		FROM GENERATE_SERIES(0,11,1) as series_month(month)
 		     CROSS JOIN generate_series(EXTRACT(year from p_start_date_in)::int,EXTRACT(year from p_end_date_in)::int,1) as series_year(year)
 		     JOIN ref_year ON series_year.year = ref_year.year_value;		
@@ -51,6 +51,20 @@ BEGIN
 		RETURN 2;
 	END IF;
 	
+	UPDATE ref_month
+	SET display_order = (CASE WHEN month_value = 7 THEN 1
+				  WHEN month_value = 8 THEN 2
+				  WHEN month_value = 9 THEN 3
+				  WHEN month_value = 10 THEN 4
+				  WHEN month_value = 11 THEN 5
+				  WHEN month_value = 12 THEN 6
+				  WHEN month_value = 1 THEN 7
+				  WHEN month_value = 2 THEN 8
+				  WHEN month_value = 3 THEN 9
+				  WHEN month_value = 4 THEN 10
+				  WHEN month_value = 5 THEN 11
+				  WHEN month_value = 6 THEN 12
+				  END);
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in etl.initializedate';
@@ -157,6 +171,11 @@ insert into ref_award_level(award_level_code) values ('1'),('2'),('3');
 insert into ref_procurement_type(procurement_type_id,procurement_type_name) values ('1','Unclassified');
 insert into ref_document_function_code(document_function_code_id) values (1),(2);
 insert into ref_commodity_type (commodity_type_id ) values (1),(2);
+insert into vendor(vendor_id,vendor_customer_code,legal_name) values(nextval('seq_vendor_vendor_id'),'N/A','(PRIVACY/SECURITY)');
+insert into vendor_history(vendor_history_id,vendor_id,legal_name) 
+select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
+from vendor where vendor_customer_code='N/A'
+and legal_name='(PRIVACY/SECURITY)';
 
 /*insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
 
