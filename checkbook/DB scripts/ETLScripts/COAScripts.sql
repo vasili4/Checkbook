@@ -622,26 +622,19 @@ BEGIN
 	
 	-- Generate the revenue category id for new records
 
-
-
 	TRUNCATE etl.ref_revenue_category_id_seq;
 	
 	INSERT INTO etl.ref_revenue_category_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   tmp_ref_revenue_category
-	WHERE  exists_flag ='N';
-
-	
+	WHERE  exists_flag ='N';	
 	
 	INSERT INTO ref_revenue_category(revenue_category_id,revenue_category_code,revenue_category_name,revenue_category_short_name,created_date)
 	SELECT a.revenue_category_id,b.rscat_cd,b.rscat_nm,rscat_sh_nm, now()::timestamp
 	FROM   etl.ref_revenue_category_id_seq a JOIN tmp_ref_revenue_category b ON a.uniq_id = b.uniq_id;
 	
 
-
-
-
-CREATE TEMPORARY TABLE tmp_ref_revenue_category_1(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar,rscat_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_category_id smallint)
+	CREATE TEMPORARY TABLE tmp_ref_revenue_category_1(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar,rscat_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_category_id smallint)
 	DISTRIBUTED BY (revenue_category_id);
 
 	INSERT INTO tmp_ref_revenue_category_1
@@ -682,8 +675,6 @@ BEGIN
 	
 	-- For all records check if data is modified/new
 
-
-	
 	INSERT INTO tmp_ref_revenue_class
 	SELECT  a.uniq_id,
 		a.rscls_cd, 
@@ -711,16 +702,14 @@ BEGIN
 	FROM   etl.ref_revenue_class_id_seq a JOIN tmp_ref_revenue_class b ON a.uniq_id = b.uniq_id;
 	
 
-
-
-
-CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),rscls_nm varchar,rscls_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_class_id smallint)
+	CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),rscls_nm varchar,rscls_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_class_id smallint)
 	DISTRIBUTED BY (revenue_class_id);
 
 	INSERT INTO tmp_ref_revenue_class_1
 	SELECT a.*,b.revenue_class_id FROM tmp_ref_revenue_class a JOIN ref_revenue_class b ON a.rscls_cd = b.revenue_class_code
 	WHERE exists_flag ='Y' and modified_flag='Y';
-Raise notice '5';
+	
+	Raise notice '5';
 	
 	UPDATE ref_revenue_class a
 	SET	revenue_class_name = b.rscls_nm,
@@ -747,8 +736,8 @@ BEGIN
 
 
 
-CREATE TEMPORARY TABLE tmp_ref_revenue_source(uniq_id bigint,fy integer,
-rsrc_cd varchar(20),rsrc_nm varchar, exists_flag char(1), modified_flag char(1),
+	CREATE TEMPORARY TABLE tmp_ref_revenue_source(uniq_id bigint,fy integer,
+		rsrc_cd varchar(20),rsrc_nm varchar, exists_flag char(1), modified_flag char(1),
 		rsrc_sh_nm varchar,
 		act_fl bit(1),   
 		alw_bud_fl bit(1), 
@@ -776,11 +765,9 @@ rsrc_cd varchar(20),rsrc_nm varchar, exists_flag char(1), modified_flag char(1),
 		rcls_id smallint,
 		fund_class_id smallint,
 		rscat_id smallint
-)
+	)
 	DISTRIBUTED BY (uniq_id);	
 	-- For all records check if data is modified/new
-
-
 	
 	INSERT INTO tmp_ref_revenue_source
 	SELECT  a.uniq_id,
@@ -815,44 +802,45 @@ rsrc_cd varchar(20),rsrc_nm varchar, exists_flag char(1), modified_flag char(1),
 		a.srsrc_req
 	       	FROM   etl.stg_revenue_source a LEFT JOIN ref_revenue_source b ON a.rsrc_cd = b.revenue_source_code and a.fy= fiscal_year;
 
+	--For Populating temp with revenue class id
 
+	CREATE TEMPORARY TABLE temp_revenuesource_class_id(uniq_id bigint,rcls_cd varchar,rcls_id smallint)DISTRIBUTED BY (uniq_id); 
 
+	INSERT INTO temp_revenuesource_class_id  
+	SELECT b.uniq_id as uniq_id, a.revenue_class_code as revenue_class_code,a.revenue_class_id as revenue_class_id  
+	FROM 	etl.stg_revenue_source b  left join   ref_revenue_class a on a.revenue_class_code = b.rscls_cd;
 
---For Populating temp with revenue class id
+	UPDATE tmp_ref_revenue_source a 
+	SET rcls_id = b.rcls_id 
+	FROM temp_revenuesource_class_id b 
+	WHERE a.uniq_id = b.uniq_id  ;
 
-CREATE TEMPORARY TABLE temp_revenuesource_class_id(uniq_id bigint,rcls_cd varchar,rcls_id smallint)DISTRIBUTED BY (uniq_id); 
+	--For populating temp with funding_class_id
 
-insert into temp_revenuesource_class_id  select b.uniq_id as uniq_id, a.revenue_class_code as revenue_class_code,a.revenue_class_id as revenue_class_id  from
- etl.stg_revenue_source b  left join   ref_revenue_class a on a.revenue_class_code = b.rscls_cd;
+	CREATE TEMPORARY TABLE temp_revenuesource_fund_class_id(uniq_id bigint,fund_class_cd varchar,fund_class_id smallint)
+	DISTRIBUTED BY (uniq_id); 
 
-update tmp_ref_revenue_source a set rcls_id = b.rcls_id from temp_revenuesource_class_id b where a.uniq_id = b.uniq_id  ;
+	INSERT into temp_revenuesource_fund_class_id  
+	SELECT b.uniq_id as uniq_id,a.funding_class_code as funding_class_code,a.funding_class_id as funding_class_id  
+	FROM    etl.stg_revenue_source b  left join  ref_funding_class a on a.funding_class_code = b.fund_cls;
 
+	UPDATE tmp_ref_revenue_source a 
+	SET fund_class_id = b.fund_class_id 
+	FROM temp_revenuesource_fund_class_id b where a.uniq_id = b.uniq_id  ;
 
+	--For populating temp with revenue category
+	CREATE TEMPORARY TABLE temp_revenuesource_category_id(uniq_id bigint,rscat_cd varchar,rscat_id smallint)DISTRIBUTED BY (uniq_id); 
 
+	INSERT INTO temp_revenuesource_category_id 
+	SELECT b.uniq_id, a.revenue_category_code as revenue_category_code,a.revenue_category_id as revenue_category_id 
+	FROM   etl.stg_revenue_source b left join ref_revenue_category a on a.revenue_category_code = b.rscat_cd;
 
---For populating temp with funding_class_id
+	UPDATE tmp_ref_revenue_source a 
+	SET rscat_id = b.rscat_id 
+	FROM temp_revenuesource_category_id b 
+	WHERE a.uniq_id = b.uniq_id ;
 
-CREATE TEMPORARY TABLE temp_revenuesource_fund_class_id(uniq_id bigint,fund_class_cd varchar,fund_class_id smallint)DISTRIBUTED BY (uniq_id); 
-
-insert into temp_revenuesource_fund_class_id  select b.uniq_id as uniq_id,a.funding_class_code as funding_class_code,a.funding_class_id as funding_class_id  from
- etl.stg_revenue_source b  left join   ref_funding_class a on a.funding_class_code = b.fund_cls;
-
-update tmp_ref_revenue_source a set fund_class_id = b.fund_class_id from temp_revenuesource_fund_class_id b where a.uniq_id = b.uniq_id  ;
-
-
-
-
---For populating temp with revenue category
-CREATE TEMPORARY TABLE temp_revenuesource_category_id(uniq_id bigint,rscat_cd varchar,rscat_id smallint)DISTRIBUTED BY (uniq_id); 
-
-insert into temp_revenuesource_category_id select b.uniq_id, a.revenue_category_code as revenue_category_code,a.revenue_category_id as revenue_category_id from
-etl.stg_revenue_source b left join ref_revenue_category a on a.revenue_category_code = b.rscat_cd;
-
-update tmp_ref_revenue_source a set rscat_id = b.rscat_id from temp_revenuesource_category_id b where a.uniq_id = b.uniq_id ;
-
-RAISE NOTICE 'RS -2';
-
-
+	RAISE NOTICE 'RS -2';
 	
 	-- Generate the revenue source id for new records
 		
@@ -863,9 +851,7 @@ RAISE NOTICE 'RS -2';
 	FROM   tmp_ref_revenue_source
 	WHERE  exists_flag ='N';
 
-
-
-   RAISE NOTICE 'RS - 3';
+   	RAISE NOTICE 'RS - 3';
 	
 	INSERT INTO ref_revenue_source(revenue_source_id,fiscal_year,revenue_source_code,revenue_source_name,revenue_source_short_name,description,
 	funding_class_id,revenue_class_id,revenue_category_id,
@@ -873,7 +859,6 @@ RAISE NOTICE 'RS -2';
 	apply_interest_late_fee ,apply_interest_admin_fee ,apply_interest_nsf_fee ,apply_interest_other_fee,eligible_intercept_process,
 	earned_receivable_code,finance_fee_override_flag,allow_override_interest, billing_lag_days, billing_frequency , billing_fiscal_year_start_month ,
  	 billing_fiscal_year_start_day , federal_agency_code ,	 federal_agency_suffix , federal_name ,srsrc_req ,created_date)
-
 	SELECT a.revenue_source_id,b.fy,b.rsrc_cd,b.rsrc_nm,
 	        b.rsrc_sh_nm,
 		b.rsrc_dscr,
@@ -907,7 +892,7 @@ RAISE NOTICE 'RS -2';
 
 	RAISE NOTICE 'RS - 4';
 
-CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar, revenue_source_id smallint)
+	CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar, revenue_source_id smallint)
 	DISTRIBUTED BY (revenue_source_id);
 
 	INSERT INTO tmp_ref_revenue_source_1
@@ -915,7 +900,7 @@ CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar, revenue_source_
 	WHERE exists_flag ='Y' and modified_flag='Y';
 
 
-Raise notice '5';
+	Raise notice '5';
 	
 	UPDATE ref_revenue_source a
 	SET	revenue_source_name = b.rsrc_nm,
