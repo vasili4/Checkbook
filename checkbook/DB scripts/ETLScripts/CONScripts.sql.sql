@@ -423,12 +423,20 @@ BEGIN
 		LEFT JOIN vendor_history c ON b.vendor_id = c.vendor_id
 	WHERE b.miscellaneous_vendor_flag = 0::bit OR b.miscellaneous_vendor_flag IS NULL	
 	GROUP BY 1,2,4;
-	
+
+	CREATE TEMPORARY TABLE tmp_fk_values_vendor_1(uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);	
 
 	INSERT INTO tmp_fk_values_vendor
-	SELECT DISTINCT uniq_id,a.vend_cust_cd,0 as vendor_history_id,1::bit,
-		a.lgl_nm,a.vend_cust_alias_nm
+	SELECT DISTINCT uniq_id
 	FROM	etl.stg_con_ct_vendor a  JOIN (SELECT DISTINCT vendor_customer_code FROM vendor WHERE miscellaneous_vendor_flag = 1::bit) b ON a.vend_cust_cd = b.vendor_customer_code;	
+	
+	UPDATE tmp_fk_values_vendor a
+	SET 	miscellaneous_vendor_flag = 1::bit,
+		vendor_history_id =0
+	FROM	tmp_fk_values_vendor_1 b
+	WHERE	a.uniq_id = b.uniq_id;
+	
 	-- Identify the new vendors
 	
 	CREATE TEMPORARY TABLE tmp_vendor_new(uniq_id bigint, vendor_customer_code varchar)
@@ -438,10 +446,8 @@ BEGIN
 	SELECT min(uniq_id) as uniq_id, vendor_customer_code
 	FROM	tmp_fk_values_vendor
 	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 0::bit
-	GROUP BY 2
-	HAVING COUNT(*) = 1; -- Miscellaneous one will be considered twice
+	GROUP BY 2;	
 	
-
 	INSERT INTO tmp_vendor_new
 	SELECT  uniq_id as uniq_id, vendor_customer_code
 	FROM	tmp_fk_values_vendor
@@ -808,33 +814,33 @@ BEGIN
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting line deleted on receiving a new version of the document  from all_agreement_accounting_line');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting line deleted on receiving a new version of the document  from all_agreement_accounting_line');
 	
 	/**************
 	DELETE FROM all_agreement_commodity WHERE agreement_id IN (select agreement_id from tmp_ct_deletion);
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of commodities deleted on receiving a new version of the document  from the internal table');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of commodities deleted on receiving a new version of the document  from the internal table');
 	****************/
 	
 	DELETE FROM all_agreement_worksite WHERE agreement_id IN (select agreement_id from tmp_ct_deletion) AND master_agreement_yn='N';	
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of worksites deleted on receiving a new version of the document  from all_agreement_worksite table');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of worksites deleted on receiving a new version of the document  from all_agreement_worksite table');
 	
 	DELETE FROM agreement WHERE agreement_id IN (select agreement_id from tmp_ct_deletion);
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of agreements deleted on receiving a new version of the document from agreement');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of agreements deleted on receiving a new version of the document from agreement');
 	
 	DELETE FROM all_agreement WHERE agreement_id IN (select agreement_id from tmp_ct_deletion);	
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of agreements deleted on receiving a new version of the document from all_agreement');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of agreements deleted on receiving a new version of the document from all_agreement');
 	
 	RAISE NOTICE 'CON 9';
 	INSERT INTO all_agreement(agreement_id,master_agreement_id,document_code_id,
@@ -883,7 +889,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of agreements inserted in all_agreement table');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of agreements inserted in all_agreement table');
 
 	/* Insert new contracts into history_all_agreement
 	identified by action flag as I 
@@ -935,7 +941,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of agreements inserted in history_all_agreement');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of agreements inserted in history_all_agreement');
 	
 	/* Updates */
 	CREATE TEMPORARY TABLE tmp_con_ct_update AS
@@ -1026,7 +1032,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of agreements updated in history_all_agreement');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of agreements updated in history_all_agreement');
 
 	-- Associate Disbursement line item to the latest version of the agreement
 	
@@ -1070,13 +1076,13 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines deleted on receiving same version of the document  from the all_agreement_accounting_line ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines deleted on receiving same version of the document  from the all_agreement_accounting_line ');
 		
 	DELETE FROM history_all_agreement_accounting_line WHERE agreement_id IN (SELECT agreement_id FROM tmp_ct_deletion);
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting line deleted on receiving same version of the document from history_all_agreement_accounting_line');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting line deleted on receiving same version of the document from history_all_agreement_accounting_line');
 	
 	/* Insert the agreement accounting lines.
 	Accounting lines of the Latest version will be inserted into all_agreement_accounting_line.
@@ -1105,7 +1111,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in all_agreement_accounting_line ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in all_agreement_accounting_line ');
 					     
 	INSERT INTO agreement_accounting_line
 	SELECT a.*
@@ -1114,7 +1120,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in agreement_accounting_line ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in agreement_accounting_line ');
 	
 
 	INSERT INTO history_all_agreement_accounting_line
@@ -1124,7 +1130,7 @@ BEGIN
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in history_all_agreement_accounting_line ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in history_all_agreement_accounting_line ');
 	
 	INSERT INTO history_all_agreement_accounting_line(agreement_id,line_number,
 			event_type_id,description,line_amount,
@@ -1147,7 +1153,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines(for old versions) inserted in history_all_agreement_accounting_line ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines(for old versions) inserted in history_all_agreement_accounting_line ');
 	
 	INSERT INTO history_agreement_accounting_line
 	SELECT a.*
@@ -1156,7 +1162,7 @@ BEGIN
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in history_agreement_accounting_line ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of accounting lines inserted in history_agreement_accounting_line ');
 
 	RAISE NOTICE 'CON 11';
 	-- Capturing worksite information
@@ -1165,13 +1171,13 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of records deleted on recieving same version of agreement in all_agreement_worksite ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records deleted on recieving same version of agreement in all_agreement_worksite ');
 		
 	DELETE FROM history_all_agreement_worksite WHERE agreement_id IN (SELECT agreement_id FROM tmp_ct_deletion);
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of records deleted on recieving same version of agreement in history_agreement_worksite ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records deleted on recieving same version of agreement in history_agreement_worksite ');
 	
 	FOR l_array_ctr IN 1..array_upper(l_worksite_col_array,1) LOOP
 	
@@ -1187,7 +1193,7 @@ BEGIN
 
 		GET DIAGNOSTICS l_count = ROW_COUNT;
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of records inserted in all_agreement_worksite ');
+		VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records inserted in all_agreement_worksite ');
 		
 		l_insert_sql := ' INSERT INTO history_all_agreement_worksite(agreement_id,worksite_id,percentage,amount,master_agreement_yn,load_id,created_date) '||
 				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.max_cntrc_am *b.'|| l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''N'',' ||p_load_id_in || ', now()::timestamp '||
@@ -1201,7 +1207,7 @@ BEGIN
 
 		GET DIAGNOSTICS l_count = ROW_COUNT;
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of records(for old versions) inserted in history_all_agreement_worksite ');
+		VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records(for old versions) inserted in history_all_agreement_worksite ');
 		
 	END LOOP; 
 	
@@ -1212,7 +1218,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of records inserted in agreement_worksite ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records inserted in agreement_worksite ');
 	
 	INSERT INTO history_all_agreement_worksite
 	SELECT a.* 
@@ -1220,7 +1226,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of records(for latest version) inserted in history_all_agreement_worksite ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records(for latest version) inserted in history_all_agreement_worksite ');
 
 
 	INSERT INTO history_agreement_worksite
@@ -1230,7 +1236,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-	VALUES(p_load_file_id,'C','CT1,CTA1,CTA2',l_count,'# of records inserted in history_agreement_worksite ');
+	VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records inserted in history_agreement_worksite ');
 
 
 	RAISE NOTICE 'CON 12';
@@ -1303,41 +1309,41 @@ BEGIN
 				vendor_id,original_contract_amount,master_agreement_yn, description,
 				document_code,agency_history_id,agency_name,vendor_history_id, vendor_name,
 				agreement_type_id,award_category_id_1,record_date,effective_begin_date,effective_end_date,
-				tracking_number,master_document_id )
+				tracking_number,master_document_id,registered_date,has_parent_yn )
 	SELECT a.agreement_id,a.master_agreement_id,a.document_code_id,b.agency_id,
 		a.document_id,a.document_version,a.effective_begin_date_id,a.effective_end_date_id,
 		a.registered_date_id,a.maximum_contract_amount,a.award_method_id,
 		c.vendor_id,a.original_contract_amount,'N' as master_agreement_yn,a.description,
 		e.document_code,a.agency_history_id,b.agency_name,c.vendor_history_id,COALESCE(c.legal_name,c.alias_name),
 		a.agreement_type_id,a.award_category_id_1,f.date as record_date,g.date as effective_begin_date, h.date as effective_end_date,
-		a.tracking_number,i.document_id
+		a.tracking_number,i.document_id,j.date as registered_date,(CASE WHEN COALESCE(a.master_agreement_id,0) =0 THEN 'N' ELSE 'Y' END) as has_parent_yn
 	FROM   agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
-		JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
+		LEFT JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
 		JOIN tmp_ct_con d ON a.agreement_id = d.agreement_id		
 		JOIN ref_document_code e ON e.document_code_id = a.document_code_id
 		LEFT JOIN ref_date f ON a.record_date_id = f.date_id
 		LEFT JOIN ref_date g ON a.effective_begin_date_id = g.date_id
 		LEFT JOIN ref_date h ON a.effective_end_date_id = h.date_id
-		LEFT JOIN master_agreement i ON a.master_agreement_id = i.master_agreement_id;
+		LEFT JOIN master_agreement i ON a.master_agreement_id = i.master_agreement_id
+		LEFT JOIN ref_date j ON a.registered_date_id = j.date_id;
 		
 	
 	CREATE TEMPORARY TABLE tmp_fact_agreement_worksite(agreement_id bigint, worksites_name varchar)
 	DISTRIBUTED BY (agreement_id);
 	
 	INSERT INTO tmp_fact_agreement_worksite(agreement_id,worksites_name)
-	SELECT agreement_id,group_concat(DISTINCT worksite_code)
+	SELECT a.agreement_id,group_concat(DISTINCT worksite_code)
 	FROM   agreement_worksite a JOIN ref_worksite b ON a.worksite_id = b.worksite_id
-	WHERE load_id = p_load_id_in
-		AND master_agreement_yn ='N'
+		JOIN tmp_ct_con d ON a.agreement_id = d.agreement_id			
 	GROUP BY 1;
 	
 	CREATE TEMPORARY TABLE tmp_fact_agreement_acc_line(agreement_id bigint, expenditure_objects_name varchar)
 	DISTRIBUTED BY (agreement_id);
 	
 	INSERT INTO tmp_fact_agreement_acc_line(agreement_id,expenditure_objects_name)
-	SELECT agreement_id,group_concat(DISTINCT expenditure_object_name)
+	SELECT a.agreement_id,group_concat(DISTINCT expenditure_object_name)
 	FROM   agreement_accounting_line a JOIN ref_expenditure_object_history b ON a.expenditure_object_history_id = b.expenditure_object_history_id
-	WHERE load_id = p_load_id_in
+		JOIN tmp_ct_con d ON a.agreement_id = d.agreement_id	
 	GROUP BY 1;
 	
 	UPDATE fact_agreement a
@@ -1357,13 +1363,13 @@ BEGIN
 	DISTRIBUTED BY (agreement_id);
 
 	INSERT INTO tmp_fact_agreement_ytd_spent
-	SELECT agreement_id, SUM(check_amount)
-	FROM fact_disbursement_line_item a tmp_ct_con b
+	SELECT a.agreement_id, SUM(check_amount)
+	FROM fact_disbursement_line_item a JOIN tmp_ct_con b
 		ON a.agreement_id = b.agreement_id
 	GROUP BY 1;
 
 	INSERT INTO tmp_fact_agreement_ytd_spent
-	SELECTa. master_agreement_id, SUM(check_amount)
+	SELECT a.master_agreement_id, SUM(check_amount)
 	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT master_agreement_id
 					    FROM   tmp_ct_con b JOIN agreement c 
 					    ON b.agreement_id = c.agreement_id
