@@ -349,9 +349,15 @@ CREATE EXTERNAL WEB TABLE budget__0 (
     cash_expense_amount numeric,
     post_closing_adjustment_amount numeric,
     total_expenditure_amount numeric,
-    updated_date_id smallint,
-    load_id integer,
-    created_date timestamp without time zone
+    source_updated_date_id smallint,
+    budget_fiscal_year_id smallint,
+    agency_id smallint,
+    object_class_id integer,
+    department_id integer,    
+    created_load_id integer,
+    updated_load_id integer,
+    created_date timestamp without time zone,
+    updated_date timestamp without time zone
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.budget to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -364,7 +370,8 @@ ALTER EXTERNAL TABLE staging.budget__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW budget AS
-    SELECT budget__0.budget_id, budget__0.budget_fiscal_year, budget__0.fund_class_id, budget__0.agency_history_id, budget__0.department_history_id, budget__0.budget_code_id, budget__0.object_class_history_id, budget__0.adopted_amount, budget__0.current_budget_amount, budget__0.pre_encumbered_amount, budget__0.encumbered_amount, budget__0.accrued_expense_amount, budget__0.cash_expense_amount, budget__0.post_closing_adjustment_amount, budget__0.total_expenditure_amount, budget__0.updated_date_id, budget__0.load_id, budget__0.created_date FROM ONLY budget__0;
+    SELECT budget__0.budget_id, budget__0.budget_fiscal_year, budget__0.fund_class_id, budget__0.agency_history_id, budget__0.department_history_id, budget__0.budget_code_id, budget__0.object_class_history_id, budget__0.adopted_amount, budget__0.current_budget_amount, budget__0.pre_encumbered_amount, budget__0.encumbered_amount, budget__0.accrued_expense_amount, budget__0.cash_expense_amount, budget__0.post_closing_adjustment_amount, budget__0.total_expenditure_amount, budget__0.source_updated_date_id, budget__0.budget_fiscal_year_id, 
+    budget__0.agency_id, budget__0.object_class_id, budget__0.department_id, budget__0.created_load_id, budget__0.updated_load_id,budget__0.created_date,budget__0.updated_date FROM ONLY budget__0;
 
 
 ALTER TABLE staging.budget OWNER TO gpadmin;
@@ -492,7 +499,9 @@ CREATE EXTERNAL WEB TABLE fact_agreement__0 (
 	record_date date,
 	effective_begin_date date,
 	effective_end_date date,
-	tracking_number varchar    
+	tracking_number varchar    ,
+	registered_date date,
+	has_parent_yn char(1)
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_agreement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -506,7 +515,8 @@ ALTER EXTERNAL TABLE staging.fact_agreement__0 OWNER TO gpadmin;
 
 CREATE VIEW fact_agreement AS
     SELECT fact_agreement__0.agreement_id, fact_agreement__0.master_agreement_id, fact_agreement__0.document_code_id, fact_agreement__0.agency_id, fact_agreement__0.document_id, fact_agreement__0.document_version, fact_agreement__0.effective_begin_date_id, fact_agreement__0.effective_end_date_id, fact_agreement__0.registered_date_id, fact_agreement__0.maximum_contract_amount, fact_agreement__0.award_method_id, fact_agreement__0.vendor_id, fact_agreement__0.original_contract_amount, fact_agreement__0.master_agreement_yn, fact_agreement__0.description ,
-    fact_agreement__0.document_code,fact_agreement__0.master_document_id,fact_agreement__0.amount_spent,fact_agreement__0.agency_history_id,fact_agreement__0.agency_name,fact_agreement__0.vendor_history_id,fact_agreement__0.vendor_name,fact_agreement__0.worksites_name,fact_agreement__0.agreement_type_id,fact_agreement__0.award_category_id_1,fact_agreement__0.expenditure_objects_name,fact_agreement__0.record_date,fact_agreement__0.effective_begin_date,fact_agreement__0.effective_end_date,fact_agreement__0.tracking_number FROM ONLY fact_agreement__0;
+    fact_agreement__0.document_code,fact_agreement__0.master_document_id,fact_agreement__0.amount_spent,fact_agreement__0.agency_history_id,fact_agreement__0.agency_name,fact_agreement__0.vendor_history_id,fact_agreement__0.vendor_name,fact_agreement__0.worksites_name,fact_agreement__0.agreement_type_id,fact_agreement__0.award_category_id_1,fact_agreement__0.expenditure_objects_name,fact_agreement__0.record_date,fact_agreement__0.effective_begin_date,fact_agreement__0.effective_end_date,fact_agreement__0.tracking_number,
+    fact_agreement__0.registered_date,fact_agreement__0.has_parent_yn FROM ONLY fact_agreement__0;
 
 
 ALTER TABLE staging.fact_agreement OWNER TO gpadmin;
@@ -620,7 +630,15 @@ CREATE EXTERNAL WEB TABLE fact_revenue__0 (
     fiscal_period bpchar,
     posting_amount numeric,
     revenue_category_id smallint,
-    revenue_source_id smallint
+    revenue_source_id smallint,
+    fiscal_year_id smallint,
+    agency_id smallint,
+	department_id integer,	
+	revenue_class_id smallint,
+	fund_class_id smallint,
+	funding_class_id smallint,
+	budget_code_id integer,
+	budget_year_id integer
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_revenue to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -633,7 +651,9 @@ ALTER EXTERNAL TABLE staging.fact_revenue__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW fact_revenue AS
-    SELECT fact_revenue__0.revenue_id, fact_revenue__0.fiscal_year, fact_revenue__0.fiscal_period, fact_revenue__0.posting_amount, fact_revenue__0.revenue_category_id, fact_revenue__0.revenue_source_id FROM ONLY fact_revenue__0;
+    SELECT fact_revenue__0.revenue_id, fact_revenue__0.fiscal_year, fact_revenue__0.fiscal_period, fact_revenue__0.posting_amount, fact_revenue__0.revenue_category_id, fact_revenue__0.revenue_source_id,fact_revenue__0.fiscal_year_id ,
+    fact_revenue__0.agency_id ,fact_revenue__0.department_id , fact_revenue__0.revenue_class_id , fact_revenue__0.fund_class_id , fact_revenue__0.funding_class_id , 
+    fact_revenue__0.budget_code_id,fact_revenue__0.budget_year_id FROM  ONLY fact_revenue__0;
 
 
 ALTER TABLE staging.fact_revenue OWNER TO gpadmin;
@@ -965,11 +985,11 @@ CREATE EXTERNAL WEB TABLE master_agreement__0 (
     contract_class_code character varying,
     number_solicitation integer,
     document_name character varying,
-    created_load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone,
     privacy_flag bpchar,
-    updated_load_id integer
+    created_load_id integer,
+    updated_load_id integer,
+    created_date timestamp without time zone,
+    updated_date timestamp without time zone    
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.master_agreement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -982,7 +1002,7 @@ ALTER EXTERNAL TABLE staging.master_agreement__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW master_agreement AS
-    SELECT master_agreement__0.master_agreement_id, master_agreement__0.document_code_id, master_agreement__0.agency_history_id, master_agreement__0.document_id, master_agreement__0.document_version, master_agreement__0.tracking_number, master_agreement__0.record_date_id, master_agreement__0.budget_fiscal_year, master_agreement__0.document_fiscal_year, master_agreement__0.document_period, master_agreement__0.description, master_agreement__0.actual_amount, master_agreement__0.total_amount, master_agreement__0.replacing_master_agreement_id, master_agreement__0.replaced_by_master_agreement_id, master_agreement__0.award_status_id, master_agreement__0.procurement_id, master_agreement__0.procurement_type_id, master_agreement__0.effective_begin_date_id, master_agreement__0.effective_end_date_id, master_agreement__0.reason_modification, master_agreement__0.source_created_date_id, master_agreement__0.source_updated_date_id, master_agreement__0.document_function_code_id, master_agreement__0.award_method_id, master_agreement__0.agreement_type_id, master_agreement__0.award_category_id_1, master_agreement__0.award_category_id_2, master_agreement__0.award_category_id_3, master_agreement__0.award_category_id_4, master_agreement__0.award_category_id_5, master_agreement__0.number_responses, master_agreement__0.location_service, master_agreement__0.location_zip, master_agreement__0.borough_code, master_agreement__0.block_code, master_agreement__0.lot_code, master_agreement__0.council_district_code, master_agreement__0.vendor_history_id, master_agreement__0.vendor_preference_level, master_agreement__0.board_approved_award_no, master_agreement__0.board_approved_award_date_id, master_agreement__0.original_contract_amount, master_agreement__0.oca_number, master_agreement__0.original_term_begin_date_id, master_agreement__0.original_term_end_date_id, master_agreement__0.registered_date_id, master_agreement__0.maximum_amount, master_agreement__0.maximum_spending_limit, master_agreement__0.award_level_id, master_agreement__0.contract_class_code, master_agreement__0.number_solicitation, master_agreement__0.document_name, master_agreement__0.created_load_id, master_agreement__0.created_date, master_agreement__0.updated_date, master_agreement__0.privacy_flag, master_agreement__0.updated_load_id FROM ONLY master_agreement__0;
+    SELECT master_agreement__0.master_agreement_id, master_agreement__0.document_code_id, master_agreement__0.agency_history_id, master_agreement__0.document_id, master_agreement__0.document_version, master_agreement__0.tracking_number, master_agreement__0.record_date_id, master_agreement__0.budget_fiscal_year, master_agreement__0.document_fiscal_year, master_agreement__0.document_period, master_agreement__0.description, master_agreement__0.actual_amount, master_agreement__0.total_amount, master_agreement__0.replacing_master_agreement_id, master_agreement__0.replaced_by_master_agreement_id, master_agreement__0.award_status_id, master_agreement__0.procurement_id, master_agreement__0.procurement_type_id, master_agreement__0.effective_begin_date_id, master_agreement__0.effective_end_date_id, master_agreement__0.reason_modification, master_agreement__0.source_created_date_id, master_agreement__0.source_updated_date_id, master_agreement__0.document_function_code_id, master_agreement__0.award_method_id, master_agreement__0.agreement_type_id, master_agreement__0.award_category_id_1, master_agreement__0.award_category_id_2, master_agreement__0.award_category_id_3, master_agreement__0.award_category_id_4, master_agreement__0.award_category_id_5, master_agreement__0.number_responses, master_agreement__0.location_service, master_agreement__0.location_zip, master_agreement__0.borough_code, master_agreement__0.block_code, master_agreement__0.lot_code, master_agreement__0.council_district_code, master_agreement__0.vendor_history_id, master_agreement__0.vendor_preference_level, master_agreement__0.board_approved_award_no, master_agreement__0.board_approved_award_date_id, master_agreement__0.original_contract_amount, master_agreement__0.oca_number, master_agreement__0.original_term_begin_date_id, master_agreement__0.original_term_end_date_id, master_agreement__0.registered_date_id, master_agreement__0.maximum_amount, master_agreement__0.maximum_spending_limit, master_agreement__0.award_level_id, master_agreement__0.contract_class_code, master_agreement__0.number_solicitation, master_agreement__0.document_name,master_agreement__0.privacy_flag, master_agreement__0.created_load_id,master_agreement__0.updated_load_id, master_agreement__0.created_date, master_agreement__0.updated_date FROM ONLY master_agreement__0;
 
 
 ALTER TABLE staging.master_agreement OWNER TO gpadmin;
@@ -1838,7 +1858,8 @@ CREATE EXTERNAL WEB TABLE ref_fund_class__0 (
     fund_class_id smallint,
     fund_class_code character varying,
     fund_class_name character varying,
-    created_date timestamp without time zone
+    created_load_id integer,
+    created_date timestamp without time zone    
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_fund_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -1851,7 +1872,7 @@ ALTER EXTERNAL TABLE staging.ref_fund_class__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW ref_fund_class AS
-    SELECT ref_fund_class__0.fund_class_id, ref_fund_class__0.fund_class_code, ref_fund_class__0.fund_class_name, ref_fund_class__0.created_date FROM ONLY ref_fund_class__0;
+    SELECT ref_fund_class__0.fund_class_id, ref_fund_class__0.fund_class_code, ref_fund_class__0.fund_class_name,ref_fund_class__0.created_load_id, ref_fund_class__0.created_date FROM ONLY ref_fund_class__0;
 
 
 ALTER TABLE staging.ref_fund_class OWNER TO gpadmin;
@@ -2449,7 +2470,8 @@ CREATE EXTERNAL WEB TABLE ref_revenue_source__0 (
     srsrc_req bpchar,
     created_date timestamp without time zone,
     updated_load_id integer,
-    updated_date timestamp without time zone
+    updated_date timestamp without time zone,
+    created_load_id integer
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_revenue_source to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -2462,7 +2484,16 @@ ALTER EXTERNAL TABLE staging.ref_revenue_source__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW ref_revenue_source AS
-    SELECT ref_revenue_source__0.revenue_source_id, ref_revenue_source__0.fiscal_year, ref_revenue_source__0.revenue_source_code, ref_revenue_source__0.revenue_source_name, ref_revenue_source__0.revenue_source_short_name, ref_revenue_source__0.description, ref_revenue_source__0.funding_class_id, ref_revenue_source__0.revenue_class_id, ref_revenue_source__0.revenue_category_id, ref_revenue_source__0.active_flag, ref_revenue_source__0.budget_allowed_flag, ref_revenue_source__0.operating_indicator, ref_revenue_source__0.fasb_class_indicator, ref_revenue_source__0.fhwa_revenue_credit_flag, ref_revenue_source__0.usetax_collection_flag, ref_revenue_source__0.apply_interest_late_fee, ref_revenue_source__0.apply_interest_admin_fee, ref_revenue_source__0.apply_interest_nsf_fee, ref_revenue_source__0.apply_interest_other_fee, ref_revenue_source__0.eligible_intercept_process, ref_revenue_source__0.earned_receivable_code, ref_revenue_source__0.finance_fee_override_flag, ref_revenue_source__0.allow_override_interest, ref_revenue_source__0.billing_lag_days, ref_revenue_source__0.billing_frequency, ref_revenue_source__0.billing_fiscal_year_start_month, ref_revenue_source__0.billing_fiscal_year_start_day, ref_revenue_source__0.federal_agency_code, ref_revenue_source__0.federal_agency_suffix, ref_revenue_source__0.federal_name, ref_revenue_source__0.srsrc_req, ref_revenue_source__0.created_date, ref_revenue_source__0.updated_load_id, ref_revenue_source__0.updated_date FROM ONLY ref_revenue_source__0;
+    SELECT ref_revenue_source__0.revenue_source_id, ref_revenue_source__0.fiscal_year, ref_revenue_source__0.revenue_source_code, ref_revenue_source__0.revenue_source_name, 
+    ref_revenue_source__0.revenue_source_short_name, ref_revenue_source__0.description, ref_revenue_source__0.funding_class_id, ref_revenue_source__0.revenue_class_id, 
+    ref_revenue_source__0.revenue_category_id, ref_revenue_source__0.active_flag, ref_revenue_source__0.budget_allowed_flag, ref_revenue_source__0.operating_indicator, 
+    ref_revenue_source__0.fasb_class_indicator, ref_revenue_source__0.fhwa_revenue_credit_flag, ref_revenue_source__0.usetax_collection_flag, 
+    ref_revenue_source__0.apply_interest_late_fee, ref_revenue_source__0.apply_interest_admin_fee, ref_revenue_source__0.apply_interest_nsf_fee, 
+    ref_revenue_source__0.apply_interest_other_fee, ref_revenue_source__0.eligible_intercept_process, ref_revenue_source__0.earned_receivable_code, 
+    ref_revenue_source__0.finance_fee_override_flag, ref_revenue_source__0.allow_override_interest, ref_revenue_source__0.billing_lag_days, 
+    ref_revenue_source__0.billing_frequency, ref_revenue_source__0.billing_fiscal_year_start_month, ref_revenue_source__0.billing_fiscal_year_start_day, 
+    ref_revenue_source__0.federal_agency_code, ref_revenue_source__0.federal_agency_suffix, ref_revenue_source__0.federal_name, ref_revenue_source__0.srsrc_req, 
+    ref_revenue_source__0.created_date, ref_revenue_source__0.updated_load_id, ref_revenue_source__0.updated_date,ref_revenue_source__0.created_load_id FROM ONLY ref_revenue_source__0;
 
 
 ALTER TABLE staging.ref_revenue_source OWNER TO gpadmin;
@@ -2617,9 +2648,10 @@ CREATE EXTERNAL WEB TABLE revenue__0 (
     major_cafr_revenue_type character varying,
     minor_cafr_revenue_type character varying,
     vendor_history_id integer,
+    fiscal_year_id smallint,
+    budget_fiscal_year_id smallint,    
     load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
+    created_date timestamp without time zone  
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -2632,7 +2664,7 @@ ALTER EXTERNAL TABLE staging.revenue__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW revenue AS
-    SELECT revenue__0.revenue_id, revenue__0.record_date_id, revenue__0.fiscal_period, revenue__0.fiscal_year, revenue__0.budget_fiscal_year, revenue__0.fiscal_quarter, revenue__0.event_category, revenue__0.event_type, revenue__0.bank_account_code, revenue__0.posting_pair_type, revenue__0.posting_code, revenue__0.debit_credit_indicator, revenue__0.line_function, revenue__0.posting_amount, revenue__0.increment_decrement_indicator, revenue__0.time_of_occurence, revenue__0.balance_sheet_account_code, revenue__0.balance_sheet_account_type, revenue__0.expenditure_object_history_id, revenue__0.government_branch_code, revenue__0.cabinet_code, revenue__0.agency_history_id, revenue__0.department_history_id, revenue__0.reporting_activity_code, revenue__0.budget_code_id, revenue__0.fund_category, revenue__0.fund_type, revenue__0.fund_group, revenue__0.balance_sheet_account_class_code, revenue__0.balance_sheet_account_category_code, revenue__0.balance_sheet_account_group_code, revenue__0.balance_sheet_account_override_flag, revenue__0.object_class_history_id, revenue__0.object_category_code, revenue__0.object_type_code, revenue__0.object_group_code, revenue__0.document_category, revenue__0.document_type, revenue__0.document_code_id, revenue__0.document_agency_history_id, revenue__0.document_id, revenue__0.document_version_number, revenue__0.document_function_code_id, revenue__0.document_unit, revenue__0.commodity_line, revenue__0.accounting_line, revenue__0.document_posting_line, revenue__0.ref_document_code_id, revenue__0.ref_document_agency_history_id, revenue__0.ref_document_id, revenue__0.ref_commodity_line, revenue__0.ref_accounting_line, revenue__0.ref_posting_line, revenue__0.reference_type, revenue__0.line_description, revenue__0.service_start_date_id, revenue__0.service_end_date_id, revenue__0.reason_code, revenue__0.reclassification_flag, revenue__0.closing_classification_code, revenue__0.closing_classification_name, revenue__0.revenue_category_id, revenue__0.revenue_class_id, revenue__0.revenue_source_id, revenue__0.funding_source_id, revenue__0.fund_class_id, revenue__0.reporting_code, revenue__0.major_cafr_revenue_type, revenue__0.minor_cafr_revenue_type, revenue__0.vendor_history_id, revenue__0.load_id, revenue__0.created_date, revenue__0.updated_date FROM ONLY revenue__0;
+    SELECT revenue__0.revenue_id, revenue__0.record_date_id, revenue__0.fiscal_period, revenue__0.fiscal_year, revenue__0.budget_fiscal_year, revenue__0.fiscal_quarter, revenue__0.event_category, revenue__0.event_type, revenue__0.bank_account_code, revenue__0.posting_pair_type, revenue__0.posting_code, revenue__0.debit_credit_indicator, revenue__0.line_function, revenue__0.posting_amount, revenue__0.increment_decrement_indicator, revenue__0.time_of_occurence, revenue__0.balance_sheet_account_code, revenue__0.balance_sheet_account_type, revenue__0.expenditure_object_history_id, revenue__0.government_branch_code, revenue__0.cabinet_code, revenue__0.agency_history_id, revenue__0.department_history_id, revenue__0.reporting_activity_code, revenue__0.budget_code_id, revenue__0.fund_category, revenue__0.fund_type, revenue__0.fund_group, revenue__0.balance_sheet_account_class_code, revenue__0.balance_sheet_account_category_code, revenue__0.balance_sheet_account_group_code, revenue__0.balance_sheet_account_override_flag, revenue__0.object_class_history_id, revenue__0.object_category_code, revenue__0.object_type_code, revenue__0.object_group_code, revenue__0.document_category, revenue__0.document_type, revenue__0.document_code_id, revenue__0.document_agency_history_id, revenue__0.document_id, revenue__0.document_version_number, revenue__0.document_function_code_id, revenue__0.document_unit, revenue__0.commodity_line, revenue__0.accounting_line, revenue__0.document_posting_line, revenue__0.ref_document_code_id, revenue__0.ref_document_agency_history_id, revenue__0.ref_document_id, revenue__0.ref_commodity_line, revenue__0.ref_accounting_line, revenue__0.ref_posting_line, revenue__0.reference_type, revenue__0.line_description, revenue__0.service_start_date_id, revenue__0.service_end_date_id, revenue__0.reason_code, revenue__0.reclassification_flag, revenue__0.closing_classification_code, revenue__0.closing_classification_name, revenue__0.revenue_category_id, revenue__0.revenue_class_id, revenue__0.revenue_source_id, revenue__0.funding_source_id, revenue__0.fund_class_id, revenue__0.reporting_code, revenue__0.major_cafr_revenue_type, revenue__0.minor_cafr_revenue_type, revenue__0.vendor_history_id, revenue__0.fiscal_year_id, revenue__0.budget_fiscal_year_id, revenue__0.load_id,revenue__0.created_date FROM ONLY revenue__0;
 
 
 ALTER TABLE staging.revenue OWNER TO gpadmin;
