@@ -168,6 +168,7 @@ CREATE TABLE ref_fund_class (
   fund_class_id smallint PRIMARY KEY default nextval('seq_ref_fund_class_fund_class_id'),
   fund_class_code varchar(5),
   fund_class_name varchar(50),
+  created_load_id integer,
   created_date timestamp
 ) DISTRIBUTED BY (fund_class_id);
 
@@ -613,8 +614,8 @@ CREATE TABLE ref_revenue_class (
   budget_allowed_flag bit ,
   description varchar(100),
   created_date timestamp,
-    updated_load_id integer,
-updated_date timestamp without time zone
+  updated_load_id integer,
+  updated_date timestamp without time zone
 ) DISTRIBUTED BY (revenue_class_id);
 
 CREATE TABLE ref_revenue_source (
@@ -651,8 +652,8 @@ CREATE TABLE ref_revenue_source (
     srsrc_req character(1),
     created_date timestamp without time zone,
     updated_load_id integer,
-updated_date timestamp without time zone
-
+    updated_date timestamp without time zone,
+    created_load_id integer
 ) distributed by (revenue_source_id);
 
 
@@ -1165,9 +1166,10 @@ CREATE TABLE revenue (
     major_cafr_revenue_type character varying(4),
     minor_cafr_revenue_type character varying(4),
     vendor_history_id integer,
+    fiscal_year_id smallint,
+    budget_fiscal_year_id smallint,    
     load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
+    created_date timestamp without time zone    
 ) distributed by (revenue_id);
 
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_etl_data_load FOREIGN KEY (load_id) REFERENCES etl_data_load(load_id);
@@ -1207,9 +1209,15 @@ CREATE TABLE budget (
     cash_expense_amount numeric(20,2),
     post_closing_adjustment_amount numeric(20,2),
     total_expenditure_amount numeric(20,2),
-    updated_date_id smallint,
-    load_id integer,
-    created_date timestamp without time zone
+    source_updated_date_id smallint,
+    budget_fiscal_year_id smallint,
+    agency_id smallint,
+    object_class_id integer,
+    department_id integer,
+    created_load_id integer,
+    updated_load_id integer,
+    created_date timestamp without time zone,
+    updated_date timestamp without time zone
 ) distributed by (budget_id);
 	
 ALTER TABLE  budget ADD constraint fk_budget_ref_fund_class foreign key (fund_class_id) references ref_fund_class (fund_class_id);
@@ -1252,7 +1260,11 @@ CREATE TABLE fact_agreement
 	record_date date,
 	effective_begin_date date,
 	effective_end_date date,
-	tracking_number varchar
+	tracking_number varchar,
+	registered_date date,
+	has_parent_yn char(1),
+	total_child_records int,
+	record_date_id smallint
 ) DISTRIBUTED BY (agreement_id);
 
 ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
@@ -1275,7 +1287,15 @@ CREATE TABLE fact_revenue
 	fiscal_period char(2),
 	posting_amount decimal(16,2),
 	revenue_category_id smallint,
-	revenue_source_id smallint
+	revenue_source_id smallint,
+	fiscal_year_id smallint,
+	agency_id smallint,
+	department_id integer,	
+	revenue_class_id smallint,
+	fund_class_id smallint,
+	funding_class_id smallint,
+	budget_code_id integer,
+	budget_year_id integer
 ) DISTRIBUTED BY (revenue_id);
 
 
