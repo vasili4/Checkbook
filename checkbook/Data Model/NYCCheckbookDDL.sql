@@ -1392,7 +1392,22 @@ CREATE TABLE fact_disbursement_line_item(
 	vendor_id integer,
 	department_id integer,
 	maximum_contract_amount numeric(16,2),
-	maximum_spending_limit numeric(16,2))
+	maximum_spending_limit numeric(16,2),
+	document_id varchar(20),
+	vendor_name varchar,
+	check_eft_issued_date date,
+	agency_name varchar(50),
+	location_name varchar,
+	department_name varchar(100),
+	expenditure_object_name varchar(40),
+	budget_code_id integer,
+	budget_name varchar(60),
+	contract_number varchar,
+	purpose varchar,
+	reporting_code varchar(15),
+	location_id integer,
+	fund_class_name varchar(50)
+)
 DISTRIBUTED BY (disbursement_line_item_id);
 
 
@@ -1437,3 +1452,9 @@ CREATE TABLE aggregateon_spending_contract (
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
 	) DISTRIBUTED BY (agreement_id) ;
+	
+CREATE TABLE ref_fiscal_period(
+	fiscal_period smallint,
+	fiscal_period_name varchar
+)
+DISTRIBUTED BY (fiscal_period);
