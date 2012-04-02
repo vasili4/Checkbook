@@ -453,7 +453,6 @@ CREATE TABLE ref_fund_class_id_seq(uniq_id bigint,fund_class_id int default next
 DISTRIBUTED BY (uniq_id);
 
 
-
 CREATE TABLE stg_agency(
 	agency_code varchar(20),
 	agency_name varchar(50),
@@ -3398,6 +3397,12 @@ CREATE TABLE etl.stg_budget
   action_flag character(1),
   budget_id integer,
   budget_fiscal_year_id smallint,
+  agency_id smallint,
+  object_class_id integer,
+  department_id integer,
+  agency_name varchar,
+  object_class_name varchar,
+  department_name varchar,
   uniq_id bigint DEFAULT nextval('etl.seq_stg_budget_uniq_id'::regclass),
   invalid_flag character(1),
   invalid_reason character varying

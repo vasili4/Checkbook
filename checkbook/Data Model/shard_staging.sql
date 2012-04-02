@@ -120,6 +120,7 @@ ALTER TABLE staging.aggregateon_spending_contract OWNER TO gpadmin;
 CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor__0 (
     vendor_id integer,
     agency_id smallint,
+    month_id smallint,
     year_id smallint,
     total_spending_amount numeric,
     total_contract_amount numeric
@@ -135,7 +136,7 @@ ALTER EXTERNAL TABLE staging.aggregateon_spending_vendor__0 OWNER TO gpadmin;
 --
 
 CREATE VIEW aggregateon_spending_vendor AS
-    SELECT aggregateon_spending_vendor__0.vendor_id, aggregateon_spending_vendor__0.agency_id, aggregateon_spending_vendor__0.year_id, aggregateon_spending_vendor__0.total_spending_amount, aggregateon_spending_vendor__0.total_contract_amount FROM ONLY aggregateon_spending_vendor__0;
+    SELECT aggregateon_spending_vendor__0.vendor_id, aggregateon_spending_vendor__0.agency_id, aggregateon_spending_vendor__0.month_id, aggregateon_spending_vendor__0.year_id, aggregateon_spending_vendor__0.total_spending_amount, aggregateon_spending_vendor__0.total_contract_amount FROM ONLY aggregateon_spending_vendor__0;
 
 
 ALTER TABLE staging.aggregateon_spending_vendor OWNER TO gpadmin;
@@ -354,6 +355,9 @@ CREATE EXTERNAL WEB TABLE budget__0 (
     agency_id smallint,
     object_class_id integer,
     department_id integer,    
+    agency_name varchar,
+    object_class_name varchar,
+    department_name varchar,    
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -371,7 +375,9 @@ ALTER EXTERNAL TABLE staging.budget__0 OWNER TO gpadmin;
 
 CREATE VIEW budget AS
     SELECT budget__0.budget_id, budget__0.budget_fiscal_year, budget__0.fund_class_id, budget__0.agency_history_id, budget__0.department_history_id, budget__0.budget_code_id, budget__0.object_class_history_id, budget__0.adopted_amount, budget__0.current_budget_amount, budget__0.pre_encumbered_amount, budget__0.encumbered_amount, budget__0.accrued_expense_amount, budget__0.cash_expense_amount, budget__0.post_closing_adjustment_amount, budget__0.total_expenditure_amount, budget__0.source_updated_date_id, budget__0.budget_fiscal_year_id, 
-    budget__0.agency_id, budget__0.object_class_id, budget__0.department_id, budget__0.created_load_id, budget__0.updated_load_id,budget__0.created_date,budget__0.updated_date FROM ONLY budget__0;
+    budget__0.agency_id, budget__0.object_class_id, budget__0.department_id, 
+    budget__0.agency_name, budget__0.object_class_name,budget__0.department_name,
+    budget__0.created_load_id, budget__0.updated_load_id,budget__0.created_date,budget__0.updated_date FROM ONLY budget__0;
 
 
 ALTER TABLE staging.budget OWNER TO gpadmin;
@@ -579,7 +585,9 @@ CREATE EXTERNAL WEB TABLE fact_disbursement_line_item__0 (
 	purpose varchar,
 	reporting_code varchar,
 	location_id integer,
-	fund_class_name varchar    
+	fund_class_name varchar,
+	spending_category_id smallint,
+	spending_category_name varchar
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_disbursement_line_item to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -596,7 +604,8 @@ CREATE VIEW fact_disbursement_line_item AS
     fact_disbursement_line_item__0.document_id, fact_disbursement_line_item__0.vendor_name, fact_disbursement_line_item__0.check_eft_issued_date, fact_disbursement_line_item__0.agency_name,
     fact_disbursement_line_item__0.location_name, fact_disbursement_line_item__0.department_name, fact_disbursement_line_item__0.expenditure_object_name, fact_disbursement_line_item__0.budget_code_id,
      fact_disbursement_line_item__0.budget_name, fact_disbursement_line_item__0.contract_number, fact_disbursement_line_item__0.purpose,
-    fact_disbursement_line_item__0.reporting_code,fact_disbursement_line_item__0.location_id,fact_disbursement_line_item__0.fund_class_name
+    fact_disbursement_line_item__0.reporting_code,fact_disbursement_line_item__0.location_id,fact_disbursement_line_item__0.fund_class_name,
+    fact_disbursement_line_item__0.spending_category_id,fact_disbursement_line_item__0.spending_category_name
 FROM ONLY fact_disbursement_line_item__0;
 
 
@@ -657,7 +666,15 @@ CREATE EXTERNAL WEB TABLE fact_revenue__0 (
 	fund_class_id smallint,
 	funding_class_id smallint,
 	budget_code_id integer,
-	budget_year_id integer
+	budget_fiscal_year_id integer,
+	agency_name varchar,
+	revenue_category_name varchar,
+	revenue_source_name varchar,
+	budget_fiscal_year smallint,
+	department_name varchar,
+	revenue_class_name varchar,
+	fund_class_name varchar,
+	funding_class_name varchar		
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_revenue to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -672,7 +689,8 @@ ALTER EXTERNAL TABLE staging.fact_revenue__0 OWNER TO gpadmin;
 CREATE VIEW fact_revenue AS
     SELECT fact_revenue__0.revenue_id, fact_revenue__0.fiscal_year, fact_revenue__0.fiscal_period, fact_revenue__0.posting_amount, fact_revenue__0.revenue_category_id, fact_revenue__0.revenue_source_id,fact_revenue__0.fiscal_year_id ,
     fact_revenue__0.agency_id ,fact_revenue__0.department_id , fact_revenue__0.revenue_class_id , fact_revenue__0.fund_class_id , fact_revenue__0.funding_class_id , 
-    fact_revenue__0.budget_code_id,fact_revenue__0.budget_year_id FROM  ONLY fact_revenue__0;
+    fact_revenue__0.budget_code_id,fact_revenue__0.budget_fiscal_year_id,fact_revenue__0.agency_name, fact_revenue__0.revenue_category_name,fact_revenue__0.revenue_source_name,
+    fact_revenue__0.budget_fiscal_year,fact_revenue__0.department_name,fact_revenue__0.revenue_class_name,fact_revenue__0.fund_class_name,fact_revenue__0.funding_class_name FROM  ONLY fact_revenue__0;
 
 
 ALTER TABLE staging.fact_revenue OWNER TO gpadmin;
@@ -2824,6 +2842,55 @@ ENCODING 'UTF8';
 CREATE VIEW ref_fiscal_period AS
 	SELECT ref_fiscal_period__0.fiscal_period, ref_fiscal_period__0.fiscal_period_name FROM ref_fiscal_period__0;
 	
+
+CREATE EXTERNAL WEB TABLE aggregateon_revenue_category__0(
+	revenue_category_id smallint,
+	fiscal_period smallint,
+	budget_fiscal_year_id smallint,
+	posting_amount numeric(16,2),
+	adopted_amount numeric(16,2),
+	current_modified_amount numeric(16,2)
+)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_category to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+
+CREATE VIEW aggregateon_revenue_category AS
+	SELECT aggregateon_revenue_category__0.revenue_category_id, aggregateon_revenue_category__0.fiscal_period, aggregateon_revenue_category__0.budget_fiscal_year_id,
+		aggregateon_revenue_category__0.posting_amount, aggregateon_revenue_category__0.adopted_amount, aggregateon_revenue_category__0.current_modified_amount
+	FROM aggregateon_revenue_category__0;
+	
+CREATE EXTERNAL WEB TABLE aggregateon_revenue_funding_class__0(
+	funding_class_id smallint,
+	fiscal_period smallint,
+	budget_fiscal_year_id smallint,
+	posting_amount numeric(16,2),
+	adopted_amount numeric(16,2),
+	current_modified_amount numeric(16,2)
+)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_funding_class to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';	
+
+CREATE VIEW aggregateon_revenue_funding_class AS
+	SELECT aggregateon_revenue_funding_class__0.funding_class_id,aggregateon_revenue_funding_class__0.fiscal_period,aggregateon_revenue_funding_class__0.budget_fiscal_year_id,
+		aggregateon_revenue_funding_class__0.posting_amount,aggregateon_revenue_funding_class__0.adopted_amount,aggregateon_revenue_funding_class__0.current_modified_amount
+	FROM aggregateon_revenue_funding_class__0;	
+	
+	
+CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor_exp_object__0(
+	vendor_id integer,
+	expenditure_object_id integer,
+	check_eft_issued_nyc_year_id smallint,
+	total_spending_amount numeric(16,2) 
+)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_spending_vendor_exp_object to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+
+CREATE VIEW aggregateon_spending_vendor_exp_object AS
+	SELECT aggregateon_spending_vendor_exp_object__0.vendor_id, aggregateon_spending_vendor_exp_object__0.expenditure_object_id, aggregateon_spending_vendor_exp_object__0.check_eft_issued_nyc_year_id ,
+		aggregateon_spending_vendor_exp_object__0.total_spending_amount FROM aggregateon_spending_vendor_exp_object__0;
 --
 -- Name: staging; Type: ACL; Schema: -; Owner: gpadmin
 --
