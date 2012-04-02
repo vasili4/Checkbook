@@ -1214,6 +1214,9 @@ CREATE TABLE budget (
     agency_id smallint,
     object_class_id integer,
     department_id integer,
+    agency_name varchar,
+    object_class_name varchar,
+    department_name varchar,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -1295,7 +1298,15 @@ CREATE TABLE fact_revenue
 	fund_class_id smallint,
 	funding_class_id smallint,
 	budget_code_id integer,
-	budget_year_id integer
+	budget_fiscal_year_id smallint,
+	agency_name varchar,
+	revenue_category_name varchar,
+	revenue_source_name varchar,
+	budget_fiscal_year smallint,
+	department_name varchar,
+	revenue_class_name varchar,
+	fund_class_name varchar,
+	funding_class_name varchar	
 ) DISTRIBUTED BY (revenue_id);
 
 
@@ -1406,7 +1417,9 @@ CREATE TABLE fact_disbursement_line_item(
 	purpose varchar,
 	reporting_code varchar(15),
 	location_id integer,
-	fund_class_name varchar(50)
+	fund_class_name varchar(50),
+	spending_category_id smallint,
+	spending_category_name varchar
 )
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -1437,6 +1450,7 @@ CREATE TABLE aggregateon_spending_coa_entities (
 CREATE TABLE aggregateon_spending_vendor (
 	vendor_id integer,
 	agency_id smallint,
+	month_id smallint,
 	year_id smallint,
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
@@ -1458,3 +1472,29 @@ CREATE TABLE ref_fiscal_period(
 	fiscal_period_name varchar
 )
 DISTRIBUTED BY (fiscal_period);
+
+
+CREATE TABLE aggregateon_revenue_category(
+	revenue_category_id smallint,
+	fiscal_period smallint,
+	budget_fiscal_year_id smallint,
+	posting_amount numeric(16,2),
+	adopted_amount numeric(16,2),
+	current_modified_amount numeric(16,2))
+DISTRIBUTED BY (revenue_category_id);	
+
+CREATE TABLE aggregateon_revenue_funding_class(
+	funding_class_id smallint,
+	fiscal_period smallint,
+	budget_fiscal_year_id smallint,
+	posting_amount numeric(16,2),
+	adopted_amount numeric(16,2),
+	current_modified_amount numeric(16,2))
+DISTRIBUTED BY (funding_class_id);	
+
+CREATE TABLE aggregateon_spending_vendor_exp_object(
+	vendor_id integer,
+	expenditure_object_id integer,
+	check_eft_issued_nyc_year_id smallint,
+	total_spending_amount numeric(16,2) )
+DISTRIBUTED BY (expenditure_object_id);	
