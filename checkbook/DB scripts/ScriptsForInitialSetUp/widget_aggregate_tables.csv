@@ -11,13 +11,13 @@ SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,"SELECT dep
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
                         AND fund_class_code = 400
                    THEN
-                      1
+                      3
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
                         AND fund_class_code <> 400
                    THEN
-                      2
+                      1
                    ELSE
-                      3
+                      4
                 END)
                   AS spending_category_id,
                expenditure_object_id,
@@ -69,3 +69,15 @@ SpendingByContractId,aggregateon_spending_contract,"SELECT a.agreement_id,
           ON COALESCE(a.master_agreement_id, a.agreement_id) =
                 COALESCE(b.master_agreement_id, b.agreement_id)
 GROUP BY 1,2,3,4,5,6"
+RevenueByCategoryId,aggregateon_revenue_category,"SELECT b.revenue_category_id, fiscal_year_period,
+       budget_fiscal_year_id, SUM(posting_amount) as posting_amount,
+       0 as adopted_budget,
+       0 as current_modified_budget
+FROM   fact_revenue a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
+GROUP BY 1,2,3;"
+RevenueByFundingClassId,aggregateon_revenue_funding_class,"SELECT b.funding_class_id,fiscal_year_period,
+       a.budget_fiscal_year_id, SUM(posting_amount) as posting_amount,
+       0 as adopted_budget,
+       0 as current_modified_budget
+FROM   fact_revenue a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
+GROUP BY 1,2,3;"
