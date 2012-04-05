@@ -1217,6 +1217,8 @@ CREATE TABLE budget (
     agency_name varchar,
     object_class_name varchar,
     department_name varchar,
+    budget_code varchar,
+    budget_code_name varchar,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -1228,8 +1230,8 @@ ALTER TABLE  budget ADD constraint fk_budget_ref_agency_history FOREIGN KEY (age
 ALTER TABLE  budget ADD constraint fk_budget_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
 ALTER TABLE  budget ADD constraint fk_budget_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
 ALTER TABLE  budget ADD constraint fk_budget_ref_object_class_history foreign key (object_class_history_id) references ref_object_class_history (object_class_history_id);
-ALTER TABLE  budget ADD constraint fk_budget_etl_data_load foreign key (load_id) references etl_data_load (load_id);
-ALTER TABLE  budget ADD constraint fk_budget_ref_date foreign key (updated_date_id) references ref_date (date_id);
+ALTER TABLE  budget ADD constraint fk_budget_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
+ALTER TABLE  budget ADD constraint fk_budget_ref_date foreign key (source_updated_date_id) references ref_date (date_id);
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE fact_agreement

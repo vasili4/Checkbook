@@ -358,6 +358,8 @@ CREATE EXTERNAL WEB TABLE budget__0 (
     agency_name varchar,
     object_class_name varchar,
     department_name varchar,    
+    budget_code varchar,
+    budget_code_name varchar,    
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -377,6 +379,7 @@ CREATE VIEW budget AS
     SELECT budget__0.budget_id, budget__0.budget_fiscal_year, budget__0.fund_class_id, budget__0.agency_history_id, budget__0.department_history_id, budget__0.budget_code_id, budget__0.object_class_history_id, budget__0.adopted_amount, budget__0.current_budget_amount, budget__0.pre_encumbered_amount, budget__0.encumbered_amount, budget__0.accrued_expense_amount, budget__0.cash_expense_amount, budget__0.post_closing_adjustment_amount, budget__0.total_expenditure_amount, budget__0.source_updated_date_id, budget__0.budget_fiscal_year_id, 
     budget__0.agency_id, budget__0.object_class_id, budget__0.department_id, 
     budget__0.agency_name, budget__0.object_class_name,budget__0.department_name,
+    budget__0.budget_code, budget__0.budget_code_name,
     budget__0.created_load_id, budget__0.updated_load_id,budget__0.created_date,budget__0.updated_date FROM ONLY budget__0;
 
 
@@ -507,7 +510,9 @@ CREATE EXTERNAL WEB TABLE fact_agreement__0 (
 	effective_end_date date,
 	tracking_number varchar    ,
 	registered_date date,
-	has_parent_yn char(1)
+	has_parent_yn char(1),
+	total_child_records smallint,
+	record_date_id smallint
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_agreement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -522,7 +527,8 @@ ALTER EXTERNAL TABLE staging.fact_agreement__0 OWNER TO gpadmin;
 CREATE VIEW fact_agreement AS
     SELECT fact_agreement__0.agreement_id, fact_agreement__0.master_agreement_id, fact_agreement__0.document_code_id, fact_agreement__0.agency_id, fact_agreement__0.document_id, fact_agreement__0.document_version, fact_agreement__0.effective_begin_date_id, fact_agreement__0.effective_end_date_id, fact_agreement__0.registered_date_id, fact_agreement__0.maximum_contract_amount, fact_agreement__0.award_method_id, fact_agreement__0.vendor_id, fact_agreement__0.original_contract_amount, fact_agreement__0.master_agreement_yn, fact_agreement__0.description ,
     fact_agreement__0.document_code,fact_agreement__0.master_document_id,fact_agreement__0.amount_spent,fact_agreement__0.agency_history_id,fact_agreement__0.agency_name,fact_agreement__0.vendor_history_id,fact_agreement__0.vendor_name,fact_agreement__0.worksites_name,fact_agreement__0.agreement_type_id,fact_agreement__0.award_category_id_1,fact_agreement__0.expenditure_objects_name,fact_agreement__0.record_date,fact_agreement__0.effective_begin_date,fact_agreement__0.effective_end_date,fact_agreement__0.tracking_number,
-    fact_agreement__0.registered_date,fact_agreement__0.has_parent_yn FROM ONLY fact_agreement__0;
+    fact_agreement__0.registered_date,fact_agreement__0.has_parent_yn,
+    fact_agreement__0.total_child_records,fact_agreement__0.record_date_id FROM ONLY fact_agreement__0;
 
 
 ALTER TABLE staging.fact_agreement OWNER TO gpadmin;

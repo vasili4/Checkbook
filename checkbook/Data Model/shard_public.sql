@@ -428,6 +428,8 @@ CREATE TABLE budget (
     agency_name varchar,
     object_class_name varchar,
     department_name varchar,    
+    budget_code varchar,
+    budget_code_name varchar,    
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
