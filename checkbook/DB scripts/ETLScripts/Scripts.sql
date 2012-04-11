@@ -180,6 +180,24 @@ BEGIN
 			END IF;
 		END LOOP; 
 
+	-- Copying the malformed records to the respective malformed tables
+	CREATE TEMPORARY TABLE tmp_malformed(col1 varchar);
+	
+	copy tmp_malformed from '/home/gpadmin/athiagarajan/NYC/badfile.txt';
+	
+	l_insert_sql := 'INSERT INTO ' || replace(l_data_feed_table,'ext_stg','malformed') ||
+			' SELECT col1, ' || p_load_file_id_in ||
+			' FROM tmp_malformed';
+
+	EXECUTE l_insert_sql;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+
+	l_ins_staging_cnt := l_count;
+
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,record_identifier,document_type,num_transactions,description)
+	VALUES(p_load_file_id_in,l_data_source_code,l_record_identifiers[l_array_ctr],l_document_type_array[l_array_ctr],l_ins_staging_cnt, 'Malformed');
+			
 	-- Updating the processed flag to S to indicate that the data is staged.	
 	
 	UPDATE  etl.etl_data_load_file
