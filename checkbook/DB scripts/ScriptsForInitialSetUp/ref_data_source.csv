@@ -1,14 +1,14 @@
 Data_source_code,Data_source_name,document_type,document_name,record_identifier,record_type_name,staging_table_name,etl.archive_table_name,etl.invalid_table_name,Table_order,Data_source_order
-A,COA - Agency,,,,,etl.ext_stg_coa_agency_feed,,,1,0
-A,COA - Agency,,,,,etl.stg_agency,etl.archive_agency,etl.invalid_agency,2,0
-D,COA - Department,,,,,etl.ext_stg_coa_department_feed,,,1,1
-D,COA - Department,,,,,etl.stg_department,etl.archive_department,etl.invalid_department,2,1
-E,COA - Expenditure Object,,,,,etl.ext_stg_coa_expenditure_object_feed,,,1,1
-E,COA - Expenditure Object,,,,,etl.stg_expenditure_object,etl.archive_expenditure_object,etl.invalid_expenditure_object,2,1
-L,COA - Location,,,,,etl.ext_stg_coa_location_feed,,,1,1
-L,COA - Location,,,,,etl.stg_location,etl.archive_location,etl.invalid_location,2,1
-O,COA -Object Class,,,,,etl.ext_stg_coa_object_class_feed,,,1,1
-O,COA -Object Class,,,,,etl.stg_object_class,etl.archive_object_class,etl.invalid_object_class,2,1
+A,COAAgency,,,,,etl.ext_stg_coa_agency_feed,,,1,0
+A,COAAgency,,,,,etl.stg_agency,etl.archive_agency,etl.invalid_agency,2,0
+D,COADepartment,,,,,etl.ext_stg_coa_department_feed,,,1,1
+D,COADepartment,,,,,etl.stg_department,etl.archive_department,etl.invalid_department,2,1
+E,COAExpenditureObject,,,,,etl.ext_stg_coa_expenditure_object_feed,,,1,1
+E,COAExpenditureObject,,,,,etl.stg_expenditure_object,etl.archive_expenditure_object,etl.invalid_expenditure_object,2,1
+L,COALocation,,,,,etl.ext_stg_coa_location_feed,,,1,1
+L,COALocation,,,,,etl.stg_location,etl.archive_location,etl.invalid_location,2,1
+O,COAObjectClass,,,,,etl.ext_stg_coa_object_class_feed,,,1,1
+O,COAObjectClass,,,,,etl.stg_object_class,etl.archive_object_class,etl.invalid_object_class,2,1
 V,FMSV,,,,,etl.ext_stg_fmsv_data_feed,,,1,1
 V,FMSV,,,V,Vendor,etl.stg_fmsv_vendor,etl.archive_fmsv_vendor,etl.invalid_fmsv_vendor,2,1
 V,FMSV,,,M,Business Type,etl.stg_fmsv_business_type,etl.archive_fmsv_business_type,etl.invalid_fmsv_business_type,3,1
@@ -44,11 +44,11 @@ R,Revenue,,,,,etl.ext_stg_revenue,,,1,2
 R,Revenue,,,,,etl.stg_revenue,etl.archive_revenue,etl.invalid_revenue,2,2
 B,Budget,,,,,etl.ext_stg_budget_feed,,,1,2
 B,Budget,,,,,etl.stg_budget,etl.archive_budget,etl.invalid_budget,2,2
-RY,COA Revenue Category,,,,,etl.ext_stg_coa_revenue_category_feed,,,1,1
-RY,COA Revenue Category,,,,,etl.stg_revenue_category,etl.archive_revenue_category,etl.invalid_revenue_category,2,1
-RC,COA Revenue Class,,,,,etl.ext_stg_coa_revenue_class_feed,,,1,1
-RC,COA Revenue Class,,,,,etl.stg_revenue_class,etl.archive_revenue_class ,etl.invalid_revenue_class ,2,1
-RS,COA Revenue Source,,,,,etl.ext_stg_coa_revenue_source_feed,,,1,2
-RS,COA Revenue Source,,,,,etl.stg_revenue_source,etl.archive_revenue_source ,etl.invalid_revenue_source ,2,2
-BC,COA Budget Code,,,,,etl.ext_stg_coa_budget_code_feed,,,1,1
-BC,COA Budget Code,,,,,etl.stg_budget_code,etl.archive_budget_code,etl.invalid_budget_code,2,1
+RY,COARevenueCategory,,,,,etl.ext_stg_coa_revenue_category_feed,,,1,1
+RY,COARevenueCategory,,,,,etl.stg_revenue_category,etl.archive_revenue_category,etl.invalid_revenue_category,2,1
+RC,COARevenueClass,,,,,etl.ext_stg_coa_revenue_class_feed,,,1,1
+RC,COARevenueClass,,,,,etl.stg_revenue_class,etl.archive_revenue_class ,etl.invalid_revenue_class ,2,1
+RS,COARevenueSource,,,,,etl.ext_stg_coa_revenue_source_feed,,,1,2
+RS,COARevenueSource,,,,,etl.stg_revenue_source,etl.archive_revenue_source ,etl.invalid_revenue_source ,2,2
+BC,COABudgetCode,,,,,etl.ext_stg_coa_budget_code_feed,,,1,1
+BC,COABudgetCode,,,,,etl.stg_budget_code,etl.archive_budget_code,etl.invalid_budget_code,2,1
