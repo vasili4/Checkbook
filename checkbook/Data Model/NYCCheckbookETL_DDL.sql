@@ -3888,3 +3888,84 @@ CREATE EXTERNAL TABLE ext_stg_pension_fund(
 )
 DISTRIBUTED BY (aggregate_table_name);
 
+-------------------------------------------------------------------------------------------------------------------------------------------
+-- Tables to capture malformed records
+CREATE TABLE malformed_coa_agency_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_department_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_expenditure_object_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_location_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_object_class_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_budget_code_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_revenue_category_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_revenue_class_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_coa_revenue_source_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_fmsv_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_mag_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_con_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_fms_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_pms_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_budget_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_revenue(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
