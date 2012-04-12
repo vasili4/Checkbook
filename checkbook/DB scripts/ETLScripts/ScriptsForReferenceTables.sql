@@ -165,6 +165,21 @@ INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values (
 
 INSERT INTO ref_spending_category(spending_category_id, spending_category_code, spending_category_name) values(3,'cc','Capital Contracts'),(1,'c','Contracts'),(4,'o','Others'),(2,'p','Payroll');
 
+INSERT INTO ref_fiscal_period VALUES (1,'July'), 
+				      (2, 'August'),
+				      (3, 'September'),
+				      (4, 'October'),
+				      (5, 'November'),
+				      (6, 'December'),
+				      (7, 'January'),
+				      (8, 'February'),
+				      (9, 'March'),
+				      (10, 'April'),
+				      (11, 'May'),
+				      (12, 'June'),
+				      (13,'Post Adjustment Closing')
+				      ;
+
 -- Dummy values
 insert into ref_award_status(award_status_id) values (1),(2),(3),(4);
 insert into ref_award_level(award_level_code) values ('1'),('2'),('3');
