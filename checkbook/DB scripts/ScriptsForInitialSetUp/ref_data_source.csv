@@ -39,7 +39,7 @@ F,FMS,,,H,Header,etl.stg_fms_header,etl.archive_fms_header,etl.invalid_fms_heade
 F,FMS,,,V,Vendor,etl.stg_fms_vendor,etl.archive_fms_vendor,etl.invalid_fms_vendor,3,4
 F,FMS,,,A,Accounting Line,etl.stg_fms_accounting_line,etl.archive_fms_accounting_line,etl.invalid_fms_accounting_line,4,4
 P,PMS,,,,,etl.ext_stg_pms_data_feed,,,1,4
-P,PMS,,,,,etl.stg_payroll_summary,etl.archive_payroll_summary,etl.invalid_payroll_summary,2,4
+P,PMS,,,,,etl.stg_payroll,etl.archive_payroll,etl.invalid_payroll,2,4
 R,Revenue,,,,,etl.ext_stg_revenue,,,1,2
 R,Revenue,,,,,etl.stg_revenue,etl.archive_revenue,etl.invalid_revenue,2,2
 B,Budget,,,,,etl.ext_stg_budget_feed,,,1,2
