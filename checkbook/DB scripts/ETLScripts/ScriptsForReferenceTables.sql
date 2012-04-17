@@ -213,3 +213,6 @@ insert into ref_expenditure_cancel_type(expenditure_cancel_type_id) values (1),(
 insert into ref_expenditure_cancel_reason(expenditure_cancel_reason_id) values (9),(11);
 */
 
+-----------------------------------------------------------------------------------------------
+/*PMS*/
+INSERT INTO ref_amount_basis(amount_basis_id,amount_basis_name) VALUES (1,'ANNUAL'),(2,'DAILY'),(3,'HOURLY');
