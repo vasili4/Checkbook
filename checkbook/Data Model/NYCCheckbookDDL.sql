@@ -15,9 +15,6 @@ CREATE SEQUENCE seq_ref_business_type_business_type_id;
 CREATE SEQUENCE seq_ref_commodity_type_commodity_type_id;
 CREATE SEQUENCE seq_ref_document_code_document_code_id;
 CREATE SEQUENCE seq_ref_document_function_code_document_function_code_id;
-CREATE SEQUENCE seq_ref_employee_category_employee_category_id;
-CREATE SEQUENCE seq_ref_employee_classification_employee_classification_id;
-CREATE SEQUENCE seq_ref_employee_sub_category_employee_sub_category_id;
 CREATE SEQUENCE seq_ref_event_type_event_type_id;
 CREATE SEQUENCE seq_ref_expenditure_cancel_reason_expenditure_cancel_reason_id;
 CREATE SEQUENCE seq_ref_expenditure_cancel_type_expenditure_cancel_type_id;
@@ -30,14 +27,7 @@ CREATE SEQUENCE seq_ref_funding_class_funding_class_id;
 CREATE SEQUENCE seq_ref_funding_source_funding_source_id;
 CREATE SEQUENCE seq_ref_location_location_id;
 CREATE SEQUENCE seq_ref_object_class_object_class_id;
-CREATE SEQUENCE seq_ref_payroll_frequency_payroll_frequency_id;
-CREATE SEQUENCE seq_ref_payroll_number_payroll_number_id;
-CREATE SEQUENCE seq_ref_payroll_object_payroll_object_id;
-CREATE SEQUENCE seq_ref_payroll_payment_payroll_payment_id;
-CREATE SEQUENCE seq_ref_payroll_reporting_payroll_reporting_id;
-CREATE SEQUENCE seq_ref_pay_type_pay_type_id;
 CREATE SEQUENCE seq_ref_procurement_type_procurement_type_id;
-CREATE SEQUENCE seq_ref_pay_cycle_pay_cycle_id;
 CREATE SEQUENCE seq_ref_revenue_category_revenue_category_id;
 CREATE SEQUENCE seq_ref_revenue_class_revenue_class_id;
 CREATE SEQUENCE seq_ref_revenue_source_revenue_source_id;
@@ -61,6 +51,10 @@ CREATE SEQUENCE seq_ref_location_history_id;
 CREATE SEQUENCE seq_ref_object_class_history_id;
 CREATE SEQUENCE seq_ref_year_year_id;
 CREATE SEQUENCE seq_ref_month_month_id;
+CREATE SEQUENCE seq_payroll_payroll_id;
+CREATE SEQUENCE seq_employee_employee_id;
+CREATE SEQUENCE seq_employee_history_employee_history_id;
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /*Sequences for FMSV data feed*/
@@ -300,29 +294,6 @@ CREATE TABLE ref_document_function_code (
   created_date timestamp 
 ) DISTRIBUTED BY (document_function_code_id);
 
-
-CREATE TABLE ref_employee_category (
-  employee_category_id smallint PRIMARY KEY default nextval('seq_ref_employee_category_employee_category_id'),
-  employee_category_name varchar(50) ,
-  created_date timestamp 
-) DISTRIBUTED BY (employee_category_id);
-
-CREATE TABLE ref_employee_classification (
-  employee_classification_id smallint PRIMARY KEY default nextval('seq_ref_employee_classification_employee_classification_id'),
-  employee_classification_code varchar(20) ,
-  employee_classification_name varchar(50) ,
-  created_date timestamp 
-) DISTRIBUTED BY (employee_classification_id);
- 
- CREATE TABLE ref_employee_sub_category (
-   employee_sub_category_id smallint PRIMARY KEY default nextval('seq_ref_employee_sub_category_employee_sub_category_id'),
-   employee_sub_category_name varchar(50) ,
-   employee_category_id smallint ,
-   created_date timestamp 
-) DISTRIBUTED BY (employee_sub_category_id);
-
- ALTER TABLE  ref_employee_sub_category ADD constraint fk_ref_employee_sub_category_ref_employee_category foreign key (employee_category_id) references ref_employee_category (employee_category_id);
-
 CREATE TABLE ref_event_type (
   event_type_id smallint PRIMARY KEY default nextval('seq_ref_event_type_event_type_id'),
   event_type_code varchar(4) ,
@@ -516,75 +487,6 @@ CREATE TABLE ref_object_class_history (
  ALTER TABLE  ref_object_class_history 	ADD constraint fk_ref_object_class_history_ref_date_1 foreign key (effective_end_date_id) references ref_date (date_id);
  ALTER TABLE  ref_object_class_history 	ADD constraint fk_ref_obj_class_history_ref_obj_class foreign key (object_class_id) references ref_object_class (object_class_id);
  ALTER TABLE  ref_object_class_history ADD constraint fk_ref_object_class_history_etl_data_load foreign key (load_id) references etl_data_load (load_id);
-
- 
-CREATE TABLE ref_payroll_frequency (
-  payroll_frequency_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_payroll_frequency_payroll_frequency_id'),
-  payroll_frequency_code char(1),
-  payroll_frequency_name varchar(50) ,
-  created_date timestamp 
-) DISTRIBUTED BY (payroll_frequency_id);
-
-CREATE TABLE ref_payroll_number (
-    payroll_number_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_payroll_number_payroll_number_id'::regclass) NOT NULL,
-    payroll_number character varying(20),
-    payroll_name character varying(50),
-    agency_id smallint,
-    created_date timestamp without time zone
-) distributed by (payroll_number_id);
-
- ALTER TABLE  ref_payroll_number ADD constraint fk_ref_payroll_number_ref_agency FOREIGN KEY (agency_id) REFERENCES ref_agency(agency_id);
-
-CREATE TABLE ref_payroll_object (
-  payroll_object_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_payroll_object_payroll_object_id'),
-  payroll_object_code varchar(5) ,
-  payroll_object_name varchar(100) ,
-  created_date timestamp 
-) DISTRIBUTED BY (payroll_object_id);
-
-CREATE TABLE ref_payroll_payment_status (
-  payroll_payment_status_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_payroll_payment_payroll_payment_id'),
-  payroll_payment_status_code varchar(1) ,
-  description varchar(50) ,
-  created_date timestamp 
-) DISTRIBUTED BY (payroll_payment_status_id);
-
-CREATE TABLE ref_payroll_reporting (
-  payroll_reporting_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_payroll_reporting_payroll_reporting_id'),
-  payroll_reporting_code varchar(5) ,
-  payroll_reporting_name varchar(100) ,
-  created_date timestamp 
-) DISTRIBUTED BY (payroll_reporting_id);
-
-CREATE TABLE ref_payroll_wage (
-  payroll_wage_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_payroll_reporting_payroll_reporting_id'),
-  payroll_wage_code char(1),
-  payroll_wage_name varchar(50) ,
-  created_date timestamp
-) DISTRIBUTED BY (payroll_wage_id);
-
-CREATE TABLE ref_pay_cycle (
-  pay_cycle_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_pay_cycle_pay_cycle_id'),
-  pay_cycle_code varchar(20) ,
-  description varchar(100) ,
-  created_date timestamp
-) DISTRIBUTED BY (pay_cycle_id);
-
-CREATE TABLE ref_pay_type (
-  pay_type_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_pay_type_pay_type_id'),
-  pay_type_code varchar(5) ,
-  pay_type_name varchar(100) ,
-  balance_number_id smallint ,
-  payroll_reporting_id smallint ,
-  payroll_object_id smallint ,
-  prior_year_payroll_object_id smallint ,
-  fringe_indicator char(1) ,
-  created_date timestamp 
-) DISTRIBUTED BY (pay_type_id);
-
- ALTER TABLE  ref_pay_type ADD constraint fk_ref_pay_type_ref_balance_number foreign key (balance_number_id) references ref_balance_number (balance_number_id);
- ALTER TABLE  ref_pay_type ADD constraint fk_ref_pay_type_ref_payroll_reporting foreign key (payroll_reporting_id) references ref_payroll_reporting (payroll_reporting_id);
- ALTER TABLE  ref_pay_type ADD constraint fk_ref_pay_type_ref_payroll_object foreign key (payroll_object_id) references ref_payroll_object (payroll_object_id);
 
 CREATE TABLE ref_procurement_type (
   procurement_type_id smallint PRIMARY KEY ,
@@ -1500,3 +1402,65 @@ CREATE TABLE aggregateon_spending_vendor_exp_object(
 	check_eft_issued_nyc_year_id smallint,
 	total_spending_amount numeric(16,2) )
 DISTRIBUTED BY (expenditure_object_id);	
+
+CREATE TABLE payroll(
+	payroll_id bigint PRIMARY KEY DEFAULT nextval('seq_payroll_payroll_id'::regclass) NOT NULL,
+	pay_cycle_code CHAR(1),
+	pay_date_id smallint,
+	employee_history_id bigint,
+	payroll_number varchar,
+	job_sequence_number varchar,
+	agency_history_id smallint,
+	fiscal_year smallint,
+	orig_pay_date_id smallint,
+	pay_frequency varchar,
+	department_history_id int,
+	annual_salary numeric(16,2),
+	amount_basis_id smallint,
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay  numeric(16,2) )
+DISTRIBUTED BY (payroll_id);	
+
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_date foreign key (pay_date_id) references ref_date (date_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_employee_history foreign key (employee_history_id) references employee_history (employee_history_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_agency_history foreign key (agency_history_id) references ref_agency_history (agency_history_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_date_1 foreign key (orig_pay_date_id) references ref_date (date_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_department_history foreign key (department_history_id) references ref_department_history (department_history_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_amount_basis foreign key (amount_basis_id) references ref_amount_basis (amount_basis_id);
+
+
+CREATE TABLE ref_amount_basis (
+  amount_basis_id smallint PRIMARY KEY,
+  amount_basis_name varchar(50) ,
+  created_date timestamp 
+) DISTRIBUTED BY (amount_basis_id);
+
+CREATE TABLE employee (
+  employee_id bigint PRIMARY KEY DEFAULT nextval('seq_employee_employee_id'::regclass) NOT NULL,
+  employee_number varchar,
+  first_name varchar,
+  last_name varchar,
+  initial varchar,
+  original_first_name varchar,
+  original_last_name varchar,
+  original_initial varchar,
+  created_date timestamp,
+  updated_date timestamp,
+  created_load_id int,
+  updated_load_id int
+  )
+  DISTRIBUTED BY (employee_id);
+  
+CREATE TABLE employee_history (
+  employee_history_id bigint PRIMARY KEY DEFAULT nextval('seq_employee_history_employee_history_id'::regclass) NOT NULL,
+  employee_id int,
+  first_name varchar,
+  last_name varchar,
+  initial varchar,
+  created_date timestamp,
+  created_load_id int
+  )
+  DISTRIBUTED BY (employee_history_id);
+  ALTER TABLE  employee_history ADD constraint fk_employee_history_employee foreign key (employee_id) references employee (employee_id);
