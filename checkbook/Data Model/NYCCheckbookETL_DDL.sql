@@ -42,6 +42,7 @@ CREATE SEQUENCE seq_stg_budget_code_uniq_id;
 
 CREATE SEQUENCE seq_etl_job_id;
 
+CREATE SEQUENCE seq_stg_pms_uniq_id;
 
 CREATE TABLE ref_data_source (
     data_source_code varchar(2),
@@ -3416,56 +3417,6 @@ ALTER TABLE etl.archive_budget ADD COLUMN load_file_id bigint;
 CREATE TABLE etl.invalid_budget (LIKE etl.archive_budget) DISTRIBUTED BY (uniq_id);
 
 ----------------------------------------------------------------------------------------------------------------
-
-/* PMS data feed */
-
-CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
-	pay_cycle varchar(20),
-	pay_date  varchar(10),
-	pyrl_no   varchar(20),
-	pyrl_desc varchar(50),
-	uoa	 varchar(20),
-	uoa_name varchar(100),
-	fy int,
-	object varchar(4),
-	object_desc varchar(40),
-	agency  varchar(20),
-	agency_name  varchar(50),
-	bud_code varchar(10) ,
-	bud_code_desc  varchar(100),
-	total_amt decimal(15,2),
-	col15 varchar)
- LOCATION (
-  	    'gpfdist://mdw1:8081/datafiles/PMS_feed.txt')
-  	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
- ENCODING 'UTF8';		
- 
- CREATE TABLE stg_payroll_summary(
- 	pay_cycle varchar(20),
- 	pay_date  varchar(10),
- 	pyrl_no   varchar(20),
- 	pyrl_desc varchar(50),
- 	uoa	 varchar(20),
- 	uoa_name varchar(100),
- 	fy int,
- 	object varchar(4),
- 	object_desc varchar(40),
- 	agency  varchar(20),
- 	agency_name  varchar(50),
- 	bud_code varchar(10) ,
- 	bud_code_desc  varchar(100),
- 	total_amt decimal(15,2),
- 	uniq_id bigint default nextval('seq_stg_payroll_summary_uniq_id'),
-	invalid_flag char(1),
-	invalid_reason varchar		);
-
-
-CREATE TABLE archive_payroll_summary (LIKE stg_payroll_summary) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_payroll_summary ADD COLUMN load_file_id bigint;
-
-CREATE TABLE invalid_payroll_summary (LIKE archive_payroll_summary) DISTRIBUTED BY (uniq_id);	
-	
---------------------------------------------------------------------------------------------------------------------------------------
 /* Revenue data feed */
 
 CREATE EXTERNAL TABLE ext_stg_revenue(
@@ -3969,3 +3920,81 @@ CREATE TABLE malformed_revenue(
 	record varchar,
 	load_file_id integer)
 DISTRIBUTED BY (load_file_id);
+
+--------------------------------------------------------------------------------
+/* PMS feed */
+CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
+	pay_cycle_code bpchar,
+	pay_date varchar,
+	employee_number varchar,
+	payroll_number varchar,
+	job_sequence_number varchar,
+	agency_code varchar,
+	fiscal_year varchar,
+	orig_pay_date varchar,
+	pay_frequency varchar,
+	last_name varchar,
+	first_name varchar,
+	initial varchar,
+	department_code varchar,
+	annual_salary varchar,
+	amount_basis varchar,
+	base_pay varchar,
+	overtime_pay varchar,
+	other_payments varchar,
+	gross_pay  varchar )
+LOCATION (
+	    'gpfdist://mdw1:8081/datafiles/PMS_feed.txt')
+	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
+ENCODING 'UTF8';
+
+CREATE TABLE stg_payroll
+(
+	pay_cycle_code CHAR(1),
+	pay_date date,
+	employee_number varchar,
+	payroll_number varchar,
+	job_sequence_number varchar,
+	agency_code varchar,
+	fiscal_year smallint,
+	orig_pay_date date,
+	pay_frequency varchar,
+	last_name varchar,
+	first_name varchar,
+	initial varchar,
+	department_code varchar,
+	annual_salary numeric(16,2),
+	amount_basis VARCHAR,
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay  numeric(16,2),
+	payroll_id bigint,	
+	pay_date_id smallint,
+	agency_history_id smallint,
+	orig_pay_date_id smallint,
+	amount_basis_id smallint,	
+	department_history_id integer,
+	employee_history_id bigint,
+	action_flag char(1),
+	uniq_id bigint DEFAULT nextval('etl.seq_stg_pms_uniq_id'::regclass),
+	invalid_flag character(1),
+	invalid_reason character varying		
+)
+DISTRIBUTED BY (uniq_id);
+
+CREATE TABLE archive_payroll (LIKE stg_payroll) DISTRIBUTED BY (uniq_id);
+ALTER TABLE archive_payroll ADD COLUMN load_file_id bigint;
+
+CREATE TABLE invalid_payroll (LIKE archive_payroll) DISTRIBUTED BY (uniq_id);
+
+CREATE TABLE payroll_id_seq(uniq_id bigint,payroll_id int default nextval('public.seq_payroll_payroll_id'))
+DISTRIBUTED BY (uniq_id);
+
+CREATE TABLE employee_id_seq(employee_number varchar,employee_id bigint default nextval('public.seq_employee_employee_id'))
+DISTRIBUTED BY (employee_number);
+
+CREATE TABLE employee_history_id_seq(employee_number varchar,employee_history_id bigint default nextval('public.seq_employee_history_employee_history_id'))
+DISTRIBUTED BY (employee_number);
+
+--------------------------------------------------------------------------------
