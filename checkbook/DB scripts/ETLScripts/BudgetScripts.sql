@@ -13,7 +13,8 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_fk_budget_values (uniq_id bigint, fund_class_id smallint, agency_history_id smallint, department_history_id integer, 
 						     budget_code_id integer, object_class_history_id integer, updated_date_id smallint,
 						     budget_fiscal_year_id smallint,agency_id smallint,object_class_id integer,department_id integer,
-						     agency_name varchar,department_name varchar,object_class_name varchar,budget_code varchar, budget_name varchar)
+						     agency_name varchar,department_name varchar,object_class_name varchar,budget_code varchar, budget_name varchar,
+						     agency_code varchar,department_code varchar,object_class_code varchar)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:fund_class_id
@@ -24,9 +25,9 @@ BEGIN
 		
 	-- FK:Agency_history_id
 	
-	INSERT INTO tmp_fk_budget_values(uniq_id,agency_history_id,agency_id,agency_name)
+	INSERT INTO tmp_fk_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code)
 	SELECT	a.uniq_id, max(c.agency_history_id)as agency_history_id,max(b.agency_id) as agency_id,
-		max(c.agency_name) as agency_name
+		max(c.agency_name) as agency_name,b.agency_code
 	FROM etl.stg_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1;
@@ -69,8 +70,9 @@ BEGIN
 	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
 
 	RAISE NOTICE '1.3';
-	INSERT INTO tmp_fk_budget_values(uniq_id,agency_history_id,agency_id,agency_name)
-	SELECT	a.uniq_id, max(c.agency_history_id) , max(b.agency_id), max(c.agency_name) as agency_name
+	INSERT INTO tmp_fk_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code)
+	SELECT	a.uniq_id, max(c.agency_history_id) , max(b.agency_id), max(c.agency_name) as agency_name,
+		b.agency_code
 	FROM etl.stg_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
@@ -79,9 +81,9 @@ BEGIN
 	
 	-- FK:department_history_id
 	
-	INSERT INTO tmp_fk_budget_values(uniq_id,department_history_id,department_id,department_name)
+	INSERT INTO tmp_fk_budget_values(uniq_id,department_history_id,department_id,department_name,department_code)
 	SELECT	a.uniq_id, max(e.department_history_id) as department_history_id,max(d.department_id) as department_id,
-		max(e.department_name) as department_name
+		max(e.department_name) as department_name,d.department_code
 	FROM etl.stg_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
 	JOIN ref_fund_class c ON a.fund_class_code = c.fund_class_code
 	JOIN ref_department d ON a.department_code = d.department_code AND b.agency_id = d.agency_id AND c.fund_class_id = d.fund_class_id AND  a.budget_fiscal_year = d.fiscal_year
@@ -145,9 +147,9 @@ BEGIN
 
 	RAISE NOTICE '1.6';
 	
-	INSERT INTO tmp_fk_budget_values(uniq_id,department_history_id,department_id,department_name)
+	INSERT INTO tmp_fk_budget_values(uniq_id,department_history_id,department_id,department_name,department_code)
 	SELECT	a.uniq_id, max(c.department_history_id) ,max(b.department_id) as department_id,
-		max(c.department_name) as department_name
+		max(c.department_name) as department_name,b.department_code
 	FROM etl.stg_budget a JOIN ref_department b  ON a.department_code = b.department_code AND a.budget_fiscal_year = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.agency_code = d.agency_code AND b.agency_id = d.agency_id
@@ -205,9 +207,9 @@ BEGIN
 						
 	-- FK:object_class_history_id
 
-	INSERT INTO tmp_fk_budget_values(uniq_id,object_class_history_id,object_class_id,object_class_name)
+	INSERT INTO tmp_fk_budget_values(uniq_id,object_class_history_id,object_class_id,object_class_name,object_class_code)
 	SELECT	a.uniq_id, max(c.object_class_history_id) as object_class_history_id,max(b.object_class_id) as object_class_id,
-		max(c.object_class_name) as object_class_name
+		max(c.object_class_name) as object_class_name,b.object_class_code
 	FROM etl.stg_budget a JOIN ref_object_class b ON a.object_class_code = b.object_class_code
 		JOIN ref_object_class_history c ON b.object_class_id = c.object_class_id
 	GROUP BY 1;
@@ -251,9 +253,9 @@ BEGIN
 
 	RAISE NOTICE '1.3';
 	
-	INSERT INTO tmp_fk_budget_values(uniq_id,object_class_history_id,object_class_id,object_class_name)
+	INSERT INTO tmp_fk_budget_values(uniq_id,object_class_history_id,object_class_id,object_class_name,object_class_code)
 	SELECT	a.uniq_id, max(c.object_class_history_id) , max(b.object_class_id) as object_class_id,
-		max(c.object_class_name) as object_class_name
+		max(c.object_class_name) as object_class_name,b.object_class_code
 	FROM etl.stg_budget a JOIN ref_object_class b ON a.object_class_code = b.object_class_code
 		JOIN ref_object_class_history c ON b.object_class_id = c.object_class_id
 		JOIN etl.ref_object_class_history_id_seq d ON c.object_class_history_id = d.object_class_history_id
@@ -283,7 +285,10 @@ BEGIN
 		department_name = ct_table.department_name,
 		object_class_name = ct_table.object_class_name,
 		budget_code = ct_table.budget_code,
-		budget_code_name = ct_table.budget_code_name
+		budget_code_name = ct_table.budget_code_name,
+		agency_code = ct_table.agency_code,
+		department_code = ct_table.department_code,
+		object_class_code = ct_table.object_class_code
 	FROM	(SELECT uniq_id, max(fund_class_id) as fund_class_id, 
 				 max(agency_history_id) as agency_history_id,
 				 max(department_history_id) as department_history_id,
@@ -296,6 +301,9 @@ BEGIN
 				 max(object_class_name) as object_class_name,
 				 max(budget_code) as budget_code,
 				 max(budget_code_name) as budget_code_name,
+				 max(agency_code) as agency_code,
+				 max(department_code) as department_code,
+				 max(object_class_code) as object_class_code
 		 FROM	tmp_fk_budget_values
 		 GROUP BY 1) ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
@@ -352,7 +360,8 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_budget_data_to_update(budget_id integer, adopted_amount numeric(20,2), current_budget_amount numeric(20,2), 
 							 pre_encumbered_amount numeric(20,2),  encumbered_amount numeric(20,2), accrued_expense_amount numeric(20,2), 
 							 cash_expense_amount numeric(20,2), post_closing_adjustment_amount numeric(20,2), 	
-							 total_expenditure_amount numeric(20,2), updated_date_id smallint, load_id integer,budget_fiscal_year_id smallint) 
+							 total_expenditure_amount numeric(20,2), updated_date_id smallint, load_id integer,budget_fiscal_year_id smallint,
+							 agency_code varchar,department_code varchar,object_class_code varchar) 
 	DISTRIBUTED BY (budget_id);
 
 	INSERT INTO tmp_budget_data_to_update(budget_id, adopted_amount, current_budget_amount, 
@@ -362,7 +371,8 @@ BEGIN
 	SELECT budget_id, adopted_amount, current_budget_amount, 
 	       pre_encumbered_amount,  encumbered_amount, accrued_expense_amount, 
 	       cash_expense_amount, post_closing_adjustment_amount, 
-	       total_expenditure_amount, updated_date_id, p_load_id_in,budget_fiscal_year_id
+	       total_expenditure_amount, updated_date_id, p_load_id_in,budget_fiscal_year_id,
+	       agency_code,department_code,object_class_code
 	FROM etl.stg_budget 
 	WHERE action_flag = 'U' AND budget_id IS NOT NULL;
 
@@ -378,7 +388,10 @@ BEGIN
 		source_updated_date_id = b.updated_date_id,
 		updated_load_id = b.load_id,
 		updated_date = now()::timestamp,
-		budget_fiscal_year_id = b.budget_fiscal_year_id
+		budget_fiscal_year_id = b.budget_fiscal_year_id,
+		agency_code = b.agency_code,
+		department_code = b.department_code,
+		object_class_code = b.object_class_code
 	FROM 	tmp_budget_data_to_update b
 	WHERE 	a.budget_id = b.budget_id;
 
@@ -390,12 +403,14 @@ BEGIN
 			   object_class_history_id, adopted_amount, current_budget_amount, pre_encumbered_amount, encumbered_amount, 
 			   accrued_expense_amount, cash_expense_amount, post_closing_adjustment_amount, total_expenditure_amount, source_updated_date_id, 
 			   created_load_id, created_date,budget_fiscal_year_id,agency_id,object_class_id ,department_id ,
-			   agency_name,object_class_name,department_name,budget_code,budget_code_name)
+			   agency_name,object_class_name,department_name,budget_code,budget_code_name,
+			   agency_code,department_code,object_class_code)
 	SELECT budget_fiscal_year, fund_class_id, agency_history_id, department_history_id, budget_code_id, 
 		object_class_history_id, adopted_amount, current_budget_amount, pre_encumbered_amount, encumbered_amount, 
 		accrued_expense_amount, cash_expense_amount, post_closing_adjustment_amount, total_expenditure_amount, 
 		updated_date_id , p_load_id_in, now()::timestamp,budget_fiscal_year_id,agency_id,object_class_id ,department_id ,
-		agency_name,object_class_name,department_name,budget_code,budget_code_name
+		agency_name,object_class_name,department_name,budget_code,budget_code_name,
+		agency_code,department_code,object_class_code
 	FROM  etl.stg_budget 
 	WHERE action_flag = 'I' AND budget_id IS NULL;		
 
