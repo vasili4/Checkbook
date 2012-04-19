@@ -33,7 +33,7 @@ SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,"SELECT dep
                      ELSE 0
                   END)
                   AS contract_amount
-          FROM fact_disbursement_line_item a
+          FROM disbursement_line_item_details a
           JOIN ref_fund_class b ON a.fund_class_id = b.fund_class_id 
   GROUP BY 1,2,3,4,5,6,7) X
   GROUP BY 1,2,3,4,5,6"
@@ -55,7 +55,7 @@ SpendingByVendorId,aggregateon_spending_vendor,"SELECT vendor_id, agency_id,
                      ELSE 0
                   END)
                   AS contract_amount
-          FROM    fact_disbursement_line_item a
+          FROM    disbursement_line_item_details a
 GROUP BY 1,2,3,4,5) X
 GROUP BY 1,2,3,4"
 SpendingByContractId,aggregateon_spending_contract,"SELECT a.agreement_id, 
@@ -67,7 +67,7 @@ SpendingByContractId,aggregateon_spending_contract,"SELECT a.agreement_id,
        sum(b.check_amount) AS total_spending_amount,
        MIN(a.maximum_contract_amount) AS totla_contract_amount
   FROM fact_agreement a
-       JOIN fact_disbursement_line_item b
+       JOIN disbursement_line_item_details b
           ON COALESCE(b.master_agreement_id, b.agreement_id) =
                 a.agreement_id
 GROUP BY 1,2,3,4,5,6"
@@ -75,15 +75,15 @@ RevenueByCategoryId,aggregateon_revenue_category,"SELECT b.revenue_category_id, 
        budget_fiscal_year_id, SUM(posting_amount) as posting_amount,
        0 as adopted_budget,
        0 as current_modified_budget
-FROM   fact_revenue a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
+FROM   revenue_details a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
 GROUP BY 1,2,3;"
 RevenueByFundingClassId,aggregateon_revenue_funding_class,"SELECT b.funding_class_id,fiscal_period::smallint,
        a.budget_fiscal_year_id, SUM(posting_amount) as posting_amount,
        0 as adopted_budget,
        0 as current_modified_budget
-FROM   fact_revenue a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
+FROM   revenue_details a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
 GROUP BY 1,2,3;"
 SpendingByVendorExpObject,aggregateon_spending_vendor_exp_object,"SELECT vendor_id,expenditure_object_id,
  check_eft_issued_nyc_year_id AS year_id, SUM(check_amount) as total_spending_amount
- FROM fact_disbursement_line_item
+ FROM disbursement_line_item_details
 GROUP BY 1,2,3;"
