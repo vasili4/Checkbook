@@ -293,7 +293,10 @@ CREATE TABLE budget (
     object_class_name varchar,
     department_name varchar,    
     budget_code varchar,
-    budget_code_name varchar,    
+    budget_code_name varchar,   
+    agency_code varchar,
+    department_code varchar,
+    object_class_code varchar,    
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -408,10 +411,10 @@ CREATE TABLE fact_agreement_accounting_line (
 ) DISTRIBUTED BY (agreement_id);
 
 --
--- Name: fact_disbursement_line_item; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
+-- Name: disbursement_line_item_details; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
-CREATE TABLE fact_disbursement_line_item (
+CREATE TABLE disbursement_line_item_details (
     disbursement_line_item_id bigint,
     disbursement_id integer,
     line_number integer,
@@ -447,14 +450,10 @@ CREATE TABLE fact_disbursement_line_item (
 ) DISTRIBUTED BY (disbursement_line_item_id);
 
 --
--- Name: fact_disbursement_line_item_new; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
+-- Name: revenue_details; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
---
--- Name: fact_revenue; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE fact_revenue
+CREATE TABLE revenue_details
 (	revenue_id bigint,
 	fiscal_year smallint,
 	fiscal_period char(2),

@@ -1121,6 +1121,9 @@ CREATE TABLE budget (
     department_name varchar,
     budget_code varchar,
     budget_code_name varchar,
+    agency_code varchar,
+    department_code varchar,
+    object_class_code varchar,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -1188,7 +1191,7 @@ CREATE TABLE fact_agreement_accounting_line
 	line_amount numeric(16,2)	
 ) DISTRIBUTED BY (agreement_id);
 
-CREATE TABLE fact_revenue
+CREATE TABLE revenue_details
 (	revenue_id bigint,
 	fiscal_year smallint,
 	fiscal_period char(2),
@@ -1291,7 +1294,7 @@ CREATE TABLE disbursement_line_item (LIKE all_disbursement_line_item) DISTRIBUTE
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_location_history foreign key (location_history_id) references ref_location_history (location_history_id);
 
 
-CREATE TABLE fact_disbursement_line_item(
+CREATE TABLE disbursement_line_item_details(
 	disbursement_line_item_id bigint,
 	disbursement_id integer,
 	line_number integer,
