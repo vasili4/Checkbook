@@ -799,7 +799,7 @@ BEGIN
 	FROM	tmp_do1_fms_line_item b
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
-	UPDATE fact_disbursement_line_item a
+	UPDATE disbursement_line_item_details a
 	SET	agreement_id = b.agreement_id
 	FROM	tmp_do1_fms_line_item b
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
@@ -1022,13 +1022,13 @@ BEGIN
 
 	INSERT INTO tmp_fact_agreement_ytd_spent_do1
 	SELECT a.agreement_id, SUM(check_amount)
-	FROM fact_disbursement_line_item a JOIN tmp_do1_con b
+	FROM disbursement_line_item_details a JOIN tmp_do1_con b
 		ON a.agreement_id = b.agreement_id
 	GROUP BY 1;
 
 	INSERT INTO tmp_fact_agreement_ytd_spent_do1
 	SELECT a.master_agreement_id, SUM(check_amount)
-	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT master_agreement_id
+	FROM disbursement_line_item_details a JOIN (SELECT DISTINCT master_agreement_id
 					    FROM   tmp_do1_con b JOIN agreement c 
 					    ON b.agreement_id = c.agreement_id
 					    WHERE COALESCE(c.master_agreement_id,0) <> 0) d

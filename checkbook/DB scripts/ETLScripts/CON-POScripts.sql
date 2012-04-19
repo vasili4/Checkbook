@@ -942,7 +942,7 @@ BEGIN
 	FROM	tmp_po_fms_line_item b
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
-	UPDATE fact_disbursement_line_item a
+	UPDATE disbursement_line_item_details a
 	SET	agreement_id = b.agreement_id,
 		maximum_contract_amount = b.maximum_contract_amount
 	FROM	tmp_po_fms_line_item b
@@ -1250,7 +1250,7 @@ BEGIN
 
 	INSERT INTO tmp_fact_agreement_ytd_spent_po
 	SELECT a.agreement_id, SUM(check_amount)
-	FROM fact_disbursement_line_item a JOIN tmp_po_con b
+	FROM disbursement_line_item_details a JOIN tmp_po_con b
 		ON a.agreement_id = b.agreement_id
 	GROUP BY 1;
 

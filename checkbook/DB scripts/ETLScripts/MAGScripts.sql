@@ -829,7 +829,7 @@ BEGIN
 	FROM	tmp_mag_fms_line_item b
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
-	UPDATE fact_disbursement_line_item a
+	UPDATE disbursement_line_item_details a
 	SET	master_agreement_id = b.agreement_id,
 		maximum_spending_limit = b.maximum_spending_limit
 	FROM	tmp_mag_fms_line_item b
@@ -841,10 +841,10 @@ BEGIN
 	
 	INSERT INTO tmp_mag_fms_line_item
 	SELECT disbursement_line_item_id, b.new_agreement_id,c.ma_prch_lmt_am
-	FROM fact_disbursement_line_item a JOIN tmp_mag_deletion b ON a.master_agreement_id = b.agreement_id
+	FROM disbursement_line_item_details a JOIN tmp_mag_deletion b ON a.master_agreement_id = b.agreement_id
 		JOIN etl.stg_mag_header c ON b.uniq_id = c.uniq_id;
 		
-	UPDATE fact_disbursement_line_item a
+	UPDATE disbursement_line_item_details a
 	SET	master_agreement_id = b.agreement_id,
 		maximum_spending_limit = b.maximum_spending_limit
 	FROM	tmp_mag_fms_line_item b
@@ -1069,7 +1069,7 @@ BEGIN
 
 	INSERT INTO tmp_fact_agreement_ytd_spent_mag
 	SELECT master_agreement_id, SUM(check_amount)
-	FROM fact_disbursement_line_item a JOIN tmp_mag_con b
+	FROM disbursement_line_item_details a JOIN tmp_mag_con b
 		ON a.master_agreement_id = b.agreement_id
 	GROUP BY 1;
 

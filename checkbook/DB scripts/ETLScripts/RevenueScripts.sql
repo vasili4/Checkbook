@@ -778,7 +778,7 @@ BEGIN
 	VALUES(p_load_file_id_in,'R',l_count,'# of records inserted in budget ');
 		
 	/******************
-	INSERT into fact_revenue(revenue_id,fiscal_year,fiscal_period,posting_amount,
+	INSERT into revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,
 				revenue_category_id,revenue_source_id,fiscal_year_id,agency_id,
 				department_id,revenue_class_id,fund_class_id,funding_class_id,
 				budget_code_id,budget_fiscal_year_id,agency_name,revenue_category_name,

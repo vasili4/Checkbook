@@ -1164,10 +1164,10 @@ CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_load_id_in bigint) RETURNS I
 $$
 DECLARE
 BEGIN
-	-- Inserting into the fact_disbursement_line_item
+	-- Inserting into the disbursement_line_item_details
 
 	RAISE NOTICE 'FMS 16';
-	INSERT INTO fact_disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
+	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
 						check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
 						agreement_id,master_agreement_id,fund_class_id,
 						check_amount,agency_id,expenditure_object_id,
@@ -1210,10 +1210,10 @@ BEGIN
 	
 	INSERT INTO tmp_agreement_con
 	SELECT a.disbursement_line_item_id, b.agreement_id,b.master_agreement_id,b.maximum_contract_amount, b.master_agreement_yn,b.description,b.document_id
-	FROM fact_disbursement_line_item a JOIN fact_agreement b ON a.agreement_id = b.agreement_id
+	FROM disbursement_line_item_details a JOIN fact_agreement b ON a.agreement_id = b.agreement_id
 		JOIN etl.seq_disbursement_line_item_id c ON a.disbursement_line_item_id = c.disbursement_line_item_id;
 
-	UPDATE fact_disbursement_line_item a
+	UPDATE disbursement_line_item_details a
 	SET	master_agreement_id = (CASE WHEN b.master_agreement_yn = 'Y' THEN b.agreement_id ELSE b.master_agreement_id END),
 		agreement_id = (CASE WHEN b.master_agreement_yn = 'Y' THEN NULL ELSE a.agreement_id END),
 		maximum_contract_amount =(CASE WHEN b.master_agreement_yn = 'N' THEN b.maximum_contract_amount ELSE NULL END),
@@ -1229,10 +1229,10 @@ BEGIN
 	
 	INSERT INTO tmp_agreement_con(disbursement_line_item_id,master_agreement_id,maximum_contract_amount)
 	SELECT a.disbursement_line_item_id, b.agreement_id,b.maximum_contract_amount
-	FROM	fact_disbursement_line_item a JOIN fact_agreement b ON	a.master_agreement_id = b.agreement_id AND COALESCE(a.agreement_id) > 0
+	FROM	disbursement_line_item_details a JOIN fact_agreement b ON	a.master_agreement_id = b.agreement_id AND COALESCE(a.agreement_id) > 0
 		JOIN etl.seq_disbursement_line_item_id c ON a.disbursement_line_item_id = c.disbursement_line_item_id;
 
-	UPDATE fact_disbursement_line_item a
+	UPDATE disbursement_line_item_details a
 	SET maximum_spending_limit = b.maximum_contract_amount
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
@@ -1244,16 +1244,16 @@ BEGIN
 	
 	INSERT INTO tmp_fact_agreement_ytd_spent_1
 	SELECT a.agreement_id, SUM(check_amount)
-	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT agreement_id
-					    FROM   fact_disbursement_line_item b JOIN etl.seq_disbursement_line_item_id c 
+	FROM disbursement_line_item_details a JOIN (SELECT DISTINCT agreement_id
+					    FROM   disbursement_line_item_details b JOIN etl.seq_disbursement_line_item_id c 
 					    ON b.disbursement_line_item_id = c.disbursement_line_item_id) d
 		ON a.agreement_id = d.agreement_id
 	GROUP BY 1;
 	
 	INSERT INTO tmp_fact_agreement_ytd_spent_1
 	SELECT a.master_agreement_id, SUM(check_amount)
-	FROM fact_disbursement_line_item a JOIN (SELECT DISTINCT master_agreement_id
-					    FROM   fact_disbursement_line_item b JOIN etl.seq_disbursement_line_item_id c 
+	FROM disbursement_line_item_details a JOIN (SELECT DISTINCT master_agreement_id
+					    FROM   disbursement_line_item_details b JOIN etl.seq_disbursement_line_item_id c 
 					    ON b.disbursement_line_item_id = c.disbursement_line_item_id
 					    WHERE COALESCE(b.master_agreement_id,0) <> 0) d
 		ON a.master_agreement_id = d.master_agreement_id
