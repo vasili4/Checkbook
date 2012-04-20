@@ -1,12 +1,16 @@
 #!/bin/sh
+
+cd /home/gpadmin/athiagarajan/NYC/
+
 echo $1
+echo $2
 
 rm -f goodfile.txt
 rm -f badfile.txt
 dirName="/home/gpadmin/athiagarajan/NYC/datafiles/"
 fileName=$dirName$2
 if [ $1 == "COAAgency" ] ; then	
-	./removeMalformedAgencyRecords.sh 
+	./removeMalformedAgencyRecords.sh $fileName
 	
 elif [ $1 == "COABudgetCode" ] ; then
 	./removeMalformedBudgetCodeRecords.sh $fileName
