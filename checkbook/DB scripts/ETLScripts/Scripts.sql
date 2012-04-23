@@ -5,6 +5,7 @@
 	isEligibleForConsumption
 	errorhandler
 	refreshaggregates
+	grant access
 */
 
 CREATE FUNCTION concat(text, text) RETURNS text
@@ -1019,3 +1020,55 @@ BEGIN
 					'vendor_history'];
 END;
 $$ language plpgsql;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.grantaccess(username character varying, privilege character varying)
+  RETURNS integer AS $$
+DECLARE
+	l_etl_tables RECORD;
+	l_public_tables RECORD;
+	l_grant_str VARCHAR;
+BEGIN
+
+	For l_etl_tables IN 	SELECT  a.relname 
+			FROM pg_class a , 
+			pg_namespace b where a.relnamespace = b.oid and b.nspname='etl'	and relkind <> 'i'		      
+	
+	LOOP
+
+		l_grant_str := 'GRANT ' || privilege || ' ON etl.' || l_etl_tables.relname || ' TO '  || username ;	
+
+		RAISE notice 'l_grant_str %',l_grant_str;
+		
+		EXECUTE l_grant_str;
+
+	END LOOP;
+
+	For l_public_tables IN 	SELECT  a.relname 
+			FROM pg_class a , 
+			pg_namespace b where a.relnamespace = b.oid and b.nspname='public'	and relkind <> 'i'	
+
+
+	LOOP
+
+		l_grant_str := 'GRANT ' || privilege || ' ON public.' || l_public_tables.relname || ' TO '  || username ;	
+
+		RAISE notice 'l_grant_str %',l_grant_str;
+		
+		EXECUTE l_grant_str;
+
+	END LOOP;
+	
+	
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in grantaccess';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+END;
+
+$$  LANGUAGE plpgsql ;
