@@ -475,7 +475,13 @@ CREATE TABLE revenue_details
 	department_name varchar,
 	revenue_class_name varchar,
 	fund_class_name varchar,
-	funding_class_name varchar	
+	funding_class_name varchar,
+	agency code varchar,
+	revenue_class_code varchar,
+	fund_class_code varchar,
+	funding_class_code varchar,
+	revenue_category_code varchar,
+	revenue_source_code varchar
 ) DISTRIBUTED BY (revenue_id);
 
 --
