@@ -563,7 +563,13 @@ CREATE EXTERNAL WEB TABLE revenue_details__0 (
 	department_name varchar,
 	revenue_class_name varchar,
 	fund_class_name varchar,
-	funding_class_name varchar		
+	funding_class_name varchar,
+	agency code varchar,
+	revenue_class_code varchar,
+	fund_class_code varchar,
+	funding_class_code varchar,
+	revenue_category_code varchar,
+	revenue_source_code varchar
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -576,7 +582,10 @@ CREATE VIEW revenue_details AS
     SELECT revenue_details__0.revenue_id, revenue_details__0.fiscal_year, revenue_details__0.fiscal_period, revenue_details__0.posting_amount, revenue_details__0.revenue_category_id, revenue_details__0.revenue_source_id,revenue_details__0.fiscal_year_id ,
     revenue_details__0.agency_id ,revenue_details__0.department_id , revenue_details__0.revenue_class_id , revenue_details__0.fund_class_id , revenue_details__0.funding_class_id , 
     revenue_details__0.budget_code_id,revenue_details__0.budget_fiscal_year_id,revenue_details__0.agency_name, revenue_details__0.revenue_category_name,revenue_details__0.revenue_source_name,
-    revenue_details__0.budget_fiscal_year,revenue_details__0.department_name,revenue_details__0.revenue_class_name,revenue_details__0.fund_class_name,revenue_details__0.funding_class_name FROM  ONLY revenue_details__0;
+    revenue_details__0.budget_fiscal_year,revenue_details__0.department_name,revenue_details__0.revenue_class_name,revenue_details__0.fund_class_name,revenue_details__0.funding_class_name 
+    revenue_details__0.agency_code,revenue_details__0.revenue_class_code,revenue_details__0.fund_class_code,revenue_details__0.funding_class_code,revenue_details__0.revenue_category_code,
+    revenue_details__0.revenue_source_code
+    FROM  ONLY revenue_details__0;
 
 --
 -- Name: history_agreement__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
