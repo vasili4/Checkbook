@@ -1213,9 +1213,14 @@ CREATE TABLE revenue_details
 	department_name varchar,
 	revenue_class_name varchar,
 	fund_class_name varchar,
-	funding_class_name varchar	
+	funding_class_name varchar,
+	agency_code varchar,
+	revenue_class_code varchar,
+	fund_class_code varchar,
+	funding_class_code varchar,
+	revenue_category_code varchar,
+	revenue_source_code varchar
 ) DISTRIBUTED BY (revenue_id);
-
 
 ALTER TABLE  fact_revenue ADD CONSTRAINT fk_fact_revenue_ref_revenue_category FOREIGN KEY (revenue_category_id) REFERENCES ref_revenue_category(revenue_category_id);
 ALTER TABLE  fact_revenue ADD CONSTRAINT fk_fact_revenue_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
