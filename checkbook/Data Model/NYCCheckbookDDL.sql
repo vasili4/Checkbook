@@ -1305,12 +1305,14 @@ CREATE TABLE disbursement_line_item_details(
 	line_number integer,
 	check_eft_issued_date_id smallint,
 	check_eft_issued_nyc_year_id smallint,
+	fiscal_year smallint,
 	check_eft_issued_cal_month_id smallint,
 	agreement_id bigint,
 	master_agreement_id bigint,
 	fund_class_id smallint,
 	check_amount numeric(16,2),
 	agency_id smallint,
+	agency_code varchar(20),
 	expenditure_object_id integer,
 	vendor_id integer,
 	department_id integer,
@@ -1321,18 +1323,23 @@ CREATE TABLE disbursement_line_item_details(
 	check_eft_issued_date date,
 	agency_name varchar(50),
 	location_name varchar,
+	location_code varchar(4),
 	department_name varchar(100),
+	department_code varchar(20),
 	expenditure_object_name varchar(40),
+	expenditure_object_code varchar(4),
 	budget_code_id integer,
+	budget_code varchar(10),
 	budget_name varchar(60),
 	contract_number varchar,
 	purpose varchar,
 	reporting_code varchar(15),
 	location_id integer,
 	fund_class_name varchar(50),
+	fund_class_code varchar(5),
 	spending_category_id smallint,
 	spending_category_name varchar
-)
+	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
 
