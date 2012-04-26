@@ -414,40 +414,49 @@ CREATE TABLE fact_agreement_accounting_line (
 -- Name: disbursement_line_item_details; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
-CREATE TABLE disbursement_line_item_details (
-    disbursement_line_item_id bigint,
-    disbursement_id integer,
-    line_number integer,
-    check_eft_issued_date_id smallint,
-    check_eft_issued_nyc_year_id smallint,
-    check_eft_issued_cal_month_id smallint,
-    agreement_id bigint,
-    master_agreement_id bigint,
-    fund_class_id smallint,
-    check_amount numeric(16,2),
-    agency_id smallint,
-    expenditure_object_id integer,
-    vendor_id integer,
-    department_id integer,
-    maximum_contract_amount numeric(16,2),
-    maximum_spending_limit numeric(16,2),
+CREATE TABLE disbursement_line_item_details(
+	disbursement_line_item_id bigint,
+	disbursement_id integer,
+	line_number integer,
+	check_eft_issued_date_id smallint,
+	check_eft_issued_nyc_year_id smallint,
+	fiscal_year smallint,
+	check_eft_issued_cal_month_id smallint,
+	agreement_id bigint,
+	master_agreement_id bigint,
+	fund_class_id smallint,
+	check_amount numeric(16,2),
+	agency_id smallint,
+	agency_code varchar(20),
+	expenditure_object_id integer,
+	vendor_id integer,
+	department_id integer,
+	maximum_contract_amount numeric(16,2),
+	maximum_spending_limit numeric(16,2),
 	document_id varchar(20),
 	vendor_name varchar,
 	check_eft_issued_date date,
 	agency_name varchar(50),
 	location_name varchar,
+	location_code varchar(4),
 	department_name varchar(100),
+	department_code varchar(20),
 	expenditure_object_name varchar(40),
+	expenditure_object_code varchar(4),
 	budget_code_id integer,
+	budget_code varchar(10),
 	budget_name varchar(60),
 	contract_number varchar,
 	purpose varchar,
 	reporting_code varchar(15),
 	location_id integer,
 	fund_class_name varchar(50),
+	fund_class_code varchar(5),
 	spending_category_id smallint,
-	spending_category_name varchar	
-) DISTRIBUTED BY (disbursement_line_item_id);
+	spending_category_name varchar
+	)
+DISTRIBUTED BY (disbursement_line_item_id);
+
 
 --
 -- Name: revenue_details; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
