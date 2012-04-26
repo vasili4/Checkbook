@@ -1168,22 +1168,22 @@ BEGIN
 
 	RAISE NOTICE 'FMS 16';
 	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
-						check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
+						check_eft_issued_nyc_year_id,fiscal_year, check_eft_issued_cal_month_id,
 						agreement_id,master_agreement_id,fund_class_id,
-						check_amount,agency_id,expenditure_object_id,
+						check_amount,agency_id,agency_code,expenditure_object_id,
 						vendor_id,maximum_contract_amount,maximum_spending_limit,department_id,						
 						document_id,vendor_name,check_eft_issued_date,agency_name,location_name,
-						department_name,expenditure_object_name,budget_code_id,
-						budget_name,reporting_code,location_id ,fund_class_name,
+						department_name,department_code,expenditure_object_name,expenditure_object_code,
+						budget_code_id,budget_code,budget_name,reporting_code,location_id,location_code,fund_class_name,fund_class_code,
 						spending_category_id,spending_category_name)
 	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
-		f.nyc_year_id,f.calendar_month_id,
+		f.nyc_year_id,l.year_id,f.calendar_month_id,
 		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
-		b.check_amount,c.agency_id,d.expenditure_object_id,
+		b.check_amount,c.agency_id,m.agency_code,d.expenditure_object_id,
 		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit, g.department_id,
 		a.document_id,COALESCE(e.legal_name,e.alias_name) as vendor_name,f.date,c.agency_name,COALESCE(i.location_short_name,i.location_name),
-		g.department_name,d.expenditure_object_name,j.budget_code_id,
-		j.budget_code_name,b.reporting_code,i.location_id,k.fund_class_name,
+		g.department_name,o.department_code,d.expenditure_object_name,p.expenditure_object_code,
+		j.budget_code_id,j.budget_code,j.budget_code_name,b.reporting_code,i.location_id,n.location_code,k.fund_class_name,k.fund_class_code,
 		(CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code = '400' THEN 3
 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code <> '400' THEN 1
 		      ELSE 4
@@ -1192,13 +1192,18 @@ BEGIN
 		 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code <> '400' THEN 'Contracts'
 		 		      ELSE 'Others'
 		 END) as spending_category_name
-	FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
+		FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
 			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
+			JOIN ref_agency m on c.agency_id = m.agency_id
 			JOIN ref_expenditure_object_history d ON b.expenditure_object_history_id = d.expenditure_object_history_id
+			JOIN ref_expenditure_object p on d.expenditure_object_id = p.expenditure_object_id
 			JOIN vendor_history e ON a.vendor_history_id = e.vendor_history_id
 			JOIN ref_date f ON a.check_eft_issued_date_id = f.date_id
+			JOIN ref_year l on f.nyc_year_id = l.year_id
 			JOIN ref_department_history g ON b.department_history_id = g.department_history_id
+			JOIN ref_department o on g.department_id = o.department_id
 			JOIN ref_location_history i ON b.location_history_id = i.location_history_id
+			JOIN ref_location  n ON i.location_id = n.location_id
 			LEFT JOIN ref_budget_code j ON j.budget_code_id = b.budget_code_id
 			JOIN ref_fund_class k ON k.fund_class_id = b.fund_class_id
 	WHERE a.load_id = p_load_id_in;
