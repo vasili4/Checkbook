@@ -248,31 +248,13 @@ BEGIN
 	
 	-- FK: payroll_id
 	
-	INSERT INTO tmp_fk_pms_values(uniq_id,payroll_id,action_flag)
-	SELECT a.uniq_id,b.payroll_id,'U' as action_flag
-	FROM	etl.stg_payroll a 
-		JOIN (SELECT uniq_id,
-				max(pay_date_id )as pay_date_id ,
-				max(agency_history_id )as agency_history_id ,
-				max(orig_pay_date_id )as orig_pay_date_id ,
-				max(department_history_id )as department_history_id ,
-				max(amount_basis_id) as amount_basis_id,
-				max(employee_history_id) as employee_history_id
-			FROM	tmp_fk_pms_values
-			GROUP	BY 1) ct_table ON a.uniq_id = ct_table.uniq_id
-		JOIN payroll b ON ct_table.employee_history_id = b.employee_history_id 	AND ct_table.pay_date_id=b.pay_date_id
-				  AND ct_table.agency_history_id = b.agency_history_id AND a.pay_cycle_code = b.pay_cycle_code;
-		
-	RAISE NOTICE '1.8';
 	
 	TRUNCATE etl.payroll_id_seq;
 	
 	INSERT INTO etl.payroll_id_seq(uniq_id)
 	SELECT DISTINCT a.uniq_id
-	FROM 	etl.stg_payroll a join (SELECT uniq_id
-					FROM tmp_fk_pms_values
-					GROUP BY 1
-					HAVING max(payroll_id) is null) b on a.uniq_id=b.uniq_id;
+	FROM 	etl.stg_payroll a 
+	
 	RAISE NOTICE '1.8.1';
 	
 	INSERT INTO tmp_fk_pms_values(uniq_id,payroll_id,action_flag)
@@ -336,46 +318,6 @@ BEGIN
 	IF l_fk_update <> 1 THEN
 		RETURN -1;
 	END IF;
-	
-	CREATE TEMPORARY TABLE tmp_payroll_update(payroll_id bigint, pay_cycle_code CHAR(1), pay_date_id smallint, employee_history_id bigint,
-						  payroll_number varchar, job_sequence_number varchar ,agency_history_id smallint,fiscal_year smallint,
-						  orig_pay_date_id smallint,pay_frequency varchar,department_history_id int,annual_salary numeric(16,2),
-						  amount_basis_id smallint,base_pay numeric(16,2),overtime_pay numeric(16,2),other_payments numeric(16,2),
-						  gross_pay numeric(16,2))
-	DISTRIBUTED BY (payroll_id);
-	
-	INSERT INTO tmp_payroll_update
-	SELECT payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
-	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,
-	       orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
-	       amount_basis_id,base_pay,overtime_pay,other_payments,
-	       gross_pay
-	FROM   etl.stg_payroll
-	WHERE  action_flag = 'U';
-	
-	UPDATE payroll a
-	SET     pay_cycle_code = b.pay_cycle_code,
-		pay_date_id = b.pay_date_id,
-		employee_history_id = b.employee_history_id,
-		payroll_number = b.payroll_number,
-		job_sequence_number = b.job_sequence_number,
-		agency_history_id = b.agency_history_id,
-		fiscal_year = b.fiscal_year,
-		orig_pay_date_id = b.orig_pay_date_id,
-		pay_frequency = b.pay_frequency,
-		department_history_id = b.department_history_id,
-		annual_salary = b.annual_salary,
-		amount_basis_id = b.amount_basis_id,
-		base_pay = b.base_pay,
-		overtime_pay = b.overtime_pay,
-		other_payments = b.other_payments,
-		gross_pay = b.gross_pay
-	FROM	tmp_payroll_update b
-	WHERE 	a.payroll_id = b.payroll_id;
-	
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'P',l_count,'# of modified PMS records');
 		
 	INSERT INTO payroll(payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,
