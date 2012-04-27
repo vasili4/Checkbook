@@ -74,9 +74,6 @@ END;
 $$
     LANGUAGE plpgsql;
 
-
-ALTER FUNCTION public.grantaccess(username character varying, privilege character varying) OWNER TO athiagarajan;
-
 --
 -- Name: address; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
@@ -1581,10 +1578,62 @@ CREATE TABLE vendor_history (
     legal_name character varying(60),
     alias_name character varying(60),
     miscellaneous_vendor_flag bit(1),
-    vendor_sub_code integer DEFAULT nextval('seq_vendor_vendor_sub_code'::regclass),
+    vendor_sub_code integer,
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) DISTRIBUTED BY (vendor_history_id);
 
+CREATE TABLE ref_amount_basis (
+  amount_basis_id smallint,
+  amount_basis_name varchar(50) ,
+  created_date timestamp 
+) DISTRIBUTED BY (amount_basis_id);
 
+CREATE TABLE employee (
+  employee_id bigint,
+  employee_number varchar,
+  first_name varchar,
+  last_name varchar,
+  initial varchar,
+  original_first_name varchar,
+  original_last_name varchar,
+  original_initial varchar,
+  created_date timestamp,
+  updated_date timestamp,
+  created_load_id int,
+  updated_load_id int
+  )
+  DISTRIBUTED BY (employee_id);
+  
+CREATE TABLE employee_history (
+  employee_history_id bigint,
+  employee_id int,
+  first_name varchar,
+  last_name varchar,
+  initial varchar,
+  created_date timestamp,
+  created_load_id int
+  )
+  DISTRIBUTED BY (employee_history_id);
+
+
+CREATE TABLE payroll(
+	payroll_id bigint,
+	pay_cycle_code CHAR(1),
+	pay_date_id smallint,
+	employee_history_id bigint,
+	payroll_number varchar,
+	job_sequence_number varchar,
+	agency_history_id smallint,
+	fiscal_year smallint,
+	orig_pay_date_id smallint,
+	pay_frequency varchar,
+	department_history_id int,
+	annual_salary numeric(16,2),
+	amount_basis_id smallint,
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay  numeric(16,2) )
+DISTRIBUTED BY (payroll_id);	

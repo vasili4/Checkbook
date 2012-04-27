@@ -908,35 +908,6 @@ CREATE VIEW master_agreement AS
     SELECT master_agreement__0.master_agreement_id, master_agreement__0.document_code_id, master_agreement__0.agency_history_id, master_agreement__0.document_id, master_agreement__0.document_version, master_agreement__0.tracking_number, master_agreement__0.record_date_id, master_agreement__0.budget_fiscal_year, master_agreement__0.document_fiscal_year, master_agreement__0.document_period, master_agreement__0.description, master_agreement__0.actual_amount, master_agreement__0.total_amount, master_agreement__0.replacing_master_agreement_id, master_agreement__0.replaced_by_master_agreement_id, master_agreement__0.award_status_id, master_agreement__0.procurement_id, master_agreement__0.procurement_type_id, master_agreement__0.effective_begin_date_id, master_agreement__0.effective_end_date_id, master_agreement__0.reason_modification, master_agreement__0.source_created_date_id, master_agreement__0.source_updated_date_id, master_agreement__0.document_function_code_id, master_agreement__0.award_method_id, master_agreement__0.agreement_type_id, master_agreement__0.award_category_id_1, master_agreement__0.award_category_id_2, master_agreement__0.award_category_id_3, master_agreement__0.award_category_id_4, master_agreement__0.award_category_id_5, master_agreement__0.number_responses, master_agreement__0.location_service, master_agreement__0.location_zip, master_agreement__0.borough_code, master_agreement__0.block_code, master_agreement__0.lot_code, master_agreement__0.council_district_code, master_agreement__0.vendor_history_id, master_agreement__0.vendor_preference_level, master_agreement__0.board_approved_award_no, master_agreement__0.board_approved_award_date_id, master_agreement__0.original_contract_amount, master_agreement__0.oca_number, master_agreement__0.original_term_begin_date_id, master_agreement__0.original_term_end_date_id, master_agreement__0.registered_date_id, master_agreement__0.maximum_amount, master_agreement__0.maximum_spending_limit, master_agreement__0.award_level_id, master_agreement__0.contract_class_code, master_agreement__0.number_solicitation, master_agreement__0.document_name,master_agreement__0.privacy_flag, master_agreement__0.created_load_id,master_agreement__0.updated_load_id, master_agreement__0.created_date, master_agreement__0.updated_date FROM ONLY master_agreement__0;
 
 --
--- Name: payroll_summary__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE payroll_summary__0 (
-    payroll_summary_id bigint,
-    agency_history_id smallint,
-    pay_cycle_id smallint,
-    expenditure_object_history_id integer,
-    payroll_number_id smallint,
-    department_history_id integer,
-    fiscal_year smallint,
-    budget_code_id integer,
-    total_amount numeric,
-    pay_date_id smallint,
-    load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll_summary to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: payroll_summary; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW payroll_summary AS
-    SELECT payroll_summary__0.payroll_summary_id, payroll_summary__0.agency_history_id, payroll_summary__0.pay_cycle_id, payroll_summary__0.expenditure_object_history_id, payroll_summary__0.payroll_number_id, payroll_summary__0.department_history_id, payroll_summary__0.fiscal_year, payroll_summary__0.budget_code_id, payroll_summary__0.total_amount, payroll_summary__0.pay_date_id, payroll_summary__0.load_id, payroll_summary__0.created_date, payroll_summary__0.updated_date FROM ONLY payroll_summary__0;
-
---
 -- Name: ref_address_type__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
 --
 
@@ -1342,65 +1313,6 @@ CREATE VIEW ref_document_function_code AS
     SELECT ref_document_function_code__0.document_function_code_id, ref_document_function_code__0.document_function_name, ref_document_function_code__0.created_date FROM ONLY ref_document_function_code__0;
 
 --
--- Name: ref_employee_category__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_employee_category__0 (
-    employee_category_id smallint,
-    employee_category_name character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_employee_category to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_employee_category; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_employee_category AS
-    SELECT ref_employee_category__0.employee_category_id, ref_employee_category__0.employee_category_name, ref_employee_category__0.created_date FROM ONLY ref_employee_category__0;
-
---
--- Name: ref_employee_classification__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_employee_classification__0 (
-    employee_classification_id smallint,
-    employee_classification_code character varying,
-    employee_classification_name character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_employee_classification to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_employee_classification; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_employee_classification AS
-    SELECT ref_employee_classification__0.employee_classification_id, ref_employee_classification__0.employee_classification_code, ref_employee_classification__0.employee_classification_name, ref_employee_classification__0.created_date FROM ONLY ref_employee_classification__0;
-
---
--- Name: ref_employee_sub_category__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_employee_sub_category__0 (
-    employee_sub_category_id smallint,
-    employee_sub_category_name character varying,
-    employee_category_id smallint,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_employee_sub_category to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_employee_sub_category; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_employee_sub_category AS
-    SELECT ref_employee_sub_category__0.employee_sub_category_id, ref_employee_sub_category__0.employee_sub_category_name, ref_employee_sub_category__0.employee_category_id, ref_employee_sub_category__0.created_date FROM ONLY ref_employee_sub_category__0;
-
---
 -- Name: ref_event_type__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
 --
 
@@ -1776,7 +1688,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_object_class AS
-    SELECT ref_object_class__0.object_class_id, ref_object_class__0.object_class_code, ref_object_class__0.object_class_name, ref_object_class__0.object_class_short_name, ref_object_class__0.active_flag, ref_object_class__0.effective_begin_date_id, ref_object_class__0.effective_end_date_id, ref_object_class__0.budget_allowed_flag, ref_object_class__0.description, ref_object_class__0.source_updated_date, ref_object_class__0.intra_city_flag, ref_object_class__0.contracts_positions_flag, ref_object_class__0.payroll_type, ref_object_class__0.extended_description, ref_object_class__0.related_object_class_code, ref_object_class__0.original_object_class_name, ref_object_class__0.created_date, ref_object_class__0.updated_date, ref_object_class__0.created_load_id, ref_object_class__0.updated_load_id FROM ONLY ref_object_class__0;\
+    SELECT ref_object_class__0.object_class_id, ref_object_class__0.object_class_code, ref_object_class__0.object_class_name, ref_object_class__0.object_class_short_name, ref_object_class__0.active_flag, ref_object_class__0.effective_begin_date_id, ref_object_class__0.effective_end_date_id, ref_object_class__0.budget_allowed_flag, ref_object_class__0.description, ref_object_class__0.source_updated_date, ref_object_class__0.intra_city_flag, ref_object_class__0.contracts_positions_flag, ref_object_class__0.payroll_type, ref_object_class__0.extended_description, ref_object_class__0.related_object_class_code, ref_object_class__0.original_object_class_name, ref_object_class__0.created_date, ref_object_class__0.updated_date, ref_object_class__0.created_load_id, ref_object_class__0.updated_load_id FROM ONLY ref_object_class__0;
     
 --
 -- Name: ref_object_class_history__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -1810,172 +1722,6 @@ ENCODING 'UTF8';
 
 CREATE VIEW ref_object_class_history AS
     SELECT ref_object_class_history__0.object_class_history_id, ref_object_class_history__0.object_class_id, ref_object_class_history__0.object_class_name, ref_object_class_history__0.object_class_short_name, ref_object_class_history__0.active_flag, ref_object_class_history__0.effective_begin_date_id, ref_object_class_history__0.effective_end_date_id, ref_object_class_history__0.budget_allowed_flag, ref_object_class_history__0.description, ref_object_class_history__0.source_updated_date, ref_object_class_history__0.intra_city_flag, ref_object_class_history__0.contracts_positions_flag, ref_object_class_history__0.payroll_type, ref_object_class_history__0.extended_description, ref_object_class_history__0.related_object_class_code, ref_object_class_history__0.created_date, ref_object_class_history__0.load_id FROM ONLY ref_object_class_history__0;
-
---
--- Name: ref_pay_cycle__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_pay_cycle__0 (
-    pay_cycle_id smallint,
-    pay_cycle_code character varying,
-    description character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_pay_cycle to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_pay_cycle; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_pay_cycle AS
-    SELECT ref_pay_cycle__0.pay_cycle_id, ref_pay_cycle__0.pay_cycle_code, ref_pay_cycle__0.description, ref_pay_cycle__0.created_date FROM ONLY ref_pay_cycle__0;
-
---
--- Name: ref_pay_type__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_pay_type__0 (
-    pay_type_id smallint,
-    pay_type_code character varying,
-    pay_type_name character varying,
-    balance_number_id smallint,
-    payroll_reporting_id smallint,
-    payroll_object_id smallint,
-    prior_year_payroll_object_id smallint,
-    fringe_indicator bpchar,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_pay_type to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_pay_type; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_pay_type AS
-    SELECT ref_pay_type__0.pay_type_id, ref_pay_type__0.pay_type_code, ref_pay_type__0.pay_type_name, ref_pay_type__0.balance_number_id, ref_pay_type__0.payroll_reporting_id, ref_pay_type__0.payroll_object_id, ref_pay_type__0.prior_year_payroll_object_id, ref_pay_type__0.fringe_indicator, ref_pay_type__0.created_date FROM ONLY ref_pay_type__0;
-
---
--- Name: ref_payroll_frequency__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_payroll_frequency__0 (
-    payroll_frequency_id smallint,
-    payroll_frequency_code bpchar,
-    payroll_frequency_name character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_payroll_frequency to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_payroll_frequency; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_payroll_frequency AS
-    SELECT ref_payroll_frequency__0.payroll_frequency_id, ref_payroll_frequency__0.payroll_frequency_code, ref_payroll_frequency__0.payroll_frequency_name, ref_payroll_frequency__0.created_date FROM ONLY ref_payroll_frequency__0;
-
---
--- Name: ref_payroll_number__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_payroll_number__0 (
-    payroll_number_id smallint,
-    payroll_number character varying,
-    payroll_name character varying,
-    agency_id smallint,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_payroll_number to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_payroll_number; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_payroll_number AS
-    SELECT ref_payroll_number__0.payroll_number_id, ref_payroll_number__0.payroll_number, ref_payroll_number__0.payroll_name, ref_payroll_number__0.agency_id, ref_payroll_number__0.created_date FROM ONLY ref_payroll_number__0;
-
---
--- Name: ref_payroll_object__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_payroll_object__0 (
-    payroll_object_id smallint,
-    payroll_object_code character varying,
-    payroll_object_name character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_payroll_object to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_payroll_object; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_payroll_object AS
-    SELECT ref_payroll_object__0.payroll_object_id, ref_payroll_object__0.payroll_object_code, ref_payroll_object__0.payroll_object_name, ref_payroll_object__0.created_date FROM ONLY ref_payroll_object__0;
-
---
--- Name: ref_payroll_payment_status__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_payroll_payment_status__0 (
-    payroll_payment_status_id smallint,
-    payroll_payment_status_code character varying,
-    description character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_payroll_payment_status to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_payroll_payment_status; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_payroll_payment_status AS
-    SELECT ref_payroll_payment_status__0.payroll_payment_status_id, ref_payroll_payment_status__0.payroll_payment_status_code, ref_payroll_payment_status__0.description, ref_payroll_payment_status__0.created_date FROM ONLY ref_payroll_payment_status__0;
-
---
--- Name: ref_payroll_reporting__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_payroll_reporting__0 (
-    payroll_reporting_id smallint,
-    payroll_reporting_code character varying,
-    payroll_reporting_name character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_payroll_reporting to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_payroll_reporting; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_payroll_reporting AS
-    SELECT ref_payroll_reporting__0.payroll_reporting_id, ref_payroll_reporting__0.payroll_reporting_code, ref_payroll_reporting__0.payroll_reporting_name, ref_payroll_reporting__0.created_date FROM ONLY ref_payroll_reporting__0;
-
---
--- Name: ref_payroll_wage__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE ref_payroll_wage__0 (
-    payroll_wage_id smallint,
-    payroll_wage_code bpchar,
-    payroll_wage_name character varying,
-    created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_payroll_wage to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: ref_payroll_wage; Type: VIEW; Schema: staging; Owner: gpadmin
---
-
-CREATE VIEW ref_payroll_wage AS
-    SELECT ref_payroll_wage__0.payroll_wage_id, ref_payroll_wage__0.payroll_wage_code, ref_payroll_wage__0.payroll_wage_name, ref_payroll_wage__0.created_date FROM ONLY ref_payroll_wage__0;
 
 --
 -- Name: ref_revenue_category__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -2398,3 +2144,87 @@ CREATE VIEW aggregateon_spending_vendor_exp_object AS
 	SELECT aggregateon_spending_vendor_exp_object__0.vendor_id, aggregateon_spending_vendor_exp_object__0.expenditure_object_id, aggregateon_spending_vendor_exp_object__0.check_eft_issued_nyc_year_id ,
 		aggregateon_spending_vendor_exp_object__0.total_spending_amount FROM aggregateon_spending_vendor_exp_object__0;
 
+CREATE EXTERNAL WEB TABLE ref_amount_basis__0 (
+  amount_basis_id smallint ,
+  amount_basis_name varchar(50) ,
+  created_date timestamp 
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_amount_basis to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+
+CREATE VIEW ref_amount_basis AS
+	SELECT ref_amount_basis__0.amount_basis_id , ref_amount_basis__0.amount_basis_name , ref_amount_basis__0.created_date
+	FROM 	ref_amount_basis__0;
+	
+CREATE EXTERNAL WEB TABLE employee__0 (
+  employee_id bigint,
+  employee_number varchar,
+  first_name varchar,
+  last_name varchar,
+  initial varchar,
+  original_first_name varchar,
+  original_last_name varchar,
+  original_initial varchar,
+  created_date timestamp,
+  updated_date timestamp,
+  created_load_id int,
+  updated_load_id int
+  )
+  EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.employee to stdout csv"' ON SEGMENT 0 
+   FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+  
+ CREATE VIEW  employee AS
+ 	SELECT employee__0.employee_id , employee__0.employee_number , employee__0.first_name , employee__0.last_name , 
+ 		employee__0.initial , employee__0.original_first_name , employee__0.original_last_name , employee__0.original_initial , 
+ 		employee__0.created_date , employee__0.updated_date , employee__0.created_load_id , employee__0.updated_load_id 
+ FROM employee__0; 		
+ 		
+CREATE EXTERNAL WEB TABLE employee_history__0 (
+  employee_history_id bigint,
+  employee_id int,
+  first_name varchar,
+  last_name varchar,
+  initial varchar,
+  created_date timestamp,
+  created_load_id int
+  )
+  EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.employee_history to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+
+ CREATE VIEW employee_history AS
+ 	SELECT employee_history__0.employee_history_id , employee_history__0.employee_id , employee_history__0.first_name , employee_history__0.last_name ,
+ 		employee_history__0.initial , employee_history__0.created_date , employee_history__0.created_load_id 
+ 	FROM   employee_history__0;
+ 		
+CREATE EXTERNAL WEB TABLE payroll__0(
+	payroll_id bigint,
+	pay_cycle_code CHAR(1),
+	pay_date_id smallint,
+	employee_history_id bigint,
+	payroll_number varchar,
+	job_sequence_number varchar,
+	agency_history_id smallint,
+	fiscal_year smallint,
+	orig_pay_date_id smallint,
+	pay_frequency varchar,
+	department_history_id int,
+	annual_salary numeric(16,2),
+	amount_basis_id smallint,
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay  numeric(16,2) )
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';	
+  
+ CREATE VIEW  payroll AS
+ 	SELECT payroll__0.payroll_id , payroll__0.pay_cycle_code , payroll__0.pay_date_id, payroll__0.employee_history_id , 
+ 		payroll__0.payroll_number , payroll__0.job_sequence_number , payroll__0.agency_history_id , payroll__0.fiscal_year , 
+ 		payroll__0.orig_pay_date_id , payroll__0.pay_frequency , payroll__0.department_history_id , payroll__0.annual_salary,
+ 		payroll__0.amount_basis_id , payroll__0.base_pay , payroll__0.overtime_pay , payroll__0.other_payments,
+ 		payroll__0.gross_pay
+ 	FROM	payroll__0;	
