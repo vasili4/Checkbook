@@ -1418,34 +1418,6 @@ CREATE TABLE aggregateon_spending_vendor_exp_object(
 	total_spending_amount numeric(16,2) )
 DISTRIBUTED BY (expenditure_object_id);	
 
-CREATE TABLE payroll(
-	payroll_id bigint PRIMARY KEY DEFAULT nextval('seq_payroll_payroll_id'::regclass) NOT NULL,
-	pay_cycle_code CHAR(1),
-	pay_date_id smallint,
-	employee_history_id bigint,
-	payroll_number varchar,
-	job_sequence_number varchar,
-	agency_history_id smallint,
-	fiscal_year smallint,
-	orig_pay_date_id smallint,
-	pay_frequency varchar,
-	department_history_id int,
-	annual_salary numeric(16,2),
-	amount_basis_id smallint,
-	base_pay numeric(16,2),
-	overtime_pay numeric(16,2),
-	other_payments numeric(16,2),
-	gross_pay  numeric(16,2) )
-DISTRIBUTED BY (payroll_id);	
-
-ALTER TABLE  payroll ADD constraint fk_payroll_ref_date foreign key (pay_date_id) references ref_date (date_id);
-ALTER TABLE  payroll ADD constraint fk_payroll_employee_history foreign key (employee_history_id) references employee_history (employee_history_id);
-ALTER TABLE  payroll ADD constraint fk_payroll_ref_agency_history foreign key (agency_history_id) references ref_agency_history (agency_history_id);
-ALTER TABLE  payroll ADD constraint fk_payroll_ref_date_1 foreign key (orig_pay_date_id) references ref_date (date_id);
-ALTER TABLE  payroll ADD constraint fk_payroll_ref_department_history foreign key (department_history_id) references ref_department_history (department_history_id);
-ALTER TABLE  payroll ADD constraint fk_payroll_ref_amount_basis foreign key (amount_basis_id) references ref_amount_basis (amount_basis_id);
-
-
 CREATE TABLE ref_amount_basis (
   amount_basis_id smallint PRIMARY KEY,
   amount_basis_name varchar(50) ,
@@ -1479,3 +1451,30 @@ CREATE TABLE employee_history (
   )
   DISTRIBUTED BY (employee_history_id);
   ALTER TABLE  employee_history ADD constraint fk_employee_history_employee foreign key (employee_id) references employee (employee_id);
+
+CREATE TABLE payroll(
+	payroll_id bigint PRIMARY KEY DEFAULT nextval('seq_payroll_payroll_id'::regclass) NOT NULL,
+	pay_cycle_code CHAR(1),
+	pay_date_id smallint,
+	employee_history_id bigint,
+	payroll_number varchar,
+	job_sequence_number varchar,
+	agency_history_id smallint,
+	fiscal_year smallint,
+	orig_pay_date_id smallint,
+	pay_frequency varchar,
+	department_history_id int,
+	annual_salary numeric(16,2),
+	amount_basis_id smallint,
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay  numeric(16,2) )
+DISTRIBUTED BY (payroll_id);	
+
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_date foreign key (pay_date_id) references ref_date (date_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_employee_history foreign key (employee_history_id) references employee_history (employee_history_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_agency_history foreign key (agency_history_id) references ref_agency_history (agency_history_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_date_1 foreign key (orig_pay_date_id) references ref_date (date_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_department_history foreign key (department_history_id) references ref_department_history (department_history_id);
+ALTER TABLE  payroll ADD constraint fk_payroll_ref_amount_basis foreign key (amount_basis_id) references ref_amount_basis (amount_basis_id);
