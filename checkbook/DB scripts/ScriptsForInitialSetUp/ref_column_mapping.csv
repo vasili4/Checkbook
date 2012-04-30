@@ -2177,3 +2177,15 @@ etl.ext_stg_budget_feed,accrued_expense_amount,varchar,etl.stg_budget,accrued_ex
 etl.ext_stg_budget_feed,cash_expense_amount,varchar,etl.stg_budget,cash_expense_amount,"numeric(20,2)",12
 etl.ext_stg_budget_feed,post_closing_adjustment_amount,varchar,etl.stg_budget,post_closing_adjustment_amount,"numeric(20,2)",13
 etl.ext_stg_budget_feed,updated_date,varchar,etl.stg_budget,updated_date,timestamp,14
+etl.ext_stg_funding_class,fy,int,etl.stg_funding_class,fy,int,1
+etl.ext_stg_funding_class,funding_class_code,varchar,etl.stg_funding_class,funding_class_code,varchar(5),2
+etl.ext_stg_funding_class,name,varchar,etl.stg_funding_class,name,varchar(52),3
+etl.ext_stg_funding_class,short_name,varchar,etl.stg_funding_class,short_name,varchar(50),4
+etl.ext_stg_funding_class,category_name,varchar,etl.stg_funding_class,category_name,varchar(52),5
+etl.ext_stg_funding_class,cty_fund_fl,int,etl.stg_funding_class,cty_fund_fl,int,6
+etl.ext_stg_funding_class,intr_cty_fl,int,etl.stg_funding_class,intr_cty_fl,int,7
+etl.ext_stg_funding_class,fund_aloc_req_fl,int,etl.stg_funding_class,fund_aloc_req_fl,int,8
+etl.ext_stg_funding_class,tbl_last_dt,varchar,etl.stg_funding_class,tbl_last_dt,varchar(20),9
+etl.ext_stg_funding_class,ams_row_vers_no,varchar,etl.stg_funding_class,ams_row_vers_no,char(1),10
+etl.ext_stg_funding_class,rsfcls_nm_up,varchar,etl.stg_funding_class,rsfcls_nm_up,varchar(52),11
+etl.ext_stg_funding_class,fund_category,varchar,etl.stg_funding_class,fund_category,varchar(50),12
