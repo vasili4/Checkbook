@@ -216,3 +216,5 @@ B,,,Duplicate,,,"budget_fiscal_year,fund_class_code,agency_code,department_code,
 R,,,Missing key elements,,,fy_dc,,,,,1
 P,,,Missing key elements,,,"employee_number,payroll_number,job_sequence_number,pay_date,fiscal_year,amount_basis",,,,,1
 P,,,Duplicate,,,"employee_number,payroll_number,job_sequence_number,pay_date",,,,,2
+FC,,,Missing key elements,,,"funding_class_id,funding_class_code,funding_class_name,fiscal_year",,,,,1
+FC,,,Duplicate,,,"funding_class_id,funding_class_code,funding_class_name,fiscal_year",,,,,2
