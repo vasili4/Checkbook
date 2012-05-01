@@ -3921,6 +3921,13 @@ CREATE TABLE malformed_revenue(
 	load_file_id integer)
 DISTRIBUTED BY (load_file_id);
 
+
+CREATE TABLE malformed_funding_class(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+
 --------------------------------------------------------------------------------
 /* PMS feed */
 CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
