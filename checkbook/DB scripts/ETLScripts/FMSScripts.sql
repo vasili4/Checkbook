@@ -1177,7 +1177,7 @@ BEGIN
 						budget_code_id,budget_code,budget_name,reporting_code,location_id,location_code,fund_class_name,fund_class_code,
 						spending_category_id,spending_category_name)
 	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
-		f.nyc_year_id,l.year_id,f.calendar_month_id,
+		f.nyc_year_id,l.year_value,f.calendar_month_id,
 		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
 		b.check_amount,c.agency_id,m.agency_code,d.expenditure_object_id,
 		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit, g.department_id,
