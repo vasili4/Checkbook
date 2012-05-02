@@ -817,16 +817,16 @@ BEGIN
 
 	--For populating temp with funding_class_id
 
-	CREATE TEMPORARY TABLE temp_revenuesource_fund_class_id(uniq_id bigint,fund_class_cd varchar,fund_class_id smallint)
+	CREATE TEMPORARY TABLE temp_revenuesource_funding_class_id(uniq_id bigint,funding_class_cd varchar,funding_class_id smallint)
 	DISTRIBUTED BY (uniq_id); 
 
-	INSERT into temp_revenuesource_fund_class_id  
+	INSERT into temp_revenuesource_funding_class_id  
 	SELECT b.uniq_id as uniq_id,a.funding_class_code as funding_class_code,a.funding_class_id as funding_class_id  
-	FROM    etl.stg_revenue_source b  left join  ref_funding_class a on a.funding_class_code = b.fund_cls;
+	FROM    etl.stg_revenue_source b  left join  ref_funding_class a on a.funding_class_code = b.fund_cls and a.fiscal_year = b.fy;
 
 	UPDATE tmp_ref_revenue_source a 
-	SET fund_class_id = b.fund_class_id 
-	FROM temp_revenuesource_fund_class_id b where a.uniq_id = b.uniq_id  ;
+	SET fund_class_id = b.funding_class_id 
+	FROM temp_revenuesource_funding_class_id b where a.uniq_id = b.uniq_id  ;
 
 	--For populating temp with revenue category
 	CREATE TEMPORARY TABLE temp_revenuesource_category_id(uniq_id bigint,rscat_cd varchar,rscat_id smallint)DISTRIBUTED BY (uniq_id); 
