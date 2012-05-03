@@ -9,11 +9,11 @@ SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,"SELECT dep
   FROM (SELECT agency_id,
                (CASE
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
-                        AND fund_class_code = 400
+                        AND fund_class_code in ('400','402')
                    THEN
                       3
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
-                        AND fund_class_code <> 400
+                        AND fund_class_code not in ('400','402')
                    THEN
                       1
                    ELSE
