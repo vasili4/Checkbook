@@ -593,7 +593,7 @@ CREATE TABLE stg_revenue_category
 	distributed by (uniq_id);
 
 CREATE TABLE archive_revenue_category (LIKE stg_revenue_category) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_revenue_category ADD COLUMN load_id bigint;
+ALTER TABLE archive_revenue_category ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_revenue_category (LIKE archive_revenue_category) DISTRIBUTED BY (uniq_id);
 
@@ -628,7 +628,7 @@ distributed by (uniq_id);
 
 
 CREATE TABLE archive_revenue_class (LIKE stg_revenue_class) DISTRIBUTED BY (uniq_id);
-alter table archive_revenue_class ADD COLUMN load_id bigint;
+alter table archive_revenue_class ADD COLUMN load_file_id bigint;
 
 
 CREATE TABLE invalid_revenue_class (LIKE archive_revenue_class) DISTRIBUTED BY (uniq_id);
@@ -759,7 +759,7 @@ DISTRIBUTED BY (uniq_id);
 ---archive and invalid tables
 
 CREATE TABLE archive_revenue_source (LIKE stg_revenue_source) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_revenue_source ADD COLUMN load_id bigint;
+ALTER TABLE archive_revenue_source ADD COLUMN load_file_id bigint;
 
 
 CREATE TABLE invalid_revenue_source (LIKE archive_revenue_source) DISTRIBUTED BY (uniq_id);
@@ -3938,6 +3938,7 @@ CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
 	job_sequence_number varchar,
 	agency_code varchar,
 	fiscal_year varchar,
+	orig_pay_cycle_code bpchar,	
 	orig_pay_date varchar,
 	pay_frequency varchar,
 	last_name varchar,
@@ -3964,6 +3965,7 @@ CREATE TABLE stg_payroll
 	job_sequence_number varchar,
 	agency_code varchar,
 	fiscal_year smallint,
+	orig_pay_cycle_code CHAR(1),
 	orig_pay_date date,
 	pay_frequency varchar,
 	last_name varchar,
@@ -4005,3 +4007,52 @@ CREATE TABLE employee_history_id_seq(employee_number varchar,employee_history_id
 DISTRIBUTED BY (employee_number);
 
 --------------------------------------------------------------------------------
+
+-- Payroll summary
+
+CREATE EXTERNAL TABLE ext_stg_pms_summary_data_feed(
+	pay_cycle varchar(20),
+	pay_date  varchar(10),
+	pyrl_no   varchar(20),
+	pyrl_desc varchar(50),
+	uoa	 varchar(20),
+	uoa_name varchar(100),
+	fy varchar,
+	object varchar(4),
+	object_desc varchar(40),
+	agency  varchar(20),
+	agency_name  varchar(50),
+	bud_code varchar(10) ,
+	bud_code_desc  varchar(100),
+	total_amt varchar,
+	col15 varchar)
+ LOCATION (
+  	    'gpfdist://mdw1:8081/datafiles/PMS_summary_feed.txt')
+  	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
+ ENCODING 'UTF8';		
+ 
+ CREATE TABLE stg_payroll_summary(
+ 	pay_cycle varchar(20),
+ 	pay_date  varchar(10),
+ 	pyrl_no   varchar(20),
+ 	pyrl_desc varchar(50),
+ 	uoa	 varchar(20),
+ 	uoa_name varchar(100),
+ 	fy int,
+ 	object varchar(4),
+ 	object_desc varchar(40),
+ 	agency  varchar(20),
+ 	agency_name  varchar(50),
+ 	bud_code varchar(10) ,
+ 	bud_code_desc  varchar(100),
+ 	total_amt decimal(15,2),
+ 	uniq_id bigint default nextval('seq_stg_payroll_summary_uniq_id'),
+	invalid_flag char(1),
+	invalid_reason varchar		);
+
+
+CREATE TABLE archive_payroll_summary (LIKE stg_payroll_summary) DISTRIBUTED BY (uniq_id);
+ALTER TABLE archive_payroll_summary ADD COLUMN load_file_id bigint;
+
+CREATE TABLE invalid_payroll_summary (LIKE archive_payroll_summary) DISTRIBUTED BY (uniq_id);	
+	
