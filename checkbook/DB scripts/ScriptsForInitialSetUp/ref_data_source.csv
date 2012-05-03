@@ -52,5 +52,7 @@ RS,COARevenueSource,,,,,etl.ext_stg_coa_revenue_source_feed,,,1,2
 RS,COARevenueSource,,,,,etl.stg_revenue_source,etl.archive_revenue_source ,etl.invalid_revenue_source ,2,2
 BC,COABudgetCode,,,,,etl.ext_stg_coa_budget_code_feed,,,1,1
 BC,COABudgetCode,,,,,etl.stg_budget_code,etl.archive_budget_code,etl.invalid_budget_code,2,1
+PS,PMSSummary,,,,,etl.ext_stg_pms_summary_data_feed,,,1,4
+PS,PMSSummary,,,,,etl.stg_payroll_summary,etl.archive_payroll_summary,etl.invalid_payroll_summary,2,4
 FC,FundingClass,,,,,etl.ext_stg_funding_class,,,1,1
 FC,FundingClass,,,,,etl.stg_funding_class,etl.archive_funding_class,etl.invalid_funding_class,2,1
