@@ -1433,6 +1433,7 @@ CREATE TABLE employee (
   original_first_name varchar,
   original_last_name varchar,
   original_initial varchar,
+  masked_name varchar,
   created_date timestamp,
   updated_date timestamp,
   created_load_id int,
@@ -1446,6 +1447,7 @@ CREATE TABLE employee_history (
   first_name varchar,
   last_name varchar,
   initial varchar,
+  masked_name varchar,
   created_date timestamp,
   created_load_id int
   )
@@ -1460,7 +1462,7 @@ CREATE TABLE payroll(
 	payroll_number varchar,
 	job_sequence_number varchar,
 	agency_history_id smallint,
-	fiscal_year smallint,
+	fiscal_year smallint,	
 	orig_pay_date_id smallint,
 	pay_frequency varchar,
 	department_history_id int,
@@ -1469,7 +1471,10 @@ CREATE TABLE payroll(
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
-	gross_pay  numeric(16,2) )
+	gross_pay  numeric(16,2),
+	orig_pay_cycle_code CHAR(1),
+	created_date timestamp,
+	created_load_id int)
 DISTRIBUTED BY (payroll_id);	
 
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_date foreign key (pay_date_id) references ref_date (date_id);
