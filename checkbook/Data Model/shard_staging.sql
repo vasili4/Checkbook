@@ -2166,6 +2166,7 @@ CREATE EXTERNAL WEB TABLE employee__0 (
   original_first_name varchar,
   original_last_name varchar,
   original_initial varchar,
+  masked_name varchar,
   created_date timestamp,
   updated_date timestamp,
   created_load_id int,
@@ -2178,7 +2179,7 @@ ENCODING 'UTF8';
  CREATE VIEW  employee AS
  	SELECT employee__0.employee_id , employee__0.employee_number , employee__0.first_name , employee__0.last_name , 
  		employee__0.initial , employee__0.original_first_name , employee__0.original_last_name , employee__0.original_initial , 
- 		employee__0.created_date , employee__0.updated_date , employee__0.created_load_id , employee__0.updated_load_id 
+ 		employee__0.masked_name ,employee__0.created_date , employee__0.updated_date , employee__0.created_load_id , employee__0.updated_load_id 
  FROM employee__0; 		
  		
 CREATE EXTERNAL WEB TABLE employee_history__0 (
@@ -2187,6 +2188,7 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
   first_name varchar,
   last_name varchar,
   initial varchar,
+  masked_name varchar,
   created_date timestamp,
   created_load_id int
   )
@@ -2196,7 +2198,7 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
 
  CREATE VIEW employee_history AS
  	SELECT employee_history__0.employee_history_id , employee_history__0.employee_id , employee_history__0.first_name , employee_history__0.last_name ,
- 		employee_history__0.initial , employee_history__0.created_date , employee_history__0.created_load_id 
+ 		employee_history__0.initial , employee_history__0.masked_name,employee_history__0.created_date , employee_history__0.created_load_id 
  	FROM   employee_history__0;
  		
 CREATE EXTERNAL WEB TABLE payroll__0(
@@ -2216,7 +2218,10 @@ CREATE EXTERNAL WEB TABLE payroll__0(
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
-	gross_pay  numeric(16,2) )
+	gross_pay  numeric(16,2),
+	orig_pay_cycle_code CHAR(1),
+	created_date timestamp,
+	created_load_id int	)
 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	
@@ -2226,5 +2231,5 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv
  		payroll__0.payroll_number , payroll__0.job_sequence_number , payroll__0.agency_history_id , payroll__0.fiscal_year , 
  		payroll__0.orig_pay_date_id , payroll__0.pay_frequency , payroll__0.department_history_id , payroll__0.annual_salary,
  		payroll__0.amount_basis_id , payroll__0.base_pay , payroll__0.overtime_pay , payroll__0.other_payments,
- 		payroll__0.gross_pay
+ 		payroll__0.gross_pay,payroll__0.orig_pay_cycle_code,payroll__0.created_date,payroll__0.created_load_id
  	FROM	payroll__0;	
