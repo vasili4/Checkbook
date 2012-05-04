@@ -973,9 +973,9 @@ CREATE TABLE all_disbursement_line_item (
 CREATE TABLE payroll_summary (
     payroll_summary_id bigint  PRIMARY KEY DEFAULT nextval('seq_payroll_summary_payroll_summary_id'::regclass) NOT NULL,
     agency_history_id smallint,
-    pay_cycle_id smallint,
+    pay_cycle_code char(1),
     expenditure_object_history_id integer,
-    payroll_number_id smallint,
+    payroll_number varchar,
     department_history_id integer,
     fiscal_year smallint,
     budget_code_id integer,
@@ -987,9 +987,7 @@ CREATE TABLE payroll_summary (
 ) distributed by (payroll_summary_id);
 
 
-ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_pay_cycle foreign key (pay_cycle_id) references ref_pay_cycle (pay_cycle_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_exp_object_history foreign key (expenditure_object_history_id) references ref_expenditure_object_history (expenditure_object_history_id);
-ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_payroll_number foreign key (payroll_number_id) references ref_payroll_number (payroll_number_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_etl_data_load foreign key (load_id) references etl_data_load (load_id);
@@ -1222,9 +1220,9 @@ CREATE TABLE revenue_details
 	revenue_source_code varchar
 ) DISTRIBUTED BY (revenue_id);
 
-ALTER TABLE  fact_revenue ADD CONSTRAINT fk_fact_revenue_ref_revenue_category FOREIGN KEY (revenue_category_id) REFERENCES ref_revenue_category(revenue_category_id);
-ALTER TABLE  fact_revenue ADD CONSTRAINT fk_fact_revenue_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
-ALTER TABLE  fact_revenue ADD CONSTRAINT fk_fact_revenue_revenue FOREIGN KEY (revenue_id) REFERENCES revenue(revenue_id);
+ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_details_ref_revenue_category FOREIGN KEY (revenue_category_id) REFERENCES ref_revenue_category(revenue_category_id);
+ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_details_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
+ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_detailse_revenue FOREIGN KEY (revenue_id) REFERENCES revenue(revenue_id);
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
