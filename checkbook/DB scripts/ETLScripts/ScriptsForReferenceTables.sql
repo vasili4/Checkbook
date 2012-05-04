@@ -103,7 +103,7 @@ INSERT INTO ref_business_type_status values (1,'Requested',now()::timestamp),
 					(2,'Accepted',now()::timestamp),
 					(3,'Rejected',now()::timestamp);
 			
-CREATE TABLE etl.stg_funding_class(
+/* CREATE TABLE etl.stg_funding_class(
 	fy int,
 	funding_class_code varchar(5),
 	name varchar(52),
@@ -128,6 +128,7 @@ SELECT funding_class_code,name,short_name,category_name,
 	now()::timestamp     
 from etl.stg_funding_class;
 
+*/
 select initializedate('1990-01-01'::date,'2020-12-31'::date);
 
 --------------------------------------------------------------------------------------------------------------------------------------------
