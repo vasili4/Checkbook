@@ -1,3 +1,11 @@
+/* Functions defined 
+updateEmployees
+updateForeignKeysForPMS
+processPayroll
+updateForeignKeysForPMSSummary
+processPayrollSummary
+*/
+
 CREATE OR REPLACE FUNCTION etl.updateEmployees(p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
@@ -25,8 +33,15 @@ BEGIN
 	FROM   tmp_ref_employee
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial)
-	SELECT a.employee_id,b.employee_number,first_name,last_name,initial,now()::timestamp,p_load_id_in,first_name,last_name,initial
+	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial,masked_name)
+	SELECT a.employee_id,b.employee_number,first_name,last_name,initial,now()::timestamp,p_load_id_in,first_name,last_name,initial,
+		coalesce(last_name,'') || (	CASE WHEN coalesce(first_name,'') <> '' AND  coalesce(initial,'') <> '' THEN
+							' ' || first_name || ' ' || initial
+						     WHEN coalesce(first_name,'') <> '' AND  coalesce(initial,'') = '' THEN
+						     	' ' || first_name 
+						     WHEN coalesce(first_name,'') = '' AND  coalesce(initial,'') <> ''	THEN
+						     	' ' || initial 
+						     END)	as masked_name
 	FROM   etl.employee_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number;
 	
 	
@@ -53,13 +68,27 @@ BEGIN
 	SET	first_name = b.first_name,
 		last_name = b.last_name,
 		initial = b.initial,
+		masked_name = coalesce(b.last_name,'') || (	CASE WHEN coalesce(b.first_name,'') <> '' AND  coalesce(b.initial,'') <> '' THEN
+							' ' || b.first_name || ' ' || initial
+						     WHEN coalesce(b.first_name,'') <> '' AND  coalesce(b.initial,'') = '' THEN
+						     	' ' || b.first_name 
+						     WHEN coalesce(b.first_name,'') = '' AND  coalesce(b.initial,'') <> ''	THEN
+						     	' ' || b.initial 
+						     END) ,
 		updated_date = now()::timestamp,
 		updated_load_id = p_load_id_in
 	FROM	tmp_ref_employee_1 b		
 	WHERE	a.employee_id = b.employee_id;
 	
-	INSERT INTO employee_history(employee_history_id,employee_id,first_name,last_name,initial,created_date,created_load_id)
-	SELECT a.employee_history_id,c.employee_id,b.first_name,b.last_name,b.initial,now()::timestamp,p_load_id_in
+	INSERT INTO employee_history(employee_history_id,employee_id,first_name,last_name,initial,masked_name,created_date,created_load_id)
+	SELECT a.employee_history_id,c.employee_id,b.first_name,b.last_name,b.initial,
+	coalesce(b.last_name,'') || (	CASE WHEN coalesce(b.first_name,'') <> '' AND  coalesce(b.initial,'') <> '' THEN
+							' ' || b.first_name || ' ' || initial
+						     WHEN coalesce(b.first_name,'') <> '' AND  coalesce(b.initial,'') = '' THEN
+						     	' ' || b.first_name 
+						     WHEN coalesce(b.first_name,'') = '' AND  coalesce(b.initial,'') <> ''	THEN
+						     	' ' || b.initial 
+						     END) as masked_name,now()::timestamp,p_load_id_in
 	FROM   etl.employee_history_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number
 		JOIN employee c ON b.employee_number = c.employee_number
 	WHERE   exists_flag ='N'
@@ -152,6 +181,7 @@ BEGIN
 	FROM etl.stg_payroll a JOIN ref_date b ON a.orig_pay_date = b.date;
 	
 	-- FK:department_history_id
+	-- Basis - PMS transactions are for general fund only
 	
 	INSERT INTO tmp_fk_pms_values(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
@@ -161,18 +191,17 @@ BEGIN
 		JOIN ref_fund_class e ON '001' = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 	GROUP BY 1;
 	
-	CREATE TEMPORARY TABLE tmp_fk_values_pms_new_dept(agency_history_id integer,agency_id integer,department_code varchar,
+	CREATE TEMPORARY TABLE tmp_fk_values_pms_new_dept(agency_id integer,department_code varchar,
 						fund_class_id smallint,fiscal_year smallint, uniq_id bigint)
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_pms_new_dept
-	SELECT d.agency_history_id,c.agency_id,a.department_code,e.fund_class_id,a.fiscal_year,MIN(b.uniq_id) as uniq_id
+	SELECT c.agency_id,a.department_code,e.fund_class_id,a.fiscal_year,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_payroll a join (SELECT uniq_id
 						 FROM tmp_fk_pms_values
 						 GROUP BY 1
 						 HAVING max(department_history_id) IS NULL) b on a.uniq_id=b.uniq_id
-		JOIN ref_agency c ON a.agency_code = c.agency_code
-		JOIN ref_agency_history d ON c.agency_id = d.agency_id
+		JOIN ref_agency c ON a.agency_code = c.agency_code		
 		JOIN ref_fund_class e ON '001' = e.fund_class_code
 	GROUP BY 1,2,3,4,5;
 
@@ -253,7 +282,7 @@ BEGIN
 	
 	INSERT INTO etl.payroll_id_seq(uniq_id)
 	SELECT DISTINCT a.uniq_id
-	FROM 	etl.stg_payroll a 
+	FROM 	etl.stg_payroll a; 
 	
 	RAISE NOTICE '1.8.1';
 	
@@ -321,14 +350,14 @@ BEGIN
 		
 	INSERT INTO payroll(payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,
-						  orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
+						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 						  amount_basis_id,base_pay,overtime_pay,other_payments,
-						  gross_pay)
+						  gross_pay,created_date,created_load_id)
 	SELECT payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,
-	       orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
+	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 	       amount_basis_id,base_pay,overtime_pay,other_payments,
-	       gross_pay
+	       gross_pay,now()::timestamp,p_load_id_in
 	FROM   etl.stg_payroll
 	WHERE  action_flag = 'I';
 		
@@ -341,6 +370,403 @@ BEGIN
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in processPayroll';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
+END;
+$$ language plpgsql;
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForPMSSummary(p_load_id_in bigint) RETURNS INT AS $$
+DECLARE
+BEGIN
+
+	CREATE TEMPORARY TABLE tmp_fk_pms_summay_values(uniq_id bigint,pay_date_id smallint,agency_history_id smallint,
+					department_history_id integer,expenditure_object_history_id integer,budget_code_id integer,
+					payroll_summary_id bigint, action_flag char(1))
+	DISTRIBUTED BY (uniq_id);
+	
+	-- FK:pay_date_id
+	
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,pay_date_id)
+	SELECT	a.uniq_id, b.date_id
+	FROM etl.stg_payroll_summary a JOIN ref_date b ON a.pay_date = b.date;
+	
+	-- FK:Agency_history_id
+	
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,agency_history_id)
+	SELECT	a.uniq_id, max(c.agency_history_id) as agency_history_id
+	FROM etl.stg_payroll_summary a JOIN ref_agency b ON a.agency = b.agency_code
+		JOIN ref_agency_history c ON b.agency_id = c.agency_id
+	GROUP BY 1;
+	
+	CREATE TEMPORARY TABLE tmp_fk_pms_summary_values_new_agencies(agency_code varchar,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_pms_summary_values_new_agencies
+	SELECT agency,MIN(b.uniq_id) as uniq_id
+	FROM etl.stg_payroll_summary a join (SELECT uniq_id
+						 FROM tmp_fk_pms_summay_values
+						 GROUP BY 1
+						 HAVING max(agency_history_id) is null) b on a.uniq_id=b.uniq_id
+	GROUP BY 1;
+
+	RAISE NOTICE '1';
+	
+	TRUNCATE etl.ref_agency_id_seq;
+	
+	INSERT INTO etl.ref_agency_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_pms_summary_values_new_agencies;
+	
+	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
+	SELECT a.agency_id,b.agency_code,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
+	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_pms_summary_values_new_agencies b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.1';
+
+	-- Generate the agency history id for history records
+	
+	TRUNCATE etl.ref_agency_history_id_seq;
+	
+	INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_pms_summary_values_new_agencies;
+
+	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
+	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
+	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.3';
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,agency_history_id)
+	SELECT	a.uniq_id, max(c.agency_history_id) 
+	FROM etl.stg_payroll_summary a JOIN ref_agency b ON a.agency = b.agency_code
+		JOIN ref_agency_history c ON b.agency_id = c.agency_id
+		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
+	GROUP BY 1	;
+	
+	-- FK:department_history_id
+	-- Basis - PMS transactions are for general fund only
+	
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,department_history_id)
+	SELECT	a.uniq_id, max(c.department_history_id) 
+	FROM etl.stg_payroll_summary a JOIN ref_department b ON a.uoa = b.department_code AND a.fy = b.fiscal_year
+		JOIN ref_department_history c ON b.department_id = c.department_id
+		JOIN ref_agency d ON a.agency = d.agency_code AND b.agency_id = d.agency_id
+		JOIN ref_fund_class e ON '001' = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+	GROUP BY 1;
+	
+	CREATE TEMPORARY TABLE tmp_fk_values_pms_summary_new_dept(agency_id integer,department_code varchar,
+						fund_class_id smallint,fiscal_year smallint, uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_values_pms_summary_new_dept
+	SELECT c.agency_id,a.uoa,e.fund_class_id,a.fy,MIN(b.uniq_id) as uniq_id
+	FROM etl.stg_payroll_summary a join (SELECT uniq_id
+						 FROM tmp_fk_pms_summay_values
+						 GROUP BY 1
+						 HAVING max(department_history_id) IS NULL) b on a.uniq_id=b.uniq_id
+		JOIN ref_agency c ON a.agency = c.agency_code		
+		JOIN ref_fund_class e ON '001' = e.fund_class_code
+	GROUP BY 1,2,3,4;
+
+	RAISE NOTICE '1.4';
+						
+	-- Generate the department id for new records
+		
+	TRUNCATE etl.ref_department_id_seq;
+	
+	INSERT INTO etl.ref_department_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_pms_summary_new_dept;
+
+	INSERT INTO ref_department(department_id,department_code,
+				   department_name,
+				   agency_id,fund_class_id,
+				   fiscal_year,created_date,created_load_id,original_department_name)
+	SELECT a.department_id,COALESCE(b.department_code,'---------') as department_code,
+		(CASE WHEN COALESCE(b.department_code,'') <> '' THEN '<Unknown Department>'
+			ELSE 'Non-Applicable Department' END) as department_name,
+		b.agency_id,b.fund_class_id,b.fiscal_year,
+		now()::timestamp,p_load_id_in,
+		(CASE WHEN COALESCE(b.department_code,'') <> '' THEN '<Unknown Department>'
+			ELSE 'Non-Applicable Department' END) as original_department_name
+	FROM   etl.ref_department_id_seq a JOIN tmp_fk_values_pms_summary_new_dept b ON a.uniq_id = b.uniq_id;
+
+	RAISE NOTICE '1.5';
+	-- Generate the department history id for history records
+	
+	TRUNCATE etl.ref_department_history_id_seq;
+	
+	INSERT INTO etl.ref_department_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_pms_summary_new_dept;
+
+	INSERT INTO ref_department_history(department_history_id,department_id,
+					   department_name,agency_id,fund_class_id,
+					   fiscal_year,created_date,load_id)
+	SELECT a.department_history_id,c.department_id,	
+		(CASE WHEN COALESCE(b.department_code,'') <> '' THEN '<Unknown Department>'
+		      ELSE 'Non-Applicable Department' END) as department_name,
+		b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
+	FROM   etl.ref_department_history_id_seq a JOIN tmp_fk_values_pms_summary_new_dept b ON a.uniq_id = b.uniq_id
+		JOIN etl.ref_department_id_seq  c ON a.uniq_id = c.uniq_id ;
+
+
+	RAISE NOTICE '1.6';
+	
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,department_history_id)
+	SELECT	a.uniq_id, max(c.department_history_id) 
+	FROM etl.stg_payroll_summary a JOIN ref_department b  ON a.uoa = b.department_code AND a.fy = b.fiscal_year
+		JOIN ref_department_history c ON b.department_id = c.department_id
+		JOIN ref_agency d ON a.agency = d.agency_code AND b.agency_id = d.agency_id
+		JOIN ref_fund_class e ON '001' = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN etl.ref_department_history_id_seq f ON c.department_history_id = f.department_history_id
+	GROUP BY 1	;	
+
+	-- FK:expenditure_object_history_id
+
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id)
+	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON a.object = b.expenditure_object_code AND a.fy = b.fiscal_year
+		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
+	GROUP BY 1	;
+
+
+	RAISE NOTICE '1.8';
+	
+	CREATE TEMPORARY TABLE tmp_fk_values_pm_summary_new_exp_object(obj_cd varchar,fiscal_year smallint,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_values_pm_summary_new_exp_object
+	SELECT (CASE WHEN COALESCE(object,'')='' THEN '----' ELSE object END) as obj_cd,fy,MIN(a.uniq_id) as uniq_id
+	FROM etl.stg_payroll_summary a join (SELECT uniq_id
+						 FROM tmp_fk_pms_summay_values
+						 GROUP BY 1
+						 HAVING max(expenditure_object_history_id) is null) b on a.uniq_id=b.uniq_id
+	GROUP BY 1,2;
+
+	-- Generate the expenditure_object id for new records
+		
+	TRUNCATE etl.ref_expenditure_object_id_seq;
+	
+	INSERT INTO etl.ref_expenditure_object_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_pm_summary_new_exp_object;
+
+	RAISE NOTICE '1.9';
+	
+	INSERT INTO ref_expenditure_object(expenditure_object_id,expenditure_object_code,
+		expenditure_object_name,fiscal_year,created_date,created_load_id,original_expenditure_object_name)
+	SELECT a.expenditure_object_id,b.obj_cd,
+		(CASE WHEN b.obj_cd <> '----' THEN '<Unknown Expenditure Object>'
+			ELSE '<Non-Applicable Expenditure Object>' END) as expenditure_object_name,
+		b.fiscal_year,now()::timestamp,p_load_id_in,
+		(CASE WHEN b.obj_cd <> '----' THEN '<Unknown Expenditure Object>'
+			ELSE '<Non-Applicable Expenditure Object>' END) as original_expenditure_object_name
+	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id;
+
+	-- Generate the expenditure_object history id for history records
+	
+	TRUNCATE etl.ref_expenditure_object_history_id_seq;
+	
+	INSERT INTO etl.ref_expenditure_object_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_pm_summary_new_exp_object;
+
+	RAISE NOTICE '1.10';
+	
+	INSERT INTO ref_expenditure_object_history(expenditure_object_history_id,expenditure_object_id,fiscal_year,expenditure_object_name,created_date,load_id)
+	SELECT a.expenditure_object_history_id,c.expenditure_object_id,b.fiscal_year,
+		(CASE WHEN b.obj_cd <> '----' THEN '<Unknown Expenditure Object>'
+			ELSE '<Non-Applicable Expenditure Object>' END) as expenditure_object_name,now()::timestamp,p_load_id_in
+	FROM   etl.ref_expenditure_object_history_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id
+		JOIN etl.ref_expenditure_object_id_seq c ON a.uniq_id = c.uniq_id;
+
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id)
+	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON (COALESCE(a.object,'----') = b.expenditure_object_code 
+										OR (a.object='' AND b.expenditure_object_code='----')
+									     ) 
+									     AND a.fy = b.fiscal_year
+		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
+		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
+	GROUP BY 1	;
+		
+	-- FK:budget_code_id
+
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,budget_code_id)
+	SELECT	a.uniq_id, b.budget_code_id
+	FROM etl.stg_payroll_summary a JOIN ref_budget_code b ON a.bud_code = b.budget_code AND a.fy=b.fiscal_year
+		JOIN ref_agency d ON a.agency = d.agency_code AND b.agency_id = d.agency_id
+		JOIN ref_fund_class e ON '001' = e.fund_class_code AND e.fund_class_id = b.fund_class_id;	
+
+	CREATE TEMPORARY TABLE tmp_fk_values_pms_summary_new_budget(agency_id integer,budget_code varchar,
+						fund_class_id smallint,fiscal_year smallint, uniq_id bigint,
+						bud_code_desc varchar)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_values_pms_summary_new_budget
+	SELECT c.agency_id,a.bud_code,e.fund_class_id,a.fy,MIN(b.uniq_id) as uniq_id, min(a.bud_code_desc) as bud_code_desc
+	FROM etl.stg_payroll_summary a join (SELECT uniq_id
+						 FROM tmp_fk_pms_summay_values
+						 GROUP BY 1
+						 HAVING max(budget_code_id) IS NULL) b on a.uniq_id=b.uniq_id
+		JOIN ref_agency c ON a.agency = c.agency_code		
+		JOIN ref_fund_class e ON '001' = e.fund_class_code
+	GROUP BY 1,2,3,4;
+	
+	TRUNCATE etl.ref_budget_code_id_seq;
+	
+	INSERT INTO etl.ref_budget_code_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   tmp_fk_values_pms_summary_new_budget;		
+
+	INSERT INTO  ref_budget_code( budget_code_id,fiscal_year ,budget_code ,
+				      agency_id,fund_class_id,budget_code_name ,
+				      created_date,load_id)
+	SELECT a.budget_code_id,b.fiscal_year,b.budget_code,
+		b.agency_id,b.fund_class_id,b.bud_code_desc,
+		now()::timestamp,p_load_id_in		
+	FROM   etl.ref_budget_code_id_seq a JOIN tmp_fk_values_pms_summary_new_budget b ON a.uniq_id = b.uniq_id;
+
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,budget_code_id)
+	SELECT	a.uniq_id, max(b.budget_code_id) 
+	FROM etl.stg_payroll_summary a JOIN ref_budget_code b  ON a.bud_code = b.budget_code AND a.fy = b.fiscal_year		
+		JOIN ref_agency d ON a.agency = d.agency_code AND b.agency_id = d.agency_id
+		JOIN ref_fund_class e ON '001' = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN etl.ref_budget_code_id_seq f ON b.budget_code_id = f.budget_code_id
+	GROUP BY 1	;		
+
+	RAISE NOTICE '1.5';
+	
+	-- FK: Payroll Summary Id
+	
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,payroll_summary_id,action_flag)
+	SELECT a.uniq_id,b.payroll_summary_id,'U' as action_flag
+	FROM   etl.stg_payroll_summary a JOIN payroll_summary b ON a.fy = b.fiscal_year 
+		JOIN ref_agency c ON a.agency = c.agency_code
+		JOIN ref_agency_history d ON c.agency_id = d.agency_id AND d.agency_history_id = b.agency_history_id
+		JOIN ref_department e ON a.uoa = e.department_code AND e.fiscal_year=a.fy AND c.agency_id = e.agency_id
+		JOIN ref_fund_class z on '001' = z.fund_class_code and z.fund_class_id = e.fund_class_id 
+		JOIN ref_department_history f on e.department_id = f.department_id AND b.department_history_id = f.department_history_id
+		JOIN ref_expenditure_object g on g.expenditure_object_code = a.object AND a.fy = e.fiscal_year
+		JOIN ref_expenditure_object_history h on h.expenditure_object_id = g.expenditure_object_id AND b.expenditure_object_history_id = h.expenditure_object_history_id
+		JOIN ref_budget_code i on a.bud_code = i.budget_code AND a.fy = i.fiscal_year AND i.agency_id = c.agency_id AND z.fund_class_id = i.fund_class_id AND i.budget_code_id = b.budget_code_id;
+		
+	
+	TRUNCATE etl.payroll_summary_id_seq;
+	
+	INSERT INTO etl.payroll_summary_id_seq(uniq_id)
+	SELECT a.uniq_id
+	FROM	etl.stg_payroll_summary a JOIN (SELECT uniq_id
+						 FROM tmp_fk_pms_summay_values
+						 GROUP BY 1
+						 HAVING max(payroll_summary_id) is null) b on a.uniq_id=b.uniq_id;
+	
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,payroll_summary_id,action_flag)
+	SELECT uniq_id,payroll_summary_id,'I' as action_flag
+	FROM etl.payroll_summary_id_seq;
+	
+	
+	UPDATE etl.stg_payroll_summary a
+	SET	
+		pay_date_id =ct_table.pay_date_id ,
+		agency_history_id =ct_table.agency_history_id ,		
+		department_history_id=ct_table.department_history_id,
+		expenditure_object_history_id = ct_table.expenditure_object_history_id,
+		budget_code_id = ct_table.budget_code_id,
+		payroll_summary_id = ct_table.payroll_summary_id,
+		action_flag = ct_table.action_flag
+	FROM	
+		(SELECT uniq_id,
+			max(pay_date_id )as pay_date_id ,
+			max(agency_history_id )as agency_history_id ,			
+			max(department_history_id )as department_history_id ,
+			max(expenditure_object_history_id) as expenditure_object_history_id,			
+			max(budget_code_id) as budget_code_id,
+			max(payroll_summary_id) as payroll_summary_id,
+			max(action_flag) as action_flag
+		FROM	tmp_fk_pms_summay_values
+		GROUP	BY 1) ct_table
+	WHERE	a.uniq_id = ct_table.uniq_id;	
+	
+	RAISE NOTICE '1.7';
+	
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in updateForeignKeysForPMSSummary';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
+END;
+$$ language plpgsql;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.processPayrollSummary(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
+DECLARE
+	l_count bigint;
+	l_fk_update smallint;
+	
+BEGIN
+	l_fk_update := etl.updateForeignKeysForPMSSummary(p_load_id_in);
+
+	IF l_fk_update <> 1 THEN
+		RETURN -1;
+	END IF;
+		
+	INSERT INTO payroll_summary(payroll_summary_id,agency_history_id,pay_cycle_code,
+    				    expenditure_object_history_id, payroll_number,payroll_description,department_history_id,
+    				    fiscal_year ,budget_code_id ,total_amount,
+				    pay_date_id, created_load_id, created_date)
+	SELECT payroll_summary_id, agency_history_id,pay_cycle,
+    	       expenditure_object_history_id, pyrl_no,pyrl_desc,department_history_id,
+    	       fy ,budget_code_id ,total_amt,
+	       pay_date_id,p_load_id_in,now()::timestamp
+	FROM   etl.stg_payroll_summary
+	WHERE  action_flag = 'I';
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'PS',l_count,'# of new PMS Summary records');
+
+	CREATE TEMPORARY TABLE tmp_payroll_summary_update AS
+	SELECT *
+	FROM etl.stg_payroll_summary
+	WHERE  action_flag = 'U'
+	DISTRIBUTED BY (payroll_summary_id)  ;     
+
+	UPDATE payroll_summary a
+	SET    agency_history_id = b.agency_history_id,
+	       pay_cycle_code = b.pay_cycle,
+    	       expenditure_object_history_id = b.expenditure_object_history_id,
+    	       payroll_number = b.pyrl_no,
+    	       payroll_description = b.pyrl_desc,
+    	       department_history_id = b.department_history_id,
+    	       fiscal_year = b.fy,
+    	       budget_code_id = b.budget_code_id,
+    	       total_amount = b.total_amt,
+	       pay_date_id = b.pay_date_id,
+	       updated_load_id = p_load_id_in,
+	       updated_date = now()::timestamp
+	FROM   tmp_payroll_summary_update b
+	WHERE  a.payroll_summary_id = b.payroll_summary_id;	       
+	       
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,'PS',l_count,'# of updated PMS Summary records');
+			
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in processPayrollSummary';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	RETURN 0;
