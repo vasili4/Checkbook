@@ -517,7 +517,8 @@ CREATE TABLE ref_revenue_class (
   budget_allowed_flag bit ,
   description varchar(100),
   created_date timestamp,
-  updated_load_id integer,
+created_load_id integer,  
+updated_load_id integer,
   updated_date timestamp without time zone
 ) DISTRIBUTED BY (revenue_class_id);
 
