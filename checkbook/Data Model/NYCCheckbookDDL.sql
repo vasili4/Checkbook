@@ -503,6 +503,7 @@ CREATE TABLE ref_revenue_category (
     budget_allowed_flag bit(1),
     description character varying(100),
     created_date timestamp without time zone,
+    created_load_id integer
     updated_load_id integer,
 updated_date timestamp without time zone
 ) distributed by (revenue_category_id);
