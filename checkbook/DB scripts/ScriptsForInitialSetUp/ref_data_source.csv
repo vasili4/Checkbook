@@ -10,10 +10,7 @@ L,COALocation,,,,,etl.stg_location,etl.archive_location,etl.invalid_location,2,1
 O,COAObjectClass,,,,,etl.ext_stg_coa_object_class_feed,,,1,1
 O,COAObjectClass,,,,,etl.stg_object_class,etl.archive_object_class,etl.invalid_object_class,2,1
 V,FMSV,,,,,etl.ext_stg_fmsv_data_feed,,,1,1
-V,FMSV,,,V,Vendor,etl.stg_fmsv_vendor,etl.archive_fmsv_vendor,etl.invalid_fmsv_vendor,2,1
-V,FMSV,,,M,Business Type,etl.stg_fmsv_business_type,etl.archive_fmsv_business_type,etl.invalid_fmsv_business_type,3,1
-V,FMSV,,,A,Address,etl.stg_fmsv_address,etl.archive_fmsv_address,etl.invalid_fmsv_address,4,1
-V,FMSV,,,T,Address Type,etl.stg_fmsv_address_type,etl.archive_fmsv_address_type,etl.invalid_fmsv_address_type,5,1
+V,FMSV,,,M,Business Type,etl.stg_fmsv_business_type,etl.archive_fmsv_business_type,etl.invalid_fmsv_business_type,2,1
 M,MAG,,,,,etl.ext_stg_mag_data_feed,,,1,2
 M,MAG,,,H,Header,etl.stg_mag_header,etl.archive_mag_header,etl.invalid_mag_header,2,2
 M,MAG,,,W,Award detail,etl.stg_mag_award_detail,etl.archive_mag_award_detail,etl.invalid_mag_award_detail,3,2

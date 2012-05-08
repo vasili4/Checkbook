@@ -9,34 +9,13 @@ L,,,Missing key elements,,,"location_code,location_name,agency_code",,,,,1
 L,,,Duplicate,,,"location_code,agency_code",,,,,2
 O,,,Missing key elements,,,"object_class_code,object_class_name",,,,,1
 O,,,Duplicate,,,object_class_code,,,,,2
-V,A,,Missing key elements,,,"vend_cust_cd,ad_id,ctry,str_1_nm",,,,"(ctry='US' AND(COALESCE(str_1_nm,'')='' OR COALESCE(zip,'')='' OR COALESCE(city_nm,'')=''))",14
-V,A,,Duplicate,,,"vend_cust_cd,ad_id",,,,,15
-V,A,,Missing vendor,etl.stg_fmsv_vendor,,vend_cust_cd,,,,,17
-V,A,,Invalid component - vendor,,etl.stg_fmsv_vendor,vend_cust_cd,,,,,58
-V,A,,Invalid component - business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,59
-V,A,,Invalid component - address,,etl.stg_fmsv_address,vend_cust_cd,,,,,60
-V,A,,Invalid component - address type,,etl.stg_fmsv_address_type,vend_cust_cd,,,,,61
-V,M,,Missing key elements,,,"vend_cust_cd,bus_typ,bus_typ_sta,disp_cert_strt_dt",,,,,4
-V,M,,Duplicate,,,"vend_cust_cd,bus_typ",,,,,5
-V,M,,Invalid business type,,,bus_typ,,public.ref_business_type,business_type_code,,6
-V,M,,Invalid minority type,,,min_typ,,public.ref_minority_type,minority_type_id,,7
-V,M,,Invalid business type status,,,bus_typ_sta,,public.ref_business_type_status,business_type_status_id,,8
-V,M,,Inconsistent minority type,,,,,,,"bus_typ='MNRT' AND bus_typ_sta=2 AND COALESCE(min_typ,0)=0",9
-V,M,,Inconsistent business type,,,,,,,"COALESCE(bus_typ,'')<>'MNRT' AND  COALESCE(min_typ,0) >0",10
-V,M,,Missing vendor,etl.stg_fmsv_vendor,,vend_cust_cd,,,,,11
-V,M,,Invalid start date,,,,,,,disp_cert_strt_dt>cert_end_dt,12
-V,M,,Invalid component - vendor,,etl.stg_fmsv_vendor,vend_cust_cd,,,,,54
-V,M,,Invalid component - business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,55
-V,M,,Invalid component - address,,etl.stg_fmsv_address,vend_cust_cd,,,,,56
-V,M,,Invalid component - address type,,etl.stg_fmsv_address_type,vend_cust_cd,,,,,57
-V,T,,Invalid start date,,,,,,,efbgn_dt>efend_dt,16
-V,T,,Missing key elements,,,"vend_cust_cd,ad_id,ad_typ,efbgn_dt",,,,,21
-V,T,,Duplicate,,,"vend_cust_cd,ad_id,ad_typ",,,,,22
-V,T,,Invalid address type,,,ad_typ,,public.ref_address_type,address_type_code,,23
-V,T,,Missing vendor,etl.stg_fmsv_vendor,,vend_cust_cd,,,,,24
-V,T,,Missing address,etl.stg_fmsv_address,,"vend_cust_cd,ad_id",,,,,25
-V,T,,Invalid component -vendor,,etl.stg_fmsv_vendor,vend_cust_cd,,,,,62
-V,T,,Invalid component -business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,63
+V,M,,Missing key elements,,,"vend_cust_cd,bus_typ,bus_typ_sta",,,,,1
+V,M,,Duplicate,,,"vend_cust_cd,bus_typ",,,,,2
+V,M,,Invalid minority type,,,min_typ,,public.ref_minority_type,minority_type_id,,3
+V,M,,Invalid business type status,,,bus_typ_sta,,public.ref_business_type_status,business_type_status_id,,4
+V,M,,Inconsistent minority type,,,,,,,"bus_typ='MNRT' AND bus_typ_sta=2 AND COALESCE(min_typ,0)=0",5
+V,M,,Inconsistent business type,,,,,,,"COALESCE(bus_typ,'')<>'MNRT' AND  COALESCE(min_typ,0) >0",6
+V,M,,Invalid component - business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,7
 F,H,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_rec_dt_dc,doc_bfy,doc_per_dc,chk_eft_am,chk_eft_iss_dt",,,,,1
 F,H,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,2
 F,H,,Missing vendor,,etl.stg_fms_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,3
@@ -157,14 +136,6 @@ C,A,DO1,Invalid component - header,etl.stg_con_do1_header,,"doc_cd,doc_dept_cd,d
 C,A,DO1,Invalid component - vendor,,etl.stg_con_do1_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,122
 C,A,DO1,Invalid component - commodity,,etl.stg_con_do1_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,123
 C,A,DO1,Invalid component - accounting line,,etl.stg_con_do1_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,124
-V,T,,Invalid component -address,,etl.stg_fmsv_address,vend_cust_cd,,,,,64
-V,T,,Invalid component -address type,,etl.stg_fmsv_address_type,vend_cust_cd,,,,,65
-V,V,,Missing key elements,,,vend_cust_cd,,,,"COALESCE(lgl_nm,'')='' AND COALESCE(alias_nm,'')=''",1
-V,V,,Duplicate,,,vend_cust_cd,,,,,2
-V,V,,Invalid start date,,,,,,,efbgn_dt>efend_dt,3
-V,V,,Invalid component -business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,51
-V,V,,Invalid component -address,,etl.stg_fmsv_address,vend_cust_cd,,,,,52
-V,V,,Invalid component -address type,,etl.stg_fmsv_address_type,vend_cust_cd,,,,,53
 RY,,,Missing key elements,,,rscat_cd,,,,,1
 RY,,,Duplicate,,,rscat_cd,,,,,2
 RC,,,Missing key elements,,,rscls_cd,,,,,1
