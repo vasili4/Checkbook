@@ -380,7 +380,11 @@ CREATE TABLE ref_funding_class (
     intra_city_flag bit(1),
     fund_allocation_required_flag bit(1),
     category_code character varying(2),
-    created_date timestamp without time zone
+    created_date timestamp without time zone,
+    fiscal_year smallint,
+    updated_date timestamp,
+    created_load_id integer,
+    updated_load_id integer
 ) distributed by (funding_class_id);
 
 
@@ -671,6 +675,17 @@ ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_vendor_h
 ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_ref_business_type foreign key (business_type_id) references ref_business_type (business_type_id);
 ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_etl_data_load foreign key (load_id) references etl_data_load (load_id);
 ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_ref_minority_type foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+
+CREATE TABLE fmsv_business_type (
+	vendor_customer_code character varying(20),
+	business_type_id smallint,
+	status smallint,
+    	minority_type_id smallint,
+    	certification_start_date date,
+    	certification_end_date date, 
+    	initiation_date date
+)
+DISTRIBUTED BY (vendor_customer_code);
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -978,14 +993,16 @@ CREATE TABLE payroll_summary (
     pay_cycle_code char(1),
     expenditure_object_history_id integer,
     payroll_number varchar,
+    payroll_description varchar,
     department_history_id integer,
     fiscal_year smallint,
     budget_code_id integer,
     total_amount numeric(15,2),
     pay_date_id smallint,
-    load_id integer,
+    created_load_id integer,
     created_date timestamp without time zone,
-    updated_date timestamp without time zone
+    updated_date timestamp without time zone,
+    updated_load_id integer
 ) distributed by (payroll_summary_id);
 
 
