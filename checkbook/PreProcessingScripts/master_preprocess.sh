@@ -35,7 +35,7 @@ elif [ $1 == "COARevenueClass" ] ; then
 	 
 elif [ $1 == "COARevenueSource" ] ; then
 	./removeMalformedRevenueSourceRecords.sh $fileName
-	 
+	
 elif [ $1 == "CON" ] ; then
 	./removeMalformedCONRecords.sh $fileName
 	 
@@ -45,11 +45,23 @@ elif [ $1 == "FMS" ] ; then
 elif [ $1 == "MAG" ] ; then
 	./removeMalformedMAGRecords.sh $fileName
 	 
+elif [ $1 == "FundingClass" ] ; then
+	./removeMalformedFundingClassRecords.sh $fileName
+	
 elif [ $1 == "Revenue" ] ; then
 	./removeMalformedRevenueRecords.sh $fileName
 	 
 elif [ $1 == "Budget" ] ; then
 	./removeMalformedBudgetRecords.sh $fileName
+	
+elif [ $1 == "PMSSummary" ] ; then
+	./removeMalformedPayrollSummaryRecords.sh $fileName	
+	
+elif [ $1 == "PMS" ] ; then
+	./removeMalformedPMSRecords.sh $fileName	
+	
+elif [ $1 == "PendingContracts" ] ; then
+	./removeMalformedPendingContracts.sh $fileName
 	
 fi
 
