@@ -1233,138 +1233,16 @@ CREATE TABLE invalid_mag_commodity (LIKE archive_mag_commodity) DISTRIBUTED BY (
 
 -- Start of FMSV related tables
 
- CREATE EXTERNAL TABLE ext_stg_fmsv_data_feed(record_type char(1),col2 varchar,col3 varchar, col4 varchar,col5 varchar,
-col6 varchar,col7 varchar,col8 varchar,col9 varchar,col10 varchar,
-col11 text,col12 varchar,col13 text,col14 varchar,col15 varchar,
-col16 varchar,col17 varchar,col18 varchar,col19 varchar,col20 varchar,
-col21 varchar,col22 varchar,col23 varchar,col24 varchar,col25 varchar,
-col26 varchar,col27 varchar,col28 varchar,col29 varchar,col30 varchar,
-col31 varchar,col32 text,col33 text,col34 varchar,col35 varchar,
-col36 varchar,col37 varchar,col38 varchar,col39 varchar,col40 varchar,
-col41 varchar,col42 varchar,col43 varchar,col44 varchar,col45 varchar,
-col46 text,col47 varchar,col48 varchar,col49 varchar,col50 varchar,
-col51 varchar,col52 varchar,col53 varchar,col54 varchar,col55 varchar,
-col56 varchar,col57 text,col58 varchar,col59 text,col60 text,
-col61 text,col62 text,col63 text,col64 text,col65 varchar,
-col66 varchar,col67 varchar,col68 varchar,col69 varchar,col70 varchar,
-col71 varchar,col72 text,col73 varchar,col74 varchar,col75 varchar,
-col76 varchar,col77 varchar,col78 text,col79 varchar,col80 text,
-col81 varchar,col82 varchar,col83 varchar,col84 varchar,col85 varchar,
-col86 varchar,col87 varchar,col88 varchar,col89 varchar,col90 varchar,
-col91 varchar,col92 varchar,col93 varchar,col94 varchar,col95 varchar,
-col96 varchar,col97 varchar(1),col98 varchar(1))
+ CREATE EXTERNAL TABLE ext_stg_fmsv_data_feed(record_type char(1),doc_dept_cd varchar,vend_cust_cd varchar,
+					      bus_typ varchar,bus_typ_sta varchar,min_typ varchar,disp_cert_strt_dt varchar,
+					      cert_end_dt varchar,init_dt varchar,col10 varchar )
  LOCATION (
   	    'gpfdist://mdw1:8081/datafiles/FMSV_feed.txt')
   	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
  ENCODING 'UTF8';
 
-CREATE TABLE stg_fmsv_vendor(
-	vend_cust_cd varchar(20),
-	ad_id varchar(20),
-	ad_typ varchar (2),
-	lgl_nm varchar(60),
-	alias_nm varchar(60),
-	frst_nm varchar(14),
-	mid_nm varchar(14),
-	last_nm varchar(30),
-	comp_nm varchar(60),
-	vend_act_sta integer,
-	cust_act_sta integer,
-	vend_aprv_sta integer,
-	cust_aprv_sta integer,
-	efbgn_dt date,
-	efend_dt date,
-	org_typ integer,
-	org_cls integer,
-	tin varchar(9),
-	tin_typ varchar (1),
-	rpt_1099_ind char(1),
-	bkup_whld_fl char(1),
-	hld_pymt_fl char(1),
-	eft_sta integer,
-	prvnt_new_spnd_ind integer,
-	int_acct_fl char(1),
-	thrd_pty_only_fl char(1),
-	thrd_pty_vend_fl char(1),
-	thrd_pty_cust_fl char(1),
-	rstr_use_fl char(1),
-	loc_nm varchar(60),
-	invn_cust_fl char(1),
-	dept_cd varchar(4),
-	unit_cd varchar(8),
-	fran_acct_fl char(1),
-	pnt_duns_no varchar(9),
-	pnt_web_ad varchar(100),
-	pnt_acct_lgl_nm varchar(60),
-	w8_form integer,
-	mercht_cd varchar(20),
-	ebic_no varchar(30),
-	iaec_no varchar(30),
-	web_ad varchar(100),
-	sex integer,
-	dob timestamp,
-	mart_sta integer,
-	no_of_empl integer,
-	annl_inc integer,
-	tax_prfl_cd varchar(10),
-	tax_prfl_nm varchar(50),
-	chk_nm integer,
-	sched_pymt_dy integer,
-	pybl_auth_usid varchar(16),
-	pybl_auth_dt timestamp,
-	hld_reas varchar,
-	sngl_chk_ind char(1),
-	disb_cat varchar(4),
-	dflt_disb_frmt varchar(4),
-	dflt_disb_typ integer,
-	thrd_pty_cd varchar(20),
-	thrd_pty_nm varchar(60),
-	thrd_pty_dt timestamp,
-	thrd_pty_reas varchar,
-	thrd_pty_aprv_usid varchar(16),
-	dflt_disb_prty integer,
-	alw_eft_fl char(1),
-	eft_frmt varchar(4),
-	last_sta_chg_dt timestamp,
-	rej_hld_reas varchar,
-	dum_pnote_rqst_dt date,
-	pnote_rej_cd varchar(3),
-	pnote_rej_expl varchar,
-	remt_adv_req_fl char(1),
-	remt_adv_frmt varchar(4),
-	disc_1_dy integer,
-	disc_2_dy integer,
-	disc_3_dy integer,
-	disc_4_dy integer,
-	disc_1_pc decimal(17,4),
-	disc_2_pc decimal(17,4),
-	disc_3_pc decimal(17,4),
-	disc_4_pc decimal(17,4),
-	disc_alw_3_fl char(1),
-	disc_alw_4_fl char(1),
-	disc_alw_1_fl char(1),
-	disc_alw_2_fl char(1),
-	dflt_rect_typ integer,
-	dflt_bpro varchar(5),
-	bill_pnt_fl char(1),
-	duns_no varchar(9),
-	intrnt_ctlg varchar(100),
-	pref_ord_meth integer,
-	pcard_acc_lvl integer,
-	vend_pref_lvl integer,
-	last_mod_dt timestamp,
-	reg_dt date,
-	misc_acct_fl bit(1),
-	uniq_id bigint default nextval('seq_stg_fmsv_vendor_uniq_id'),
-	invalid_flag char(1),
-	invalid_reason varchar		
-)
-DISTRIBUTED BY (uniq_id);
-
 CREATE TABLE stg_fmsv_business_type(
-	vend_cust_cd varchar(20),
-	ad_id varchar(20),
-	ad_typ varchar (2),
+	vend_cust_cd varchar(20),	
 	bus_typ varchar(4),
 	bus_typ_sta integer,
 	min_typ integer,
@@ -1375,102 +1253,11 @@ CREATE TABLE stg_fmsv_business_type(
 	invalid_flag char(1),
 	invalid_reason varchar		)
 DISTRIBUTED BY (uniq_id)	;
-	
-CREATE TABLE stg_fmsv_address(
-	vend_cust_cd varchar(20),
-	ad_id varchar(20),
-	ad_typ varchar (2),
-	str_1_nm varchar(75),
-	str_2_nm varchar(75),
-	ctry varchar(3),
-	st varchar(2),
-	zip varchar(10),
-	city_nm varchar(60),
-	uniq_id bigint default nextval('seq_stg_fmsv_address_uniq_id'),
-	invalid_flag char(1),
-	invalid_reason varchar		)
-DISTRIBUTED BY (uniq_id)	;
-	
-CREATE TABLE stg_fmsv_address_type(
-	vend_cust_cd varchar(20),
-	ad_id varchar(20),
-	ad_typ varchar (2),
-	efbgn_dt date,
-	efend_dt date,
-	mail_ret_fl char(1),
-	dflt_ad_typ char(1),
-	addl_ad_info varchar(60),
-	voice_ph_no varchar(30),
-	voice_ph_ext varchar(6),
-	ctry_ph_cd varchar(5),
-	cnty_nm varchar(75),
-	cnty_cd varchar(5),
-	alw_eft_fl char(1),
-	pnote_rej_cd varchar(3),
-	eft_frmt varchar(4),
-	eft_sta integer,
-	hld_reas varchar,
-	pnote_rej_expl varchar,
-	dum_pnote_rqst_dt date,
-	last_sta_chg_dt timestamp,
-	remt_adv_req_fl char(1),
-	remt_adv_frmt varchar(4),
-	cntac_no varchar(20),
-	prin_cntac varchar(60),
-	eng_sp_fl char(1),
-	email_ad varchar(100),
-	alt_voice_ph_no varchar(30),
-	alt_voice_ph_ext varchar(6),
-	fax_ph_no varchar(30),
-	fax_ph_ext varchar(6),
-	alt_fax_ph_no varchar(30),
-	alt_fax_ph_ext varchar(6),
-	acorspd_typ integer,
-	cntac_str_1_nm varchar(75),
-	cntac_str_2_nm varchar(75),
-	cntac_ctry varchar(3),
-	cntac_st varchar(2),
-	cntac_zip varchar(10),
-	cntac_city_nm varchar(60),
-	cntac_cnty_nm varchar(75),
-	cntac_cnty_cd varchar(5),
-	cntac_ctry_ph_cd varchar(5),
-	cntac_ph_no varchar(30),
-	cntac_ph_ext varchar(6),
-	last_mod_dt timestamp,
-	last_mod_usid varchar(16),
-	last_aprv_usid varchar(16),
-	last_aprv_dt timestamp,
-	prvnt_new_spnd_ind integer,
-	uniq_id bigint default nextval('seq_stg_fmsv_address_type_uniq_id'),
-	invalid_flag char(1),
-	invalid_reason varchar		)
-DISTRIBUTED BY (uniq_id)	;
-
-
-
-CREATE TABLE archive_fmsv_vendor (LIKE stg_fmsv_vendor) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fmsv_vendor ADD COLUMN load_file_id bigint;
-
-CREATE TABLE invalid_fmsv_vendor (LIKE archive_fmsv_vendor) DISTRIBUTED BY (uniq_id);
-
 
 CREATE TABLE archive_fmsv_business_type (LIKE stg_fmsv_business_type) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_fmsv_business_type ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_fmsv_business_type (LIKE archive_fmsv_business_type) DISTRIBUTED BY (uniq_id);
-
-CREATE TABLE archive_fmsv_address (LIKE stg_fmsv_address) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fmsv_address ADD COLUMN load_file_id bigint;
-
-CREATE TABLE invalid_fmsv_address (LIKE archive_fmsv_address) DISTRIBUTED BY (uniq_id);
-
-
-CREATE TABLE archive_fmsv_address_type (LIKE stg_fmsv_address_type) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_fmsv_address_type ADD COLUMN load_file_id bigint;
-
-CREATE TABLE invalid_fmsv_address_type (LIKE archive_fmsv_address_type) DISTRIBUTED BY (uniq_id);
-
 
 CREATE TABLE vendor_id_seq(uniq_id bigint,vendor_id int DEFAULT nextval('public.seq_vendor_vendor_id'))
 DISTRIBUTED BY (uniq_id);
@@ -1487,6 +1274,8 @@ DISTRIBUTED BY (uniq_id);
 CREATE TABLE vendor_business_id_seq(uniq_id bigint,vendor_business_type_id int DEFAULT nextval('public.seq_vendor_bus_type_vendor_bus_type_id'))
 DISTRIBUTED BY (uniq_id);
 
+CREATE TABLE ref_business_type_id_seq(uniq_id bigint,business_type_id int DEFAULT nextval('public.seq_ref_business_type_business_type_id'))
+DISTRIBUTED BY (uniq_id);
 
 
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -3927,6 +3716,16 @@ CREATE TABLE malformed_funding_class(
 	load_file_id integer)
 DISTRIBUTED BY (load_file_id);
 
+CREATE TABLE malformed_pms_summary_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+
+CREATE TABLE malformed_oaisis_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
 
 --------------------------------------------------------------------------------
 /* PMS feed */
@@ -3997,7 +3796,7 @@ ALTER TABLE archive_payroll ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_payroll (LIKE archive_payroll) DISTRIBUTED BY (uniq_id);
 
-CREATE TABLE payroll_id_seq(uniq_id bigint,payroll_id int default nextval('public.seq_payroll_payroll_id'))
+CREATE TABLE payroll_id_seq(uniq_id bigint,payroll_id bigint default nextval('public.seq_payroll_payroll_id'))
 DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE employee_id_seq(employee_number varchar,employee_id bigint default nextval('public.seq_employee_employee_id'))
@@ -4045,6 +3844,13 @@ CREATE EXTERNAL TABLE ext_stg_pms_summary_data_feed(
  	agency_name  varchar(50),
  	bud_code varchar(10) ,
  	bud_code_desc  varchar(100),
+ 	pay_date_id smallint,
+	agency_history_id smallint,
+	department_history_id integer,
+	expenditure_object_history_id integer,
+	budget_code_id integer,
+	payroll_summary_id bigint, 
+	action_flag char(1),
  	total_amt decimal(15,2),
  	uniq_id bigint default nextval('seq_stg_payroll_summary_uniq_id'),
 	invalid_flag char(1),
@@ -4056,3 +3862,87 @@ ALTER TABLE archive_payroll_summary ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_payroll_summary (LIKE archive_payroll_summary) DISTRIBUTED BY (uniq_id);	
 	
+CREATE TABLE payroll_summary_id_seq(uniq_id bigint,payroll_summary_id bigint default nextval('public.seq_payroll_summary_payroll_summary_id'))
+DISTRIBUTED BY (uniq_id);
+	
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
+	con_trans_code varchar,
+	con_trans_ad_code  varchar,
+	con_no  varchar,
+	con_par_trans_code varchar,
+	con_par_ad_code	varchar,
+	con_par_reg_num	varchar,
+	con_cur_encumbrance varchar,
+	con_original_max varchar,
+	con_rev_max varchar,
+	vc_legal_name varchar,
+	con_vc_code varchar,
+	con_purpose varchar,
+	submitting_agency_desc	 varchar,
+	submitting_agency_code	 varchar,
+	awarding_agency_desc	 varchar,
+	awarding_agency_code	 varchar,
+	cont_desc varchar,
+	cont_code  varchar,
+	am_desc varchar,
+	am_code varchar,
+	con_term_from varchar,
+	con_term_to varchar,
+	con_rev_start_dt varchar,
+	con_rev_end_dt varchar,
+	con_cif_received_date varchar,
+	con_pin	 varchar,
+	con_internal_pin varchar,
+	con_batch_suffix varchar,
+	con_version varchar)
+ LOCATION (
+  	    'gpfdist://mdw1:8081/datafiles/OAISIS_feed.txt')
+  	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
+ ENCODING 'UTF8';	
+
+ CREATE TABLE stg_pending_contracts(
+ 	con_trans_code varchar(4),
+ 	con_trans_ad_code  varchar(4),
+ 	con_no  varchar(11),
+ 	con_par_trans_code varchar(4),
+ 	con_par_ad_code	varchar(4),
+ 	con_par_reg_num	varchar(11),
+ 	con_cur_encumbrance numeric(15,2),
+ 	con_original_max numeric(15,2),
+ 	con_rev_max numeric(15,2),
+ 	vc_legal_name varchar(80),
+ 	con_vc_code varchar(20),
+ 	con_purpose varchar(78),
+ 	submitting_agency_desc	 varchar(50),
+ 	submitting_agency_code	 varchar(4),
+ 	awarding_agency_desc	 varchar(50),
+ 	awarding_agency_code	 varchar(4),
+ 	cont_desc varchar(40),
+ 	cont_code  varchar(2),
+ 	am_desc varchar(50),
+ 	am_code varchar(3),
+ 	con_term_from date,
+ 	con_term_to date,
+ 	con_rev_start_dt date,
+ 	con_rev_end_dt date,
+ 	con_cif_received_date date,
+ 	con_pin	 varchar(30),
+ 	con_internal_pin varchar(15),
+ 	con_batch_suffix varchar(10),
+	con_version varchar(5),
+	document_code_id smallint,
+	agency_history_id smallint,
+ 	uniq_id bigint default nextval('seq_stg_payroll_summary_uniq_id'),
+	invalid_flag char(1),
+	invalid_reason varchar	
+ );
+ 
+ CREATE TABLE archive_pending_contracts (LIKE stg_pending_contracts) DISTRIBUTED BY (uniq_id);
+ ALTER TABLE archive_pending_contracts ADD COLUMN load_file_id bigint;
+ 
+ CREATE TABLE invalid_pending_contracts (LIKE archive_pending_contracts) DISTRIBUTED BY (uniq_id);	
+
+ CREATE TABLE pending_contract_id_seq(uniq_id bigint,contract_id bigint default nextval('public.seq_pending_contract_contract_id'))
+ DISTRIBUTED BY (uniq_id);
