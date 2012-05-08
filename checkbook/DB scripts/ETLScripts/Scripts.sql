@@ -515,6 +515,15 @@ BEGIN
 				EXECUTE l_update_str;	
 
 			END IF;
+			IF l_rule.rule_name like 'Inconsistent%' THEN
+			
+				l_update_str := 'UPDATE ' || l_rule.staging_table_name || 
+						' SET invalid_flag = ''Y'', ' ||
+						'	invalid_reason =''' || l_rule.rule_name || ''' ' ||						
+						' WHERE ' || l_rule.invalid_condition ;
+				EXECUTE l_update_str;
+							
+			END IF;			
 
 		END LOOP;
 
