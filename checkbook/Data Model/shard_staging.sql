@@ -571,7 +571,7 @@ CREATE EXTERNAL WEB TABLE revenue_details__0 (
 	revenue_class_name varchar,
 	fund_class_name varchar,
 	funding_class_name varchar,
-	agency code varchar,
+	agency_code varchar,
 	revenue_class_code varchar,
 	fund_class_code varchar,
 	funding_class_code varchar,
@@ -589,7 +589,7 @@ CREATE VIEW revenue_details AS
     SELECT revenue_details__0.revenue_id, revenue_details__0.fiscal_year, revenue_details__0.fiscal_period, revenue_details__0.posting_amount, revenue_details__0.revenue_category_id, revenue_details__0.revenue_source_id,revenue_details__0.fiscal_year_id ,
     revenue_details__0.agency_id ,revenue_details__0.department_id , revenue_details__0.revenue_class_id , revenue_details__0.fund_class_id , revenue_details__0.funding_class_id , 
     revenue_details__0.budget_code_id,revenue_details__0.budget_fiscal_year_id,revenue_details__0.agency_name, revenue_details__0.revenue_category_name,revenue_details__0.revenue_source_name,
-    revenue_details__0.budget_fiscal_year,revenue_details__0.department_name,revenue_details__0.revenue_class_name,revenue_details__0.fund_class_name,revenue_details__0.funding_class_name 
+    revenue_details__0.budget_fiscal_year,revenue_details__0.department_name,revenue_details__0.revenue_class_name,revenue_details__0.fund_class_name,revenue_details__0.funding_class_name, 
     revenue_details__0.agency_code,revenue_details__0.revenue_class_code,revenue_details__0.fund_class_code,revenue_details__0.funding_class_code,revenue_details__0.revenue_category_code,
     revenue_details__0.revenue_source_code
     FROM  ONLY revenue_details__0;
@@ -1503,15 +1503,19 @@ CREATE VIEW ref_fund_class AS
 
 CREATE EXTERNAL WEB TABLE ref_funding_class__0 (
     funding_class_id smallint,
-    funding_class_code character varying,
-    funding_class_name character varying,
-    funding_class_short_name character varying,
-    category_name character varying,
+    funding_class_code character varying(4),
+    funding_class_name character varying(60),
+    funding_class_short_name character varying(15),
+    category_name character varying(60),
     city_fund_flag bit(1),
     intra_city_flag bit(1),
     fund_allocation_required_flag bit(1),
-    category_code character varying,
-    created_date timestamp without time zone
+    category_code character varying(2),
+    created_date timestamp without time zone,
+    fiscal_year smallint,
+    updated_date timestamp,
+    created_load_id integer,
+    updated_load_id integer
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_funding_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -1521,7 +1525,11 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_funding_class AS
-    SELECT ref_funding_class__0.funding_class_id, ref_funding_class__0.funding_class_code, ref_funding_class__0.funding_class_name, ref_funding_class__0.funding_class_short_name, ref_funding_class__0.category_name, ref_funding_class__0.city_fund_flag, ref_funding_class__0.intra_city_flag, ref_funding_class__0.fund_allocation_required_flag, ref_funding_class__0.category_code, ref_funding_class__0.created_date FROM ONLY ref_funding_class__0;
+    SELECT ref_funding_class__0.funding_class_id, ref_funding_class__0.funding_class_code, ref_funding_class__0.funding_class_name, 
+    ref_funding_class__0.funding_class_short_name, ref_funding_class__0.category_name, ref_funding_class__0.city_fund_flag, 
+    ref_funding_class__0.intra_city_flag, ref_funding_class__0.fund_allocation_required_flag, ref_funding_class__0.category_code, 
+    ref_funding_class__0.created_date,ref_funding_class__0.fiscal_year,ref_funding_class__0.updated_date,ref_funding_class__0.created_load_id,
+    ref_funding_class__0.updated_load_id FROM ONLY ref_funding_class__0;
 
 --
 -- Name: ref_funding_source__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
