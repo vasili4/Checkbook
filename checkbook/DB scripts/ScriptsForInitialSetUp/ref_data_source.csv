@@ -3,8 +3,8 @@ A,COAAgency,,,,,etl.ext_stg_coa_agency_feed,,,1,0
 A,COAAgency,,,,,etl.stg_agency,etl.archive_agency,etl.invalid_agency,2,0
 D,COADepartment,,,,,etl.ext_stg_coa_department_feed,,,1,1
 D,COADepartment,,,,,etl.stg_department,etl.archive_department,etl.invalid_department,2,1
-E,COAExpenditureObject,,,,,etl.ext_stg_coa_expenditure_object_feed,,,1,1
-E,COAExpenditureObject,,,,,etl.stg_expenditure_object,etl.archive_expenditure_object,etl.invalid_expenditure_object,2,1
+E,COAExpenditureObject,,,,,etl.ext_stg_coa_expenditure_object_feed,,,1,0
+E,COAExpenditureObject,,,,,etl.stg_expenditure_object,etl.archive_expenditure_object,etl.invalid_expenditure_object,2,0
 L,COALocation,,,,,etl.ext_stg_coa_location_feed,,,1,1
 L,COALocation,,,,,etl.stg_location,etl.archive_location,etl.invalid_location,2,1
 O,COAObjectClass,,,,,etl.ext_stg_coa_object_class_feed,,,1,1
@@ -56,3 +56,5 @@ PS,PMSSummary,,,,,etl.ext_stg_pms_summary_data_feed,,,1,4
 PS,PMSSummary,,,,,etl.stg_payroll_summary,etl.archive_payroll_summary,etl.invalid_payroll_summary,2,4
 FC,FundingClass,,,,,etl.ext_stg_funding_class,,,1,1
 FC,FundingClass,,,,,etl.stg_funding_class,etl.archive_funding_class,etl.invalid_funding_class,2,1
+PC,PendingContracts,,,,,etl.ext_stg_oaisis_feed,,,1,2
+PC,PendingContracts,,,,,etl.stg_pending_contracts,etl.archive_pending_contracts,etl.invalid_pending_contracts,2,2
