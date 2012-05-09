@@ -599,16 +599,34 @@ $$ language plpgsql;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION etl.processrevenuecategory(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
 DECLARE
+
+	ry_data_source_code ref_data_source.data_source_code%TYPE;
+	ry_count int:=0;
+	ry_ins_count int:=0;
+	ry_update_count int:=0;
+
+
+
 BEGIN
 
+	--Initialise variables
+	ry_data_source_code :='';
+
+
+	--Determine source code
+
+	SELECT b.data_source_code 
+	FROM   etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id	       
+	WHERE  a.load_file_id = p_load_file_id_in     
+	INTO   ry_data_source_code;
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_category(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar,rscat_sh_nm varchar, exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
-	
+
 	-- For all records check if data is modified/new
 
 
-	
+
 	INSERT INTO tmp_ref_revenue_category
 	SELECT  a.uniq_id,
 		a.rscat_cd, 
@@ -619,20 +637,29 @@ BEGIN
 	FROM   etl.stg_revenue_category a LEFT JOIN ref_revenue_category b ON a.rscat_cd = b.revenue_category_code;
 
 	RAISE NOTICE '1';
-	
+
 	-- Generate the revenue category id for new records
 
+
+
 	TRUNCATE etl.ref_revenue_category_id_seq;
-	
+
 	INSERT INTO etl.ref_revenue_category_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   tmp_ref_revenue_category
-	WHERE  exists_flag ='N';	
-	
-	INSERT INTO ref_revenue_category(revenue_category_id,revenue_category_code,revenue_category_name,revenue_category_short_name,created_date)
-	SELECT a.revenue_category_id,b.rscat_cd,b.rscat_nm,rscat_sh_nm, now()::timestamp
+	WHERE  exists_flag ='N';
+
+
+	INSERT INTO ref_revenue_category(revenue_category_id,revenue_category_code,revenue_category_name,revenue_category_short_name,created_date,created_load_id)
+	SELECT a.revenue_category_id,b.rscat_cd,b.rscat_nm,rscat_sh_nm, now()::timestamp,p_load_id_in 
 	FROM   etl.ref_revenue_category_id_seq a JOIN tmp_ref_revenue_category b ON a.uniq_id = b.uniq_id;
-	
+
+
+	GET DIAGNOSTICS ry_count = ROW_COUNT;
+	ry_ins_count := ry_count;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,ry_data_source_code,ry_ins_count, 'insert');
+
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_category_1(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar,rscat_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_category_id smallint)
 	DISTRIBUTED BY (revenue_category_id);
@@ -641,18 +668,29 @@ BEGIN
 	SELECT a.*,b.revenue_category_id FROM tmp_ref_revenue_category a JOIN ref_revenue_category b ON a.rscat_cd = b.revenue_category_code
 	WHERE exists_flag ='Y' and modified_flag='Y';
 
+
+
 	RAISE NOTICE '2';
-	
+
 	UPDATE ref_revenue_category a
 	SET	revenue_category_name = b.rscat_nm,
+		revenue_category_short_name = b.rscat_sh_nm,
 		updated_date = now()::timestamp,
-		updated_load_id = p_load_id_in
+		updated_load_id =  p_load_id_in
 	FROM	tmp_ref_revenue_category_1 b		
 	WHERE	a.revenue_category_id = b.revenue_category_id;
 
 
+	GET DIAGNOSTICS ry_count = ROW_COUNT;
+	ry_update_count := ry_count;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,ry_data_source_code,ry_update_count, 'update');
+
+
+	RAISE NOTICE 'INSIDE';
+
 	Return 1;
-	
+
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in processrevenuecategory';
@@ -660,19 +698,35 @@ EXCEPTION
 
 	RETURN 0;
 
-	
+
 END;
 $$ language plpgsql;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION etl.processrevenueclass(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
 DECLARE
-BEGIN
 
+	rc_data_source_code ref_data_source.data_source_code%TYPE;
+	rc_count int:=0;
+	rc_ins_count int:=0;
+	rc_update_count int:=0;
+
+
+
+BEGIN
+	--Initialise variables
+	rc_data_source_code :='';
+
+	--Determine source code
+
+	SELECT b.data_source_code 
+	FROM   etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id	       
+	WHERE  a.load_file_id = p_load_file_id_in     
+	INTO   rc_data_source_code;
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_class(uniq_id bigint,rscls_cd varchar(20),rscls_nm varchar,rscls_sh_nm varchar, exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
-	
+
 	-- For all records check if data is modified/new
 
 	INSERT INTO tmp_ref_revenue_class
@@ -685,41 +739,61 @@ BEGIN
 	FROM   etl.stg_revenue_class a LEFT JOIN ref_revenue_class b ON a.rscls_cd = b.revenue_class_code;
 
 	Raise notice '1';
-	
+
 	-- Generate the revenue class id for new records
-		
+
 	TRUNCATE etl.ref_revenue_class_id_seq;
-	
+
 	INSERT INTO etl.ref_revenue_class_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   tmp_ref_revenue_class
 	WHERE  exists_flag ='N';
 
-	
-	Raise notice '3';
-	INSERT INTO ref_revenue_class(revenue_class_id,revenue_class_code,revenue_class_name,revenue_class_short_name,created_date)
-	SELECT a.revenue_class_id,b.rscls_cd,b.rscls_nm,b.rscls_sh_nm, now()::timestamp
-	FROM   etl.ref_revenue_class_id_seq a JOIN tmp_ref_revenue_class b ON a.uniq_id = b.uniq_id;
-	
 
-	CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),rscls_nm varchar,rscls_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_class_id smallint)
+	Raise notice '3';
+	INSERT INTO ref_revenue_class(revenue_class_id,revenue_class_code,revenue_class_name,revenue_class_short_name,created_date,created_load_id)
+	SELECT a.revenue_class_id,b.rscls_cd,b.rscls_nm,b.rscls_sh_nm, now()::timestamp, p_load_id_in
+	FROM   etl.ref_revenue_class_id_seq a JOIN tmp_ref_revenue_class b ON a.uniq_id = b.uniq_id;
+
+
+
+	GET DIAGNOSTICS rc_count = ROW_COUNT;
+	rc_ins_count := rc_count;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,rc_data_source_code,rc_ins_count, 'insert');
+
+
+	CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),
+						rscls_nm varchar,rscls_sh_nm varchar, 
+						exists_flag char(1), modified_flag char(1), 
+						revenue_class_id smallint)
 	DISTRIBUTED BY (revenue_class_id);
 
 	INSERT INTO tmp_ref_revenue_class_1
 	SELECT a.*,b.revenue_class_id FROM tmp_ref_revenue_class a JOIN ref_revenue_class b ON a.rscls_cd = b.revenue_class_code
 	WHERE exists_flag ='Y' and modified_flag='Y';
-	
+
 	Raise notice '5';
-	
+
+
 	UPDATE ref_revenue_class a
 	SET	revenue_class_name = b.rscls_nm,
+		revenue_class_short_name = b.rscls_sh_nm,
 		updated_date = now()::timestamp,
 		updated_load_id = p_load_id_in
 	FROM	tmp_ref_revenue_class_1 b		
 	WHERE	a.revenue_class_id = b.revenue_class_id;
 
+
+	GET DIAGNOSTICS rc_count = ROW_COUNT;
+	rc_update_count := rc_count;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,rc_data_source_code,rc_update_count, 'update');
+
+	RAISE NOTICE 'INSIDE';
+
 	Return 1;
-	
+
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in processrevenueclass';
@@ -732,12 +806,32 @@ $$ language plpgsql;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION etl.processrevenuesource(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
 DECLARE
+
+	rs_data_source_code ref_data_source.data_source_code%TYPE;
+	rs_count int:=0;
+	rs_ins_count int:=0;
+	rs_update_count int:=0;
+
+
 BEGIN
+	--Initialise variables
+	rs_data_source_code :='';
+
+	--Determine source code
+
+	SELECT b.data_source_code 
+	FROM   etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id	       
+	WHERE  a.load_file_id = p_load_file_id_in     
+	INTO   rs_data_source_code;
 
 
-
-	CREATE TEMPORARY TABLE tmp_ref_revenue_source(uniq_id bigint,fy integer,
-		rsrc_cd varchar(20),rsrc_nm varchar, exists_flag char(1), modified_flag char(1),
+	CREATE TEMPORARY TABLE tmp_ref_revenue_source
+		(uniq_id bigint,
+		fy integer,
+		rsrc_cd varchar(20),
+		rsrc_nm varchar, 
+		exists_flag char(1),
+		modified_flag char(1),
 		rsrc_sh_nm varchar,
 		act_fl bit(1),   
 		alw_bud_fl bit(1), 
@@ -763,21 +857,21 @@ BEGIN
 		fed_nm VarChar,
 		srsrc_req VarChar,
 		rcls_id smallint,
-		fund_class_id smallint,
+		funding_class_id smallint,
 		rscat_id smallint
-	)
+		)
 	DISTRIBUTED BY (uniq_id);	
 	-- For all records check if data is modified/new
-	
+
 	INSERT INTO tmp_ref_revenue_source
 	SELECT  a.uniq_id,
 		a.fy,
 		a.rsrc_cd, 
-	       a.rsrc_nm,
+		 a.rsrc_nm,
 		(CASE WHEN b.revenue_source_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.revenue_source_code IS NOT NULL AND a.rsrc_nm <> b.revenue_source_name THEN 'Y' ELSE 'N' END) as modified_flag,
-	       a.rsrc_sh_nm,
-	       a.act_fl,   
+		(CASE WHEN b.revenue_source_code IS NOT NULL AND a.rsrc_nm <> b.revenue_source_name THEN 'Y' ELSE 'N' END) as modified_flag,
+		a.rsrc_sh_nm,
+		a.act_fl,   
 		a.alw_bud_fl, 
 		a.oper_ind, 
 		a.fasb_cls_ind,
@@ -800,72 +894,93 @@ BEGIN
 		a.fed_agcy_sfx,
 		a.fed_nm,
 		a.srsrc_req
-	       	FROM   etl.stg_revenue_source a LEFT JOIN ref_revenue_source b ON a.rsrc_cd = b.revenue_source_code and a.fy= fiscal_year;
+	FROM   etl.stg_revenue_source a LEFT JOIN ref_revenue_source b 
+		ON a.rsrc_cd = b.revenue_source_code and a.fy= fiscal_year;
 
 	--For Populating temp with revenue class id
 
-	CREATE TEMPORARY TABLE temp_revenuesource_class_id(uniq_id bigint,rcls_cd varchar,rcls_id smallint)DISTRIBUTED BY (uniq_id); 
+	CREATE TEMPORARY TABLE temp_revenuesource_class_id(uniq_id bigint,rcls_cd varchar,rcls_id smallint)
+	DISTRIBUTED BY (uniq_id); 
 
 	INSERT INTO temp_revenuesource_class_id  
-	SELECT b.uniq_id as uniq_id, a.revenue_class_code as revenue_class_code,a.revenue_class_id as revenue_class_id  
-	FROM 	etl.stg_revenue_source b  left join   ref_revenue_class a on a.revenue_class_code = b.rscls_cd;
+	select b.uniq_id as uniq_id, a.revenue_class_code as revenue_class_code,a.revenue_class_id as revenue_class_id 
+	FROM etl.stg_revenue_source b  left join   ref_revenue_class a on a.revenue_class_code = b.rscls_cd;
 
 	UPDATE tmp_ref_revenue_source a 
-	SET rcls_id = b.rcls_id 
+	set rcls_id = b.rcls_id 
 	FROM temp_revenuesource_class_id b 
 	WHERE a.uniq_id = b.uniq_id  ;
+
 
 	--For populating temp with funding_class_id
 
 	CREATE TEMPORARY TABLE temp_revenuesource_funding_class_id(uniq_id bigint,funding_class_cd varchar,funding_class_id smallint)
 	DISTRIBUTED BY (uniq_id); 
 
-	INSERT into temp_revenuesource_funding_class_id  
-	SELECT b.uniq_id as uniq_id,a.funding_class_code as funding_class_code,a.funding_class_id as funding_class_id  
-	FROM    etl.stg_revenue_source b  left join  ref_funding_class a on a.funding_class_code = b.fund_cls and a.fiscal_year = b.fy;
+	INSERT INTO temp_revenuesource_funding_class_id  
+	select b.uniq_id as uniq_id,a.funding_class_code,a.funding_class_id
+	FROM etl.stg_revenue_source b  left join   ref_funding_class a on a.funding_class_code = b.fund_cls and a.fiscal_year = b.fy;
 
 	UPDATE tmp_ref_revenue_source a 
-	SET fund_class_id = b.funding_class_id 
-	FROM temp_revenuesource_funding_class_id b where a.uniq_id = b.uniq_id  ;
+	set funding_class_id = b.funding_class_id 
+	FROM temp_revenuesource_funding_class_id b 
+	WHERE a.uniq_id = b.uniq_id  ;
 
 	--For populating temp with revenue category
-	CREATE TEMPORARY TABLE temp_revenuesource_category_id(uniq_id bigint,rscat_cd varchar,rscat_id smallint)DISTRIBUTED BY (uniq_id); 
+
+	CREATE TEMPORARY TABLE temp_revenuesource_category_id(uniq_id bigint,rscat_cd varchar,rscat_id smallint)
+	DISTRIBUTED BY (uniq_id); 
 
 	INSERT INTO temp_revenuesource_category_id 
-	SELECT b.uniq_id, a.revenue_category_code as revenue_category_code,a.revenue_category_id as revenue_category_id 
-	FROM   etl.stg_revenue_source b left join ref_revenue_category a on a.revenue_category_code = b.rscat_cd;
+	select b.uniq_id, a.revenue_category_code as revenue_category_code,a.revenue_category_id as revenue_category_id 
+	FROM etl.stg_revenue_source b left join ref_revenue_category a 
+	ON a.revenue_category_code = b.rscat_cd;
 
-	UPDATE tmp_ref_revenue_source a 
-	SET rscat_id = b.rscat_id 
-	FROM temp_revenuesource_category_id b 
-	WHERE a.uniq_id = b.uniq_id ;
+	update tmp_ref_revenue_source a 
+	set rscat_id = b.rscat_id 
+	from temp_revenuesource_category_id b 
+	where a.uniq_id = b.uniq_id ;
 
 	RAISE NOTICE 'RS -2';
-	
+
+
 	-- Generate the revenue source id for new records
-		
+
 	TRUNCATE etl.ref_revenue_source_id_seq;
-	
+
 	INSERT INTO etl.ref_revenue_source_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   tmp_ref_revenue_source
 	WHERE  exists_flag ='N';
 
-   	RAISE NOTICE 'RS - 3';
-	
-	INSERT INTO ref_revenue_source(revenue_source_id,fiscal_year,revenue_source_code,revenue_source_name,revenue_source_short_name,description,
-	funding_class_id,revenue_class_id,revenue_category_id,
-	active_flag,budget_allowed_flag,operating_indicator,fasb_class_indicator,fhwa_revenue_credit_flag ,usetax_collection_flag ,
-	apply_interest_late_fee ,apply_interest_admin_fee ,apply_interest_nsf_fee ,apply_interest_other_fee,eligible_intercept_process,
-	earned_receivable_code,finance_fee_override_flag,allow_override_interest, billing_lag_days, billing_frequency , billing_fiscal_year_start_month ,
- 	 billing_fiscal_year_start_day , federal_agency_code ,	 federal_agency_suffix , federal_name ,srsrc_req ,created_date)
-	SELECT a.revenue_source_id,b.fy,b.rsrc_cd,b.rsrc_nm,
-	        b.rsrc_sh_nm,
+	RAISE NOTICE 'RS - 3';
+
+	INSERT INTO ref_revenue_source(revenue_source_id,fiscal_year,
+					revenue_source_code,revenue_source_name,
+					revenue_source_short_name,description,
+					funding_class_id,revenue_class_id,
+					revenue_category_id,active_flag,budget_allowed_flag,
+					operating_indicator,fasb_class_indicator,
+					fhwa_revenue_credit_flag ,usetax_collection_flag ,
+					apply_interest_late_fee ,apply_interest_admin_fee ,
+					apply_interest_nsf_fee ,apply_interest_other_fee,
+					eligible_intercept_process,earned_receivable_code,
+					finance_fee_override_flag,allow_override_interest,
+					billing_lag_days, billing_frequency ,
+					billing_fiscal_year_start_month , billing_fiscal_year_start_day , 
+					federal_agency_code , federal_agency_suffix , 
+					federal_name ,srsrc_req ,
+					created_date,created_load_id)
+	SELECT 	a.revenue_source_id,
+		b.fy,
+		b.rsrc_cd,
+		b.rsrc_nm,
+		b.rsrc_sh_nm, 
 		b.rsrc_dscr,
-		b.fund_class_id,
+		b.funding_class_id,
 		b.rcls_id,
 		b.rscat_id,
-	        b.act_fl,   
+		b.act_fl,   
 		b.alw_bud_fl, 
 		b.oper_ind, 
 		b.fasb_cls_ind,
@@ -887,37 +1002,54 @@ BEGIN
 		b.fed_agcy_sfx,
 		b.fed_nm,
 		b.srsrc_req,
-		 now()::timestamp
-	FROM   etl.ref_revenue_source_id_seq a JOIN tmp_ref_revenue_source b ON a.uniq_id = b.uniq_id;
+		now()::timestamp, p_load_id_in
+	FROM etl.ref_revenue_source_id_seq a JOIN tmp_ref_revenue_source b ON a.uniq_id = b.uniq_id;
+
+
+	GET DIAGNOSTICS rs_count = ROW_COUNT;
+	rs_ins_count := rs_count;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,rs_data_source_code,rs_ins_count, 'insert');
+
 
 	RAISE NOTICE 'RS - 4';
 
-	CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar, revenue_source_id smallint)
+	CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar,rsrc_sh_nm varchar, revenue_source_id smallint)
 	DISTRIBUTED BY (revenue_source_id);
 
 	INSERT INTO tmp_ref_revenue_source_1
-	SELECT a.rsrc_nm,b.revenue_source_id FROM tmp_ref_revenue_source a JOIN ref_revenue_source b ON a.rsrc_cd = b.revenue_source_code AND a.fy = b.fiscal_year
+	SELECT a.rsrc_nm,a.rsrc_sh_nm,b.revenue_source_id 
+	FROM tmp_ref_revenue_source a JOIN ref_revenue_source b ON a.rsrc_cd = b.revenue_source_code AND a.fy = b.fiscal_year
 	WHERE exists_flag ='Y' and modified_flag='Y';
 
 
 	Raise notice '5';
-	
+
 	UPDATE ref_revenue_source a
-	SET	revenue_source_name = b.rsrc_nm,
-		updated_date = now()::timestamp,
-		updated_load_id = p_load_id_in
-	FROM	tmp_ref_revenue_source_1 b		
+	SET revenue_source_name = b.rsrc_nm,
+	    revenue_source_short_name = b.rsrc_sh_nm,
+	    updated_date = now()::timestamp,
+	    updated_load_id =  p_load_id_in
+	FROM tmp_ref_revenue_source_1 b		
 	WHERE	a.revenue_source_id = b.revenue_source_id;
 
+	GET DIAGNOSTICS rs_count = ROW_COUNT;
+	rs_update_count := rs_count;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,rs_data_source_code,rs_update_count, 'update');
+
+
+	RAISE NOTICE 'INSIDE';
+
 	Return 1;
-	
+
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in processrevenuesource';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	RETURN 0;
-	
+
 END;
 $$ language plpgsql;
 
@@ -925,18 +1057,46 @@ $$ language plpgsql;
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.processbudgetcode(p_load_file_id_in integer, p_load_id_in bigint)   RETURNS integer AS $$
+
+-- Function: etl.processbudgetcode(integer, bigint)
+
+-- DROP FUNCTION etl.processbudgetcode(integer, bigint);
+
+CREATE OR REPLACE FUNCTION etl.processbudgetcode(p_load_file_id_in integer, p_load_id_in bigint)
+  RETURNS integer AS
+$BODY$
 DECLARE
+
+	bc_data_source_code ref_data_source.data_source_code%TYPE;
+	bc_count int:=0;
+	bc_ins_count int:=0;
+	bc_update_count int:=0;
+	bc_agency_ins_count int:=0; 
+	bc_agency_count int:=0;
+	bc_fund_ins_count int:=0; 
+	bc_fund_count int:=0;
+
 BEGIN
 
+	--Initialise variables
+	bc_data_source_code :='';
 
+	--Determine source code
 
+	SELECT b.data_source_code 
+	FROM   etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id	       
+	WHERE  a.load_file_id = p_load_file_id_in     
+	INTO   bc_data_source_code;
 
-CREATE TEMPORARY TABLE tmp_ref_budget_code
-		(uniq_id bigint,fy integer,
+	CREATE TEMPORARY TABLE tmp_ref_budget_code
+		(uniq_id bigint,
+		fy integer,
 		fcls_cd	varchar,
 		fcls_nm	varchar,
-		exists_flag char(1), modified_flag char(1),
+		exists_flag char(1),
+		budget_code_modified_flag char(1),
+		agency_exists_flag char(1),
+		fund_class_exists_flag char(1), 
 		dept_cd	varchar,
 		dept_nm	varchar,
 		func_cd	varchar,
@@ -958,142 +1118,194 @@ CREATE TEMPORARY TABLE tmp_ref_budget_code
 		fin_plan_sav_fl bit(1),
 		agency_id smallint,
 		fund_class_id smallint
-)
+
+	)
 	DISTRIBUTED BY (uniq_id);	
+
 
 	-- For all records check if data is modified/new
 
+	INSERT INTO tmp_ref_budget_code
+	SELECT  a.uniq_id,
+		a.fy,
+		a.fcls_cd, 
+		a.fcls_nm,
+		(CASE WHEN b.budget_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
+		(CASE WHEN b.budget_code IS NOT NULL AND a.func_nm <> b.budget_code_name THEN 'Y' ELSE 'N' END) as budget_code_modified_flag,
+		(CASE WHEN c.agency_code IS NULL THEN 'N' ELSE 'Y' END) as agency_exists_flag,
+		(CASE WHEN d.fund_class_code IS NULL THEN 'N' ELSE 'Y' END) as fund_class_exists_flag,
+		a.dept_cd,
+		a.dept_nm,
+		a.func_cd,
+		a.func_nm,
+		a.func_attr_nm,
+		a.func_attr_sh_nm,
+		a.resp_ctr,
+		a.func_anlys_unit,
+		a.cntrl_cat,
+		a.local_svc_dist,
+		a.ua_fund_fl ,
+		a.pyrl_dflt_fl,
+		a.bud_cat_a,
+		a.bud_cat_b,
+		a.bud_func,
+		a.dscr_ext,
+		a.tbl_last_dt,	
+		a.func_attr_nm_up,
+		a.fin_plan_sav_fl 
+	FROM   etl.stg_budget_code a LEFT Join ref_agency c on  a.dept_cd = c.agency_code 
+				     LEFT join ref_fund_class d on a.fcls_cd =  d.fund_class_code 
+				     LEFT JOIN ref_budget_code b ON a.func_cd = b.budget_code 
+				     and a.fy= b.fiscal_year 
+				     and c.agency_id = b.agency_id 
+				     and d.fund_class_id = b.fund_class_id;
 
+	--New agency in budget_code
+	INSERT INTO ref_agency (agency_code,agency_name,created_date,created_load_id)
+	SELECT b.dept_cd,dept_nm,now()::timestamp,p_load_id_in 
+	FROM tmp_ref_budget_code b 
+	WHERE b.agency_exists_flag ='N';
+
+	-- TO DO - Agency history
+
+	INSERT INTO ref_agency_history (agency_name,created_date,load_id)
+	SELECT dept_nm,now()::timestamp,p_load_id_in 
+	FROM tmp_ref_budget_code b 
+	WHERE b.agency_exists_flag ='N';
+
+	--For Populating temp with agency _id
 	
-	
-		INSERT INTO tmp_ref_budget_code
-	
-		SELECT  a.uniq_id,
-			a.fy,
-			a.fcls_cd, 
-		       a.fcls_nm,
-			(CASE WHEN b.budget_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-		       (CASE WHEN b.budget_code IS NOT NULL AND a.fcls_nm <> b.budget_code_name THEN 'Y' ELSE 'N' END) as modified_flag,
-		       		a.dept_cd,
-		       		a.dept_nm,
-		       		a.func_cd,
-		       		a.func_nm,
-		       		a.func_attr_nm,
-		       		a.func_attr_sh_nm,
-		       		a.resp_ctr varchar,
-		       		a.func_anlys_unit,
-		       		a.cntrl_cat,
-		       		a.local_svc_dist,
-		       		a.ua_fund_fl ,
-		       		a.pyrl_dflt_fl,
-		       		a.bud_cat_a,
-		       		a.bud_cat_b,
-		       		a.bud_func,
-		       		a.dscr_ext,
-		       		a.tbl_last_dt,	
-		       		a.func_attr_nm_up,
-				a.fin_plan_sav_fl 
-		       	FROM   etl.stg_budget_code a LEFT JOIN ref_budget_code b ON a.fcls_cd = b.budget_code and a.fy= fiscal_year;
+	CREATE TEMPORARY TABLE temp_budgetcode_agency_id(uniq_id bigint,agency_code varchar,agency_id smallint)DISTRIBUTED BY (uniq_id); 
+
+	INSERT INTO temp_budgetcode_agency_id  
+	select b.uniq_id as uniq_id,a.agency_code as agency_code,a.agency_id as agency_id  
+	FROM etl.stg_budget_code b  join   ref_agency a 
+	on a.agency_code = b.dept_cd;	
+
+	UPDATE tmp_ref_budget_code a 
+	SET agency_id = b.agency_id
+	FROM temp_budgetcode_agency_id b 
+	WHERE a.uniq_id = b.uniq_id  ;
 
 
---For Populating temp with agency _id
-CREATE TEMPORARY TABLE temp_budgetcode_agency_id(uniq_id bigint,dept_cd varchar,agency_id smallint)DISTRIBUTED BY (uniq_id); 
+	--New fund_class
 
-insert into temp_budgetcode_agency_id  select b.uniq_id as uniq_id,a.agency_code as agency_code,a.agency_id as agency_id  from
- etl.stg_budget_code b  left join   ref_agency a on a.agency_code = b.dept_cd;
-
-update tmp_ref_budget_code a set agency_id = b.agency_id from temp_budgetcode_agency_id b where a.uniq_id = b.uniq_id  ;
-
+	INSERT INTO ref_fund_class(fund_class_code,fund_class_name,created_date,created_load_id) 
+	SELECT b.fcls_cd, fcls_nm,now()::timestamp,p_load_id_in
+	FROM tmp_ref_budget_code b 
+	WHERE b.fund_class_exists_flag='N';
 
 
---For populating temp with fund_class_id
+	--For populating temp with fund_class_id
 
-CREATE TEMPORARY TABLE temp_budgetcode_fund_class_id(uniq_id bigint,fund_class_cd varchar,fund_class_id smallint)DISTRIBUTED BY (uniq_id); 
+	CREATE TEMPORARY TABLE temp_budgetcode_fund_class_id(uniq_id bigint,fund_class_cd varchar,fund_class_id smallint)DISTRIBUTED BY (uniq_id); 
 
-insert into temp_budgetcode_fund_class_id  select b.uniq_id as uniq_id,a.fund_class_code as fund_class_code,a.fund_class_id as fund_class_id  from
- etl.stg_budget_code b  left join   ref_fund_class a on a.fund_class_code = b.fcls_cd;
+	INSERT INTO temp_budgetcode_fund_class_id  
+	select b.uniq_id as uniq_id,a.fund_class_code as fund_class_code,a.fund_class_id as fund_class_id  
+	FROM etl.stg_budget_code b   join   ref_fund_class a on a.fund_class_code = b.fcls_cd;
 
-update tmp_ref_budget_code a set fund_class_id = b.fund_class_id from temp_budgetcode_fund_class_id b where a.uniq_id = b.uniq_id  ;
+	UPDATE tmp_ref_budget_code a 
+	SET fund_class_id = b.fund_class_id 
+	FROM temp_budgetcode_fund_class_id b 
+	WHERE a.uniq_id = b.uniq_id  ;
 
+	RAISE NOTICE 'RS -2';
 
-
-
-RAISE NOTICE 'RS -2';
-
-
-	
 	-- Generate the budget code id for new records
-		
+
 	TRUNCATE etl.ref_budget_code_id_seq;
 	INSERT INTO etl.ref_budget_code_id_seq(uniq_id)
-		SELECT uniq_id
-		FROM   tmp_ref_budget_code
+	SELECT uniq_id
+	FROM   tmp_ref_budget_code
 	WHERE  exists_flag ='N';
 
-	
+	RAISE NOTICE 'RS - 3';
 
-   RAISE NOTICE 'RS - 3';
-	
 	INSERT INTO ref_budget_code( budget_code_id ,
-					fiscal_year ,budget_code ,
-					agency_id,fund_class_id,
-					budget_code_name ,
-					attribute_name ,
-					attribute_short_name ,
-					responsibility_center ,	
-					control_category , 
-					ua_funding_flag ,payroll_default_flag , 
-					budget_function ,description , 
-					 created_date  ,
-					 load_id 
-					 )
-	
-		SELECT a.budget_code_id,
-				b.fy,b.func_cd,
-				b.agency_id,
-				b.fund_class_id,
-				b.func_nm,
-				b.func_attr_nm,
-				b.func_attr_sh_nm,
-				b.resp_ctr,
-				b.cntrl_cat,
-				b.ua_fund_fl ,b.pyrl_dflt_fl,
-				b.bud_func,b.dscr_ext,
-				now()::timestamp
-				,p_load_id_in
-			FROM   etl.ref_budget_code_id_seq a JOIN tmp_ref_budget_code b ON a.uniq_id = b.uniq_id ;
-			
-			
+				     fiscal_year ,
+				     budget_code ,
+				     agency_id,
+				     fund_class_id,
+				     budget_code_name ,
+				     attribute_name ,
+				     attribute_short_name ,
+				     responsibility_center ,	
+				     control_category , 
+				     ua_funding_flag ,
+				     payroll_default_flag , 
+				     budget_function ,
+				     description , 
+				     created_date  ,
+				     load_id 
+				 )
+	SELECT 		a.budget_code_id,
+			b.fy,
+			b.func_cd,
+			b.agency_id,
+			b.fund_class_id,
+			b.func_nm,
+			b.func_attr_nm,
+			b.func_attr_sh_nm,
+			b.resp_ctr,
+			b.cntrl_cat,
+			b.ua_fund_fl ,b.pyrl_dflt_fl,
+			b.bud_func,b.dscr_ext,
+			now()::timestamp
+			,p_load_id_in
+	FROM   etl.ref_budget_code_id_seq a JOIN tmp_ref_budget_code b ON a.uniq_id = b.uniq_id;
 
 
-	RAISE NOTICE 'RS - 4';
-
-CREATE TEMPORARY TABLE tmp_ref_budget_code_1(fcls_nm varchar, budget_code_id smallint)
-	DISTRIBUTED BY (budget_code_id);
-
-	INSERT INTO tmp_ref_budget_code_1
-	SELECT a.fcls_nm,b.budget_code_id FROM tmp_ref_budget_code a JOIN ref_budget_code b ON a.fcls_cd = b.budget_code AND a.fy = b.fiscal_year
-	WHERE exists_flag ='Y' and modified_flag='Y';
-
-	
-	UPDATE ref_budget_code a
-	SET	budget_code_name = b.fcls_nm,
-		updated_date = now()::timestamp,
-		updated_load_id = p_load_id_in
-	FROM	tmp_ref_budget_code_1 b		
-	WHERE	a.budget_code_id = b.budget_code_id;
+	GET DIAGNOSTICS bc_count = ROW_COUNT;
+	bc_ins_count := bc_count;
+	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+	VALUES(p_load_file_id_in,bc_data_source_code,bc_ins_count, 'insert');
 
 
-Return 1;
-	
-EXCEPTION
-	WHEN OTHERS THEN
-	RAISE NOTICE 'Exception Occurred in processrevenueclass';
-	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
-	RETURN 0;
+		RAISE NOTICE 'RS - 4';
 
-	
+		-- change of budget_code
+		CREATE TEMPORARY TABLE tmp_ref_budget_code_1(func_nm varchar, budget_code_id smallint)
+		DISTRIBUTED BY (budget_code_id);
+
+
+		INSERT INTO tmp_ref_budget_code_1
+		SELECT a.func_nm,b.budget_code_id FROM tmp_ref_budget_code a JOIN ref_budget_code b ON a.func_cd = b.budget_code AND a.fy = b.fiscal_year
+		WHERE exists_flag ='Y' and budget_code_modified_flag ='Y';
+
+
+	-- TO Do check attributed name
+
+		UPDATE ref_budget_code a
+		SET budget_code_name = b.func_nm,
+			updated_date = now()::timestamp,
+			updated_load_id = p_load_id_in 
+		FROM	tmp_ref_budget_code_1 b		
+		WHERE	a.budget_code_id = b.budget_code_id;
+
+
+		GET DIAGNOSTICS bc_count = ROW_COUNT;
+			bc_update_count := bc_count;
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+			VALUES(p_load_file_id_in,bc_data_source_code,bc_update_count, 'update budget code');
+
+		RAISE NOTICE 'INSIDE';
+
+
+		Return 1;
+
+
+		EXCEPTION
+		WHEN OTHERS THEN
+		RAISE NOTICE 'Exception Occurred in processbudgetcode';
+		RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+		RETURN 0;
+
+
 END;
 
-$$ language plpgsql;
+$BODY$
+  LANGUAGE plpgsql VOLATILE;
+ALTER FUNCTION etl.processbudgetcode(integer, bigint)
+  OWNER TO gpadmin;
