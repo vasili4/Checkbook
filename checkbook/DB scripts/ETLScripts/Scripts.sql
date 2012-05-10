@@ -924,12 +924,8 @@ $$ language plpgsql;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-<<<<<<< .mine
-
-CREATE OR REPLACE FUNCTION getStatisticsBeforeETL(p_job_id_in integer) RETURNS integer AS $$
-=======
 CREATE OR REPLACE FUNCTION getStatisticsForJob(p_job_id_in integer) RETURNS integer AS $$
->>>>>>> .r1077
+
 DECLARE
 	l_table_names_array varchar ARRAY[15];
 	l_array_ctr smallint;
@@ -949,7 +945,7 @@ BEGIN
 					'vendor_address',
 					'vendor_business_type',
 					'vendor_history'];
-<<<<<<< .mine
+
 
 	FOR l_array_ctr IN 1..array_upper(l_table_names_array,1)LOOP
 	
@@ -960,11 +956,8 @@ BEGIN
 	END LOOP;
 RETURN 1;	
 					
-=======
 	
-	
-					
->>>>>>> .r1077
+
 END;
 $$  LANGUAGE plpgsql ;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
