@@ -751,26 +751,11 @@ BEGIN
 		(SELECT a.load_id,max(file_timestamp) as file_timestamp
 		FROM	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
 		WHERE 	b.job_id = p_job_id_in
-			AND b.data_source_code IN ('A','D','E','L','O','RC','RY','RS','BC')
+			AND b.data_source_code IN ('A','D','E','L','O','RC','RY','RS','BC','FC','V','PC')
 			AND a.pattern_matched_flag ='Y'
 		GROUP BY 1 ) tbl_timestamp ON c.load_id = tbl_timestamp.load_id AND c.file_timestamp = tbl_timestamp.file_timestamp
 	WHERE 	c.pattern_matched_flag ='Y'
-	GROUP BY 1;		
-	
-	-- FMSV - Identify the last monthly feed
-	
-	INSERT INTO tmp_files_consumption
-	SELECT c.load_id, max(load_file_id) as load_file_id
-	FROM etl.etl_data_load_file c JOIN
-		(SELECT a.load_id,max(file_timestamp) as file_timestamp
-		FROM	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
-		WHERE 	b.job_id = p_job_id_in
-			AND b.data_source_code ='V'
-			AND a.type_of_feed ='M'
-			AND a.pattern_matched_flag ='Y'
-		GROUP BY 1 ) tbl_timestamp ON c.load_id = tbl_timestamp.load_id AND c.file_timestamp = tbl_timestamp.file_timestamp
-	WHERE 	c.pattern_matched_flag ='Y'
-	GROUP BY 1;	
+	GROUP BY 1;			
 	
 	-- Update consume_flag to N for the COA/FMSV files which are not with the latest timestamp
 	
@@ -779,68 +764,6 @@ BEGIN
 	FROM	tmp_files_consumption b
 	WHERE	a.load_id = b.load_id
 		AND a.load_file_id <> b.load_file_id;
-	
-	DELETE FROM tmp_files_consumption;
-	
-	-- Select timestamp associated with the last monthly FMSV data feed.
-	
-	SELECT 	file_timestamp
-	FROM   	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
-	WHERE 	data_source_code ='V'
-		AND type_of_feed ='M'
-		AND pattern_matched_flag ='Y'
-	INTO	l_monthly_timestamp;	
-
-	-- Identifying weekly FMSV files uploaded.
-	
-	INSERT INTO tmp_files_consumption
-	SELECT c.load_id, max(load_file_id) as load_file_id
-	FROM etl.etl_data_load_file c JOIN
-	(SELECT a.load_id,max(file_timestamp) as file_timestamp
-		FROM	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
-		WHERE 	b.job_id = p_job_id_in
-			AND b.data_source_code ='V'
-			AND a.type_of_feed ='W'
-			AND a.pattern_matched_flag ='Y'
-			AND ((a.file_timestamp::timestamp >= l_monthly_timestamp::timestamp) OR 
-			      l_monthly_timestamp IS NULL)
-		GROUP BY 1) tbl_timestamp ON c.load_id = tbl_timestamp.load_id AND c.file_timestamp = tbl_timestamp.file_timestamp
-	WHERE 	c.pattern_matched_flag ='Y'
-	GROUP BY 1;	
-		
-	SELECT 	max(file_timestamp)
-	FROM   	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
-	WHERE 	data_source_code ='V'
-		AND type_of_feed ='W'
-		AND pattern_matched_flag ='Y'
-	INTO	l_weekly_timestamp;	
-	
-	SELECT greatest(l_monthly_timestamp::timestamp,l_weekly_timestamp::timestamp) INTO l_timestamp ;
-	
-	-- Identifying daily FMSV files uploaded.
-	
-	INSERT INTO tmp_files_consumption
-	SELECT c.load_id, max(load_file_id) as load_file_id
-	FROM etl.etl_data_load_file c JOIN
-	(SELECT a.load_id,max(file_timestamp) as file_timestamp
-		FROM	etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id
-		WHERE 	b.job_id = p_job_id_in
-			AND b.data_source_code ='V'
-			AND a.type_of_feed ='D'
-			AND a.pattern_matched_flag ='Y'
-			AND ((a.file_timestamp::timestamp >= l_timestamp::timestamp) OR 
-			      l_timestamp IS NULL)
-			      GROUP BY 1) tbl_timestamp ON c.load_id = tbl_timestamp.load_id AND c.file_timestamp = tbl_timestamp.file_timestamp
-	WHERE 	c.pattern_matched_flag ='Y'
-	GROUP BY 1;	
-			      
-	-- Update consume_flag to N for the FMSV files which are not with the latest timestamp
-	
-	UPDATE etl.etl_data_load_file a
-	SET    consume_flag ='Y'
-	FROM	tmp_files_consumption b
-	WHERE	a.load_id = b.load_id
-		AND a.load_file_id = b.load_file_id;
 
 	RETURN 1;	
 END;
@@ -1001,32 +924,25 @@ $$ language plpgsql;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION getStatisticsBeforeETL(p_job_id_in integer) RETURNS integer AS $$
+CREATE OR REPLACE FUNCTION getStatisticsForJob(p_job_id_in integer) RETURNS integer AS $$
 DECLARE
 	l_table_names_array varchar ARRAY[15];
 BEGIN
 	l_table_names_array := ARRAY['master_agreement',
 					'agreement',
 					'agreement_accounting_line',
-					'agreement_worksite',
-					'all_agreement',
-					'all_agreement_accounting_line',
-					'all_agreement_worksite',
-					'all_disbursement',
-					'all_disbursement_line_item',
-					'all_master_agreement',
+					'agreement_worksite',					
 					'history_agreement',
 					'history_agreement_accounting_line',
 					'history_agreement_worksite',
-					'history_all_agreement',
-					'history_all_agreement_accounting_line',
-					'history_all_agreement_worksite',
-					'history_all_master_agreement',
 					'history_master_agreement',
 					'vendor',
 					'vendor_address',
 					'vendor_business_type',
 					'vendor_history'];
+	
+	
+					
 END;
 $$ language plpgsql;
 
