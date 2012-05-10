@@ -1490,8 +1490,21 @@ CREATE TABLE payroll(
 	other_payments numeric(16,2),
 	gross_pay  numeric(16,2),
 	orig_pay_cycle_code CHAR(1),
+	agency_id smallint,
+	agency_code varchar,
+	agency_name varchar,
+	department_id integer,
+	department_code  varchar,
+	department_name varchar,
+	employee_id bigint,
+	employee_name varchar,
+	fiscal_year_id smallint,
+	pay_date date,
+	gross_pay_ytd numeric(16,2),
 	created_date timestamp,
-	created_load_id int)
+	created_load_id int,
+	updated_date timestamp,
+	updated_load_id int)
 DISTRIBUTED BY (payroll_id);	
 
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_date foreign key (pay_date_id) references ref_date (date_id);
@@ -1500,3 +1513,29 @@ ALTER TABLE  payroll ADD constraint fk_payroll_ref_agency_history foreign key (a
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_date_1 foreign key (orig_pay_date_id) references ref_date (date_id);
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_department_history foreign key (department_history_id) references ref_department_history (department_history_id);
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_amount_basis foreign key (amount_basis_id) references ref_amount_basis (amount_basis_id);
+
+CREATE TABLE aggregateon_payroll_employee(
+	employee_id bigint,
+	agency_id smallint,
+	fiscal_year_id smallint,
+	annual_salary numeric(16,2),
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay numeric(16,2) )
+DISTRIBUTED BY (employee_id);
+
+CREATE TABLE aggregateon_payroll_coa_entities(
+	employee_id bigint,
+	agency_id smallint,
+	department_id int,
+	fiscal_year_id smallint,
+	annual_salary numeric(16,2),
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay numeric(16,2) )
+DISTRIBUTED BY (agency_id);
+
+
+	
