@@ -50,7 +50,7 @@ DISTRIBUTED BY (category);
 
 COPY  etl.trends_gen_fund_revenue_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_general_fund_revenues.csv' CSV HEADER QUOTE as '"';
 
-5)	Below are the commands to populate the data from trends_gen_fund_revenue_temp to trends_gen_fund_revenue table.
+-- 5)	Below are the commands to populate the data from trends_gen_fund_revenue_temp to trends_gen_fund_revenue table.
 
 INSERT INTO trends_gen_fund_revenue (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from etl.trends_gen_fund_revenue_temp;
 INSERT INTO trends_gen_fund_revenue (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from etl.trends_gen_fund_revenue_temp;
