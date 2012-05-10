@@ -924,11 +924,20 @@ $$ language plpgsql;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+<<<<<<< .mine
+
+CREATE OR REPLACE FUNCTION getStatisticsBeforeETL(p_job_id_in integer) RETURNS integer AS $$
+=======
 CREATE OR REPLACE FUNCTION getStatisticsForJob(p_job_id_in integer) RETURNS integer AS $$
+>>>>>>> .r1077
 DECLARE
 	l_table_names_array varchar ARRAY[15];
+	l_array_ctr smallint;
+	l_insert_sql varchar;
 BEGIN
-	l_table_names_array := ARRAY['master_agreement',
+	l_table_names_array := ARRAY['ref_agency',
+					'ref_revenue_source',
+					'master_agreement',
 					'agreement',
 					'agreement_accounting_line',
 					'agreement_worksite',					
@@ -940,12 +949,24 @@ BEGIN
 					'vendor_address',
 					'vendor_business_type',
 					'vendor_history'];
+<<<<<<< .mine
+
+	FOR l_array_ctr IN 1..array_upper(l_table_names_array,1)LOOP
+	
+	l_insert_sql := 'INSERT INTO job_verification(record_count,table_name,job_id,recorded_date) select count(*),'|| '''' || l_table_names_array[l_array_ctr] || '''' ||','||p_job_id_in||',now()::timestamp from '||l_table_names_array[l_array_ctr] ;
+
+	EXECUTE l_insert_sql;
+
+	END LOOP;
+RETURN 1;	
+					
+=======
 	
 	
 					
+>>>>>>> .r1077
 END;
-$$ language plpgsql;
-
+$$  LANGUAGE plpgsql ;
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION etl.grantaccess(username character varying, privilege character varying)
