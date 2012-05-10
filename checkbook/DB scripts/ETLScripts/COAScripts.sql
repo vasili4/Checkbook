@@ -760,7 +760,7 @@ BEGIN
 	GET DIAGNOSTICS rc_count = ROW_COUNT;
 	rc_ins_count := rc_count;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rc_data_source_code,rc_ins_count, 'insert');
+	VALUES(p_load_file_id_in,rc_data_source_code,rc_ins_count, '# of records inserted into revenue_class');
 
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),
