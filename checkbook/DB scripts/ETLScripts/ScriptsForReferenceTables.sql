@@ -1,12 +1,12 @@
-COPY etl.ref_data_source FROM '/home/gpadmin/athiagarajan/NYC/ref_data_source.csv' CSV QUOTE as '"';
+COPY etl.ref_data_source FROM '/home/gpadmin/athiagarajan/NYC/ref_data_source.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_column_mapping FROM '/home/gpadmin/athiagarajan/NYC/ref_column_mapping.csv' CSV QUOTE as '"';
+COPY etl.ref_column_mapping FROM '/home/gpadmin/athiagarajan/NYC/ref_column_mapping.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_validation_rule FROM '/home/gpadmin/athiagarajan/NYC/ref_validation_rule.csv' CSV QUOTE as '"';
+COPY etl.ref_validation_rule FROM '/home/gpadmin/athiagarajan/NYC/ref_validation_rule.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_file_name_pattern FROM '/home/gpadmin/athiagarajan/NYC/ref_file_name_pattern.csv' CSV QUOTE as '"';
+COPY etl.ref_file_name_pattern FROM '/home/gpadmin/athiagarajan/NYC/ref_file_name_pattern.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.aggregate_tables FROM '/home/gpadmin/athiagarajan/NYC/widget_aggregate_tables.csv' CSV QUOTE as '"';
+COPY etl.aggregate_tables FROM '/home/gpadmin/athiagarajan/NYC/widget_aggregate_tables.csv' CSV HEADER QUOTE as '"';
 
 ---------------------------------------------------------------------------------------------------------------------------------
 
