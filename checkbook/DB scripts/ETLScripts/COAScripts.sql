@@ -658,7 +658,7 @@ BEGIN
 	GET DIAGNOSTICS ry_count = ROW_COUNT;
 	ry_ins_count := ry_count;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,ry_data_source_code,ry_ins_count, 'insert');
+	VALUES(p_load_file_id_in,ry_data_source_code,ry_ins_count, '# of records inserted into revenue_category');
 
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_category_1(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar,rscat_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_category_id smallint)
@@ -684,7 +684,7 @@ BEGIN
 	GET DIAGNOSTICS ry_count = ROW_COUNT;
 	ry_update_count := ry_count;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,ry_data_source_code,ry_update_count, 'update');
+	VALUES(p_load_file_id_in,ry_data_source_code,ry_update_count, '# of records updated in revenue_category ');
 
 
 	RAISE NOTICE 'INSIDE';
@@ -788,7 +788,7 @@ BEGIN
 	GET DIAGNOSTICS rc_count = ROW_COUNT;
 	rc_update_count := rc_count;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rc_data_source_code,rc_update_count, 'update');
+	VALUES(p_load_file_id_in,rc_data_source_code,rc_update_count, '# of records updated in revenue_class');
 
 	RAISE NOTICE 'INSIDE';
 
@@ -1009,7 +1009,7 @@ BEGIN
 	GET DIAGNOSTICS rs_count = ROW_COUNT;
 	rs_ins_count := rs_count;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rs_data_source_code,rs_ins_count, 'insert');
+	VALUES(p_load_file_id_in,rs_data_source_code,rs_ins_count,'# of records inserted in revenue_source');
 
 
 	RAISE NOTICE 'RS - 4';
@@ -1036,7 +1036,7 @@ BEGIN
 	GET DIAGNOSTICS rs_count = ROW_COUNT;
 	rs_update_count := rs_count;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rs_data_source_code,rs_update_count, 'update');
+	VALUES(p_load_file_id_in,rs_data_source_code,rs_update_count, '# of records updated in revenue_source');
 
 
 	RAISE NOTICE 'INSIDE';
@@ -1258,7 +1258,7 @@ BEGIN
 	GET DIAGNOSTICS bc_count = ROW_COUNT;
 	bc_ins_count := bc_count;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,bc_data_source_code,bc_ins_count, 'insert');
+	VALUES(p_load_file_id_in,bc_data_source_code,bc_ins_count, '# of records inserted into budget_code');
 
 
 
@@ -1287,7 +1287,7 @@ BEGIN
 		GET DIAGNOSTICS bc_count = ROW_COUNT;
 			bc_update_count := bc_count;
 			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-			VALUES(p_load_file_id_in,bc_data_source_code,bc_update_count, 'update budget code');
+			VALUES(p_load_file_id_in,bc_data_source_code,bc_update_count, '# of records updated in ref_budget_code');
 
 		RAISE NOTICE 'INSIDE';
 
