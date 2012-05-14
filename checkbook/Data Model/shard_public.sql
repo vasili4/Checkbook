@@ -432,6 +432,7 @@ CREATE TABLE disbursement_line_item_details(
 	maximum_spending_limit numeric(16,2),
 	document_id varchar(20),
 	vendor_name varchar,
+	vendor_customer_code varchar(20),
 	check_eft_issued_date date,
 	agency_name varchar(50),
 	location_name varchar,
