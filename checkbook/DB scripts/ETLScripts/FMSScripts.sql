@@ -1198,6 +1198,7 @@ BEGIN
 			JOIN ref_expenditure_object_history d ON b.expenditure_object_history_id = d.expenditure_object_history_id
 			JOIN ref_expenditure_object p on d.expenditure_object_id = p.expenditure_object_id
 			JOIN vendor_history e ON a.vendor_history_id = e.vendor_history_id
+			JOIN vendor p ON p.vendor_id = e.vendor_history_id
 			JOIN ref_date f ON a.check_eft_issued_date_id = f.date_id
 			JOIN ref_year l on f.nyc_year_id = l.year_id
 			JOIN ref_department_history g ON b.department_history_id = g.department_history_id
