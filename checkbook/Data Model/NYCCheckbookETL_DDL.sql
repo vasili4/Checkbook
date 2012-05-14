@@ -3110,6 +3110,14 @@ CREATE TABLE etl.etl_data_load_verification
 )
 DISTRIBUTED BY (load_file_id);
 
+CREATE TABLE  job_verification
+(record_count int,
+table_name varchar(60),
+job_id int,
+recorded_date timestamp
+)
+DISTRIBUTED BY (job_id)
+
 ---------------------------------------------------------------------------------------------------------------------------
 /* Refreshing shards status */
 
