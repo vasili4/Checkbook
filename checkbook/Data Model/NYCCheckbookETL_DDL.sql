@@ -3735,6 +3735,12 @@ CREATE TABLE malformed_oaisis_feed(
 	load_file_id integer)
 DISTRIBUTED BY (load_file_id);
 
+
+CREATE TABLE malformed_revenue_budget(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
 --------------------------------------------------------------------------------
 /* PMS feed */
 CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
