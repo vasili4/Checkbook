@@ -2969,10 +2969,7 @@ CREATE TABLE stg_fms_header(
 	agency_history_id smallint,
 	record_date_id smallint,
 	check_eft_issued_date_id smallint,
-	check_eft_record_date_id smallint, 
-	expenditure_status_id smallint,
-	expenditure_cancel_type_id smallint, 
-	expenditure_cancel_reason_id smallint,	
+	check_eft_record_date_id smallint, 	
 	check_eft_issued_nyc_year_id smallint,
 	uniq_id bigint default nextval('seq_stg_fms_header_uniq_id'),
 	invalid_flag char(1),
@@ -2991,6 +2988,12 @@ CREATE TABLE stg_fms_vendor(
 	ad_id varchar(20),
 	org_cls integer,
 	misc_acct_fl integer,
+	ad_ln_1 varchar(75),
+	ad_ln_2 varchar(75),
+	ctry varchar(3),
+	st varchar(2),
+	zip varchar(10),
+	city varchar(60),
 	vendor_history_id integer,
 	uniq_id bigint default nextval('seq_stg_fms_vendor_uniq_id'),
 	invalid_flag char(1),
@@ -3632,7 +3635,8 @@ CREATE EXTERNAL TABLE ext_stg_pension_fund(
 (
   widget_name character varying(150),
   aggregate_table_name character varying(150),
-  query text
+  query1 text,
+  query2 text
 )
 DISTRIBUTED BY (aggregate_table_name);
 
@@ -3799,6 +3803,15 @@ CREATE TABLE stg_payroll
 	department_history_id integer,
 	employee_history_id bigint,
 	action_flag char(1),
+	agency_id smallint,
+	agency_name varchar,
+	department_id integer,
+	department_name varchar,
+	employee_id bigint,
+	employee_name varchar,
+	fiscal_year_id smallint,	
+	calendar_fiscal_year_id smallint,
+	calendar_fiscal_year smallint,
 	uniq_id bigint DEFAULT nextval('etl.seq_stg_pms_uniq_id'::regclass),
 	invalid_flag character(1),
 	invalid_reason character varying		
