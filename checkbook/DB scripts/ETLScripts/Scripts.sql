@@ -854,7 +854,8 @@ CREATE OR REPLACE FUNCTION etl.refreshaggregates(p_load_file_id_in integer)   RE
 DECLARE
 	l_aggregate_table_array varchar ARRAY[15];
 	l_array_ctr smallint;	
-	l_query etl.aggregate_tables.query%TYPE;
+	l_query1 etl.aggregate_tables.query1%TYPE;
+	l_query2 etl.aggregate_tables.query2%TYPE;
 	l_insert_sql varchar;
 	l_truncate_sql varchar;	
 	l_start_time  timestamp;
@@ -866,8 +867,9 @@ BEGIN
 
 	l_start_time := timeofday()::timestamp;
 	
-	l_query :='';
-
+	l_query1 :='';
+	l_query2 :='';
+	
 	SELECT ARRAY(SELECT aggregate_table_name
 		FROM etl.aggregate_tables) INTO l_aggregate_table_array;
 
@@ -882,15 +884,21 @@ BEGIN
 
 			EXECUTE l_truncate_sql ;
 
-			SELECT query
+			SELECT query1, query2
 			FROM   etl.aggregate_tables	       
 			WHERE  aggregate_table_name = l_aggregate_table_array[l_array_ctr]     
-			INTO   l_query;
+			INTO   l_query1, l_query2;
 			
-			l_insert_sql := 'INSERT INTO ' || l_aggregate_table_array[l_array_ctr] || '  ' || l_query;
+			l_insert_sql := 'INSERT INTO ' || l_aggregate_table_array[l_array_ctr] || '  ' || l_query1;
 
 			EXECUTE l_insert_sql;				
 
+			IF COALESCE(l_query2,'') <> '' THEN
+				l_insert_sql := 'INSERT INTO ' || l_aggregate_table_array[l_array_ctr] || '  ' || l_query2;
+				
+				EXECUTE l_insert_sql;				
+
+			END IF;
 		
 		END LOOP; 
 
