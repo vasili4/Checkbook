@@ -117,14 +117,17 @@ BEGIN
 					department_history_id integer,amount_basis_id smallint,payroll_id bigint, action_flag char(1),
 					agency_id smallint, agency_name varchar,department_id integer,
 					department_name varchar,expenditure_object_id integer,
-					fiscal_year_id smallint, employee_id bigint, employee_name varchar)
+					fiscal_year_id smallint, employee_id bigint, employee_name varchar,
+					calendar_fiscal_year_id smallint, calendar_fiscal_year smallint)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:pay_date_id
 	
-	INSERT INTO tmp_fk_pms_values(uniq_id,pay_date_id)
-	SELECT	a.uniq_id, b.date_id
-	FROM etl.stg_payroll a JOIN ref_date b ON a.pay_date = b.date;
+	INSERT INTO tmp_fk_pms_values(uniq_id,pay_date_id,calendar_fiscal_year_id,calendar_fiscal_year)
+	SELECT	a.uniq_id, b.date_id,c.year_id as calendar_fiscal_year_id, d.year_value
+	FROM etl.stg_payroll a JOIN ref_date b ON a.pay_date = b.date
+		JOIN ref_month c ON b.calendar_month_id = c.month_id
+		JOIN ref_year d ON c.year_id = d.year_id;
 	
 	-- FK:Agency_history_id
 	
@@ -326,7 +329,9 @@ BEGIN
 		department_name = ct_table.department_name,
 		employee_id = ct_table.employee_id,
 		employee_name = ct_table.employee_name,
-		fiscal_year_id = ct_table.fiscal_year_id
+		fiscal_year_id = ct_table.fiscal_year_id,
+		calendar_fiscal_year_id = ct_table.calendar_fiscal_year_id,
+		calendar_fiscal_year = ct_table.calendar_fiscal_year
 	FROM	
 		(SELECT uniq_id,
 			max(pay_date_id )as pay_date_id ,
@@ -343,7 +348,9 @@ BEGIN
 			max(department_name ) as department_name ,
 			max(fiscal_year_id) as fiscal_year_id,
 			max(employee_id) as employee_id,
-			max(employee_name) as employee_name
+			max(employee_name) as employee_name,
+			max(calendar_fiscal_year_id) as calendar_fiscal_year_id,
+			max(calendar_fiscal_year) as calendar_fiscal_year
 		FROM	tmp_fk_pms_values
 		GROUP	BY 1) ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
@@ -387,6 +394,7 @@ BEGIN
 						  gross_pay,agency_id,agency_code,agency_name,
 						  department_id,department_code,department_name,
 						  employee_id,employee_name,fiscal_year_id,pay_date,
+						  calendar_fiscal_year_id,calendar_fiscal_year,
 						  created_date,created_load_id)
 	SELECT payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,
@@ -395,6 +403,7 @@ BEGIN
 	       gross_pay,agency_id,agency_code,agency_name,
 	       department_id,department_code,department_name,
 	       employee_id,employee_name,fiscal_year_id,pay_date,
+	       calendar_fiscal_year_id,calendar_fiscal_year,
 	       now()::timestamp,p_load_id_in
 	FROM   etl.stg_payroll
 	WHERE  action_flag = 'I';
@@ -402,6 +411,8 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'P',l_count,'# of new PMS records');
+	
+	-- Updating the gross pay YTD based on budget fiscal year
 	
 	CREATE TEMPORARY TABLE tmp_employee_rec_gross_pay(payroll_id bigint,employee_id bigint, payroll_number varchar,job_sequence_number varchar,fiscal_year smallint, pay_date date)
 	DISTRIBUTED BY (payroll_id);
@@ -433,6 +444,36 @@ BEGIN
 	FROM   tmp_employee_rec_gross_pay_1 b
 	WHERE	a.payroll_id = b.payroll_id;	
 	
+
+	-- Updating the gross pay YTD based on calendar fiscal year
+	
+	TRUNCATE tmp_employee_rec_gross_pay;
+	
+	INSERT INTO tmp_employee_rec_gross_pay
+	SELECT  DISTINCT a.payroll_id,a.employee_id, a.payroll_number, a.job_sequence_number, 
+		a.calendar_fiscal_year,a.pay_date
+	FROM   payroll a JOIN etl.stg_payroll b ON a.employee_id = b.employee_id AND a.payroll_number = b.payroll_number
+			AND a.job_sequence_number = b.job_sequence_number
+			AND a.calendar_fiscal_year = b.calendar_fiscal_year
+			AND a.pay_date >= b.pay_date;
+			
+			
+	TRUNCATE tmp_employee_rec_gross_pay_1;
+	
+	INSERT INTO tmp_employee_rec_gross_pay_1
+	SELECT b.payroll_id, sum(a.gross_pay) as gross_pay_ytd, MIN(created_load_id) as created_load_id
+	FROM	payroll a JOIN tmp_employee_rec_gross_pay b ON a.employee_id = b.employee_id AND a.payroll_number = b.payroll_number
+			AND a.job_sequence_number = b.job_sequence_number
+			AND b.pay_date >= a.pay_date
+			AND a.calendar_fiscal_year = b.fiscal_year
+	GROUP BY 1;
+	
+	UPDATE payroll a
+	SET    gross_pay_cytd = b.gross_pay_ytd,
+	       updated_load_id = (CASE WHEN b.created_load_id <> a.created_load_id THEN p_load_id_in END),
+	       updated_date =  (CASE WHEN b.created_load_id <> a.created_load_id THEN now()::timestamp END)	
+	FROM   tmp_employee_rec_gross_pay_1 b
+	WHERE	a.payroll_id = b.payroll_id;		
 	
 	RETURN 1;
 	
