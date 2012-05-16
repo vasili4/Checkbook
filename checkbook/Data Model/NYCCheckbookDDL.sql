@@ -1500,6 +1500,9 @@ CREATE TABLE payroll(
 	fiscal_year_id smallint,
 	pay_date date,
 	gross_pay_ytd numeric(16,2),
+	calendar_fiscal_year_id smallint,
+	calendar_fiscal_year smallint,
+	gross_pay_cytd numeric(16,2),
 	created_date timestamp,
 	created_load_id int,
 	updated_date timestamp,
@@ -1513,10 +1516,11 @@ ALTER TABLE  payroll ADD constraint fk_payroll_ref_date_1 foreign key (orig_pay_
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_department_history foreign key (department_history_id) references ref_department_history (department_history_id);
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_amount_basis foreign key (amount_basis_id) references ref_amount_basis (amount_basis_id);
 
-CREATE TABLE aggregateon_payroll_employee(
+CREATE TABLE aggregateon_payroll_employee_agency(
 	employee_id bigint,
 	agency_id smallint,
 	fiscal_year_id smallint,
+	type_of_year char(1),
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
@@ -1524,16 +1528,42 @@ CREATE TABLE aggregateon_payroll_employee(
 	gross_pay numeric(16,2) )
 DISTRIBUTED BY (employee_id);
 
-CREATE TABLE aggregateon_payroll_coa_entities(
+CREATE TABLE aggregateon_payroll_agency(	
+	agency_id smallint,	
+	fiscal_year_id smallint,
+	type_of_year char(1),
+	gross_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	total_employees int,
+	total_salaried_employees int,
+	total_hourly_employees int,
+	total_overtime_employees int)
+DISTRIBUTED BY (agency_id);
+
+CREATE TABLE aggregateon_payroll_employee_dept(
 	employee_id bigint,
 	agency_id smallint,
-	department_id int,
+	department_id integer,
 	fiscal_year_id smallint,
+	type_of_year char(1),
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
 	gross_pay numeric(16,2) )
+DISTRIBUTED BY (employee_id);
+
+CREATE TABLE aggregateon_payroll_dept(	
+	agency_id smallint,	
+	department_id integer,
+	fiscal_year_id smallint,
+	type_of_year char(1),
+	gross_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	total_employees int,
+	total_salaried_employees int,
+	total_hourly_employees int,
+	total_overtime_employees int)
 DISTRIBUTED BY (agency_id);
 
 
