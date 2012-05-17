@@ -1356,7 +1356,9 @@ CREATE TABLE disbursement_line_item_details(
 	fund_class_name varchar(50),
 	fund_class_code varchar(5),
 	spending_category_id smallint,
-	spending_category_name varchar
+	spending_category_name varchar,
+	calendar_fiscal_year_id smallint,
+	calendar_fiscal_year smallint
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -1378,6 +1380,7 @@ CREATE TABLE aggregateon_spending_coa_entities (
 	expenditure_object_id integer,
 	month_id smallint,
 	year_id smallint,
+	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
 	) DISTRIBUTED BY (department_id) ;
@@ -1387,6 +1390,7 @@ CREATE TABLE aggregateon_spending_vendor (
 	agency_id smallint,
 	month_id smallint,
 	year_id smallint,
+	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
 	) DISTRIBUTED BY (vendor_id) ;
@@ -1398,6 +1402,7 @@ CREATE TABLE aggregateon_spending_contract (
 	agency_id smallint,
 	description character varying(60),
 	year_id smallint,
+	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
 	) DISTRIBUTED BY (agreement_id) ;
@@ -1430,7 +1435,8 @@ DISTRIBUTED BY (funding_class_id);
 CREATE TABLE aggregateon_spending_vendor_exp_object(
 	vendor_id integer,
 	expenditure_object_id integer,
-	check_eft_issued_nyc_year_id smallint,
+	year_id smallint,
+	type_of_year char(1),
 	total_spending_amount numeric(16,2) )
 DISTRIBUTED BY (expenditure_object_id);	
 
