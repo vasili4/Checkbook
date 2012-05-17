@@ -1526,7 +1526,7 @@ CREATE TABLE aggregateon_spending_vendor_exp_object(
 	vendor_id integer,
 	expenditure_object_id integer,
 	year_id smallint,
-	type_of_char char(1),
+	type_of_year char(1),
 	total_spending_amount numeric(16,2) )
 DISTRIBUTED BY (expenditure_object_id);	
 
