@@ -2280,6 +2280,9 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_agency__0(
 	agency_id smallint,
 	fiscal_year_id smallint,
 	type_of_year char(1),
+	pay_frequency varchar,
+	type_of_employment varchar,
+	start_date date,		
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
@@ -2291,7 +2294,8 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_e
   
  CREATE VIEW aggregateon_payroll_employee_agency AS
   	SELECT aggregateon_payroll_employee_agency__0.employee_id, aggregateon_payroll_employee_agency__0.agency_id, aggregateon_payroll_employee_agency__0.fiscal_year_id,
-  		aggregateon_payroll_employee_agency__0.type_of_year,aggregateon_payroll_employee_agency__0.annual_salary, aggregateon_payroll_employee_agency__0.base_pay,
+  		aggregateon_payroll_employee_agency__0.type_of_year,aggregateon_payroll_employee_agency__0.pay_frequency,aggregateon_payroll_employee_agency__0.type_of_employment,
+  		aggregateon_payroll_employee_agency__0.start_date,aggregateon_payroll_employee_agency__0.annual_salary, aggregateon_payroll_employee_agency__0.base_pay,
   		aggregateon_payroll_employee_agency__0.overtime_pay, aggregateon_payroll_employee_agency__0.other_payments,aggregateon_payroll_employee_agency__0.gross_pay
   	FROM	aggregateon_payroll_employee_agency__0;	
   		
