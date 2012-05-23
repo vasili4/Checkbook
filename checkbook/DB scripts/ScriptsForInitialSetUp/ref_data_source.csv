@@ -55,3 +55,5 @@ FC,FundingClass,,,,,etl.ext_stg_funding_class,,,1,1
 FC,FundingClass,,,,,etl.stg_funding_class,etl.archive_funding_class,etl.invalid_funding_class,2,1
 PC,PendingContracts,,,,,etl.ext_stg_oaisis_feed,,,1,2
 PC,PendingContracts,,,,,etl.stg_pending_contracts,etl.archive_pending_contracts,etl.invalid_pending_contracts,2,2
+RB,RevenueBudget,,,,,etl.ext_stg_revenue_budget,,,1,1
+RB,RevenueBudget,,,,,etl.stg_revenue_budget,etl.archive_revenue_budget,etl.invalid_revenue_budget,2,1
