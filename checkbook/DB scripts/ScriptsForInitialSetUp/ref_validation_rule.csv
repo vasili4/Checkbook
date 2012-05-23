@@ -190,3 +190,5 @@ PS,,,Missing key elements,,,"pay_cycle,pay_date,pyrl_no,uoa,fy,object,agency,bud
 PS,,,Duplicate,,,"pay_cycle,pay_date,pyrl_no,uoa,fy,object,agency,bud_code",,,,,2
 FC,,,Missing key elements,,,"funding_class_code,name,fy",,,,,1
 FC,,,Duplicate,,,"funding_class_code,fy",,,,,2
+RB,,,Missing key elements,,,"budget_fiscal_year,budget_code,revenue_source_code,agency_code",,,,,1
+RB,,,Duplicate ,,,"budget_fiscal_year,budget_code,revenue_source_code,agency_code",,,,,2
