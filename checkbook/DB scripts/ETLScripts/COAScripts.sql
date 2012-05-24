@@ -26,7 +26,7 @@ BEGIN
 	       a.agency_name,
 	       a.agency_short_name,	
 	       (CASE WHEN b.agency_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.agency_code IS NOT NULL AND a.agency_name <> b.agency_name THEN 'Y' ELSE 'N' END) as modified_flag
+	       (CASE WHEN b.agency_code IS NOT NULL AND (a.agency_name <> b.agency_name OR a.agency_short_name <>b.agency_short_name) THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM   etl.stg_agency a LEFT JOIN ref_agency b ON a.agency_code = b.agency_code;
 	
 	
