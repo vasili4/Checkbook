@@ -111,6 +111,7 @@ CREATE TABLE ref_agency (
     agency_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_agency_agency_id'::regclass) NOT NULL,
     agency_code character varying(20),
     agency_name character varying(50),
+    agency_short_name character varying(15),
     original_agency_name character varying(50),
     created_date timestamp without time zone,
     updated_date timestamp,
@@ -125,6 +126,7 @@ CREATE TABLE ref_agency_history (
     agency_history_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_agency_history_id'::regclass) NOT NULL,
     agency_id smallint,    
     agency_name character varying(50),
+    agency_short_name character varying(15),
     created_date timestamp without time zone,
     load_id integer
 ) distributed by (agency_history_id);
