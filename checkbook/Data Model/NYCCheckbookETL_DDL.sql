@@ -117,7 +117,7 @@ CREATE EXTERNAL TABLE ext_stg_coa_agency_feed(
 	agency_code VARCHAR,
 	agency_name VARCHAR,
 	col3	    VARCHAR,
-	col4	    VARCHAR,
+	agency_short_name VARCHAR,
 	col5	    VARCHAR,
 	col6	    VARCHAR,
 	col7	    VARCHAR,
@@ -457,6 +457,7 @@ DISTRIBUTED BY (uniq_id);
 CREATE TABLE stg_agency(
 	agency_code varchar(20),
 	agency_name varchar(50),
+	agency_short_name varchar(15),
 	uniq_id bigint default nextval('seq_stg_agency_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar)
