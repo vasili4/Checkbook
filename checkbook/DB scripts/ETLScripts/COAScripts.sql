@@ -15,7 +15,7 @@ Functions defined
 CREATE OR REPLACE FUNCTION etl.processCOAAgency(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
-	CREATE TEMPORARY TABLE tmp_ref_agency(uniq_id bigint,agency_code varchar(20),agency_name varchar, exists_flag char(1), modified_flag char(1))
+	CREATE TEMPORARY TABLE tmp_ref_agency(uniq_id bigint,agency_code varchar(20),agency_name varchar(15),agency_short_name varchar(15), exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
 	
 	-- For all records check if data is modified/new
@@ -24,6 +24,7 @@ BEGIN
 	SELECT  a.uniq_id,
 		a.agency_code, 
 	       a.agency_name,
+	       a.agency_short_name,	
 	       (CASE WHEN b.agency_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
 	       (CASE WHEN b.agency_code IS NOT NULL AND a.agency_name <> b.agency_name THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM   etl.stg_agency a LEFT JOIN ref_agency b ON a.agency_code = b.agency_code;
@@ -38,8 +39,8 @@ BEGIN
 	FROM   tmp_ref_agency
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
-	SELECT a.agency_id,b.agency_code,b.agency_name,now()::timestamp,p_load_id_in,b.agency_name
+	INSERT INTO ref_agency(agency_id,agency_code,agency_name,agency_short_name,created_date,created_load_id,original_agency_name)
+	SELECT a.agency_id,b.agency_code,b.agency_name,agency_short_name,now()::timestamp,p_load_id_in,b.agency_name
 	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id;
 	
 	-- Generate the agency history id for history records
@@ -53,7 +54,7 @@ BEGIN
 		OR (exists_flag ='Y' and modified_flag='Y');
 		
 
-	CREATE TEMPORARY TABLE tmp_ref_agency_1(uniq_id bigint,agency_code varchar(20),agency_name varchar, exists_flag char(1), modified_flag char(1), agency_id smallint)
+	CREATE TEMPORARY TABLE tmp_ref_agency_1(uniq_id bigint,agency_code varchar(20),agency_name varchar, agency_short_name varchar(15),exists_flag char(1), modified_flag char(1), agency_id smallint)
 	DISTRIBUTED BY (agency_id);
 
 	INSERT INTO tmp_ref_agency_1
@@ -64,6 +65,7 @@ BEGIN
 	
 	UPDATE ref_agency a
 	SET	agency_name = b.agency_name,
+		agency_short_name = b.agency_short_name,
 		updated_date = now()::timestamp,
 		updated_load_id = p_load_id_in,
 		original_agency_name = (CASE WHEN COALESCE(a.original_agency_name,'')='' THEN b.agency_name 
@@ -73,8 +75,8 @@ BEGIN
 
 	RAISE NOTICE '2';
 	
-	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
-	SELECT a.agency_history_id,c.agency_id,b.agency_name,now()::timestamp,p_load_id_in
+	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,agency_short_name,created_date,load_id)
+	SELECT a.agency_history_id,c.agency_id,b.agency_name,b.agency_short_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_agency_history_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id
 		JOIN ref_agency c ON b.agency_code = c.agency_code
 	WHERE   exists_flag ='N'
