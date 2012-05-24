@@ -40,7 +40,7 @@ BEGIN
 	WHERE  exists_flag ='N';
 	
 	INSERT INTO ref_agency(agency_id,agency_code,agency_name,agency_short_name,created_date,created_load_id,original_agency_name)
-	SELECT a.agency_id,b.agency_code,b.agency_name,agency_short_name,now()::timestamp,p_load_id_in,b.agency_name
+	SELECT a.agency_id,b.agency_code,b.agency_name,b.agency_short_name,now()::timestamp,p_load_id_in,b.agency_name
 	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id;
 	
 	-- Generate the agency history id for history records
