@@ -154,7 +154,7 @@ ENCODING 'UTF8';
  	department_name	 VARCHAR,
  	col6	    VARCHAR,
  	col7	    VARCHAR,
- 	col8	    VARCHAR,
+ 	department_short_name    VARCHAR,
  	col9	    VARCHAR,
  	col10	    VARCHAR,
  	col11	    VARCHAR,
@@ -480,6 +480,7 @@ CREATE TABLE stg_department(
 	fiscal_year smallint,
 	department_code varchar(20) ,
 	department_name varchar(100),
+	department_short_name varchar(15),
 	uniq_id bigint default nextval('seq_stg_department_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar)
