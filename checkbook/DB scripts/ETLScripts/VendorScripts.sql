@@ -42,17 +42,41 @@ BEGIN
 	
 	l_vendor_stg_table :='etl.stg_mag_vendor';
 	
+	INSERT INTO tmp_stg_vendor(vend_cust_cd, lgl_nm, alias_nm, ad_id, org_cls, misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, 
+							   city, vendor_history_id, uniq_id, address_type_code)
+	SELECT vend_cust_cd, lgl_nm, alias_nm, ad_id, NULL as org_cls, 0 as misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, city, 
+							   vendor_history_id, uniq_id, 'PR' as address_type_code
+	FROM etl.stg_mag_vendor;
+	
 	ELSIF l_data_source_code = 'C' AND (p_doc_type = 'CT1' OR p_doc_type = 'CTA1' OR p_doc_type = 'CTA2') THEN
 	
 	l_vendor_stg_table :='etl.stg_con_ct_vendor';
+	
+	INSERT INTO tmp_stg_vendor(vend_cust_cd, lgl_nm, alias_nm, ad_id, org_cls, misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, 
+							   city, vendor_history_id, uniq_id, address_type_code)
+	SELECT vend_cust_cd, lgl_nm, alias_nm, ad_id, NULL as org_cls, 0 as misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, city, 
+							   vendor_history_id, uniq_id, 'PR' as address_type_code
+	FROM etl.stg_con_ct_vendor;
 	
 	ELSIF l_data_source_code = 'C' AND (p_doc_type = 'POC' OR p_doc_type = 'PCC1' OR p_doc_type = 'POD') THEN
 	
 	l_vendor_stg_table :='etl.stg_con_po_vendor';
 	
+	INSERT INTO tmp_stg_vendor(vend_cust_cd, lgl_nm, alias_nm, ad_id, org_cls, misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, 
+							   city, vendor_history_id, uniq_id, address_type_code)
+	SELECT vend_cust_cd, lgl_nm, alias_nm, ad_id, NULL as org_cls, 0 as misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, city, 
+							   vendor_history_id, uniq_id, 'PR' as address_type_code
+	FROM etl.stg_con_po_vendor;
+	
 	ELSIF l_data_source_code = 'C' AND (p_doc_type = 'DO1') THEN
 	
 	l_vendor_stg_table :='etl.stg_con_do1_vendor';
+	
+	INSERT INTO tmp_stg_vendor(vend_cust_cd, lgl_nm, alias_nm, ad_id, org_cls, misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, 
+							   city, vendor_history_id, uniq_id, address_type_code)
+	SELECT vend_cust_cd, lgl_nm, alias_nm, ad_id, NULL as org_cls, 0 as misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, city, 
+							   vendor_history_id, uniq_id, 'PR' as address_type_code
+	FROM etl.stg_con_do1_vendor;
 	
 	ELSE
 	
