@@ -1,61 +1,74 @@
-
 /*
 Functions defined
+
 	updateForeignKeysForMAGInHeader
 	updateForeignKeysForMAGInAwardDetail
-	updateForeignKeysForMAGVendors
 	processMAG
+
 */
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForMAGInHeader(p_load_id_in bigint) RETURNS INT AS $$
+set search_path=etl;
+
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForMAGInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
+	l_count smallint;
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	
-	CREATE TEMPORARY TABLE tmp_fk_mag_values (uniq_id bigint, document_code_id smallint,agency_history_id smallint,award_status_id smallint,
-					      document_function_code_id smallint, record_date_id smallint,procurement_type_id smallint,
+	CREATE TEMPORARY TABLE tmp_fk_values (uniq_id bigint, document_code_id smallint,agency_history_id smallint,record_date_id smallint,
 					      effective_begin_date_id smallint,effective_end_date_id smallint,source_created_date_id smallint,
 					      source_updated_date_id smallint,registered_date_id smallint, original_term_begin_date_id smallint,
-					      original_term_end_date_id smallint, board_approved_award_date_id smallint)
+					      original_term_end_date_id smallint,registered_fiscal_year smallint,registered_fiscal_year_id smallint, registered_calendar_year smallint,
+					      registered_calendar_year_id smallint,effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id smallint, effective_begin_calendar_year smallint,
+					      effective_begin_calendar_year_id smallint,effective_end_fiscal_year smallint,effective_end_fiscal_year_id smallint, effective_end_calendar_year smallint,
+					      effective_end_calendar_year_id smallint,source_updated_fiscal_year smallint,source_updated_calendar_year smallint,source_updated_calendar_year_id smallint,
+					      source_updated_fiscal_year_id smallint, board_approved_award_date_id smallint)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:Document_Code_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,document_code_id)
+	INSERT INTO tmp_fk_values(uniq_id,document_code_id)
 	SELECT	a.uniq_id, b.document_code_id
 	FROM etl.stg_mag_header a JOIN ref_document_code b ON a.doc_cd = b.document_code;
 	
 	-- FK:Agency_history_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,agency_history_id)
+	INSERT INTO tmp_fk_values(uniq_id,agency_history_id)
 	SELECT	a.uniq_id, max(c.agency_history_id) as agency_history_id
 	FROM etl.stg_mag_header a JOIN ref_agency b ON a.doc_dept_cd = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1;
 	
-	CREATE TEMPORARY TABLE tmp_fk_mag_values_new_agencies(dept_cd varchar,uniq_id bigint)
+	CREATE TEMPORARY TABLE tmp_fk_values_new_agencies(dept_cd varchar,uniq_id bigint)
 	DISTRIBUTED BY (uniq_id);
 	
-	INSERT INTO tmp_fk_mag_values_new_agencies
+	INSERT INTO tmp_fk_values_new_agencies
 	SELECT doc_dept_cd,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_mag_header a join (SELECT uniq_id
-						 FROM tmp_fk_mag_values
+						 FROM tmp_fk_values
 						 GROUP BY 1
 						 HAVING max(agency_history_id) is null) b on a.uniq_id=b.uniq_id
 	GROUP BY 1;
 
-	RAISE NOTICE 'MAG 1';
+	RAISE NOTICE '1';
 	
 	TRUNCATE etl.ref_agency_id_seq;
 	
 	INSERT INTO etl.ref_agency_id_seq(uniq_id)
 	SELECT uniq_id
-	FROM   tmp_fk_mag_values_new_agencies;
+	FROM   tmp_fk_values_new_agencies;
 	
 	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
 	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
-	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_mag_values_new_agencies b ON a.uniq_id = b.uniq_id;
+	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_values_new_agencies b ON a.uniq_id = b.uniq_id;
 
-	RAISE NOTICE 'MAG 1.1';
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from MAG header');
+	END IF;
+	
+	RAISE NOTICE '1.1';
 
 	-- Generate the agency history id for history records
 	
@@ -63,196 +76,228 @@ BEGIN
 	
 	INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
 	SELECT uniq_id
-	FROM   tmp_fk_mag_values_new_agencies;
+	FROM   tmp_fk_values_new_agencies;
 
 	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
 	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
 
-	RAISE NOTICE 'MAG 1.3';
-	INSERT INTO tmp_fk_mag_values(uniq_id,agency_history_id)
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from MAG header');
+	END IF;
+	
+	RAISE NOTICE '1.3';
+	
+	INSERT INTO tmp_fk_values(uniq_id,agency_history_id)
 	SELECT	a.uniq_id, max(c.agency_history_id) 
 	FROM etl.stg_mag_header a JOIN ref_agency b ON a.doc_dept_cd = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
 	GROUP BY 1	;	
-	
-	-- FK:Award_status_id
-	
-	INSERT INTO tmp_fk_mag_values(uniq_id,award_status_id)
-	SELECT	a.uniq_id, b.award_status_id
-	FROM etl.stg_mag_header a JOIN ref_award_status b ON a.cntrc_sta = b.award_status_id;
-	
-	-- FK:document_function_code_id
-	
-	INSERT INTO tmp_fk_mag_values(uniq_id,document_function_code_id)
-	SELECT	a.uniq_id, b.document_function_code_id
-	FROM etl.stg_mag_header a JOIN ref_document_function_code b ON a.doc_func_cd = b.document_function_code_id;
-	
+			
 	-- FK:record_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,record_date_id)
+	INSERT INTO tmp_fk_values(uniq_id,record_date_id)
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_mag_header a JOIN ref_date b ON a.doc_rec_dt_dc = b.date;
-	
-	--FK:procurement_type_id
-	
-	INSERT INTO tmp_fk_mag_values(uniq_id,procurement_type_id)
-	SELECT	a.uniq_id, b.procurement_type_id
-	FROM etl.stg_mag_header a JOIN ref_procurement_type b ON a.prcu_typ_id = b.procurement_type_id;
-	
+		
 	--FK:effective_begin_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,effective_begin_date_id)
-	SELECT	a.uniq_id, b.date_id
-	FROM etl.stg_mag_header a JOIN ref_date b ON a.efbgn_dt = b.date;
+	INSERT INTO tmp_fk_values(uniq_id,effective_begin_date_id,effective_begin_fiscal_year,effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id)
+	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
+	FROM etl.stg_mag_header a JOIN ref_date b ON a.efbgn_dt = b.date
+		JOIN ref_year c ON b.nyc_year_id = c.year_id
+		JOIN ref_month d ON b.calendar_month_id = d.month_id
+		JOIN ref_year e ON d.year_id = e.year_id;
 	
 	--FK:effective_end_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,effective_end_date_id)
-	SELECT	a.uniq_id, b.date_id
-	FROM etl.stg_mag_header a JOIN ref_date b ON a.efend_dt = b.date;
+	INSERT INTO tmp_fk_values(uniq_id,effective_end_date_id,effective_end_fiscal_year,effective_end_fiscal_year_id, effective_end_calendar_year,effective_end_calendar_year_id)
+	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
+	FROM etl.stg_mag_header a JOIN ref_date b ON a.efend_dt = b.date
+		JOIN ref_year c ON b.nyc_year_id = c.year_id
+		JOIN ref_month d ON b.calendar_month_id = d.month_id
+		JOIN ref_year e ON d.year_id = e.year_id;
 	
+	RAISE NOTICE '1.4';
+
 	--FK:source_created_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,source_created_date_id)
+	INSERT INTO tmp_fk_values(uniq_id,source_created_date_id)
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_mag_header a JOIN ref_date b ON a.doc_appl_crea_dt = b.date;
 	
 	--FK:source_updated_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,source_updated_date_id)
-	SELECT	a.uniq_id, b.date_id
-	FROM etl.stg_mag_header a JOIN ref_date b ON a.doc_appl_last_dt = b.date;
+	INSERT INTO tmp_fk_values(uniq_id,source_updated_date_id,source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,source_updated_calendar_year_id)
+	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
+	FROM etl.stg_mag_header a JOIN ref_date b ON a.doc_appl_last_dt = b.date
+		JOIN ref_year c ON b.nyc_year_id = c.year_id
+		JOIN ref_month d ON b.calendar_month_id = d.month_id
+		JOIN ref_year e ON d.year_id = e.year_id;
 	
 	--FK:registered_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,registered_date_id)
-	SELECT	a.uniq_id, b.date_id
-	FROM etl.stg_mag_header a JOIN ref_date b ON a.reg_dt = b.date;
+	INSERT INTO tmp_fk_values(uniq_id,registered_date_id, registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,registered_calendar_year_id)
+	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
+	FROM etl.stg_mag_header a JOIN ref_date b ON a.reg_dt = b.date
+		JOIN ref_year c ON b.nyc_year_id = c.year_id
+		JOIN ref_month d ON b.calendar_month_id = d.month_id
+		JOIN ref_year e ON d.year_id = e.year_id;
 
+	RAISE NOTICE '1.5';
+	
 	--FK:original_term_begin_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,original_term_begin_date_id)
+	INSERT INTO tmp_fk_values(uniq_id,original_term_begin_date_id)
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_mag_header a JOIN ref_date b ON a.orig_strt_dt = b.date;
 
 	--FK:original_term_end_date_id
 	
-	INSERT INTO tmp_fk_mag_values(uniq_id,original_term_end_date_id)
+	INSERT INTO tmp_fk_values(uniq_id,original_term_end_date_id)
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_mag_header a JOIN ref_date b ON a.orig_end_dt = b.date;
 	
-
-	--FK:board_approved_award_date_id
-	
-	INSERT INTO tmp_fk_mag_values(uniq_id,board_approved_award_date_id)
+	-- FK:board_approved_award_date_id
+	INSERT INTO tmp_fk_values(uniq_id,board_approved_award_date_id)
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_mag_header a JOIN ref_date b ON a.brd_awd_dt = b.date;
 	
-	--Updating con_ct_header with all the FK values
+	RAISE NOTICE '1.6';
+	
+	--Updating stg_mag_header with all the FK values
 	
 	UPDATE etl.stg_mag_header a
 	SET	document_code_id = ct_table.document_code_id ,
 		agency_history_id = ct_table.agency_history_id,
-		award_status_id = ct_table.award_status_id,
-		document_function_code_id = ct_table.document_function_code_id, 
 		record_date_id = ct_table.record_date_id,
-		procurement_type_id = ct_table.procurement_type_id, 
 		effective_begin_date_id = ct_table.effective_begin_date_id,
 		effective_end_date_id = ct_table.effective_end_date_id,
 		source_created_date_id = ct_table.source_created_date_id,
 		source_updated_date_id = ct_table.source_updated_date_id,
 		registered_date_id = ct_table.registered_date_id, 
-		original_term_begin_date_id = ct_table.original_term_begin_date_id, 
+		original_term_begin_date_id = ct_table.original_term_begin_date_id,		
 		original_term_end_date_id = ct_table.original_term_end_date_id,
+		registered_fiscal_year = ct_table.registered_fiscal_year, 		
+		registered_fiscal_year_id = ct_table.registered_fiscal_year_id,
+		registered_calendar_year = ct_table.registered_calendar_year,
+		registered_calendar_year_id = ct_table.registered_calendar_year_id,
+		effective_begin_fiscal_year = ct_table.effective_begin_fiscal_year,
+		effective_begin_fiscal_year_id = ct_table.effective_begin_fiscal_year_id,
+		effective_begin_calendar_year = ct_table.effective_begin_calendar_year,
+		effective_begin_calendar_year_id = ct_table.effective_begin_calendar_year_id,
+		effective_end_fiscal_year = ct_table.effective_end_fiscal_year,
+		effective_end_fiscal_year_id = ct_table.effective_end_fiscal_year_id,
+		effective_end_calendar_year = ct_table.effective_end_calendar_year,
+		effective_end_calendar_year_id = ct_table.effective_end_calendar_year_id,
+		source_updated_fiscal_year = ct_table.source_updated_fiscal_year,
+		source_updated_fiscal_year_id = ct_table.source_updated_fiscal_year_id,		
+		source_updated_calendar_year = ct_table.source_updated_calendar_year,
+		source_updated_calendar_year_id = ct_table.source_updated_calendar_year_id,
 		board_approved_award_date_id = ct_table.board_approved_award_date_id
+		
 	FROM	(SELECT uniq_id, max(document_code_id) as document_code_id ,
-				 max(agency_history_id) as agency_history_id,max(award_status_id) as award_status_id,
-				 max(document_function_code_id) as document_function_code_id, max(record_date_id) as record_date_id,
-				 max(procurement_type_id) as procurement_type_id, max(effective_begin_date_id) as effective_begin_date_id,
-				 max(effective_end_date_id) as effective_end_date_id,max(source_created_date_id) as source_created_date_id,
-				 max(source_updated_date_id) as source_updated_date_id,max(registered_date_id) as registered_date_id, 
-				 max(original_term_begin_date_id) as original_term_begin_date_id, max(original_term_end_date_id) as original_term_end_date_id,
+				 max(agency_history_id) as agency_history_id,
+				 max(record_date_id) as record_date_id,
+				 max(effective_begin_date_id) as effective_begin_date_id,
+				 max(effective_end_date_id) as effective_end_date_id,
+				 max(source_created_date_id) as source_created_date_id,
+				 max(source_updated_date_id) as source_updated_date_id,
+				 max(registered_date_id) as registered_date_id, 
+				 max(original_term_begin_date_id) as original_term_begin_date_id, 
+				 max(original_term_end_date_id) as original_term_end_date_id,
+				 max(registered_fiscal_year) as registered_fiscal_year, 
+				 max(registered_fiscal_year_id) as registered_fiscal_year_id,
+				 max(registered_calendar_year) as registered_calendar_year, 
+				 max(registered_calendar_year_id) as registered_calendar_year_id,
+				 max(effective_begin_fiscal_year) as effective_begin_fiscal_year, 
+				 max(effective_begin_fiscal_year_id) as effective_begin_fiscal_year_id,
+				 max(effective_begin_calendar_year) as effective_begin_calendar_year, 
+				 max(effective_begin_calendar_year_id) as effective_begin_calendar_year_id,
+				 max(effective_end_fiscal_year) as effective_end_fiscal_year, 
+				 max(effective_end_fiscal_year_id) as effective_end_fiscal_year_id,
+				 max(effective_end_calendar_year) as effective_end_calendar_year, 
+				 max(effective_end_calendar_year_id) as effective_end_calendar_year_id,
+				 max(source_updated_fiscal_year) as source_updated_fiscal_year,
+				 max(source_updated_fiscal_year_id) as source_updated_fiscal_year_id,
+				 max(source_updated_calendar_year) as source_updated_calendar_year, 
+				 max(source_updated_calendar_year_id) as source_updated_calendar_year_id,
 				 max(board_approved_award_date_id) as board_approved_award_date_id
-		 FROM	tmp_fk_mag_values
+		 FROM	tmp_fk_values
 		 GROUP BY 1) ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
 	
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
-	RAISE NOTICE 'MAG Exception Occurred in updateForeignKeysForMAGInHeader';
-	RAISE NOTICE 'MAG SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+	RAISE NOTICE 'Exception Occurred in updateForeignKeysForMAGInHeader';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	RETURN 0;
 END;
 $$ language plpgsql;
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForMAGInAwardDetail() RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION updateForeignKeysForMAGInAwardDetail() RETURNS INT AS $$
 DECLARE
 BEGIN
 	-- UPDATING FK VALUES IN AWARD DETAIL
 	
-	CREATE TEMPORARY TABLE tmp_fk_values_mag_award_detail(uniq_id bigint,award_method_id smallint,award_level_id smallint,agreement_type_id smallint,
+	CREATE TEMPORARY TABLE tmp_fk_values_award_detail(uniq_id bigint,award_method_id smallint,agreement_type_id smallint,
 						      		award_category_id_1 smallint,award_category_id_2 smallint, award_category_id_3 smallint, award_category_id_4 smallint,
 					      			award_category_id_5 smallint)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:award_method_id
 	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,award_method_id)
+	INSERT INTO tmp_fk_values_award_detail(uniq_id,award_method_id)
 	SELECT a.uniq_id , b.award_method_id
 	FROM	etl.stg_mag_award_detail a JOIN ref_award_method b ON a.awd_meth_cd = b.award_method_code;
-
-	--FK:award_level_id
-	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,award_level_id)
-	SELECT a.uniq_id , b.award_level_id
-	FROM	etl.stg_mag_award_detail a JOIN ref_award_level b ON a.awd_lvl_cd = b.award_level_code;
 	
 	--FK:agreement_type_id
 	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,agreement_type_id)
+	INSERT INTO tmp_fk_values_award_detail(uniq_id,agreement_type_id)
 	SELECT a.uniq_id , b.agreement_type_id
 	FROM	etl.stg_mag_award_detail a JOIN ref_agreement_type b ON a.cttyp_cd = b.agreement_type_code;
 
 	--FK:award_category_id_1
 	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,award_category_id_1)
+	INSERT INTO tmp_fk_values_award_detail(uniq_id,award_category_id_1)
 	SELECT a.uniq_id , b.award_category_id
 	FROM	etl.stg_mag_award_detail a JOIN ref_award_category b ON a.ctcat_cd_1 = b.award_category_code;
 
 	--FK:award_category_id_2
 	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,award_category_id_2)
+	INSERT INTO tmp_fk_values_award_detail(uniq_id,award_category_id_2)
 	SELECT a.uniq_id , b.award_category_id
 	FROM	etl.stg_mag_award_detail a JOIN ref_award_category b ON a.ctcat_cd_2 = b.award_category_code;
 
 	--FK:award_category_id_3
 	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,award_category_id_3)
+	INSERT INTO tmp_fk_values_award_detail(uniq_id,award_category_id_3)
 	SELECT a.uniq_id , b.award_category_id
 	FROM	etl.stg_mag_award_detail a JOIN ref_award_category b ON a.ctcat_cd_3 = b.award_category_code;
 
 	--FK:award_category_id_4
 	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,award_category_id_4)
+	INSERT INTO tmp_fk_values_award_detail(uniq_id,award_category_id_4)
 	SELECT a.uniq_id , b.award_category_id
 	FROM	etl.stg_mag_award_detail a JOIN ref_award_category b ON a.ctcat_cd_4 = b.award_category_code;
 
 	--FK:award_category_id_5
 	
-	INSERT INTO tmp_fk_values_mag_award_detail(uniq_id,award_category_id_5)
+	INSERT INTO tmp_fk_values_award_detail(uniq_id,award_category_id_5)
 	SELECT a.uniq_id , b.award_category_id
 	FROM	etl.stg_mag_award_detail a JOIN ref_award_category b ON a.ctcat_cd_5 = b.award_category_code;
 
 
 	UPDATE etl.stg_mag_award_detail a
 	SET	award_method_id = ct_table.award_method_id ,
-		award_level_id = ct_table.award_level_id ,
 		agreement_type_id = ct_table.agreement_type_id ,
 		award_category_id_1 = ct_table.award_category_id_1 ,
 		award_category_id_2 = ct_table.award_category_id_2 ,
@@ -262,14 +307,13 @@ BEGIN
 	FROM	
 		(SELECT uniq_id,
 			max(award_method_id) as award_method_id ,
-			max(award_level_id) as award_level_id 	 ,
 			max(agreement_type_id) as agreement_type_id   ,
 			max(award_category_id_1) as award_category_id_1	 ,
 			max(award_category_id_2) as award_category_id_2	 ,
 			max(award_category_id_3) as award_category_id_3	 ,
 			max(award_category_id_4) as award_category_id_4	 ,
 			max(award_category_id_5) as award_category_id_5  
-		FROM 	tmp_fk_values_mag_award_detail
+		FROM 	tmp_fk_values_award_detail
 		GROUP BY 1 )ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
 	
@@ -277,133 +321,14 @@ BEGIN
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
-	RAISE NOTICE 'MAG Exception Occurred in updateForeignKeysForMAGInAwardDetail';
-	RAISE NOTICE 'MAG SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+	RAISE NOTICE 'Exception Occurred in updateForeignKeysForMAGInAwardDetail';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	RETURN 0;
 END;
 $$ language plpgsql;
 
------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForMAGVendors(p_load_id_in bigint) RETURNS INT AS $$
-DECLARE
-
-BEGIN
-
-	-- UPDATING FK VALUES IN VENDOR
-
-	CREATE TEMPORARY TABLE tmp_fk_mag_values_vendor(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer,miscellaneous_vendor_flag bit,
-							lgl_nm varchar,alias_nm varchar)
-	DISTRIBUTED BY (uniq_id);
-	
-	INSERT INTO tmp_fk_mag_values_vendor
-	SELECT uniq_id,a.vend_cust_cd,MAX(c.vendor_history_id) as vendor_history_id,COALESCE(b.miscellaneous_vendor_flag,0::bit),
-		MIN(a.lgl_nm),MIN(a.alias_nm)
-	FROM	etl.stg_mag_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code
-		LEFT JOIN vendor_history c ON b.vendor_id = c.vendor_id
-	WHERE b.miscellaneous_vendor_flag = 0::bit OR b.miscellaneous_vendor_flag IS NULL		
-	GROUP BY 1,2,4;
-
-	RAISE NOTICE 'MAG VEN 1';
-	
-	CREATE TEMPORARY TABLE tmp_fk_mag_values_vendor_1(uniq_id bigint)
-	DISTRIBUTED BY (uniq_id);
-	
-	INSERT INTO tmp_fk_mag_values_vendor_1
-	SELECT DISTINCT uniq_id
-	FROM	etl.stg_mag_vendor a  JOIN (SELECT DISTINCT vendor_customer_code FROM vendor WHERE miscellaneous_vendor_flag = 1::bit)  b ON a.vend_cust_cd = b.vendor_customer_code;
-
-	UPDATE tmp_fk_mag_values_vendor a
-	SET 	miscellaneous_vendor_flag = 1::bit,
-		vendor_history_id =0
-	FROM	tmp_fk_mag_values_vendor_1 b
-	WHERE	a.uniq_id = b.uniq_id;
-	
-	RAISE NOTICE 'MAG VEN 1.2';
-		
-	-- Identify the new vendors
-	
-	CREATE TEMPORARY TABLE tmp_vendor_new(uniq_id bigint, vendor_customer_code varchar)
-	DISTRIBUTED BY (uniq_id);
-	
-	INSERT INTO tmp_vendor_new
-	SELECT min(uniq_id) as uniq_id, vendor_customer_code
-	FROM	tmp_fk_mag_values_vendor
-	WHERE   vendor_history_id IS NULL AND miscellaneous_vendor_flag = 0::bit
-	GROUP BY 2;	
-
-	INSERT INTO tmp_vendor_new
-	SELECT  uniq_id as uniq_id, vendor_customer_code
-	FROM	tmp_fk_mag_values_vendor
-	WHERE   vendor_history_id =0 AND miscellaneous_vendor_flag = 1::bit;
-		
-	TRUNCATE etl.vendor_id_seq;
-	
-	INSERT INTO etl.vendor_id_seq(uniq_id)
-	SELECT uniq_id
-	FROM tmp_vendor_new;
-
-	RAISE NOTICE 'MAG VEN 3';
-	
-	INSERT INTO vendor(vendor_id,vendor_customer_code,legal_name,alias_name,miscellaneous_vendor_flag,created_load_id,created_date)
-	SELECT  a.vendor_id,b.vendor_customer_code,b.lgl_nm,b.alias_nm,b.miscellaneous_vendor_flag,  p_load_id_in,now()::timestamp
-	FROM	etl.vendor_id_seq a JOIN tmp_fk_mag_values_vendor b ON a.uniq_id = b.uniq_id;	
-
-	TRUNCATE etl.vendor_history_id_seq;
-	
-	INSERT INTO etl.vendor_history_id_seq(uniq_id)
-	SELECT uniq_id
-	FROM tmp_vendor_new;
-
-	RAISE NOTICE 'MAG VEN 2';
-	
-	INSERT INTO vendor_history(vendor_history_id,vendor_id,legal_name,alias_name,miscellaneous_vendor_flag,load_id,created_date)
-	SELECT  a.vendor_history_id,c.vendor_id,b.lgl_nm,b.alias_nm,b.miscellaneous_vendor_flag, p_load_id_in,now()::timestamp
-	FROM	etl.vendor_history_id_seq a JOIN tmp_fk_mag_values_vendor b ON a.uniq_id = b.uniq_id
-		JOIN etl.vendor_id_seq c ON a.uniq_id = c.uniq_id;
-
-	CREATE TEMPORARY TABLE tmp_ct_vendor(uniq_id bigint,vendor_history_id int)
-	DISTRIBUTED BY (uniq_id);
-	
-	INSERT INTO tmp_ct_vendor
-	SELECT c.uniq_id, d.vendor_history_id
-	FROM tmp_fk_mag_values_vendor a JOIN tmp_vendor_new b ON a.uniq_id = b.uniq_id	AND a.miscellaneous_vendor_flag=0::bit	
-		JOIN tmp_fk_mag_values_vendor c ON a.vendor_customer_code = c.vendor_customer_code
-		JOIN etl.vendor_history_id_seq d ON b.uniq_id = d.uniq_id;
-
-	RAISE NOTICE 'MAG VEN 4';
-
-	INSERT INTO tmp_ct_vendor
-	SELECT a.uniq_id, d.vendor_history_id
-	FROM tmp_fk_mag_values_vendor a JOIN tmp_vendor_new b ON a.uniq_id = b.uniq_id AND a.miscellaneous_vendor_flag=1::bit		
-		JOIN etl.vendor_history_id_seq d ON b.uniq_id = d.uniq_id;
-			
-	UPDATE tmp_fk_mag_values_vendor a
-	SET	vendor_history_id = b.vendor_history_id
-	FROM	tmp_ct_vendor b 
-	WHERE	a.uniq_id = b.uniq_id;
-					
-	
-	UPDATE etl.stg_mag_vendor a
-	SET	vendor_history_id = b.vendor_history_id
-	FROM	tmp_fk_mag_values_vendor b 
-	WHERE	a.uniq_id = b.uniq_id;
-	
-	RETURN 1;
-	
-EXCEPTION
-	WHEN OTHERS THEN
-	RAISE NOTICE 'MAG Exception Occurred in updateForeignKeysForMAGVendors';
-	RAISE NOTICE 'MAG SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
-
-	RETURN 0;
-END;
-$$ language plpgsql;
-
--------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-set search_path=public;
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION etl.processMAG(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
@@ -437,9 +362,9 @@ BEGIN
 				      'percent_10'];
 				      
 
-	l_fk_update := etl.updateForeignKeysForMAGInHeader(p_load_id_in);
+	l_fk_update := etl.updateForeignKeysForMAGInHeader(p_load_file_id_in,p_load_id_in);
 
-	RAISE NOTICE 'MAG CON 1';
+	RAISE NOTICE 'MAG 1';
 	
 	IF l_fk_update = 1 THEN
 		l_fk_update := etl.updateForeignKeysForMAGInAwardDetail();
@@ -447,644 +372,496 @@ BEGIN
 		RETURN -1;
 	END IF;
 
-	RAISE NOTICE 'MAG CON 2';
+	RAISE NOTICE 'MAG 2';
 	
 	IF l_fk_update = 1 THEN
-		l_fk_update := etl.updateForeignKeysForMAGVendors(p_load_id_in);
+		l_fk_update := etl.processvendor(p_load_file_id_in,p_load_id_in,'');
 	ELSE
 		RETURN -1;
 	END IF;
+
 
 	IF l_fk_update <> 1 THEN
 		RETURN -1;
 	END IF;
 	
-	RAISE NOTICE 'MAG CON 5';
-	/************************************************************************-- UPDATING FK VALUES IN ETL.stg_mag_commodity
 	
-	CREATE TEMPORARY TABLE tmp_fk_values_mag_commodity(uniq_id bigint,commodity_type_id int)
-	DISTRIBUTED BY (uniq_id);	
-	
-	-- FK:commodity_type_id
+	RAISE NOTICE 'MAG 3';
 
-	INSERT INTO tmp_fk_values_mag_commodity(uniq_id,commodity_type_id)
-	SELECT	a.uniq_id, b.commodity_type_id
-	FROM etl.stg_mag_commodity a JOIN ref_commodity_type b ON a.ln_typ = b.commodity_type_id;
 	
-	UPDATE etl.stg_mag_commodity a
-	SET	commodity_type_id = b.commodity_type_id
-	FROM	tmp_fk_values_mag_commodity b
-	WHERE 	a.uniq_id = b.uniq_id;
+	-- Inserting all records from staging header
 	
-	*****************************************************************************************/
-	/*
-	1.Pull the key information such as document code, document id, document version etc for all agreements
-	2. For the existing contracts gather details on max version in the transaction, staging tables..Determine if the staged agreement is latest version...
-	3. Identify the new agreements. Determine the latest version for each of it.
-	*/
-	
-	RAISE NOTICE 'MAG CON 6';
-	CREATE TEMPORARY TABLE tmp_mag_con(uniq_id bigint, agency_history_id smallint,doc_id varchar,agreement_id bigint, action_flag char(1), 
+	RAISE NOTICE 'MAG 4';
+	CREATE TEMPORARY TABLE tmp_mag(uniq_id bigint, agency_history_id smallint,doc_id varchar,master_agreement_id bigint, action_flag char(1), 
 					  latest_flag char(1),doc_vers_no smallint,privacy_flag char(1),old_agreement_ids varchar)
 	DISTRIBUTED BY (uniq_id);
 	
-	INSERT INTO tmp_mag_con(uniq_id,agency_history_id,doc_id,doc_vers_no,privacy_flag)
-	SELECT uniq_id,agency_history_id,doc_id,doc_vers_no,'F' as privacy_flag
+	INSERT INTO tmp_mag(uniq_id,agency_history_id,doc_id,doc_vers_no,privacy_flag,action_flag)
+	SELECT uniq_id,agency_history_id,doc_id,doc_vers_no,'F' as privacy_flag,'I' as action_flag
 	FROM etl.stg_mag_header;
 	
-	-- For the existing contracts gather details on max version in the transaction, staging tables..Determine if the staged agreement is latest version...
+	-- Identifying the versions of the agreements for update (doubt)
+	CREATE TEMPORARY TABLE tmp_old_mag(uniq_id bigint, master_agreement_id bigint);
 	
-	CREATE TEMPORARY TABLE tmp_old_mag_con(uniq_id bigint,agreement_id bigint, action_flag char(1), latest_flag char(1),privacy_flag char(1),old_agreement_ids varchar)
-	DISTRIBUTED BY (uniq_id);
+	INSERT INTO tmp_old_mag
+	SELECT  uniq_id,		
+		b.master_agreement_id
+	FROM etl.stg_mag_header a JOIN history_master_agreement b ON a.doc_id = b.document_id AND a.document_code_id = b.document_code_id AND a.doc_vers_no = b.document_version
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id
+		JOIN ref_agency_history d ON b.agency_history_id = d.agency_history_id and c.agency_id = d.agency_id;				
 	
-	INSERT INTO tmp_old_mag_con
-	SELECT d.uniq_id,
-		inner_tbl.agreement_id,
-		(CASE WHEN match_count = 1 THEN 'U' ELSE 'I' END) as action_flag,
-		(CASE WHEN d.doc_vers_no >= staging_max_doc_vers_no AND d.doc_vers_no >= max_document_version THEN 'Y' ELSE 'N' END) as latest_flag,
-		privacy_flag,
-		old_agreement_ids
-	FROM	
-		(SELECT  uniq_id,		
-			MAX(c.agency_history_id) as stagig_agency_history_id,	
-			MIN(a.doc_id) as staging_document_id,
-			MAX(a.doc_vers_no) as staging_max_doc_vers_no,
-			MAX(b.document_version) as max_document_version, 
-			SUM(CASE WHEN a.doc_vers_no = b.document_version THEN 1 ELSE 0 END) as match_count,			
-			MAX(CASE WHEN a.doc_vers_no = b.document_version THEN b.master_agreement_id ELSE 0 END) as agreement_id,
-			MAX(b.privacy_flag) as privacy_flag,
-			GROUP_CONCAT(b.master_agreement_id) as old_agreement_ids
-		FROM etl.stg_mag_header a JOIN history_all_master_agreement b ON a.doc_id = b.document_id AND a.document_code_id = b.document_code_id
-			JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id
-			JOIN ref_agency_history d ON b.agency_history_id = d.agency_history_id
-			JOIN ref_agency e ON c.agency_id = d.agency_id AND a.doc_dept_cd = e.agency_code
-		GROUP BY 1) inner_tbl JOIN etl.stg_mag_header d ON inner_tbl.uniq_id = d.uniq_id;
-			
-	
-	UPDATE tmp_mag_con a
-	SET	agreement_id = b.agreement_id,
-		action_flag = b.action_flag,
-		latest_flag = b.latest_flag,
-		privacy_flag=b.privacy_flag,
-		old_agreement_ids = b.old_agreement_ids
-	FROM	tmp_old_mag_con b
+	UPDATE tmp_mag a
+	SET	master_agreement_id = b.master_agreement_id,
+		action_flag = 'U'		
+	FROM	tmp_old_mag b
 	WHERE	a.uniq_id = b.uniq_id;
 	
-	RAISE NOTICE 'MAG CON 7';
-	-- Identify the new agreements. Determine the latest version for each of it.
+	RAISE NOTICE 'MAG 5';
+	-- Identifying the versions of the agreements for update
 	
-	CREATE TEMPORARY TABLE tmp_new_mag_con(uniq_id bigint,agreement_id bigint, action_flag char(1), latest_flag char(1))
-	DISTRIBUTED BY (uniq_id);
-	
-	INSERT INTO tmp_new_mag_con
-	SELECT inner_tbl.uniq_id,
-		0 as agreement_id,
-		'I' as action_flag,
-		(CASE WHEN COALESCE(latest_flag,'Y') ='Y' AND c.doc_vers_no = inner_tbl.staging_max_doc_vers_no THEN 'Y' ELSE 'N' END) as latest_flag
-	FROM	
-	(SELECT  a.uniq_id,
-		max(b.doc_vers_no) as staging_max_doc_vers_no
-	FROM	tmp_mag_con a JOIN etl.stg_mag_header b ON a.doc_id = b.doc_id AND a.agency_history_id = b.agency_history_id
-	WHERE	COALESCE(a.agreement_id,0) =0 
-	GROUP BY 1) inner_tbl JOIN tmp_mag_con c ON inner_tbl.uniq_id = c.uniq_id;
-	
-	INSERT INTO tmp_new_mag_con
-	SELECT uniq_id,0 as agreement_id,
-		action_flag,
-		latest_flag
-	FROM	tmp_mag_con
-	WHERE	action_flag ='I' 
-		AND COALESCE(agreement_id,0) =0 ;
-		
-	TRUNCATE etl.agreement_id_seq;
-	
-	
-	INSERT INTO etl.agreement_id_seq(uniq_id)
+	INSERT INTO etl.agreement_id_seq
 	SELECT uniq_id
-	FROM	tmp_new_mag_con;
-	
-	UPDATE tmp_new_mag_con a
-	SET	agreement_id = b.agreement_id
+	FROM	tmp_mag
+	WHERE	action_flag ='I' 
+		AND COALESCE(master_agreement_id,0) =0 ;
+
+	UPDATE tmp_mag a
+	SET	master_agreement_id = b.agreement_id	
 	FROM	etl.agreement_id_seq b
-	WHERE	a.uniq_id = b.uniq_id;
+	WHERE	a.uniq_id = b.uniq_id;	
 	
-	UPDATE tmp_mag_con a
-	SET	agreement_id = b.agreement_id,
-		action_flag = b.action_flag,
-		latest_flag = b.latest_flag,
-		privacy_flag='F'
-	FROM	tmp_new_mag_con b
-	WHERE	a.uniq_id = b.uniq_id;
-	
-	RAISE NOTICE 'MAG CON 8';
-	-- Handling new ones
-		-- match_count is 0 & staging_doc_vers_no > max_document_version then delete the existing one from agreement and insert new records in both agreement,history_agreement
-		-- match_count is 0 & staging_doc_vers_no < max_document_version then insert into history_agreement
-	-- Handling existing ones
-		-- match_count is 0 & staging_doc_vers_no = max_document_version then update agreement,history_agreement. Delete the corresponding child records and insert new sets
-		-- match_count is 0 & staging_doc_vers_no < max_document_version then update history_agreement. Delete the corresponding child records and insert new sets
-		
-	/* Identify the agreements which have to be deleted since the latest version has been recieved in the data feed.*/
-	
-	CREATE TEMPORARY TABLE tmp_mag_deletion(agreement_id bigint, new_agreement_id bigint, uniq_id bigint)
-	DISTRIBUTED BY (agreement_id);
-	
-	INSERT INTO tmp_mag_deletion
-	SELECT  unnest(string_to_array(old_agreement_ids,','))::int as agreement_id, agreement_id as new_agreement_id, uniq_id
-	FROM	tmp_mag_con
-	WHERE	action_flag = 'I'
-		AND latest_flag ='Y';	
-		
-	--DELETE FROM all_agreement_commodity WHERE agreement_id IN (select agreement_id from tmp_mag_deletion);
-	
-	DELETE FROM all_agreement_worksite WHERE agreement_id IN (select agreement_id from tmp_mag_deletion) AND master_agreement_yn='N';	
-	
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of worksites deleted on receiving a new version of the document  from all_agreement_worksite table');
-	
-	DELETE FROM master_agreement WHERE master_agreement_id IN (select agreement_id from tmp_mag_deletion);
-
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreement deleted on receiving a new version of the document from master_agreement');
-
-	DELETE FROM all_master_agreement WHERE master_agreement_id IN (select agreement_id from tmp_mag_deletion);	
-
-
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreement deleted on receiving a new version of the document from all_master_agreement');
-
-	RAISE NOTICE 'MAG CON 9';
-	INSERT INTO all_master_agreement(master_agreement_id,document_code_id,agency_history_id,
-					document_id,document_version,tracking_number,
-					record_date_id,budget_fiscal_year,document_fiscal_year,
-					document_period,description,actual_amount,
-					total_amount,replacing_master_agreement_id,replaced_by_master_agreement_id,
-					award_status_id,procurement_id,procurement_type_id,
-					effective_begin_date_id,effective_end_date_id,reason_modification,
-					source_created_date_id,source_updated_date_id,document_function_code_id,
-					award_method_id,agreement_type_id,award_category_id_1,
-					award_category_id_2,award_category_id_3,award_category_id_4,
-					award_category_id_5,number_responses,location_service,
-					location_zip,borough_code,block_code,
-					lot_code,council_district_code,vendor_history_id,
-					vendor_preference_level,board_approved_award_no,board_approved_award_date_id,
-					original_contract_amount,oca_number,original_term_begin_date_id,
-					original_term_end_date_id,registered_date_id,maximum_amount,
-					maximum_spending_limit,award_level_id,contract_class_code,
-					number_solicitation,document_name,privacy_flag,
-					created_load_id,created_date)
-	SELECT	d.agreement_id,a.document_code_id,a.agency_history_id,
-		a.doc_id,a.doc_vers_no,a.trkg_no,
-		a.record_date_id,a.doc_bfy,a.doc_fy_dc,
-		a.doc_per_dc,a.doc_dscr,a.doc_actu_am,
-		a.ORD_TOT_AM,0 as replacing_master_agreement_id,0 as replaced_by_master_agreement_id,
-		a.award_status_id,a.prcu_id,a.procurement_type_id,
+	-- doubt
+	INSERT INTO history_master_agreement(master_agreement_id,document_code_id,
+				agency_history_id,document_id,document_version,
+				tracking_number,record_date_id,budget_fiscal_year,
+				document_fiscal_year,document_period,description,
+				actual_amount,total_amount,maximum_spending_limit,
+				replacing_master_agreement_id,replaced_by_master_agreement_id,
+				award_status_id,procurement_id,procurement_type_id,
+				effective_begin_date_id,effective_end_date_id,reason_modification,
+				source_created_date_id,source_updated_date_id,document_function_code,
+				award_method_id,award_level_code,agreement_type_id,
+				contract_class_code,award_category_id_1,award_category_id_2,
+				award_category_id_3,award_category_id_4,award_category_id_5,
+				number_responses,location_service,location_zip,
+				borough_code,block_code,lot_code,
+				council_district_code,vendor_history_id,vendor_preference_level,
+				board_approved_award_no, board_approved_award_date_id, 
+				original_contract_amount,registered_date_id,oca_number,
+				number_solicitation,document_name,original_term_begin_date_id,
+				original_term_end_date_id,privacy_flag,created_load_id,created_date,
+				registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
+				registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
+				effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
+				effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
+		   		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
+		   		source_updated_calendar_year_id,contract_number)
+	SELECT	d.master_agreement_id,a.document_code_id,
+		a.agency_history_id,a.doc_id,a.doc_vers_no,
+		a.trkg_no,a.record_date_id,a.doc_bfy,
+		a.doc_fy_dc,a.doc_per_dc,a.doc_dscr,
+		a.doc_actu_am,a.ord_tot_am,a.ma_prch_lmt_am,
+		0 as replacing_master_agreement_id,0 as replaced_by_master_agreement_id,
+		a.award_status_id,a.prcu_id,a.prcu_typ_id,
 		a.effective_begin_date_id,a.effective_end_date_id,a.reas_mod_dc,
-		a.source_created_date_id,a.source_updated_date_id,a.document_function_code_id,
-		c.award_method_id,c.agreement_type_id,c.award_category_id_1,
-		c.award_category_id_2,c.award_category_id_3,c.award_category_id_4,
-		c.award_category_id_5,c.resp_no,c.loc_serv,
-		c.loc_zip,c.brgh_cd,c.blck_cd,
-		c.lot_cd,c.coun_dist_cd,b.vendor_history_id,
-		b.vend_pref_lvl,a.brd_awd_no,a.board_approved_award_date_id,
-		a.ORIG_MAX_CT_AMT,a.OCA_NO,a.original_term_begin_date_id,
-		a.original_term_end_date_id,a.registered_date_id,a.ORD_MAX_AM,
-		a.MA_PRCH_LMT_AM,c.award_level_id,c.CTCLS_CD,
-		c.out_of_no_so,a.doc_nm,d.privacy_flag,
-		p_load_id_in,now()::timestamp
+		a.source_created_date_id,a.source_updated_date_id,a.doc_func_cd,
+		c.award_method_id,c.awd_lvl_cd,c.agreement_type_id,
+		c.ctcls_cd,c.award_category_id_1,c.award_category_id_2,
+		c.award_category_id_3,c.award_category_id_4,c.award_category_id_5,
+		c.resp_no,c.loc_serv,c.loc_zip,
+		c.brgh_cd,c.blck_cd,c.lot_cd,
+		c.coun_dist_cd,b.vendor_history_id,b.vend_pref_lvl,
+		a.brd_awd_no,a.board_approved_award_date_id,
+		a.orig_max_ct_amt,a.registered_date_id,a.oca_no,
+		c.out_of_no_so,a.doc_nm,a.original_term_begin_date_id,
+		a.original_term_end_date_id,d.privacy_flag,p_load_id_in,now()::timestamp,
+		registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
+		registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
+		effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
+		effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
+		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
+		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as document_version
 	FROM	etl.stg_mag_header a JOIN etl.stg_mag_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 					JOIN etl.stg_mag_award_detail c ON a.doc_cd = c.doc_cd AND a.doc_dept_cd = c.doc_dept_cd 
 					     AND a.doc_id = c.doc_id AND a.doc_vers_no = c.doc_vers_no
-					 JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id
-	WHERE   action_flag='I' and latest_flag='Y';							
-			 
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreement inserted in all_master_agreement table');
-
-	/* Insert new contracts into history_all_agreement
-	identified by action flag as I 
-	It will be inserted into hist_agreement based on the rule
-	*/
+					 JOIN tmp_mag d ON a.uniq_id = d.uniq_id
+	WHERE   action_flag='I';
 	
-	INSERT INTO history_all_master_agreement(master_agreement_id,document_code_id,agency_history_id,
-					document_id,document_version,tracking_number,
-					record_date_id,budget_fiscal_year,document_fiscal_year,
-					document_period,description,actual_amount,
-					total_amount,replacing_master_agreement_id,replaced_by_master_agreement_id,
-					award_status_id,procurement_id,procurement_type_id,
-					effective_begin_date_id,effective_end_date_id,reason_modification,
-					source_created_date_id,source_updated_date_id,document_function_code_id,
-					award_method_id,agreement_type_id,award_category_id_1,
-					award_category_id_2,award_category_id_3,award_category_id_4,
-					award_category_id_5,number_responses,location_service,
-					location_zip,borough_code,block_code,
-					lot_code,council_district_code,vendor_history_id,
-					vendor_preference_level,board_approved_award_no,board_approved_award_date_id,
-					original_contract_amount,oca_number,original_term_begin_date_id,
-					original_term_end_date_id,registered_date_id,maximum_amount,
-					maximum_spending_limit,award_level_id,contract_class_code,
-					number_solicitation,document_name,privacy_flag,
-					created_load_id,created_date)
-	SELECT	d.agreement_id,a.document_code_id,a.agency_history_id,
-		a.doc_id,a.doc_vers_no,a.trkg_no,
-		a.record_date_id,a.doc_bfy,a.doc_fy_dc,
-		a.doc_per_dc,a.doc_dscr,a.doc_actu_am,
-		a.Ord_tot_am,0 as replacing_master_agreement_id,0 as replaced_by_master_agreement_id,
-		a.award_status_id,a.prcu_id,a.procurement_type_id,
-		a.effective_begin_date_id,a.effective_end_date_id,a.reas_mod_dc,
-		a.source_created_date_id,a.source_updated_date_id,a.document_function_code_id,
-		c.award_method_id,c.agreement_type_id,c.award_category_id_1,
-		c.award_category_id_2,c.award_category_id_3,c.award_category_id_4,
-		c.award_category_id_5,c.resp_no,c.loc_serv,
-		c.loc_zip,c.brgh_cd,c.blck_cd,
-		c.lot_cd,c.coun_dist_cd,b.vendor_history_id,
-		b.vend_pref_lvl,a.brd_awd_no,a.board_approved_award_date_id,
-		a.orig_max_ct_amt,a.oca_no,a.original_term_begin_date_id,
-		a.original_term_end_date_id,a.registered_date_id,a.ord_max_am,
-		a.ma_prch_lmt_am,c.award_level_id,c.ctcls_cd,
-		c.out_of_no_so,a.doc_nm,d.privacy_flag,
-		p_load_id_in,now()::timestamp
-	FROM	etl.stg_mag_header a JOIN etl.stg_mag_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
-					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
-					JOIN etl.stg_mag_award_detail c ON a.doc_cd = c.doc_cd AND a.doc_dept_cd = c.doc_dept_cd 
-					     AND a.doc_id = c.doc_id AND a.doc_vers_no = c.doc_vers_no
-					 JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id
-	WHERE   action_flag='I';				 
-	
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreements inserted in history_all_master_agreement');
-	
+	RAISE NOTICE 'MAG 6';
 	/* Updates */
 	CREATE TEMPORARY TABLE tmp_mag_update AS
-	SELECT d.agreement_id,a.document_code_id,a.agency_history_id,
-		a.doc_id,a.doc_vers_no,a.trkg_no,
-		a.record_date_id,a.doc_bfy,a.doc_fy_dc,
-		a.doc_per_dc,a.doc_dscr,a.doc_actu_am,
-		a.ord_tot_am,0 as replacing_master_agreement_id,0 as replaced_by_master_agreement_id,
-		a.award_status_id,a.prcu_id,a.procurement_type_id,
-		a.effective_begin_date_id,a.effective_end_date_id,a.reas_mod_dc,
-		a.source_created_date_id,a.source_updated_date_id,a.document_function_code_id,
-		c.award_method_id,c.agreement_type_id,c.award_category_id_1,
-		c.award_category_id_2,c.award_category_id_3,c.award_category_id_4,
-		c.award_category_id_5,c.resp_no,c.loc_serv,
-		c.loc_zip,c.brgh_cd,c.blck_cd,
-		c.lot_cd,c.coun_dist_cd,b.vendor_history_id,
-		b.vend_pref_lvl,a.brd_awd_no,a.board_approved_award_date_id,
-		a.orig_max_ct_amt,a.oca_no,a.original_term_begin_date_id,
-		a.original_term_end_date_id,a.registered_date_id,a.ord_max_am,
-		a.ma_prch_lmt_am,c.award_level_id,c.ctcls_cd,
-		c.out_of_no_so,a.doc_nm,d.privacy_flag,
-		p_load_id_in as load_id,now()::timestamp as updated_date
-	FROM	etl.stg_mag_header a JOIN etl.stg_mag_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
-					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
-					JOIN etl.stg_mag_award_detail c ON a.doc_cd = c.doc_cd AND a.doc_dept_cd = c.doc_dept_cd 
-					     AND a.doc_id = c.doc_id AND a.doc_vers_no = c.doc_vers_no
-					 JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id
+	SELECT d.master_agreement_id,a.document_code_id,
+			a.agency_history_id,a.doc_id,a.doc_vers_no,
+			a.trkg_no,a.record_date_id,a.doc_bfy,
+			a.doc_fy_dc,a.doc_per_dc,a.doc_dscr,
+			a.doc_actu_am,a.ord_tot_am,a.ma_prch_lmt_am,
+			0 as replacing_master_agreement_id,0 as replaced_by_master_agreement_id,
+			a.award_status_id,a.prcu_id,a.prcu_typ_id,
+			a.effective_begin_date_id,a.effective_end_date_id,a.reas_mod_dc,
+			a.source_created_date_id,a.source_updated_date_id,a.doc_func_cd,
+			c.award_method_id,c.awd_lvl_cd,c.agreement_type_id,
+			c.ctcls_cd,c.award_category_id_1,c.award_category_id_2,
+			c.award_category_id_3,c.award_category_id_4,c.award_category_id_5,
+			c.resp_no,c.loc_serv,c.loc_zip,
+			c.brgh_cd,c.blck_cd,c.lot_cd,
+			c.coun_dist_cd,b.vendor_history_id,b.vend_pref_lvl,
+			a.brd_awd_no,a.board_approved_award_date_id,
+			a.orig_max_ct_amt,a.registered_date_id,a.oca_no,
+			c.out_of_no_so,a.doc_nm,a.original_term_begin_date_id,
+			a.original_term_end_date_id,d.privacy_flag,p_load_id_in as load_id,now()::timestamp as updated_date,
+			registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
+			registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
+			effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
+			effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
+			source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
+			source_updated_calendar_year_id			
+		FROM	etl.stg_mag_header a JOIN etl.stg_mag_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
+						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
+						JOIN etl.stg_mag_award_detail c ON a.doc_cd = c.doc_cd AND a.doc_dept_cd = c.doc_dept_cd 
+						     AND a.doc_id = c.doc_id AND a.doc_vers_no = c.doc_vers_no
+						 JOIN tmp_mag d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag='U'
-	DISTRIBUTED BY (agreement_id);				 
+	DISTRIBUTED BY (master_agreement_id);				 
 
-	UPDATE history_all_master_agreement a
+	UPDATE history_master_agreement a
 	SET	document_code_id = b.document_code_id,
-		agency_history_id =b.agency_history_id ,
-		document_id =b.doc_id ,
+		agency_history_id  = b.agency_history_id,
+		document_id  = b.doc_id,
 		document_version = b.doc_vers_no,
-		tracking_number =b.trkg_no ,
+		tracking_number = b.trkg_no,
 		record_date_id = b.record_date_id,
 		budget_fiscal_year = b.doc_bfy,
 		document_fiscal_year = b.doc_fy_dc,
-		document_period =b.doc_per_dc ,
-		description =b.doc_dscr ,
-		actual_amount =b.doc_actu_am ,
+		document_period = b.doc_per_dc,
+		description = b.doc_dscr,
+		actual_amount = b.doc_actu_am,
 		total_amount = b.ord_tot_am,
-		replacing_master_agreement_id =b.replacing_master_agreement_id ,
-		replaced_by_master_agreement_id =b.replaced_by_master_agreement_id ,
-		award_status_id =b.award_status_id ,
+		maximum_spending_limit = b.ma_prch_lmt_am,
+		replacing_master_agreement_id = b.replacing_master_agreement_id,
+		replaced_by_master_agreement_id = b.replaced_by_master_agreement_id,
+		award_status_id = b.award_status_id,
 		procurement_id = b.prcu_id,
-		procurement_type_id =b.procurement_type_id ,
-		effective_begin_date_id =b.effective_begin_date_id ,
-		effective_end_date_id =b.effective_end_date_id ,
-		reason_modification =b.reas_mod_dc ,
+		procurement_type_id = b.prcu_typ_id,
+		effective_begin_date_id = b.effective_begin_date_id,
+		effective_end_date_id = b.effective_end_date_id,
+		reason_modification = b.reas_mod_dc,
 		source_created_date_id = b.source_created_date_id,
 		source_updated_date_id = b.source_updated_date_id,
-		document_function_code_id =b.document_function_code_id ,
-		award_method_id =b.award_method_id ,
-		agreement_type_id =b.agreement_type_id ,
-		award_category_id_1 =b.award_category_id_1 ,
-		award_category_id_2 =b.award_category_id_2 ,
-		award_category_id_3 =b.award_category_id_3 ,
-		award_category_id_4 =b.award_category_id_4 ,
-		award_category_id_5 =b.award_category_id_5 ,
+		document_function_code = b.doc_func_cd,
+		award_method_id = b.award_method_id,
+		award_level_code = b.awd_lvl_cd,
+		agreement_type_id = b.agreement_type_id,
+		contract_class_code = b.ctcls_cd,
+		award_category_id_1 = b.award_category_id_1,
+		award_category_id_2 = b.award_category_id_2,
+		award_category_id_3 = b.award_category_id_3,
+		award_category_id_4 = b.award_category_id_4,
+		award_category_id_5 = b.award_category_id_5,
 		number_responses = b.resp_no,
 		location_service = b.loc_serv,
 		location_zip = b.loc_zip,
 		borough_code = b.brgh_cd,
 		block_code = b.blck_cd,
 		lot_code = b.lot_cd,
-		council_district_code =b.coun_dist_cd ,
-		vendor_history_id =b.vendor_history_id ,
-		vendor_preference_level =b.vend_pref_lvl ,
-		board_approved_award_no =b.brd_awd_no ,
+		council_district_code = b.coun_dist_cd,
+		vendor_history_id = b.vendor_history_id,
+		vendor_preference_level = b.vend_pref_lvl,
+		board_approved_award_no = b.brd_awd_no,
 		board_approved_award_date_id = b.board_approved_award_date_id,
 		original_contract_amount = b.orig_max_ct_amt,
-		oca_number = b.oca_no,
-		original_term_begin_date_id =b.original_term_begin_date_id ,
-		original_term_end_date_id =b.original_term_end_date_id ,
 		registered_date_id = b.registered_date_id,
-		maximum_amount = b.ord_max_am,
-		maximum_spending_limit = b.ma_prch_lmt_am,
-		award_level_id = b.award_level_id,
-		contract_class_code =b.ctcls_cd ,
-		number_solicitation =b.out_of_no_so ,
-		document_name =b.doc_nm ,
+		oca_number = b.oca_no,
+		number_solicitation = b.out_of_no_so,
+		document_name = b.doc_nm,
+		original_term_begin_date_id = b.original_term_begin_date_id,
+		original_term_end_date_id = b.original_term_end_date_id,
 		privacy_flag = b.privacy_flag,
-		updated_load_id =b.load_id ,
-		updated_date = b.updated_date
+		updated_load_id = b.load_id,		
+		updated_date = b.updated_date,
+		registered_fiscal_year = b.registered_fiscal_year,
+		registered_fiscal_year_id = b.registered_fiscal_year_id,
+		registered_calendar_year = b.registered_calendar_year,
+		registered_calendar_year_id = b.registered_calendar_year_id,
+		effective_end_fiscal_year = b.effective_end_fiscal_year,
+		effective_end_fiscal_year_id = b.effective_end_fiscal_year_id,
+		effective_end_calendar_year = b.effective_end_calendar_year,
+		effective_end_calendar_year_id = b.effective_end_calendar_year_id,
+		effective_begin_fiscal_year = b.effective_begin_fiscal_year,
+		effective_begin_fiscal_year_id = b.effective_begin_fiscal_year_id,
+		effective_begin_calendar_year = b.effective_begin_calendar_year,
+		effective_begin_calendar_year_id = b.effective_begin_calendar_year_id,
+		source_updated_fiscal_year = b.source_updated_fiscal_year,
+		source_updated_fiscal_year_id = b.source_updated_fiscal_year_id,
+		source_updated_calendar_year = b.source_updated_calendar_year,
+		source_updated_calendar_year_id = b.source_updated_calendar_year_id		
 	FROM	tmp_mag_update b
-	WHERE	a.master_agreement_id = b.agreement_id;
-
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of master_agreements updated in history_all_master_agreement');
-
-	-- Associate Disbursement line item to the latest version of the agreement
+	WHERE	a.master_agreement_id = b.master_agreement_id;
 	
-	CREATE TEMPORARY TABLE tmp_mag_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_spending_limit numeric(16,2))
-	DISTRIBUTED BY (disbursement_line_item_id);
+	RAISE NOTICE 'MAG 7';
+ --   agreement worksite changes
 	
-	INSERT INTO tmp_mag_fms_line_item
-	SELECT disbursement_line_item_id, b.new_agreement_id,c.ma_prch_lmt_am
-	FROM disbursement_line_item a JOIN tmp_mag_deletion b ON a.agreement_id = b.agreement_id
-		JOIN etl.stg_mag_header c ON b.uniq_id = c.uniq_id;
-	
-	UPDATE disbursement_line_item a
-	SET	agreement_id = b.agreement_id,
-		updated_load_id = p_load_id_in,
-		updated_date = now()::timestamp
-	FROM	tmp_mag_fms_line_item b
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	UPDATE disbursement_line_item_details a
-	SET	master_agreement_id = b.agreement_id,
-		maximum_spending_limit = b.maximum_spending_limit
-	FROM	tmp_mag_fms_line_item b
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
-
-	-- MAG indirectly associated to FMS line item through CON
-	
-	TRUNCATE tmp_mag_fms_line_item;
-	
-	INSERT INTO tmp_mag_fms_line_item
-	SELECT disbursement_line_item_id, b.new_agreement_id,c.ma_prch_lmt_am
-	FROM disbursement_line_item_details a JOIN tmp_mag_deletion b ON a.master_agreement_id = b.agreement_id
-		JOIN etl.stg_mag_header c ON b.uniq_id = c.uniq_id;
-		
-	UPDATE disbursement_line_item_details a
-	SET	master_agreement_id = b.agreement_id,
-		maximum_spending_limit = b.maximum_spending_limit
-	FROM	tmp_mag_fms_line_item b
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	-- End of associating Disbursement line item to the latest version of an agreement
-
-	-- Associate CON to the latest version of the master agreement
-	
-	CREATE TEMPORARY TABLE tmp_mag_contracts(agreement_id bigint, master_agreement_id bigint)
-	DISTRIBUTED BY (agreement_id);
-	
-	INSERT INTO tmp_mag_contracts
-	SELECT a.agreement_id, b.new_agreement_id
-	FROM all_agreement a JOIN tmp_mag_deletion b ON a.master_agreement_id = b.agreement_id;
-	
-	UPDATE  history_all_agreement a
-	SET	master_agreement_id = b.master_agreement_id,
-		updated_load_id = p_load_id_in,
-		updated_date = now()::timestamp
-	FROM	tmp_mag_contracts b
-	WHERE	a.agreement_id = b.agreement_id;
-	
-	UPDATE fact_agreement a
-	SET	master_agreement_id = b.agreement_id
-	FROM	tmp_mag_contracts b
-	WHERE	a.agreement_id = b.agreement_id;
-
-	-- End of associating Disbursement line item to the latest version of an agreement
-
-	
-	/* Delete the existing agreement line items
-	Rule is set up on all_agreement_accounting_line to delete from agreement_accounting_line
-	Rule is set up on history_all_agreement_accounting_line to delete from history_agreement_accounting_line
-	*/
-
-	RAISE NOTICE 'MAG CON 10';
-	TRUNCATE tmp_mag_deletion;
-	
-	INSERT INTO tmp_mag_deletion
-	SELECT  agreement_id
-	FROM	tmp_mag_con
-	WHERE	action_flag = 'U';
-	
-	-- Capturing worksite information
-	
-	DELETE FROM all_agreement_worksite WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
-
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of records deleted on recieving same version of master_agreement in all_agreement_worksite ');
-		
-	DELETE FROM history_all_agreement_worksite WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
-
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of records deleted on recieving same version of master_agreement in history_all_agreement_worksite ');
-	
+	DELETE FROM history_agreement_worksite a 
+	USING tmp_mag b 
+	WHERE a.agreement_id = b.master_agreement_id
+	      AND b.action_flag ='U';
+	      
 	FOR l_array_ctr IN 1..array_upper(l_worksite_col_array,1) LOOP
-	
-		l_insert_sql := ' INSERT INTO all_agreement_worksite(agreement_id,worksite_id,percentage,amount,master_agreement_yn,load_id,created_date) '||
-				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.MA_PRCH_LMT_AM *b.'||l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''Y'',' ||p_load_id_in || ', now()::timestamp '||
+
+		l_insert_sql := ' INSERT INTO history_agreement_worksite(agreement_id,worksite_code,percentage,amount,master_agreement_yn,load_id,created_date) '||
+				' SELECT d.master_agreement_id,b.'||l_worksite_col_array[l_array_ctr]||',b.'|| l_worksite_per_array[l_array_ctr] || ',(a.ma_prch_lmt_am *b.'||l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''Y'',' ||p_load_id_in || ', now()::timestamp '||
 				' FROM	etl.stg_mag_header a JOIN etl.stg_mag_award_detail b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd '||
 				'			     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no '||
-				'			     JOIN ref_worksite c ON b.' || l_worksite_col_array[l_array_ctr] || ' = c.worksite_code ' ||
-				'			     JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id '||
-				' WHERE latest_flag=''Y'' ';			     
+				'			     JOIN tmp_mag d ON a.uniq_id = d.uniq_id '||
+				' WHERE b.'|| l_worksite_col_array[l_array_ctr] || ' IS NOT NULL' ;			     
 
 		EXECUTE l_insert_sql;		
-		
-		GET DIAGNOSTICS l_count = ROW_COUNT;
-		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in all_agreement_worksite ');
-		
-		l_insert_sql := ' INSERT INTO history_all_agreement_worksite(agreement_id,worksite_id,percentage,amount,master_agreement_yn,load_id,created_date) '||
-				' SELECT d.agreement_id,c.worksite_id,b.'|| l_worksite_per_array[l_array_ctr] || ',(a.MA_PRCH_LMT_AM *b.'|| l_worksite_per_array[l_array_ctr] || ')/100 as amount ,''Y'',' ||p_load_id_in || ', now()::timestamp '||
-				' FROM	etl.stg_mag_header a JOIN etl.stg_mag_award_detail b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd '||
-				'			     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no '||
-				'			     JOIN ref_worksite c ON b.' || l_worksite_col_array[l_array_ctr] || ' = c.worksite_code ' ||
-				'			     JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id '||
-				' WHERE latest_flag=''N'' ';	
 
-		EXECUTE l_insert_sql;			
-		
 		GET DIAGNOSTICS l_count = ROW_COUNT;
-		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in history_all_agreement_worksite ');		
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
+		VALUES(p_load_file_id_in,'M','',l_count,'# of records inserted in all_agreement_worksite ');
+		
 	END LOOP; 
 	
-	INSERT INTO agreement_worksite
-	SELECT a.* 
-	FROM 	all_agreement_worksite a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id
-	WHERE	b.privacy_flag ='F';
+	RAISE NOTICE 'MAG 8';
 
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in agreement_worksite ');	
-	
-	INSERT INTO history_all_agreement_worksite
-	SELECT a.* 
-	FROM 	all_agreement_worksite a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id;
+	DELETE FROM history_agreement_commodity a 
+	USING tmp_mag b 
+	WHERE a.agreement_id = b.master_agreement_id
+	      AND b.action_flag ='U';	
 
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of records(for latest version) inserted in history_all_agreement_worksite ');
-
-	INSERT INTO history_agreement_worksite
-	SELECT a.* 
-	FROM 	history_all_agreement_worksite a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id
-	WHERE	b.privacy_flag ='F';
-
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'M',l_count,'# of records inserted in history_agreement_worksite ');
-
-	RAISE NOTICE 'MAG CON 12';
-	/***************************************************************************************************************-- Capturing commodity
-
-	DELETE FROM all_agreement_commodity WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
-		
-	DELETE FROM history_all_agreement_commodity WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
-	
-	INSERT INTO all_agreement_commodity(agreement_id,line_number,master_agreement_yn,
+	INSERT INTO history_agreement_commodity(agreement_id,line_number,master_agreement_yn,
 					    description,commodity_code,commodity_type_id,
 					    quantity,unit_of_measurement,unit_price,
 					    contract_amount,commodity_specification,load_id,
 					    created_date)
-	SELECT	d.agreement_id,b.doc_comm_ln_no,'Y' as master_agreement_yn,
-		b.cl_dscr,b.comm_cd,b.commodity_type_id,
+	SELECT	d.master_agreement_id,b.doc_comm_ln_no,'Y' as master_agreement_yn,
+		b.cl_dscr,b.comm_cd,b.ln_typ,
 		b.qty,b.unit_meas_cd,b.unit_price,
 		b.cntrc_am,b.comm_cd_spfn,p_load_id_in,
 		now()::timestamp
 	FROM	etl.stg_mag_header a JOIN etl.stg_mag_commodity b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
-						     JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id
-	WHERE   latest_flag='Y';	
-	
-	
-
-	INSERT INTO agreement_commodity
-	SELECT a.*
-	FROM   all_agreement_commodity a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id
-	WHERE	privacy_flag = 'F';
-	
-
-	INSERT INTO history_all_agreement_commodity
-	SELECT a.*
-	FROM   all_agreement_commodity a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id
-	WHERE	privacy_flag = 'F';
-	
-	INSERT INTO history_all_agreement_commodity(agreement_id,line_number,master_agreement_yn,
-					    description,commodity_code,commodity_type_id,
-					    quantity,unit_of_measurement,unit_price,
-					    contract_amount,commodity_specification,load_id,
-					    created_date)
-	SELECT	d.agreement_id,b.doc_comm_ln_no,'Y' as master_agreement_yn,
-		b.cl_dscr,b.comm_cd,b.commodity_type_id,
-		b.qty,b.unit_meas_cd,b.unit_price,
-		b.cntrc_am,b.comm_cd_spfn,p_load_id_in,
-		now()::timestamp
-	FROM	etl.stg_mag_header a JOIN etl.stg_mag_commodity b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
-						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
-						     JOIN tmp_mag_con d ON a.uniq_id = d.uniq_id
-	WHERE   latest_flag='N';	
-	
-	INSERT INTO history_agreement_commodity
-	SELECT a.*
-	FROM   history_all_agreement_commodity a JOIN tmp_mag_con b ON a.agreement_id = b.agreement_id
-	WHERE	privacy_flag = 'F';	
-
-	RAISE NOTICE 'MAG CON 13';
-	
-	***************************************************************************/
-	
-	------------ Insering into the fact table----------------------------------------------------------------------------------------------------
-
-	DELETE FROM fact_agreement WHERE agreement_id IN (SELECT agreement_id FROM tmp_mag_deletion);
-	
-	INSERT INTO fact_agreement(agreement_id,document_code_id,agency_id,
-				document_id,document_version,effective_begin_date_id,effective_end_date_id,
-				registered_date_id,maximum_contract_amount,award_method_id,
-				vendor_id,original_contract_amount,master_agreement_yn,description,
-				document_code,agency_history_id,agency_name,vendor_history_id, vendor_name,
-				agreement_type_id,award_category_id_1,record_date,effective_begin_date,effective_end_date,
-				tracking_number,registered_date,has_parent_yn )
-	SELECT a.master_agreement_id,a.document_code_id,b.agency_id,
-		document_id,document_version,effective_begin_date_id,effective_end_date_id,
-		registered_date_id,maximum_spending_limit,award_method_id,
-		c.vendor_id,original_contract_amount,'Y' as master_agreement_yn, a.description,
-		e.document_code,a.agency_history_id,b.agency_name,c.vendor_history_id,COALESCE(c.legal_name,c.alias_name),
-		a.agreement_type_id,a.award_category_id_1,f.date as record_date,g.date as effective_begin_date, h.date as effective_end_date,
-		a.tracking_number,j.date as registered_date,'N' as has_parent_yn		
-	FROM   master_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
-		LEFT JOIN vendor_history c ON a.vendor_history_id = c.vendor_history_id
-		JOIN tmp_mag_con d ON a.master_agreement_id = d.agreement_id
-		JOIN ref_document_code e ON e.document_code_id = a.document_code_id
-		LEFT JOIN ref_date f ON a.record_date_id = f.date_id
-		LEFT JOIN ref_date g ON a.effective_begin_date_id = g.date_id
-		LEFT JOIN ref_date h ON a.effective_end_date_id = h.date_id		
-		LEFT JOIN ref_date j ON a.registered_date_id = j.date_id;
+						     JOIN tmp_mag d ON a.uniq_id = d.uniq_id;
 		
-	CREATE TEMPORARY TABLE tmp_fact_agreement_worksite_mag(agreement_id bigint, worksites_name varchar)
-	DISTRIBUTED BY (agreement_id);
-	
-	INSERT INTO tmp_fact_agreement_worksite_mag(agreement_id,worksites_name)
-	SELECT a.agreement_id,group_concat(DISTINCT worksite_code)
-	FROM   agreement_worksite a JOIN ref_worksite b ON a.worksite_id = b.worksite_id
-		JOIN tmp_mag_con d ON a.agreement_id = d.agreement_id			
-	GROUP BY 1;
-	
-	
-	UPDATE fact_agreement a
-	SET 	worksites_name = b.worksites_name
-	FROM	tmp_fact_agreement_worksite_mag b
-	WHERE 	a.agreement_id = b.agreement_id;
-	
-	
-	-- Updating YTD spent in fact_agreement
 
-	CREATE TEMPORARY TABLE tmp_fact_agreement_ytd_spent_mag(agreement_id bigint, amount_spent numeric(18,2))
-	DISTRIBUTED BY (agreement_id);
-
-	INSERT INTO tmp_fact_agreement_ytd_spent_mag
-	SELECT master_agreement_id, SUM(check_amount)
-	FROM disbursement_line_item_details a JOIN tmp_mag_con b
-		ON a.master_agreement_id = b.agreement_id
-	GROUP BY 1;
-
-	UPDATE fact_agreement a
-	SET	amount_spent = b.amount_spent
-	FROM	tmp_fact_agreement_ytd_spent_mag b
-	WHERE	a.agreement_id = b.agreement_id;
-	
 	RETURN 1;
 	
 EXCEPTION
 	WHEN OTHERS THEN
-	RAISE NOTICE 'MAG Exception Occurred in processMAG';
-	RAISE NOTICE 'MAG SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+	RAISE NOTICE 'Exception Occurred in processMAG';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	RETURN 0;
+END;
+$$ language plpgsql;
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.postProcessMAG(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
+DECLARE
+BEGIN
+
+	
+	-- Get the master agreements (key elements only without version) which have been created or updated
+	
+	CREATE TEMPORARY TABLE tmp_loaded_master_agreements(document_id varchar,document_version integer,document_code_id smallint, agency_id smallint,
+		latest_version_no smallint,first_version smallint ) DISTRIBUTED BY (document_id);
+	
+	INSERT INTO tmp_loaded_master_agreements
+	SELECT distinct document_id,document_version,document_code_id, agency_id
+	FROM history_master_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	WHERE a.created_load_id = p_load_id_in OR a.updated_load_id = p_load_id_in;
+	
+	-- Get the max version and min version
+	
+	CREATE TEMPORARY TABLE tmp_loaded_master_agreements_1(document_id varchar,document_code_id smallint, agency_id smallint,
+		latest_version_no smallint,first_version_no smallint ) DISTRIBUTED BY (document_id);
+		
+	INSERT INTO tmp_loaded_master_agreements_1
+	SELECT a.document_id,a.document_code_id, b.agency_id, 
+	       max(a.document_version) as latest_version_no, min(a.document_version) as first_version_no
+	FROM history_master_agreement a JOIN tmp_loaded_master_agreements b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
+		GROUP BY 1,2,3;
+	
+	RAISE NOTICE 'PMAG1'; 
+	
+	-- Update the versions which are no more the first versions
+	-- Might have to change the disbursements linkage here
+	
+	CREATE TEMPORARY TABLE tmp_master_agreement_flag_changes (document_id varchar,document_code_id smallint, agency_id smallint,
+					latest_master_agreement_id bigint, first_master_agreement_id bigint,non_latest_master_agreement_id varchar, non_first_master_agreement_id varchar
+					) DISTRIBUTED BY (document_id);
+					
+	INSERT INTO tmp_master_agreement_flag_changes 				
+	SELECT a.document_id,a.document_code_id, b.agency_id, 
+		MAX(CASE WHEN a.document_version = b.latest_version_no THEN master_agreement_id END) as latest_master_agreement_id,
+		MAX(CASE WHEN a.document_version = b.first_version_no THEN master_agreement_id END) as first_master_agreement_id,
+		group_concat(CASE WHEN a.document_version <> b.latest_version_no THEN master_agreement_id END) as non_latest_master_agreement_id,		
+		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN master_agreement_id END) as non_first_master_agreement_id
+	FROM   history_master_agreement a JOIN tmp_loaded_master_agreements_1 b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
+	GROUP BY 1,2,3;	
+	
+	RAISE NOTICE 'PMAG2'; 
+	
+	-- Updating the original flag for non first agreements 
+	
+	UPDATE history_master_agreement a 
+	SET    original_version_flag = 'N',
+		original_master_agreement_id = b.first_master_agreement_id
+	FROM   (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
+		first_master_agreement_id
+		FROM	tmp_master_agreement_flag_changes ) b
+	WHERE  a.master_agreement_id = b.master_agreement_id;
+		
+	
+	UPDATE history_master_agreement a 
+	SET    latest_flag = 'N'
+	FROM   (SELECT unnest(string_to_array(non_latest_master_agreement_id,','))::int as master_agreement_id 
+		FROM	tmp_master_agreement_flag_changes ) b
+	WHERE  a.master_agreement_id = b.master_agreement_id
+		AND a.latest_flag = 'Y';	
+	
+	UPDATE history_master_agreement a 
+	SET     original_version_flag = 'Y',
+		original_master_agreement_id = b.first_master_agreement_id
+	FROM    tmp_master_agreement_flag_changes  b
+	WHERE  a.master_agreement_id = b.first_master_agreement_id;	
+		
+	
+	UPDATE history_master_agreement a 
+	SET    latest_flag = 'Y'
+	FROM    tmp_master_agreement_flag_changes  b
+	WHERE  a.master_agreement_id = b.latest_master_agreement_id
+		AND a.latest_flag = 'N';	
+
+	
+	RAISE NOTICE 'PMAG3'; 
+	-- Associate contracts/agreements to the original version of the master agreement
+	
+	CREATE TEMPORARY TABLE tmp_contracts_for_mag(agreement_id bigint, master_agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_contracts_for_mag
+	SELECT a.agreement_id, b.first_master_agreement_id
+	FROM history_agreement a JOIN  (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
+						    first_master_agreement_id
+					     FROM   tmp_master_agreement_flag_changes ) b ON a.master_agreement_id = b.master_agreement_id;
+		
+	
+	
+	UPDATE history_agreement a
+	SET	master_agreement_id = b.master_agreement_id
+	FROM	tmp_contracts_for_mag b
+	WHERE	a.agreement_id = b.agreement_id;
+	
+
+	
+	RAISE NOTICE 'PMAG4'; 
+	-- Populating the agreement_snapshot tables
+
+	
+	CREATE TEMPORARY TABLE tmp_master_agreement_snapshot(original_master_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
+						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, registered_fiscal_year smallint)
+	DISTRIBUTED BY 	(original_master_agreement_id);				      
+			
+	INSERT INTO tmp_master_agreement_snapshot 		
+	SELECT  b.original_master_agreement_id, b.source_updated_fiscal_year, b.source_updated_fiscal_year_id,
+		max(b.document_version) as document_version,
+		lead(source_updated_fiscal_year) over (partition by original_master_agreement_id ORDER BY source_updated_fiscal_year),
+		lead(source_updated_fiscal_year_id) over (partition by original_master_agreement_id ORDER BY source_updated_fiscal_year),
+		rank() over (partition by original_master_agreement_id order by source_updated_fiscal_year desc) as rank_value		
+	FROM	tmp_master_agreement_flag_changes a JOIN history_master_agreement b ON a.first_master_agreement_id = b.original_master_agreement_id
+	GROUP  BY 1,2,3;
+	
+
+	UPDATE tmp_master_agreement_snapshot a
+	SET     master_agreement_id = b.master_agreement_id,
+			registered_fiscal_year = b.registered_fiscal_year
+	FROM	history_master_agreement b
+	WHERE   a.original_master_agreement_id = b.original_master_agreement_id
+		AND a.document_version = b.document_version;
+		
+	UPDATE 	tmp_master_agreement_snapshot
+	SET	starting_year = 2010,
+		starting_year_id = year_id
+	FROM	ref_year 
+	WHERE	year_value = 2010
+		AND starting_year > 2010
+		AND registered_fiscal_year <= 2010
+		AND rank_value = 1;
+		
+	UPDATE 	tmp_master_agreement_snapshot
+	SET	ending_year = ending_year - 1,
+		ending_year_id  = year_id
+	FROM	ref_year 
+	WHERE	year_value = ending_year - 1
+		AND ending_year is not null;
+	
+	RAISE NOTICE 'PMAG5'; 
+	
+	DELETE FROM ONLY agreement_snapshot a USING  tmp_master_agreement_snapshot b WHERE a.original_agreement_id = b.original_master_agreement_id;
+	
+	RAISE NOTICE 'PMAG6'; 
+	
+	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,
+				       agreement_id, ending_year,ending_year_id,contract_number,
+				       original_contract_amount,maximum_contract_amount,description,
+					vendor_history_id,vendor_id,vendor_name,
+					dollar_difference,
+					percent_difference,
+					agreement_type_id,
+					agreement_type_name,award_category_id,award_category_name,
+					expenditure_object_names,effective_begin_date,effective_begin_date_id,
+					effective_end_date, effective_end_date_id,registered_date, 
+					registered_date_id,brd_awd_no,tracking_number,
+					registered_year, registered_year_id,latest_flag,original_version_flag,
+					effective_begin_fiscal_year,effective_begin_fiscal_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id,master_agreement_yn)
+	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
+	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
+	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year
+	        		      ELSE b.effective_end_fiscal_year END),
+	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
+	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
+	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
+	        b.original_contract_amount,b.maximum_spending_limit,b.description,
+		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),
+		b.original_contract_amount - b.maximum_spending_limit,
+		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
+		ROUND(((b.original_contract_amount - b.maximum_spending_limit) * 100 )::decimal / b.original_contract_amount,2) END),
+		e.agreement_type_id,
+		e.agreement_type_name,f.award_category_id, f.award_category_name,
+		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
+		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
+		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
+		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
+		b.effective_begin_fiscal_year,b.effective_begin_fiscal_year_id,b.effective_end_fiscal_year,b.effective_end_fiscal_year_id, 'Y' as master_agreement_yn
+	FROM	tmp_master_agreement_snapshot a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
+		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
+		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
+			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
+			   JOIN tmp_master_agreement_snapshot x ON x.master_agreement_id = z.agreement_id
+			   GROUP BY 1) g ON a.master_agreement_id = g.agreement_id
+		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
+		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
+		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
+
+		RETURN 1;
+		
+					
+	/* End of one time changes */
+
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in postProcessMAG';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
 END;
 $$ language plpgsql;
