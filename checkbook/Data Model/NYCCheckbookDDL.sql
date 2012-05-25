@@ -697,91 +697,112 @@ DISTRIBUTED BY (vendor_customer_code);
 MAG Data feed
 */
 
-CREATE TABLE master_agreement (
-    master_agreement_id bigint  PRIMARY KEY DEFAULT nextval('seq_agreement_agreement_id'::regclass) NOT NULL,
-    document_code_id smallint,
-    agency_history_id smallint,
-    document_id character varying(20),
-    document_version integer,
-    tracking_number character varying(30),
-    record_date_id smallint,
-    budget_fiscal_year smallint,
-    document_fiscal_year smallint,
-    document_period character(2),
-    description character varying(60),
-    actual_amount numeric(16,2),
-    total_amount numeric(16,2),
-    replacing_master_agreement_id bigint,
-    replaced_by_master_agreement_id bigint,
-    award_status_id smallint,
-    procurement_id character varying(20),
-    procurement_type_id smallint,
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
-    reason_modification character varying,
-    source_created_date_id smallint,
-    source_updated_date_id smallint,
-    document_function_code_id smallint,
-    award_method_id smallint,
-    agreement_type_id smallint,
-    award_category_id_1 smallint,
-    award_category_id_2 smallint,
-    award_category_id_3 smallint,
-    award_category_id_4 smallint,
-    award_category_id_5 smallint,
-    number_responses integer,
-    location_service character varying(255),
-    location_zip character varying(10),
-    borough_code character varying(10),
-    block_code character varying(10),
-    lot_code character varying(10),
-    council_district_code character varying(10),
-    vendor_history_id integer,
-    vendor_preference_level integer,
-    board_approved_award_no character varying(15),
-    board_approved_award_date_id smallint,
-    original_contract_amount numeric(20,2),
-    oca_number character varying(20),
-    original_term_begin_date_id smallint,
-    original_term_end_date_id smallint,
-    registered_date_id smallint,
-    maximum_amount numeric(20,2),
-    maximum_spending_limit numeric(20,2),
-    award_level_id smallint,
-    contract_class_code character varying(2),
-    number_solicitation integer,
-    document_name character varying(60),
-    privacy_flag char(1),
-    created_load_id integer,
-    updated_load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) distributed by (master_agreement_id);
+CREATE TABLE history_master_agreement
+(
+  master_agreement_id bigint NOT NULL DEFAULT nextval('seq_agreement_agreement_id'::regclass),
+  document_code_id smallint,
+  agency_history_id smallint,
+  document_id character varying(20),
+  document_version integer,
+  tracking_number character varying(30),
+  record_date_id smallint,
+  budget_fiscal_year smallint,
+  document_fiscal_year smallint,
+  document_period character(2),
+  description character varying(60),
+  actual_amount numeric(16,2),
+  total_amount numeric(16,2),
+  replacing_master_agreement_id bigint,
+  replaced_by_master_agreement_id bigint,
+  award_status_id smallint,
+  procurement_id character varying(20),
+  procurement_type_id smallint,
+  effective_begin_date_id smallint,
+  effective_end_date_id smallint,
+  reason_modification character varying,
+  source_created_date_id smallint,
+  source_updated_date_id smallint,
+  document_function_code character varying,
+  award_method_id smallint,
+  agreement_type_id smallint,
+  award_category_id_1 smallint,
+  award_category_id_2 smallint,
+  award_category_id_3 smallint,
+  award_category_id_4 smallint,
+  award_category_id_5 smallint,
+  number_responses integer,
+  location_service character varying(255),
+  location_zip character varying(10),
+  borough_code character varying(10),
+  block_code character varying(10),
+  lot_code character varying(10),
+  council_district_code character varying(10),
+  vendor_history_id integer,
+  vendor_preference_level integer,
+  board_approved_award_no character varying(15),
+  board_approved_award_date_id smallint,
+  original_contract_amount numeric(20,2),
+  oca_number character varying(20),
+  original_term_begin_date_id smallint,
+  original_term_end_date_id smallint,
+  registered_date_id smallint,
+  maximum_amount numeric(20,2),
+  maximum_spending_limit numeric(20,2),
+  award_level_code character(2),
+  contract_class_code character varying(2),
+  number_solicitation integer,
+  document_name character varying(60),
+  registered_fiscal_year smallint,
+  registered_fiscal_year_id smallint,
+  registered_calendar_year smallint,
+  registered_calendar_year_id smallint,
+  effective_end_fiscal_year smallint,
+  effective_end_fiscal_year_id smallint,
+  effective_end_calendar_year smallint,
+  effective_end_calendar_year_id smallint,
+  effective_begin_fiscal_year smallint,
+  effective_begin_fiscal_year_id smallint,
+  effective_begin_calendar_year smallint,
+  effective_begin_calendar_year_id smallint,
+  source_updated_fiscal_year smallint,
+  source_updated_fiscal_year_id smallint,
+  source_updated_calendar_year smallint,
+  source_updated_calendar_year_id smallint,
+  contract_number character varying,
+  original_master_agreement_id bigint,
+  originial_version_flag character(1),
+  latest_flag character(1),
+  privacy_flag character(1),
+  created_load_id integer,
+  updated_load_id integer,
+  created_date timestamp without time zone,
+  updated_date timestamp without time zone,
+  CONSTRAINT history_master_agreement_pkey PRIMARY KEY (master_agreement_id)
+)
+DISTRIBUTED BY (master_agreement_id);
 
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load(load_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_agreement_type FOREIGN KEY (agreement_type_id) REFERENCES ref_agreement_type(agreement_type_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_category_1 FOREIGN KEY (award_category_id_1) REFERENCES ref_award_category(award_category_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_category_2 FOREIGN KEY (award_category_id_2) REFERENCES ref_award_category(award_category_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_category_3 FOREIGN KEY (award_category_id_3) REFERENCES ref_award_category(award_category_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_category_4 FOREIGN KEY (award_category_id_4) REFERENCES ref_award_category(award_category_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_category_5 FOREIGN KEY (award_category_id_5) REFERENCES ref_award_category(award_category_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_level FOREIGN KEY (award_level_id) REFERENCES ref_award_level(award_level_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_method FOREIGN KEY (award_method_id) REFERENCES ref_award_method(award_method_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_award_status FOREIGN KEY (award_status_id) REFERENCES ref_award_status(award_status_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_document_function_code FOREIGN KEY (document_function_code_id) REFERENCES ref_document_function_code(document_function_code_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_ref_procurement_type FOREIGN KEY (procurement_type_id) REFERENCES ref_procurement_type(procurement_type_id);
- ALTER TABLE  master_agreement ADD CONSTRAINT fk_master_agreement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date foreign key (record_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_1 foreign key (effective_begin_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_2 foreign key (effective_end_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_3 foreign key (source_created_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_4 foreign key (source_updated_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_5 foreign key (board_approved_award_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_6 foreign key (original_term_begin_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_7 foreign key (original_term_end_date_id) references ref_date (date_id);
-  ALTER TABLE  master_agreement ADD constraint fk_master_agreement_ref_date_8 foreign key (registered_date_id) references ref_date (date_id);
+
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load(load_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_agreement_type FOREIGN KEY (agreement_type_id) REFERENCES ref_agreement_type(agreement_type_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_1 FOREIGN KEY (award_category_id_1) REFERENCES ref_award_category(award_category_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_2 FOREIGN KEY (award_category_id_2) REFERENCES ref_award_category(award_category_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_3 FOREIGN KEY (award_category_id_3) REFERENCES ref_award_category(award_category_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_4 FOREIGN KEY (award_category_id_4) REFERENCES ref_award_category(award_category_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_5 FOREIGN KEY (award_category_id_5) REFERENCES ref_award_category(award_category_id);
+  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_method FOREIGN KEY (award_method_id) REFERENCES ref_award_method(award_method_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_status FOREIGN KEY (award_status_id) REFERENCES ref_award_status(award_status_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
+ ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date foreign key (record_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_1 foreign key (effective_begin_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_2 foreign key (effective_end_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_3 foreign key (source_created_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_4 foreign key (source_updated_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_5 foreign key (board_approved_award_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_6 foreign key (original_term_begin_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_7 foreign key (original_term_end_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_8 foreign key (registered_date_id) references ref_date (date_id);
  
  
 CREATE TABLE all_agreement_commodity (
@@ -1249,9 +1270,6 @@ ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_detailse_revenue FOREIGN 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE TABLE history_master_agreement (LIKE master_agreement) DISTRIBUTED BY (master_agreement_id);
-CREATE TABLE all_master_agreement (LIKE master_agreement) DISTRIBUTED BY (master_agreement_id);
-CREATE TABLE history_all_master_agreement (LIKE master_agreement) DISTRIBUTED BY (master_agreement_id);
 
 
 CREATE TABLE history_agreement (LIKE agreement) DISTRIBUTED BY (agreement_id);
