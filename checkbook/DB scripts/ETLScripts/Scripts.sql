@@ -278,6 +278,12 @@ BEGIN
 	WHERE  a.load_file_id = p_load_file_id_in     
 	INTO   l_data_source_code, l_load_id,l_processed_flag, l_job_id;	
 
+	CREATE TEMPORARY TABLE tmp_duplicates(all_uniq_id varchar, min_uniq_id varchar)
+	DISTRIBUTED BY (all_uniq_id);
+
+	CREATE TEMPORARY TABLE tmp_duplicates_1(uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+		
 	IF l_processed_flag = 'S' THEN
 	
 		CREATE TEMPORARY TABLE tmp_invalid_uniq_id(uniq_id bigint)
@@ -297,6 +303,10 @@ BEGIN
 		LOOP
 			RAISE NOTICE 'rule name: %', l_rule.rule_name;
 			RAISE NOTICE 'staging table name: %', l_rule.staging_table_name;
+
+			truncate tmp_duplicates;
+			truncate tmp_duplicates_1;
+				
 			-- Missing key elements		
 			IF l_rule.rule_name = 'Missing key elements' THEN
 
@@ -324,7 +334,7 @@ BEGIN
 						'	invalid_reason =''' || l_rule.rule_name || ''' ' ||
 						'WHERE COALESCE(invalid_flag,'''')=''''  AND ' || l_where_clause ;		
 
-				RAISE NOTICE 'l_update_str %',l_update_str;
+				--RAISE NOTICE 'l_update_str %',l_update_str;
 
 				EXECUTE l_update_str;		
 			END IF;
@@ -332,34 +342,47 @@ BEGIN
 			-- Duplicate records
 
 			IF l_rule.rule_name  IN ('Duplicate', 'Multiple') THEN
-				--RAISE NOTICE 'select %', l_rule.staging_column_name;
 
-				l_select_str := ' SELECT group_concat(all_uniq_id) as all_uniq_id, group_concat(min_uniq_id) as min_uniq_id ' ||
-						' FROM ' || 
-						' (SELECT ' || l_rule.staging_column_name || ',count(uniq_id) as num_records , min(uniq_id) as min_uniq_id, group_concat(uniq_id) as all_uniq_id' ||
-						' FROM ' || l_rule.staging_table_name ||
-						' GROUP BY ' || l_rule.staging_column_name ||
-						' HAVING count(uniq_id) > 1 ) as a';
-
-				--RAISE NOTICE 'select %', l_select_str;
-
-				EXECUTE	l_select_str INTO l_all_uniq_id, l_min_uniq_id;
-
-				IF COALESCE(l_all_uniq_id,'') <> '' THEN
+				
 					l_update_str := 'UPDATE '|| l_rule.staging_table_name ||
 							' SET invalid_flag = ''Y'', ' ||
-							'	invalid_reason =''' || l_rule.rule_name || ''' ' ||
-							' WHERE uniq_id IN (' || l_all_uniq_id || ')' ;						
+							'	invalid_reason =''' || l_rule.rule_name || ''' ' ;											
 
+					l_select_str := 'INSERT INTO tmp_duplicates(all_uniq_id,min_uniq_id) ' ||
+							' SELECT group_concat(uniq_id) as all_uniq_id, min(uniq_id) as min_uniq_id ' ||
+							' FROM ' || l_rule.staging_table_name ||
+							' WHERE COALESCE(invalid_flag,'''')='''' '||
+							' GROUP BY ' || l_rule.staging_column_name ||
+							' HAVING count(uniq_id) > 1 ';
+
+					
+					EXECUTE l_select_str;
+
+					GET diagnostics l_count = ROW_COUNT;
+					
+					raise notice 'successful1 % ',l_count;
+						
 					-- Retain the least record for duplicates
 					IF l_rule.rule_name ='Duplicate' THEN
-						l_update_str := l_update_str || 
-								' AND uniq_id NOT IN (' || l_min_uniq_id || ')';
+
+						truncate tmp_duplicates_1;
+						INSERT INTO tmp_duplicates_1(uniq_id)
+						SELECT  unnest(string_to_array(all_uniq_id,','))::bigint from tmp_duplicates except 
+						SELECT unnest(string_to_array(min_uniq_id,','))::bigint from tmp_duplicates;
+						
+					GET diagnostics l_count = ROW_COUNT;
+								
+					ELSE
+						truncate tmp_duplicates_1;
+						
+						INSERT INTO tmp_duplicates_1(uniq_id)
+						SELECT  unnest(string_to_array(all_uniq_id,','))::bigint from tmp_duplicates;
+								
 					END IF;
-					RAISE NOTICE 'l_update_str %',l_update_str;
+					l_update_str := l_update_str || ' WHERE uniq_id IN (SELECT uniq_id FROM tmp_duplicates_1) ';
 
 					EXECUTE l_update_str;		
-				END IF; 	
+					
 			END IF;
 
 
@@ -373,7 +396,7 @@ BEGIN
 				IF (COALESCE(l_rule.parent_table_name,'') <> '' OR COALESCE(l_rule.component_table_name,'') <> '' ) THEN
 
 
-					RAISE NOTICE 'Inside invalid check 1.1';
+					--RAISE NOTICE 'Inside invalid check 1.1';
 
 					l_select_str :=  ' select array_to_string( ' || 
 							 '	 array( ' || 
@@ -404,7 +427,7 @@ BEGIN
 
 
 				ELSIF COALESCE(l_rule.ref_table_name,'') <> '' THEN
-					RAISE NOTICE 'Inside invalid check 1.2';
+					--RAISE NOTICE 'Inside invalid check 1.2';
 					-- Invalid values (Not in the reference table )
 
 					l_select_str :=  ' SELECT (CASE WHEN staging_data_type = ''varchar'' THEN ''COALESCE(''||staging_column_name||'','''''''') <> '''''''' '' '||
@@ -425,7 +448,7 @@ BEGIN
 
 				ELSE
 					-- Inconsistent values. Invalid condition must definitely have a value
-					RAISE NOTICE 'Inside inconsistent';
+					--RAISE NOTICE 'Inside inconsistent';
 					l_where_clause := l_rule.invalid_condition;										
 
 
@@ -437,7 +460,7 @@ BEGIN
 				END IF;	
 
 
-				RAISE notice 'l_insert_str %',l_insert_str;		
+				--RAISE notice 'l_insert_str %',l_insert_str;		
 				EXECUTE l_insert_str;
 
 				l_update_str := 'UPDATE ' || l_rule.staging_table_name || ' a' ||
@@ -478,7 +501,7 @@ BEGIN
 						' WHERE b.uniq_id IS NULL ';
 
 
-				RAISE notice 'l_insert_str %',l_insert_str;		
+				--RAISE notice 'l_insert_str %',l_insert_str;		
 				EXECUTE l_insert_str;
 
 				l_update_str := 'UPDATE ' || l_rule.staging_table_name || ' a' ||
@@ -502,7 +525,7 @@ BEGIN
 						' WHERE ' || l_rule.invalid_condition ;
 
 
-				RAISE NOTICE 'l_insert_str %', l_insert_str;
+				--RAISE NOTICE 'l_insert_str %', l_insert_str;
 				
 				EXECUTE l_insert_str;
 
@@ -558,7 +581,7 @@ BEGIN
 
 			IF COALESCE(l_invalid_table_array[l_array_ctr],'') <> ''  THEN
 
-				RAISE NOTICE 'INSIDE';
+				--RAISE NOTICE 'INSIDE';
 
 
 				l_insert_str :=  'INSERT INTO ' || l_invalid_table_array[l_array_ctr] ||
@@ -566,7 +589,7 @@ BEGIN
 						 ' FROM ' ||l_staging_table_array[l_array_ctr] ||
 						 ' WHERE invalid_flag = ''Y'' ';
 
-				RAISE NOTICE 'insert %',l_insert_str;
+				--RAISE NOTICE 'insert %',l_insert_str;
 
 				EXECUTE l_insert_str;															
 
