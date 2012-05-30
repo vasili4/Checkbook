@@ -187,11 +187,16 @@ insert into ref_award_level(award_level_code) values ('1'),('2'),('3');
 insert into ref_procurement_type(procurement_type_id,procurement_type_name) values ('1','Unclassified');
 insert into ref_document_function_code(document_function_code_id) values (1),(2);
 insert into ref_commodity_type (commodity_type_id ) values (1),(2);
-insert into vendor(vendor_id,vendor_customer_code,legal_name) values(nextval('seq_vendor_vendor_id'),'N/A','(PRIVACY/SECURITY)');
+insert into vendor(vendor_id,vendor_customer_code,legal_name) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)');
 insert into vendor_history(vendor_history_id,vendor_id,legal_name) 
 select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
 from vendor where vendor_customer_code='N/A'
-and legal_name='(PRIVACY/SECURITY)';
+and legal_name='N/A (PRIVACY/SECURITY)';
+
+INSERT INTO address(address_id,address_line_1 ,address_line_2,city,	state ,zip ,country) 
+VALUES(nextval('seq_address_address_id'), 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)');
+
+
 
 /*insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
 
@@ -217,3 +222,10 @@ insert into ref_expenditure_cancel_reason(expenditure_cancel_reason_id) values (
 -----------------------------------------------------------------------------------------------
 /*PMS*/
 INSERT INTO ref_amount_basis(amount_basis_id,amount_basis_name) VALUES (1,'ANNUAL'),(2,'DAILY'),(3,'HOURLY');
+
+
+INSERT INTO ref_document_code(document_code_id, document_code, document_name, created_date) VALUES(nextval('seq_ref_document_code_document_code_id'),'N/A','N/A (PRIVACY/SECURITY)',now()::timestamp);
+
+INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name) VALUES(nextval('seq_ref_agency_agency_id'),'N/A','N/A (PRIVACY/SECURITY)','N/A (PRIVACY/SECURITY)', now()::timestamp, 'N/A');
+
+INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'N/A';
