@@ -40,7 +40,7 @@ create sequence seq_stg_rs_source_uniq_id;
 create sequence seq_stg_budget_code_uniq_id;
 create sequence seq_etl_job_id;
 create sequence seq_stg_pms_uniq_id;
-
+create sequence seq_stg_revenue_budget_uniq_id;
 
 CREATE TABLE ref_data_source (
     data_source_code varchar(2),
@@ -3160,7 +3160,7 @@ table_name varchar(60),
 job_id int,
 recorded_date timestamp
 )
-DISTRIBUTED BY (job_id)
+DISTRIBUTED BY (job_id);
 
 ---------------------------------------------------------------------------------------------------------------------------
 /* Refreshing shards status */
@@ -3625,7 +3625,7 @@ CREATE EXTERNAL TABLE etl.ext_stg_revenue_budget
  LOCATION (
     'gpfdist://mdw1:8081/datafiles/revenue_budget.txt'
 )
- FORMAT 'text' (delimiter '|' null '\\N' escape '~' fill missing fields)
+  FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
 ENCODING 'UTF8';
 ALTER TABLE etl.ext_stg_revenue_budget
   OWNER TO gpadmin;
