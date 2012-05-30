@@ -1179,7 +1179,8 @@ CREATE TABLE revenue_budget
   created_date timestamp without time zone,
   updated_date timestamp without time zone,
   budget_fiscal_year_id smallint
-);
+) DISTRIBUTED BY (budget_id);
+
 
 ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load (load_id);
 ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_agency_history FOREIGN KEY (agency_history_id)  REFERENCES ref_agency_history (agency_history_id);
