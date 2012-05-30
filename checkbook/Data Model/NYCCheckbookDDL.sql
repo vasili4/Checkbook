@@ -547,9 +547,9 @@ CREATE TABLE address (
   address_line_1 varchar(75) ,
   address_line_2 varchar(75) ,
   city varchar(60) ,
-  state varchar(2) ,
-  zip varchar(10) ,
-  country varchar(3) 
+  state varchar(25) ,
+  zip varchar(25) ,
+  country varchar(25) 
 ) distributed by(address_id);
 
 CREATE TABLE vendor (
