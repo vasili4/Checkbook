@@ -76,7 +76,7 @@ BEGIN
 	FROM etl.stg_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
-	GROUP BY 1	;	
+	GROUP BY 1,5	;	
 	
 	
 	-- FK:department_history_id
@@ -155,7 +155,7 @@ BEGIN
 		JOIN ref_agency d ON a.agency_code = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fund_class_code = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 		JOIN etl.ref_department_history_id_seq f ON c.department_history_id = f.department_history_id
-	GROUP BY 1	;	
+	GROUP BY 1,5	;	
 
 	RAISE NOTICE '1.7';
 	
@@ -212,7 +212,7 @@ BEGIN
 		max(c.object_class_name) as object_class_name,b.object_class_code
 	FROM etl.stg_budget a JOIN ref_object_class b ON a.object_class_code = b.object_class_code
 		JOIN ref_object_class_history c ON b.object_class_id = c.object_class_id
-	GROUP BY 1;
+	GROUP BY 1,5;
 	
 	CREATE TEMPORARY TABLE tmp_fk_bdgt_values_new_object_class(object_class_code varchar,uniq_id bigint)
 	DISTRIBUTED BY (uniq_id);
@@ -259,7 +259,7 @@ BEGIN
 	FROM etl.stg_budget a JOIN ref_object_class b ON a.object_class_code = b.object_class_code
 		JOIN ref_object_class_history c ON b.object_class_id = c.object_class_id
 		JOIN etl.ref_object_class_history_id_seq d ON c.object_class_history_id = d.object_class_history_id
-	GROUP BY 1	;
+	GROUP BY 1,5	;
 	
 	--FK:effective_begin_date_id
 	
