@@ -270,8 +270,7 @@ BEGIN
 		AND a.fund_class_id = b.fund_class_id  
 		AND a.revenue_source_id = b.revenue_source_id
 		AND a.budget_code_id = b.budget_code_id 
-		AND a.agency_history_id = b.agency_history_id
-	 JOIN ref_agency_history h on h.agency_id = a.agency_id and h.agency_id = b.agency_id;
+		AND a.agency_id = b.agency_id;
 		
 	UPDATE etl.stg_revenue_budget a
 	SET	action_flag = b.action_flag,
