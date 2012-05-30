@@ -950,7 +950,8 @@ CREATE EXTERNAL WEB TABLE ref_agency__0 (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
-    updated_load_id integer
+    updated_load_id integer,
+    agency_short_name character varying
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_agency to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -960,7 +961,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_agency AS
-    SELECT ref_agency__0.agency_id, ref_agency__0.agency_code, ref_agency__0.agency_name, ref_agency__0.original_agency_name, ref_agency__0.created_date, ref_agency__0.updated_date, ref_agency__0.created_load_id, ref_agency__0.updated_load_id FROM ONLY ref_agency__0;
+    SELECT ref_agency__0.agency_id, ref_agency__0.agency_code, ref_agency__0.agency_name, ref_agency__0.original_agency_name, ref_agency__0.created_date, ref_agency__0.updated_date, ref_agency__0.created_load_id, ref_agency__0.updated_load_id,ref_agency__0.agency_short_name FROM ONLY ref_agency__0;
 
 --
 -- Name: ref_agency_history__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -971,7 +972,8 @@ CREATE EXTERNAL WEB TABLE ref_agency_history__0 (
     agency_id smallint,
     agency_name character varying,
     created_date timestamp without time zone,
-    load_id integer
+    load_id integer,
+    agency_short_name character varying
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_agency_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -981,7 +983,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_agency_history AS
-    SELECT ref_agency_history__0.agency_history_id, ref_agency_history__0.agency_id, ref_agency_history__0.agency_name, ref_agency_history__0.created_date, ref_agency_history__0.load_id FROM ONLY ref_agency_history__0;
+    SELECT ref_agency_history__0.agency_history_id, ref_agency_history__0.agency_id, ref_agency_history__0.agency_name, ref_agency_history__0.created_date, ref_agency_history__0.load_id,agency_short_name character varying FROM ONLY ref_agency_history__0;
 
 --
 -- Name: ref_agreement_type__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -1237,6 +1239,7 @@ CREATE VIEW ref_date AS
 -- Name: ref_department__0; Type: EXTERNAL TABLE; Schema: staging; Owner: athiagarajan; Tablespace: 
 --
 
+
 CREATE EXTERNAL WEB TABLE ref_department__0 (
     department_id integer,
     department_code character varying,
@@ -1248,7 +1251,8 @@ CREATE EXTERNAL WEB TABLE ref_department__0 (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
-    updated_load_id integer
+    updated_load_id integer,
+    department_short_name character varying
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_department to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -1258,7 +1262,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_department AS
-    SELECT ref_department__0.department_id, ref_department__0.department_code, ref_department__0.department_name, ref_department__0.agency_id, ref_department__0.fund_class_id, ref_department__0.fiscal_year, ref_department__0.original_department_name, ref_department__0.created_date, ref_department__0.updated_date, ref_department__0.created_load_id, ref_department__0.updated_load_id FROM ONLY ref_department__0;
+    SELECT ref_department__0.department_id, ref_department__0.department_code, ref_department__0.department_name, ref_department__0.agency_id, ref_department__0.fund_class_id, ref_department__0.fiscal_year, ref_department__0.original_department_name, ref_department__0.created_date, ref_department__0.updated_date, ref_department__0.created_load_id, ref_department__0.updated_load_id,ref_department__0.department_short_name FROM ONLY ref_department__0;
 
 --
 -- Name: ref_department_history__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -1272,7 +1276,8 @@ CREATE EXTERNAL WEB TABLE ref_department_history__0 (
     fund_class_id smallint,
     fiscal_year smallint,
     created_date timestamp without time zone,
-    load_id integer
+    load_id integer,
+    department_short_name character varying
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_department_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -1282,7 +1287,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_department_history AS
-    SELECT ref_department_history__0.department_history_id, ref_department_history__0.department_id, ref_department_history__0.department_name, ref_department_history__0.agency_id, ref_department_history__0.fund_class_id, ref_department_history__0.fiscal_year, ref_department_history__0.created_date, ref_department_history__0.load_id FROM ONLY ref_department_history__0;
+    SELECT ref_department_history__0.department_history_id, ref_department_history__0.department_id, ref_department_history__0.department_name, ref_department_history__0.agency_id, ref_department_history__0.fund_class_id, ref_department_history__0.fiscal_year, ref_department_history__0.created_date, ref_department_history__0.load_id, ref_department_history__0.department_history_name FROM ONLY ref_department_history__0;
 
 --
 -- Name: ref_document_code__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -2116,7 +2121,6 @@ CREATE VIEW ref_fiscal_period AS
 
 CREATE EXTERNAL WEB TABLE aggregateon_revenue_category__0(
 	revenue_category_id smallint,
-	fiscal_period smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
@@ -2127,13 +2131,12 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_c
 ENCODING 'UTF8';
 
 CREATE VIEW aggregateon_revenue_category AS
-	SELECT aggregateon_revenue_category__0.revenue_category_id, aggregateon_revenue_category__0.fiscal_period, aggregateon_revenue_category__0.budget_fiscal_year_id,
+	SELECT aggregateon_revenue_category__0.revenue_category_id, aggregateon_revenue_category__0.budget_fiscal_year_id,
 		aggregateon_revenue_category__0.posting_amount, aggregateon_revenue_category__0.adopted_amount, aggregateon_revenue_category__0.current_modified_amount
 	FROM aggregateon_revenue_category__0;
 	
 CREATE EXTERNAL WEB TABLE aggregateon_revenue_funding_class__0(
 	funding_class_id smallint,
-	fiscal_period smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
@@ -2144,7 +2147,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_f
 ENCODING 'UTF8';	
 
 CREATE VIEW aggregateon_revenue_funding_class AS
-	SELECT aggregateon_revenue_funding_class__0.funding_class_id,aggregateon_revenue_funding_class__0.fiscal_period,aggregateon_revenue_funding_class__0.budget_fiscal_year_id,
+	SELECT aggregateon_revenue_funding_class__0.funding_class_id,aggregateon_revenue_funding_class__0.budget_fiscal_year_id,
 		aggregateon_revenue_funding_class__0.posting_amount,aggregateon_revenue_funding_class__0.adopted_amount,aggregateon_revenue_funding_class__0.current_modified_amount
 	FROM aggregateon_revenue_funding_class__0;	
 	
