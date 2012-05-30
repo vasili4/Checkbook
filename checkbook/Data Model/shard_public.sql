@@ -846,7 +846,8 @@ CREATE TABLE ref_agency (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
-    updated_load_id integer
+    updated_load_id integer,
+    agency_short_name character varying(15)
 ) DISTRIBUTED BY (agency_id);
 
 --
@@ -858,7 +859,8 @@ CREATE TABLE ref_agency_history (
     agency_id smallint,
     agency_name character varying(50),
     created_date timestamp without time zone,
-    load_id integer
+    load_id integer,
+    agency_short_name character varying(15)
 ) DISTRIBUTED BY (agency_history_id);
 
 --
@@ -1020,7 +1022,8 @@ CREATE TABLE ref_department (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
-    updated_load_id integer
+    updated_load_id integer,
+    department_short_name character varying(15)
 ) DISTRIBUTED BY (department_id);
 
 --
@@ -1035,7 +1038,8 @@ CREATE TABLE ref_department_history (
     fund_class_id smallint,
     fiscal_year smallint,
     created_date timestamp without time zone,
-    load_id integer
+    load_id integer,
+    department_short_name charcater varying
 ) DISTRIBUTED BY (department_history_id);
 
 --
@@ -1506,7 +1510,6 @@ DISTRIBUTED BY (fiscal_period);
 
 CREATE TABLE aggregateon_revenue_category(
 	revenue_category_id smallint,
-	fiscal_period smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
@@ -1515,7 +1518,6 @@ DISTRIBUTED BY (revenue_category_id);
 
 CREATE TABLE aggregateon_revenue_funding_class(
 	funding_class_id smallint,
-	fiscal_period smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
