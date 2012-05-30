@@ -1484,7 +1484,7 @@ CREATE EXTERNAL TABLE ext_stg_con_data_feed(
 	col171 varchar(100),
 	col172 varchar(100))
 LOCATION (
-	    'gpfdist://mdw1:8081/datafiles/CON_feed.txt')
+	    'gpfdist://192.168.3.23:8081/datafiles/CON_feed.txt')
 	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
 ENCODING 'UTF8';
 
@@ -1602,10 +1602,7 @@ CREATE TABLE stg_con_ct_header (
 	doc_func_cd  integer,
 	document_code_id smallint,
 	agency_history_id smallint,
-	award_status_id smallint,
-	document_function_code_id smallint, 
 	record_date_id smallint,
-	procurement_type_id smallint,
 	effective_begin_date_id smallint,
 	effective_end_date_id smallint,
 	source_created_date_id smallint,
@@ -1614,6 +1611,22 @@ CREATE TABLE stg_con_ct_header (
 	original_term_begin_date_id smallint,
 	original_term_end_date_id smallint,	
 	master_agreement_id bigint,
+	registered_fiscal_year smallint,
+	registered_fiscal_year_id smallint, 
+	registered_calendar_year smallint,
+	registered_calendar_year_id smallint,
+	effective_begin_fiscal_year smallint,
+	effective_begin_fiscal_year_id smallint, 
+	effective_begin_calendar_year smallint,
+	effective_begin_calendar_year_id smallint,
+	effective_end_fiscal_year smallint,
+	effective_end_fiscal_year_id smallint, 
+	effective_end_calendar_year smallint,
+	effective_end_calendar_year_id smallint,
+	source_updated_calendar_year smallint,
+	source_updated_calendar_year_id smallint,
+	source_updated_fiscal_year_id smallint,
+	source_updated_fiscal_year smallint,
 	uniq_id bigint default nextval('seq_stg_con_ct_header_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar)
@@ -1717,7 +1730,7 @@ CREATE TABLE stg_con_ct_vendor(
 	web_ad varchar(100),
 	cntac_id varchar(20),
 	vend_pref_lvl integer,
-	vend_cust_alias_nm varchar(60),
+	alias_nm varchar(60),
 	lgl_nm varchar(60),
 	prin_cntac varchar(60),
 	voice_ph_no varchar(30),
