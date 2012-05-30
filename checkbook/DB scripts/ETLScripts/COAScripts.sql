@@ -39,8 +39,8 @@ BEGIN
 	FROM   tmp_ref_agency
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_agency(agency_id,agency_code,agency_name,agency_short_name,created_date,created_load_id,original_agency_name)
-	SELECT a.agency_id,b.agency_code,b.agency_name,b.agency_short_name,now()::timestamp,p_load_id_in,b.agency_name
+	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
+	SELECT a.agency_id,b.agency_code,b.agency_name,now()::timestamp,p_load_id_in,b.agency_name,b.agency_short_name
 	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id;
 	
 	-- Generate the agency history id for history records
@@ -75,8 +75,8 @@ BEGIN
 
 	RAISE NOTICE '2';
 	
-	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,agency_short_name,created_date,load_id)
-	SELECT a.agency_history_id,c.agency_id,b.agency_name,b.agency_short_name,now()::timestamp,p_load_id_in
+	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id,agency_short_name)
+	SELECT a.agency_history_id,c.agency_id,b.agency_name,now()::timestamp,p_load_id_in,b.agency_short_name
 	FROM   etl.ref_agency_history_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id
 		JOIN ref_agency c ON b.agency_code = c.agency_code
 	WHERE   exists_flag ='N'
@@ -98,7 +98,7 @@ CREATE OR REPLACE FUNCTION etl.processCOADepartment(p_load_file_id_in int,p_load
 DECLARE
 BEGIN
 	CREATE TEMPORARY TABLE tmp_ref_department(uniq_id bigint,agency_code varchar,agency_id int,fund_class_code varchar,fund_class_id int,
-						  department_code varchar(20),fiscal_year smallint,department_name varchar, exists_flag char(1), 
+						  department_code varchar(20),fiscal_year smallint,department_name varchar, department_short_name varchar, exists_flag char(1), 
 						  modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
 	
@@ -112,9 +112,10 @@ BEGIN
 		inner_tbl.fund_class_id,
 		inner_tbl.department_code, 
 		inner_tbl.fiscal_year,
-	       inner_tbl.department_name,
+	                 inner_tbl.department_name,
 	       (CASE WHEN b.department_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.department_code IS NOT NULL AND inner_tbl.department_name <> b.department_name THEN 'Y' ELSE 'N' END) as modified_flag
+	       (CASE WHEN b.department_code IS NOT NULL AND (inner_tbl.department_name  <> b.department_name OR inner_tbl.department_short_name <>b.department_short_name)
+THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM       
 	(SELECT a.uniq_id,
 		a.agency_code,
@@ -123,7 +124,8 @@ BEGIN
 		c.fund_class_id,
 		a.department_code,
 		a.fiscal_year, 
-	        a.department_name	       
+	        a.department_name,
+	        a.department_short_name		       
 	FROM   etl.stg_department a LEFT JOIN ref_fund_class c ON a.fund_class_code = c.fund_class_code 
 	       LEFT JOIN ref_agency d ON a.agency_code = d.agency_code ) inner_tbl
 	       LEFT JOIN ref_department b ON inner_tbl.department_code = b.department_code AND inner_tbl.fiscal_year=b.fiscal_year
@@ -220,8 +222,8 @@ BEGIN
 	FROM   tmp_ref_department
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_department(department_id,department_code,department_name,agency_id,fund_class_id,fiscal_year,created_date,created_load_id,original_department_name)
-	SELECT a.department_id,b.department_code,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_name
+	INSERT INTO ref_department(department_id,department_code,department_name,agency_id,fund_class_id,fiscal_year,created_date,created_load_id,original_department_name,department_short_name)
+	SELECT a.department_id,b.department_code,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_name,b.department_short_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id;
 
 	RAISE NOTICE '3.3';
@@ -239,7 +241,7 @@ BEGIN
 
 	CREATE TEMPORARY TABLE tmp_ref_department_1(uniq_id bigint,agency_code varchar,agency_id int,fund_class_code varchar,fund_class_id int,
 						  department_code varchar(20),fiscal_year smallint,department_name varchar, exists_flag char(1), 
-						  modified_flag char(1), department_id smallint)
+						  modified_flag char(1),department_short_name varchar, department_id smallint)
 	DISTRIBUTED BY (department_id);
 
 	INSERT INTO tmp_ref_department_1
@@ -251,6 +253,7 @@ BEGIN
 	
 	UPDATE ref_department a
 	SET	department_name = b.department_name,
+		department_short_name = b.department_short_name,
 		updated_date = now()::timestamp,
 		updated_load_id = p_load_id_in
 	FROM	tmp_ref_department_1 b		
@@ -258,8 +261,8 @@ BEGIN
 
 	RAISE NOTICE '5';
 	
-	INSERT INTO ref_department_history(department_history_id,department_id,department_name,agency_id,fund_class_id,fiscal_year,created_date,load_id)
-	SELECT a.department_history_id,c.department_id,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
+	INSERT INTO ref_department_history(department_history_id,department_id,department_name,agency_id,fund_class_id,fiscal_year,created_date,load_id,department_short_name)
+	SELECT a.department_history_id,c.department_id,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_short_name
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id
 		JOIN ref_department c ON b.department_code = c.department_code AND b.agency_id = c.agency_id 
 			AND b.fund_class_id = c.fund_class_id AND b.fiscal_year=c.fiscal_year
