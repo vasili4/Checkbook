@@ -350,6 +350,7 @@ BEGIN
 		AND a.agency_history_id = b.agency_history_id
 		AND a.department_history_id = b.department_history_id
 		AND a.object_class_history_id = b.object_class_history_id;
+	 JOIN ref_agency_history h on h.agency_id = a.agency_id and h.agency_id = b.agency_id;
 		
 	UPDATE etl.stg_budget a
 	SET	action_flag = b.action_flag,
