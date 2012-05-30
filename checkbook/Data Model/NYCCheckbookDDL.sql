@@ -1470,7 +1470,6 @@ DISTRIBUTED BY (fiscal_period);
 
 CREATE TABLE aggregateon_revenue_category(
 	revenue_category_id smallint,
-	fiscal_period smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
@@ -1479,7 +1478,6 @@ DISTRIBUTED BY (revenue_category_id);
 
 CREATE TABLE aggregateon_revenue_funding_class(
 	funding_class_id smallint,
-	fiscal_period smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
