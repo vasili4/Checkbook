@@ -23,9 +23,9 @@ BEGIN
 	WHERE  load_id = p_load_id_in
 	INTO   l_data_source_code;
 
-	CREATE TEMPORARY TABLE tmp_stg_vendor(vend_cust_cd varchar(20),	lgl_nm varchar(60), alias_nm varchar(60), ad_id varchar(20), 
-					     org_cls integer, misc_acct_fl integer, ad_ln_1 varchar(75),ad_ln_2 varchar(75), ctry varchar(3), 
-					     st varchar(2), zip varchar(10), city varchar(60),	vendor_history_id integer, uniq_id bigint, address_type_code varchar(2) )
+	CREATE TEMPORARY TABLE tmp_stg_vendor(vend_cust_cd varchar(20),	lgl_nm varchar(60), alias_nm varchar(60), ad_id varchar(25), 
+					     org_cls varchar(25), misc_acct_fl integer, ad_ln_1 varchar(75),ad_ln_2 varchar(75), ctry varchar(25), 
+					     st varchar(25), zip varchar(25), city varchar(60),	vendor_history_id integer, uniq_id bigint, address_type_code varchar(2) )
 	DISTRIBUTED BY (uniq_id);
 	
 	IF l_data_source_code = 'F' THEN
@@ -92,7 +92,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_all_vendors(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer, vendor_id integer, misc_acct_fl integer,
 					is_new_vendor char(1), is_name_changed char(1), is_vendor_address_changed char(1), is_address_new char(1), is_bus_type_changed char(1), 
-					lgl_nm varchar(60), alias_nm varchar(60), ad_ln_1 varchar(75),ad_ln_2 varchar(75), ctry varchar(3),st varchar(2), zip varchar(10), 
+					lgl_nm varchar(60), alias_nm varchar(60), ad_ln_1 varchar(75),ad_ln_2 varchar(75), ctry varchar(25),st varchar(25), zip varchar(25), 
 					city varchar(60), address_type_code varchar(2))
 	DISTRIBUTED BY (uniq_id);
 
