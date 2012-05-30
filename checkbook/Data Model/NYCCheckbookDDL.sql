@@ -554,7 +554,7 @@ CREATE TABLE address (
 
 CREATE TABLE vendor (
     vendor_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_vendor_id'::regclass) NOT NULL,
-    vendor_customer_code character varying(20),
+    vendor_customer_code character varying(25),
     legal_name character varying(60),
     alias_name character varying(60),
     miscellaneous_vendor_flag bit(1),
