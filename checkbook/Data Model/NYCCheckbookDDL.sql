@@ -6,33 +6,25 @@ CREATE SEQUENCE seq_ref_agency_agency_id;
 CREATE SEQUENCE seq_ref_fund_class_fund_class_id;
 CREATE SEQUENCE seq_ref_department_department_id;
 CREATE SEQUENCE seq_ref_award_category_award_category_id;
-CREATE SEQUENCE seq_ref_award_level_award_level_id;
 CREATE SEQUENCE seq_ref_award_method_award_method_id;
-CREATE SEQUENCE seq_ref_award_status_award_status_id;
 CREATE SEQUENCE seq_ref_balance_number_balance_number_id;
 CREATE SEQUENCE seq_ref_budget_code_budget_code_id;
 CREATE SEQUENCE seq_ref_business_type_business_type_id;
-CREATE SEQUENCE seq_ref_commodity_type_commodity_type_id;
 CREATE SEQUENCE seq_ref_document_code_document_code_id;
-CREATE SEQUENCE seq_ref_document_function_code_document_function_code_id;
-CREATE SEQUENCE seq_ref_event_type_event_type_id;
 CREATE SEQUENCE seq_ref_expenditure_cancel_reason_expenditure_cancel_reason_id;
 CREATE SEQUENCE seq_ref_expenditure_cancel_type_expenditure_cancel_type_id;
 CREATE SEQUENCE seq_ref_agreement_type_agreement_type_id;
 CREATE SEQUENCE seq_ref_expenditure_object_expendtiure_object_id;
 CREATE SEQUENCE seq_ref_expenditure_privacy_type_expenditure_privacy_type_id;
 CREATE SEQUENCE seq_ref_expenditure_status_expenditure_status_id;
-CREATE SEQUENCE seq_ref_fund_fund_id;
 CREATE SEQUENCE seq_ref_funding_class_funding_class_id;
 CREATE SEQUENCE seq_ref_funding_source_funding_source_id;
 CREATE SEQUENCE seq_ref_location_location_id;
 CREATE SEQUENCE seq_ref_object_class_object_class_id;
-CREATE SEQUENCE seq_ref_procurement_type_procurement_type_id;
 CREATE SEQUENCE seq_ref_revenue_category_revenue_category_id;
 CREATE SEQUENCE seq_ref_revenue_class_revenue_class_id;
 CREATE SEQUENCE seq_ref_revenue_source_revenue_source_id;
 CREATE SEQUENCE seq_ref_budget_budget_code_id;
-CREATE SEQUENCE seq_ref_worksite_worksite_id;
 CREATE SEQUENCE seq_ref_address_type_address_type_id;
 CREATE SEQUENCE seq_ref_date_date_id;
 CREATE SEQUENCE seq_budget_budget_id;
@@ -203,7 +195,7 @@ CREATE TABLE ref_department_history (
 
  ALTER TABLE  ref_department_history ADD constraint fk_ref_department_history_ref_fund_class FOREIGN KEY(fund_class_id) references ref_fund_class (fund_class_id);
  ALTER TABLE  ref_department_history ADD constraint fk_ref_department_history_ref_agency foreign key (agency_id) references ref_agency (agency_id);
- ALTER TABLE  ref_department_history ADD constraint fk_ref_department_history_etl_data_load FOREIGN KEY(load_id) references etl_data_load;
+ ALTER TABLE  ref_department_history ADD constraint fk_ref_department_history_etl_data_load FOREIGN KEY(load_id) references etl_data_load(load_id);
  ALTER TABLE  ref_department_history ADD constraint fk_ref_department_history_ref_department FOREIGN KEY(department_id) references ref_department(department_id);
 
  CREATE TABLE ref_award_category (
@@ -214,25 +206,12 @@ CREATE TABLE ref_department_history (
 ) DISTRIBUTED BY (award_category_id);
 
 
-CREATE TABLE ref_award_level (
-  award_level_id smallint PRIMARY KEY default nextval('seq_ref_award_level_award_level_id'),
-  award_level_code varchar(2) ,
-  award_level_name varchar(50),
-  created_date timestamp
-) DISTRIBUTED BY (award_level_id);
-
 CREATE TABLE ref_award_method (
   award_method_id smallint PRIMARY KEY default nextval('seq_ref_award_method_award_method_id'),
   award_method_code varchar(3) ,
   award_method_name varchar(50),
   created_date timestamp
 ) DISTRIBUTED BY (award_method_id);
-
-CREATE TABLE ref_award_status (
-  award_status_id smallint PRIMARY KEY,
-  award_status_name varchar(50),
-  created_date timestamp
-) DISTRIBUTED BY (award_status_id);
 
 CREATE TABLE ref_balance_number (
   balance_number_id smallint PRIMARY KEY default nextval('seq_ref_balance_number_balance_number_id'),
@@ -280,31 +259,12 @@ CREATE TABLE ref_business_type_status (
   created_date timestamp
 ) DISTRIBUTED BY (business_type_status_id);
 
-CREATE TABLE ref_commodity_type (
-  commodity_type_id smallint PRIMARY KEY,
-  commodity_type_name varchar(50) ,
-  created_date timestamp
-) DISTRIBUTED BY (commodity_type_id);
-
 CREATE TABLE ref_document_code (
   document_code_id  smallint PRIMARY KEY default nextval('seq_ref_document_code_document_code_id'),
   document_code varchar(8) ,
   document_name varchar(100) ,
   created_date timestamp 
 ) DISTRIBUTED BY (document_code_id);
-
-CREATE TABLE ref_document_function_code (
-  document_function_code_id smallint PRIMARY KEY,
-  document_function_name varchar(50) ,
-  created_date timestamp 
-) DISTRIBUTED BY (document_function_code_id);
-
-CREATE TABLE ref_event_type (
-  event_type_id smallint PRIMARY KEY default nextval('seq_ref_event_type_event_type_id'),
-  event_type_code varchar(4) ,
-  event_type_name varchar(50) ,
-  created_date timestamp
-) DISTRIBUTED BY (event_type_id);
 
 CREATE TABLE ref_expenditure_cancel_reason (
   expenditure_cancel_reason_id smallint PRIMARY KEY default nextval('seq_ref_expenditure_cancel_reason_expenditure_cancel_reason_id'),
@@ -368,12 +328,6 @@ CREATE TABLE ref_expenditure_status (
   created_date timestamp 
 ) DISTRIBUTED BY (expenditure_status_id);
 
-CREATE TABLE ref_fund (
-  fund_id SMALLINT PRIMARY KEY DEFAULT nextval('seq_ref_fund_fund_id'),
-  fund_code varchar(20) ,
-  fund_name varchar(50) ,
-  created_date timestamp
-) DISTRIBUTED BY (fund_id);
 
 CREATE TABLE ref_funding_class (
     funding_class_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_funding_class_funding_class_id'::regclass) NOT NULL,
@@ -497,12 +451,6 @@ CREATE TABLE ref_object_class_history (
  ALTER TABLE  ref_object_class_history 	ADD constraint fk_ref_obj_class_history_ref_obj_class foreign key (object_class_id) references ref_object_class (object_class_id);
  ALTER TABLE  ref_object_class_history ADD constraint fk_ref_object_class_history_etl_data_load foreign key (load_id) references etl_data_load (load_id);
 
-CREATE TABLE ref_procurement_type (
-  procurement_type_id smallint PRIMARY KEY ,
-  procurement_type_name varchar(50) ,
-  created_date timestamp
-) DISTRIBUTED BY (procurement_type_id);
-
 CREATE TABLE ref_revenue_category (
     revenue_category_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_revenue_category_revenue_category_id'::regclass) NOT NULL,
     revenue_category_code character varying(4),
@@ -573,13 +521,6 @@ CREATE TABLE ref_revenue_source (
  ALTER TABLE  ref_revenue_source ADD constraint fk_ref_revenue_source_ref_funding_class foreign key (funding_class_id) references ref_funding_class (funding_class_id);
  ALTER TABLE  ref_revenue_source ADD constraint fk_ref_revenue_source_ref_revenue_class foreign key (revenue_class_id) references ref_revenue_class (revenue_class_id);
  ALTER TABLE  ref_revenue_source ADD constraint fk_ref_revenue_source_ref_revenue_category foreign key (revenue_category_id) references ref_revenue_category (revenue_category_id);
-
-CREATE TABLE ref_worksite (
-  worksite_id int PRIMARY KEY DEFAULT nextval('seq_ref_worksite_worksite_id'),
-  worksite_code varchar(3) ,
-  worksite_name varchar(50) ,
-  created_date timestamp
-) DISTRIBUTED BY (worksite_id);
 
 CREATE TABLE ref_address_type (
   address_type_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_address_type_address_type_id'),
@@ -782,7 +723,6 @@ CREATE TABLE history_master_agreement
 )
 DISTRIBUTED BY (master_agreement_id);
 
-
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load(load_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_agreement_type FOREIGN KEY (agreement_type_id) REFERENCES ref_agreement_type(agreement_type_id);
@@ -792,7 +732,6 @@ DISTRIBUTED BY (master_agreement_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_4 FOREIGN KEY (award_category_id_4) REFERENCES ref_award_category(award_category_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_5 FOREIGN KEY (award_category_id_5) REFERENCES ref_award_category(award_category_id);
   ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_method FOREIGN KEY (award_method_id) REFERENCES ref_award_method(award_method_id);
- ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_status FOREIGN KEY (award_status_id) REFERENCES ref_award_status(award_status_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
   ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date foreign key (record_date_id) references ref_date (date_id);
@@ -803,10 +742,9 @@ DISTRIBUTED BY (master_agreement_id);
   ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_5 foreign key (board_approved_award_date_id) references ref_date (date_id);
   ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_6 foreign key (original_term_begin_date_id) references ref_date (date_id);
   ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_7 foreign key (original_term_end_date_id) references ref_date (date_id);
-  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_8 foreign key (registered_date_id) references ref_date (date_id);
+  ALTER TABLE  history_master_agreement ADD constraint fk_history_master_agreement_ref_date_8 foreign key (registered_date_id) references ref_date (date_id); 
  
- 
-CREATE TABLE all_agreement_commodity (
+CREATE TABLE history_agreement_commodity (
     agreement_commodity_id bigint  DEFAULT nextval('seq_agreement_commodity_agreement_commodity_id'::regclass) NOT NULL,
     agreement_id bigint,
     line_number integer,
@@ -826,10 +764,10 @@ CREATE TABLE all_agreement_commodity (
 
 
  
-CREATE TABLE all_agreement_worksite (
+CREATE TABLE history_agreement_worksite (
     agreement_worksite_id bigint DEFAULT nextval('seq_agreement_worksite_agreement_worksite_id'::regclass) NOT NULL,
     agreement_id bigint,
-    worksite_id integer,
+    worksite_code varchar(3),
     percentage numeric(17,4),
     amount numeric(17,4),
     master_agreement_yn character(1),
@@ -844,7 +782,7 @@ CREATE TABLE all_agreement_worksite (
 
 /* CON data feed */
 
-CREATE TABLE agreement (
+CREATE TABLE history_agreement (
     agreement_id bigint  PRIMARY KEY DEFAULT nextval('seq_agreement_agreement_id'::regclass) NOT NULL,
     master_agreement_id bigint,
     document_code_id smallint,
@@ -871,9 +809,9 @@ CREATE TABLE agreement (
     reason_modification character varying,
     source_created_date_id smallint,
     source_updated_date_id smallint,
-    document_function_code_id smallint,
+    document_function_code varchar,
     award_method_id smallint,
-    award_level_id smallint,
+    award_level_code varchar,
     agreement_type_id smallint,
     contract_class_code character varying(2),
     award_category_id_1 smallint,
@@ -896,48 +834,85 @@ CREATE TABLE agreement (
     number_solicitation integer,
     document_name character varying(60),
     original_term_begin_date_id smallint,
-    original_term_end_date_id smallint,
+    original_term_end_date_id smallint,    
+    brd_awd_no varchar,
+    registered_fiscal_year smallint,
+    registered_fiscal_year_id smallint, 
+    registered_calendar_year smallint,
+    registered_calendar_year_id smallint,
+    effective_end_fiscal_year smallint,
+    effective_end_fiscal_year_id smallint, 
+    effective_end_calendar_year smallint,
+    effective_end_calendar_year_id smallint,
+    effective_begin_fiscal_year smallint,
+    effective_begin_fiscal_year_id smallint,
+    effective_begin_calendar_year smallint,
+    effective_begin_calendar_year_id smallint,
+    source_updated_fiscal_year smallint,
+    source_updated_fiscal_year_id smallint, 
+    source_updated_calendar_year smallint,
+    source_updated_calendar_year_id smallint,
+    contract_number varchar,
+    original_agreement_id bigint,
+    original_version_flag char(1),
+    latest_flag char(1),
     privacy_flag char(1),
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (agreement_id);
-
- ALTER TABLE  agreement ADD constraint fk_agreement_master_agreement foreign key (master_agreement_id) references master_agreement (master_agreement_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_document_code foreign key (document_code_id) references ref_document_code (document_code_id);
- ALTER TABLE  agreement ADD CONSTRAINT fk_agreement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_status foreign key (award_status_id) references ref_award_status (award_status_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_procurement_type foreign key (procurement_type_id) references ref_procurement_type (procurement_type_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_document_function_code foreign key (document_function_code_id) references ref_document_function_code (document_function_code_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_method foreign key (award_method_id) references ref_award_method (award_method_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_agreement_type foreign key (agreement_type_id) references ref_agreement_type (agreement_type_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_category_1 foreign key (award_category_id_1) references ref_award_category (award_category_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_category_2 foreign key (award_category_id_2) references ref_award_category (award_category_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_category_3 foreign key (award_category_id_3) references ref_award_category (award_category_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_category_4 foreign key (award_category_id_4) references ref_award_category (award_category_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_category_5 foreign key (award_category_id_5) references ref_award_category (award_category_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_vendor_history foreign key (vendor_history_id) references vendor_history (vendor_history_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_level foreign key (award_level_id) references ref_award_level (award_level_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_date foreign key (award_level_id) references ref_award_level (award_level_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date foreign key (record_date_id) references ref_date (date_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date_1 foreign key (effective_begin_date_id) references ref_date (date_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date_2 foreign key (effective_end_date_id) references ref_date (date_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date_3 foreign key (source_created_date_id) references ref_date (date_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date_4 foreign key (source_updated_date_id) references ref_date (date_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date_5 foreign key (registered_date_id) references ref_date (date_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date_6 foreign key (original_term_begin_date_id) references ref_date (date_id);
- ALTER TABLE  agreement ADD constraint fk_agreement_ref_award_ref_date_7 foreign key (original_term_end_date_id) references ref_date (date_id);
-
-
  
+ 
+ CREATE TABLE agreement_snapshot(
+ 	original_agreement_id bigint,
+ 	document_version smallint,
+ 	agreement_id bigint,
+ 	starting_year smallint,
+ 	starting_year_id smallint,
+ 	ending_year smallint,
+ 	ending_year_id smallint,
+ 	registered_year smallint,
+ 	registered_year_id smallint,
+ 	contract_number varchar,
+ 	original_contract_amount numeric(16,2),
+ 	maximum_contract_amount numeric(16,2),
+ 	description varchar,
+ 	vendor_history_id integer,
+ 	vendor_id integer,
+ 	vendor_name varchar,
+ 	dollar_difference numeric(16,2),
+ 	percent_difference numeric(17,4),
+ 	master_agreement_id bigint,
+ 	master_contract_number varchar,
+ 	agreement_type_id smallint,
+ 	agreement_type_name varchar,
+ 	award_category_id smallint,
+ 	award_category_name varchar,
+ 	expenditure_object_names varchar,
+ 	effective_begin_date date,
+ 	effective_begin_date_id smallint,
+ 	effective_begin_year smallint,
+ 	effective_begin_year_id smallint,
+ 	effective_end_date date,
+ 	effective_end_date_id smallint,
+ 	effective_end_year smallint,
+ 	effective_end_year_id smallint,
+ 	registered_date date,
+ 	registered_date_id smallint,
+ 	brd_awd_no varchar,
+ 	tracking_number varchar,
+ 	master_agreement_yn char(1),
+ 	original_version_flag char(1),
+ 	latest_flag char(1)
+) DISTRIBUTED BY (original_agreement_id);
 
-CREATE TABLE all_agreement_accounting_line (
+CREATE TABLE history_agreement_accounting_line (
     agreement_accounting_line_id bigint DEFAULT nextval('seq_agreement_accounting_line_id'::regclass) NOT NULL,
     agreement_id bigint,
+    commodity_line_number integer,
     line_number integer,
-    event_type_id smallint,
+    event_type_code char(4),
     description character varying(100),
     line_amount numeric(16,2),
     budget_fiscal_year smallint,
@@ -951,13 +926,14 @@ CREATE TABLE all_agreement_accounting_line (
     location_code character varying(4),
     budget_code_id integer,
     reporting_code character varying(15),
-    load_id integer,
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (agreement_id);
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE all_disbursement (
+CREATE TABLE disbursement (
     disbursement_id integer  PRIMARY KEY DEFAULT nextval('seq_expenditure_expenditure_id'::regclass) NOT NULL,
     document_code_id smallint,
     agency_history_id smallint,
@@ -984,7 +960,7 @@ CREATE TABLE all_disbursement (
 
 
 
-CREATE TABLE all_disbursement_line_item (
+CREATE TABLE disbursement_line_item (
     disbursement_line_item_id bigint  PRIMARY KEY DEFAULT nextval('seq_disbursement_line_item_id'::regclass) NOT NULL,
     disbursement_id integer,
     line_number integer,
@@ -996,7 +972,7 @@ CREATE TABLE all_disbursement_line_item (
     department_history_id integer,
     expenditure_object_history_id integer,
     budget_code_id integer,
-    fund_id smallint,
+    fund_code varchar,
     reporting_code character varying(15),
     check_amount numeric(16,2),
     agreement_id bigint,
@@ -1035,7 +1011,7 @@ CREATE TABLE payroll_summary (
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_exp_object_history foreign key (expenditure_object_history_id) references ref_expenditure_object_history (expenditure_object_history_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
-ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_agency_summary foreign key (agency_history_id) references ref_agency_history (agency_history_id);
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1083,7 +1059,7 @@ CREATE TABLE revenue (
     document_agency_history_id smallint,
     document_id character varying(20),
     document_version_number integer,
-    document_function_code_id smallint,
+    document_function_code varchar,
     document_unit character varying(8),
     commodity_line integer,
     accounting_line integer,
@@ -1125,7 +1101,6 @@ ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_budget_code FOREIGN KEY (budg
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_document_code_2 FOREIGN KEY (ref_document_code_id) REFERENCES ref_document_code(document_code_id);
-ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_document_function_code FOREIGN KEY (document_function_code_id) REFERENCES ref_document_function_code(document_function_code_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_exp_object_history FOREIGN KEY (expenditure_object_history_id) REFERENCES ref_expenditure_object_history(expenditure_object_history_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_fund_class FOREIGN KEY (fund_class_id) REFERENCES ref_fund_class(fund_class_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_funding_source FOREIGN KEY (funding_source_id) REFERENCES ref_funding_source(funding_source_id);
@@ -1204,7 +1179,7 @@ CREATE TABLE revenue_budget
   created_date timestamp without time zone,
   updated_date timestamp without time zone,
   budget_fiscal_year_id smallint
-)
+);
 
 ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load (load_id);
 ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_agency_history FOREIGN KEY (agency_history_id)  REFERENCES ref_agency_history (agency_history_id);
@@ -1213,57 +1188,6 @@ ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_fund_class FOR
 
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE fact_agreement
-(
-	agreement_id bigint,
-	master_agreement_id bigint,
-	document_code_id smallint,
-	agency_id smallint ,
-	document_id VARCHAR(20),
-	document_version integer ,
-	effective_begin_date_id smallint,
-	effective_end_date_id smallint,
-	registered_date_id smallint,
-	maximum_contract_amount numeric(16,2),
-	award_method_id smallint,
-	vendor_id integer,
-	original_contract_amount  numeric(16,2),
-	master_agreement_yn char(1),
-	description character varying(60),
-	document_code varchar,
-	master_document_id  varchar,
-	amount_spent numeric(16,2),
-	agency_history_id smallint,
-	agency_name varchar,
-	vendor_history_id integer,
-	vendor_name varchar,
-	worksites_name varchar,
-	agreement_type_id smallint,
-	award_category_id_1 smallint,
-	expenditure_objects_name varchar,
-	record_date date,
-	effective_begin_date date,
-	effective_end_date date,
-	tracking_number varchar,
-	registered_date date,
-	has_parent_yn char(1),
-	total_child_records int,
-	record_date_id smallint
-) DISTRIBUTED BY (agreement_id);
-
-ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
-ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_agency FOREIGN KEY (agency_id) REFERENCES ref_agency(agency_id);
-ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_award_method FOREIGN KEY (award_method_id) REFERENCES ref_award_method(award_method_id);
-ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_vendor FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id);
-ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_date FOREIGN KEY (effective_begin_date_id) REFERENCES ref_date(date_id);
-ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_date_2 FOREIGN KEY (effective_begin_date_id) REFERENCES ref_date(date_id);
-ALTER TABLE fact_agreement ADD constraint fk_fact_agreement_ref_date_3 FOREIGN KEY (effective_begin_date_id) REFERENCES ref_date(date_id);
-
-CREATE TABLE fact_agreement_accounting_line
-(	
-	agreement_id bigint,		
-	line_amount numeric(16,2)	
-) DISTRIBUTED BY (agreement_id);
 
 CREATE TABLE revenue_details
 (	revenue_id bigint,
@@ -1302,49 +1226,6 @@ ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_detailse_revenue FOREIGN 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-CREATE TABLE history_agreement (LIKE agreement) DISTRIBUTED BY (agreement_id);
-CREATE TABLE all_agreement (LIKE agreement) DISTRIBUTED BY (agreement_id);
-CREATE TABLE history_all_agreement (LIKE agreement) DISTRIBUTED BY (agreement_id);
-
-CREATE TABLE agreement_accounting_line (LIKE all_agreement_accounting_line) DISTRIBUTED BY (agreement_id);
-CREATE TABLE history_agreement_accounting_line (LIKE agreement_accounting_line) DISTRIBUTED BY (agreement_id);
-CREATE TABLE history_all_agreement_accounting_line (LIKE agreement_accounting_line) DISTRIBUTED BY (agreement_id);
-ALTER TABLE history_all_agreement_accounting_line alter COLUMN agreement_accounting_line_id SET DEFAULT NEXTVAL('seq_agreement_accounting_line_id');
-
-
-CREATE TABLE agreement_commodity (LIKE all_agreement_commodity) DISTRIBUTED BY (agreement_id);
-CREATE TABLE history_agreement_commodity (LIKE agreement_commodity) DISTRIBUTED BY (agreement_id);
-CREATE TABLE history_all_agreement_commodity (LIKE agreement_commodity) DISTRIBUTED BY (agreement_id);
-ALTER TABLE history_all_agreement_commodity alter COLUMN agreement_commodity_id SET DEFAULT NEXTVAL('seq_agreement_commodity_agreement_commodity_id');
-
-
-CREATE TABLE agreement_worksite (LIKE all_agreement_worksite) DISTRIBUTED BY (agreement_id);
-CREATE TABLE history_agreement_worksite (LIKE agreement_worksite) DISTRIBUTED BY (agreement_id);
-CREATE TABLE history_all_agreement_worksite (LIKE agreement_worksite) DISTRIBUTED BY (agreement_id);
-ALTER TABLE history_all_agreement_worksite alter COLUMN agreement_worksite_id SET DEFAULT NEXTVAL('seq_agreement_worksite_agreement_worksite_id');
-
-ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_ref_commodity_type foreign key (commodity_type_id) references ref_commodity_type (commodity_type_id);
-ALTER TABLE  agreement_commodity ADD constraint fk_agreement_commodity_etl_data_load foreign key (load_id) references etl_data_load (load_id);
-
-ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_ref_commodity_type foreign key (worksite_id) references ref_worksite (worksite_id);
-ALTER TABLE  agreement_worksite ADD constraint fk_agreement_worksite_etl_data_load foreign key (load_id) references etl_data_load (load_id);
-
- ALTER TABLE  agreement_accounting_line ADD constraint fk_agreement_accounting_agreement foreign key (agreement_id) references agreement (agreement_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_etl_data_load FOREIGN KEY (load_id) REFERENCES etl_data_load(load_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_budget_code FOREIGN KEY (budget_code_id) REFERENCES ref_budget_code(budget_code_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_event_type FOREIGN KEY (event_type_id) REFERENCES ref_event_type(event_type_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_acc_line_ref_exp_object_history FOREIGN KEY (expenditure_object_history_id) REFERENCES ref_expenditure_object_history(expenditure_object_history_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_fund_class FOREIGN KEY (fund_class_id) REFERENCES ref_fund_class(fund_class_id);
- ALTER TABLE  agreement_accounting_line ADD CONSTRAINT fk_agreement_accounting_line_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
-
-CREATE TABLE disbursement (LIKE all_disbursement) DISTRIBUTED BY (disbursement_id);
-
-ALTER TABLE  disbursement ADD CONSTRAINT pk_disbursement PRIMARY KEY(disbursement_id);
-
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_reason FOREIGN KEY (expenditure_cancel_reason_id) REFERENCES ref_expenditure_cancel_reason(expenditure_cancel_reason_id);
@@ -1356,7 +1237,6 @@ ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date foreign key (r
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_1 foreign key (check_eft_issued_date_id) references ref_date (date_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_2 foreign key (check_eft_record_date_id) references ref_date (date_id);
 
-CREATE TABLE disbursement_line_item (LIKE all_disbursement_line_item) DISTRIBUTED BY (disbursement_line_item_id);
 
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_expenditure foreign key (disbursement_id) references disbursement (disbursement_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_fund_class foreign key (fund_class_id) references ref_fund_class (fund_class_id);
@@ -1364,8 +1244,7 @@ CREATE TABLE disbursement_line_item (LIKE all_disbursement_line_item) DISTRIBUTE
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disb_line_item_ref_exp_object_history foreign key (expenditure_object_history_id) references ref_expenditure_object_history (expenditure_object_history_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_fund foreign key (fund_id) references ref_fund (fund_id);
- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_agreement foreign key (agreement_id) references agreement (agreement_id);
+ ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_agreement foreign key (agreement_id) references history_agreement (agreement_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_location_history foreign key (location_history_id) references ref_location_history (location_history_id);
 
@@ -1627,5 +1506,17 @@ CREATE TABLE aggregateon_payroll_dept(
 	total_overtime_employees int)
 DISTRIBUTED BY (agency_id);
 
+CREATE TABLE aggregateon_payroll_coa_month(	
+	agency_id smallint,
+	department_id integer,
+	fiscal_year_id smallint,
+	month_id smallint,
+	type_of_year char(1),	
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay numeric(16,2) )
+DISTRIBUTED BY (agency_id);
 
 	
+CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
