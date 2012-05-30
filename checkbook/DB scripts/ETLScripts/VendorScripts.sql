@@ -270,18 +270,17 @@ BEGIN
 	SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,a.alias_nm,coalesce(a.misc_acct_fl,0)::bit,
 		NULL as vendor_sub_code,p_load_id_in as load_id, now()::timestamp
 	FROM	tmp_all_vendors a JOIN etl.vendor_history_id_seq b ON a.uniq_id = b.uniq_id
-		JOIN etl.vendor_id_seq c ON a.uniq_id = c.uniq_id
-	WHERE a.is_new_vendor = 'Y' ;
-
-
+		JOIN vendor c ON a.vendor_customer_code = c.vendor_customer_code
+	WHERE coalesce(a.misc_acct_fl,0) = 0;
+	
 	INSERT INTO vendor_history(vendor_history_id, vendor_id, legal_name,alias_name,miscellaneous_vendor_flag ,vendor_sub_code,
     		load_id ,created_date)
 	SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,a.alias_nm,coalesce(a.misc_acct_fl,0)::bit,
 		NULL as vendor_sub_code,p_load_id_in as load_id, now()::timestamp
 	FROM	tmp_all_vendors a JOIN etl.vendor_history_id_seq b ON a.uniq_id = b.uniq_id
-		JOIN vendor c ON a.vendor_customer_code = c.vendor_customer_code
-	WHERE a.is_new_vendor = 'N' AND c.miscellaneous_vendor_flag = 0::bit ;
-	
+		JOIN etl.vendor_id_seq c ON a.uniq_id = c.uniq_id
+	WHERE coalesce(a.misc_acct_fl,0) = 1;
+
 		
 	RAISE NOTICE 'VENDOR 6';	
 	

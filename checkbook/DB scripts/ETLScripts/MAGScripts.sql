@@ -4,6 +4,7 @@ Functions defined
 	updateForeignKeysForMAGInHeader
 	updateForeignKeysForMAGInAwardDetail
 	processMAG
+	postProcessMAG
 
 */
 set search_path=etl;
@@ -689,7 +690,7 @@ BEGIN
 	RAISE NOTICE 'PMAG1'; 
 	
 	-- Update the versions which are no more the first versions
-	-- Might have to change the disbursements linkage here
+	
 	
 	CREATE TEMPORARY TABLE tmp_master_agreement_flag_changes (document_id varchar,document_code_id smallint, agency_id smallint,
 					latest_master_agreement_id bigint, first_master_agreement_id bigint,non_latest_master_agreement_id varchar, non_first_master_agreement_id varchar
@@ -699,8 +700,8 @@ BEGIN
 	SELECT a.document_id,a.document_code_id, b.agency_id, 
 		MAX(CASE WHEN a.document_version = b.latest_version_no THEN master_agreement_id END) as latest_master_agreement_id,
 		MAX(CASE WHEN a.document_version = b.first_version_no THEN master_agreement_id END) as first_master_agreement_id,
-		group_concat(CASE WHEN a.document_version <> b.latest_version_no THEN master_agreement_id END) as non_latest_master_agreement_id,		
-		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN master_agreement_id END) as non_first_master_agreement_id
+		group_concat(CASE WHEN a.document_version <> b.latest_version_no THEN master_agreement_id ELSE 0 END) as non_latest_master_agreement_id,		
+		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN master_agreement_id ELSE 0 END) as non_first_master_agreement_id
 	FROM   history_master_agreement a JOIN tmp_loaded_master_agreements_1 b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
 	GROUP BY 1,2,3;	
@@ -736,7 +737,7 @@ BEGIN
 	SET    latest_flag = 'Y'
 	FROM    tmp_master_agreement_flag_changes  b
 	WHERE  a.master_agreement_id = b.latest_master_agreement_id
-		AND a.latest_flag = 'N';	
+		AND COALESCE(a.latest_flag,'N') = 'N';	
 
 	
 	RAISE NOTICE 'PMAG3'; 
@@ -758,22 +759,35 @@ BEGIN
 	FROM	tmp_contracts_for_mag b
 	WHERE	a.agreement_id = b.agreement_id;
 	
-
+	
 	
 	RAISE NOTICE 'PMAG4'; 
+	
 	-- Populating the agreement_snapshot tables
 
 	
+		
+-- Populating the agreement_snapshot tables for Fiscal Year (FY)
+	
 	CREATE TEMPORARY TABLE tmp_master_agreement_snapshot(original_master_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
-						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, registered_fiscal_year smallint)
+						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id 
+						     smallint,effective_end_fiscal_year smallint,   effective_end_fiscal_year_id smallint, registered_fiscal_year smallint)
 	DISTRIBUTED BY 	(original_master_agreement_id);				      
-			
+	
+	-- Get the latest version for every year of modification
+	
 	INSERT INTO tmp_master_agreement_snapshot 		
 	SELECT  b.original_master_agreement_id, b.source_updated_fiscal_year, b.source_updated_fiscal_year_id,
 		max(b.document_version) as document_version,
 		lead(source_updated_fiscal_year) over (partition by original_master_agreement_id ORDER BY source_updated_fiscal_year),
 		lead(source_updated_fiscal_year_id) over (partition by original_master_agreement_id ORDER BY source_updated_fiscal_year),
-		rank() over (partition by original_master_agreement_id order by source_updated_fiscal_year desc) as rank_value		
+		rank() over (partition by original_master_agreement_id order by source_updated_fiscal_year asc) as rank_value,
+		NULL as master_agreement_id,
+		max(effective_begin_fiscal_year) as effective_begin_fiscal_year,
+		max(effective_begin_fiscal_year_id) as effective_begin_fiscal_year_id,
+		max(effective_end_fiscal_year) as effective_end_fiscal_year,
+		max(effective_end_fiscal_year_id) as effective_end_fiscal_year_id,
+		max(registered_fiscal_year) as registered_fiscal_year
 	FROM	tmp_master_agreement_flag_changes a JOIN history_master_agreement b ON a.first_master_agreement_id = b.original_master_agreement_id
 	GROUP  BY 1,2,3;
 	
@@ -784,6 +798,17 @@ BEGIN
 	FROM	history_master_agreement b
 	WHERE   a.original_master_agreement_id = b.original_master_agreement_id
 		AND a.document_version = b.document_version;
+		
+	-- Updating the POP years from the latest version of the agreement
+	
+	UPDATE tmp_master_agreement_snapshot a
+	SET	effective_begin_fiscal_year = b.effective_begin_fiscal_year,
+		effective_begin_fiscal_year_id = b.effective_begin_fiscal_year_id,
+		effective_end_fiscal_year = b.effective_end_fiscal_year,
+		effective_end_fiscal_year_id = b.effective_end_fiscal_year_id
+	FROM	history_master_agreement b
+	WHERE   a.original_master_agreement_id = b.original_master_agreement_id
+		AND b.latest_flag = 'Y';
 		
 	UPDATE 	tmp_master_agreement_snapshot
 	SET	starting_year = 2010,
@@ -819,7 +844,7 @@ BEGIN
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
-					effective_begin_fiscal_year,effective_begin_fiscal_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id,master_agreement_yn)
+					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year
@@ -829,16 +854,16 @@ BEGIN
 	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
 	        b.original_contract_amount,b.maximum_spending_limit,b.description,
 		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),
-		b.original_contract_amount - b.maximum_spending_limit,
+		b.maximum_spending_limit - b.original_contract_amount ,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
-		ROUND(((b.original_contract_amount - b.maximum_spending_limit) * 100 )::decimal / b.original_contract_amount,2) END),
+		ROUND((( b.maximum_spending_limit - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END),
 		e.agreement_type_id,
 		e.agreement_type_name,f.award_category_id, f.award_category_name,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
 		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
-		b.effective_begin_fiscal_year,b.effective_begin_fiscal_year_id,b.effective_end_fiscal_year,b.effective_end_fiscal_year_id, 'Y' as master_agreement_yn
+		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn
 	FROM	tmp_master_agreement_snapshot a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
@@ -851,6 +876,117 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
 
+
+		-- Populating the agreement_snapshot tables for Calendar Year (CY)
+	
+	CREATE TEMPORARY TABLE tmp_master_agreement_snapshot_cy(original_master_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
+						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, effective_begin_calendar_year smallint,effective_begin_calendar_year_id 
+						     smallint,effective_end_calendar_year smallint,   effective_end_calendar_year_id smallint, registered_calendar_year smallint)
+	DISTRIBUTED BY 	(original_master_agreement_id);				      
+			
+	INSERT INTO tmp_master_agreement_snapshot_cy		
+	SELECT  b.original_master_agreement_id, b.source_updated_calendar_year, b.source_updated_calendar_year_id,
+		max(b.document_version) as document_version,
+		lead(source_updated_calendar_year) over (partition by original_master_agreement_id ORDER BY source_updated_calendar_year),
+		lead(source_updated_calendar_year_id) over (partition by original_master_agreement_id ORDER BY source_updated_calendar_year),
+		rank() over (partition by original_master_agreement_id order by source_updated_calendar_year asc) as rank_value,
+		NULL as master_agreement_id,
+		max(effective_begin_calendar_year) as effective_begin_calendar_year,
+		max(effective_begin_calendar_year_id) as effective_begin_calendar_year_id,
+		max(effective_end_calendar_year) as effective_end_calendar_year,
+		max(effective_end_calendar_year_id) as effective_end_calendar_year_id,
+		max(registered_calendar_year) as registered_calendar_year
+	FROM	tmp_master_agreement_flag_changes a JOIN history_master_agreement b ON a.first_master_agreement_id = b.original_master_agreement_id
+	GROUP  BY 1,2,3;
+	
+
+	UPDATE tmp_master_agreement_snapshot_cy a
+	SET     master_agreement_id = b.master_agreement_id,
+			registered_calendar_year = b.registered_calendar_year
+	FROM	history_master_agreement b
+	WHERE   a.original_master_agreement_id = b.original_master_agreement_id
+		AND a.document_version = b.document_version;
+	
+	
+		-- Updating the POP years from the latest version of the agreement
+	
+	UPDATE tmp_master_agreement_snapshot_cy a
+	SET	effective_begin_calendar_year = b.effective_begin_calendar_year,
+		effective_begin_calendar_year_id = b.effective_begin_calendar_year_id,
+		effective_end_calendar_year = b.effective_end_calendar_year,
+		effective_end_calendar_year_id = b.effective_end_calendar_year_id
+	FROM	history_master_agreement b
+	WHERE   a.original_master_agreement_id = b.original_master_agreement_id
+		AND b.latest_flag = 'Y';
+		
+		
+	UPDATE 	tmp_master_agreement_snapshot_cy
+	SET	starting_year = 2010,
+		starting_year_id = year_id
+	FROM	ref_year 
+	WHERE	year_value = 2010
+		AND starting_year > 2010
+		AND registered_calendar_year <= 2010
+		AND rank_value = 1;
+		
+	UPDATE 	tmp_master_agreement_snapshot_cy
+	SET	ending_year = ending_year - 1,
+		ending_year_id  = year_id
+	FROM	ref_year 
+	WHERE	year_value = ending_year - 1
+		AND ending_year is not null;
+	
+	RAISE NOTICE 'PMAG7'; 
+	
+	DELETE FROM ONLY agreement_snapshot_cy a USING  tmp_master_agreement_snapshot_cy b WHERE a.original_agreement_id = b.original_master_agreement_id;
+	
+	RAISE NOTICE 'PMAG8'; 
+	
+	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,
+				       agreement_id, ending_year,ending_year_id,contract_number,
+				       original_contract_amount,maximum_contract_amount,description,
+					vendor_history_id,vendor_id,vendor_name,
+					dollar_difference,
+					percent_difference,
+					agreement_type_id,
+					agreement_type_name,award_category_id,award_category_name,
+					expenditure_object_names,effective_begin_date,effective_begin_date_id,
+					effective_end_date, effective_end_date_id,registered_date, 
+					registered_date_id,brd_awd_no,tracking_number,
+					registered_year, registered_year_id,latest_flag,original_version_flag,
+					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn)
+	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
+	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
+	        		      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
+	        		      ELSE b.effective_end_calendar_year END),
+	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
+	        		      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year_id
+	        		      ELSE b.effective_end_calendar_year_id END),b.contract_number,
+	        b.original_contract_amount,b.maximum_spending_limit,b.description,
+		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),
+		b.maximum_spending_limit - b.original_contract_amount,
+		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
+		ROUND(((b.maximum_spending_limit - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END),
+		e.agreement_type_id,
+		e.agreement_type_name,f.award_category_id, f.award_category_name,
+		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
+		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
+		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
+		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,b.original_version_flag,
+		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn
+	FROM	tmp_master_agreement_snapshot_cy a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
+		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
+		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
+			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
+			   JOIN tmp_master_agreement_snapshot x ON x.master_agreement_id = z.agreement_id
+			   GROUP BY 1) g ON a.master_agreement_id = g.agreement_id
+		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
+		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
+		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
+
+		
 		RETURN 1;
 		
 					
