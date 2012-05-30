@@ -34,15 +34,13 @@ create sequence seq_stg_revenue_uniq_id;
 create sequence seq_stg_expenditure_object_uniq_id;
 create sequence seq_stg_location_uniq_id;
 create sequence seq_stg_object_class_uniq_id;
-
 create sequence seq_stg_rs_category_uniq_id;
 create sequence seq_stg_rs_class_uniq_id;
 create sequence seq_stg_rs_source_uniq_id;
-CREATE SEQUENCE seq_stg_budget_code_uniq_id;
+create sequence seq_stg_budget_code_uniq_id;
+create sequence seq_etl_job_id;
+create sequence seq_stg_pms_uniq_id;
 
-CREATE SEQUENCE seq_etl_job_id;
-
-CREATE SEQUENCE seq_stg_pms_uniq_id;
 
 CREATE TABLE ref_data_source (
     data_source_code varchar(2),
@@ -449,6 +447,16 @@ location
 )
 FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
 encoding 'utf8';
+
+
+
+
+
+
+
+
+
+
 
 CREATE TABLE ref_fund_class_id_seq(uniq_id bigint,fund_class_id int default nextval('public.seq_ref_fund_class_fund_class_id'))
 DISTRIBUTED BY (uniq_id);
@@ -3585,6 +3593,73 @@ CREATE TABLE archive_revenue (LIKE stg_revenue) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_revenue ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_revenue (LIKE archive_revenue) DISTRIBUTED BY (uniq_id);		
+
+
+--------------------------------------------------------------------------------------------------------------------------------
+/* Revenue budget data feed */
+
+
+CREATE EXTERNAL TABLE etl.ext_stg_revenue_budget
+(
+  bfy varchar,
+  fcls_cd varchar,
+  dept_cd varchar,
+  func_cd varchar,
+  revenue_source varchar,
+  adpt_am varchar,
+  curr_bud_am varchar
+)
+ LOCATION (
+    'gpfdist://mdw1:8081/datafiles/revenue_budget.txt'
+)
+ FORMAT 'text' (delimiter '|' null '\\N' escape '~' fill missing fields)
+ENCODING 'UTF8';
+ALTER TABLE etl.ext_stg_revenue_budget
+  OWNER TO gpadmin;
+
+
+
+CREATE TABLE etl.stg_revenue_budget
+(
+  budget_fiscal_year smallint,
+  fund_class_code character varying(4),
+  agency_code character varying(4),
+  budget_code character varying(10),
+  revenue_source_code character varying,
+  adopted_amount numeric(20,2),
+  current_budget_amount numeric(20,2),
+  updated_date timestamp without time zone,
+  fund_class_id smallint,
+  agency_history_id smallint,
+  budget_code_id integer,
+  action_flag character(1),
+  budget_id integer,
+  budget_fiscal_year_id smallint,
+  agency_id smallint,
+  agency_name character varying,
+  revenue_source_name character varying,
+  uniq_id bigint DEFAULT nextval('etl.seq_stg_revenue_budget_uniq_id'::regclass),
+  invalid_flag character(1),
+  invalid_reason character varying,
+  revenue_source_id smallint
+)
+WITH (
+  OIDS=FALSE
+)
+DISTRIBUTED BY (uniq_id);
+ALTER TABLE etl.stg_revenue_budget
+  OWNER TO gpadmin;
+
+
+-- Archive and invalid tables
+
+CREATE TABLE etl.archive_revenue_budget (LIKE etl.stg_revenue_budget) DISTRIBUTED BY (uniq_id);
+ALTER TABLE etl.archive_revenue_budget ADD COLUMN load_file_id bigint;
+
+
+
+CREATE TABLE etl.invalid_revenue_budget (LIKE etl.archive_revenue_budget) DISTRIBUTED BY (uniq_id);
+
 
 --------------------------------------------------------------------------------------------------------------------------------
 /* Reference tables from SQL server */
