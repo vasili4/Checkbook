@@ -983,7 +983,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_agency_history AS
-    SELECT ref_agency_history__0.agency_history_id, ref_agency_history__0.agency_id, ref_agency_history__0.agency_name, ref_agency_history__0.created_date, ref_agency_history__0.load_id,agency_short_name character varying FROM ONLY ref_agency_history__0;
+    SELECT ref_agency_history__0.agency_history_id, ref_agency_history__0.agency_id, ref_agency_history__0.agency_name, ref_agency_history__0.created_date, ref_agency_history__0.load_id,ref_agency_history__0.agency_short_name character varying FROM ONLY ref_agency_history__0;
 
 --
 -- Name: ref_agreement_type__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
