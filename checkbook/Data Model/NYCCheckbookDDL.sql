@@ -953,7 +953,8 @@ CREATE TABLE disbursement (
     vendor_history_id integer,
     retainage_amount numeric(16,2),
     privacy_flag char(1),
-    load_id integer,
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (disbursement_id);

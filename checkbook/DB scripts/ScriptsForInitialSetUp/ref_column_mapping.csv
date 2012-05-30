@@ -335,7 +335,7 @@ etl.ext_stg_fms_data_feed,col7,varchar,etl.stg_fms_vendor,vend_cust_cd,varchar,7
 etl.ext_stg_fms_data_feed,col8,varchar,etl.stg_fms_vendor,lgl_nm,varchar,8
 etl.ext_stg_fms_data_feed,col9,varchar,etl.stg_fms_vendor,alias_nm,varchar,9
 etl.ext_stg_fms_data_feed,col10,varchar,etl.stg_fms_vendor,ad_id,varchar,10
-etl.ext_stg_fms_data_feed,col11,varchar,etl.stg_fms_vendor,org_cls,int,11
+etl.ext_stg_fms_data_feed,col11,varchar,etl.stg_fms_vendor,org_cls,varchar,11
 etl.ext_stg_fms_data_feed,col12,varchar,etl.stg_fms_vendor,misc_acct_fl,int,12
 etl.ext_stg_fms_data_feed,col13,varchar,etl.stg_fms_vendor,ad_ln_1,varchar,13
 etl.ext_stg_fms_data_feed,col14,varchar,etl.stg_fms_vendor,ad_ln_2,varchar,14
