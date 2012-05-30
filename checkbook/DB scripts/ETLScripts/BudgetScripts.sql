@@ -347,10 +347,9 @@ BEGIN
 	FROM 	etl.stg_budget a JOIN budget b ON a.budget_fiscal_year = b.budget_fiscal_year 
 		AND a.fund_class_id = b.fund_class_id  
 		AND a.budget_code_id = b.budget_code_id 
-		AND a.agency_history_id = b.agency_history_id
-		AND a.department_history_id = b.department_history_id
-		AND a.object_class_history_id = b.object_class_history_id;
-	 JOIN ref_agency_history h on h.agency_id = a.agency_id and h.agency_id = b.agency_id;
+		AND a.agency_id = b.agency_id
+		AND a.department_id = b.department_id
+		AND a.object_class_id = b.object_class_id;
 		
 	UPDATE etl.stg_budget a
 	SET	action_flag = b.action_flag,
