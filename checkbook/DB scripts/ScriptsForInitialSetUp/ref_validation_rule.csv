@@ -37,10 +37,6 @@ C,H,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,2
 C,H,"CT1,CTA1,CTA2",Invalid start date,,,,,,,cntrct_strt_dt > cntrct_end_dt,3
 C,H,"CT1,CTA1,CTA2",Invalid contract amount,,,,,,,max_cntrc_am < 0,4
 C,H,"CT1,CTA1,CTA2",Missing award detail,,etl.stg_con_ct_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,5
-C,H,"CT1,CTA1,CTA2",Invalid component - award detail,,etl.stg_con_ct_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,26
-C,H,"CT1,CTA1,CTA2",Invalid component - vendor,,etl.stg_con_ct_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,27
-C,H,"CT1,CTA1,CTA2",Invalid component - commodity,,etl.stg_con_ct_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,28
-C,H,"CT1,CTA1,CTA2",Invalid component - accounting line,,etl.stg_con_ct_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,29
 C,W,"CT1,CTA1,CTA2",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd",,,,,6
 C,W,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd",,,,,7
 C,W,"CT1,CTA1,CTA2",Invalid award method,,,awd_meth_cd,,public.ref_award_method,award_method_code,,8
@@ -51,25 +47,29 @@ C,W,"CT1,CTA1,CTA2",Invalid contract category 3,,,ctcat_cd_3,,public.ref_award_c
 C,W,"CT1,CTA1,CTA2",Invalid contract category 4,,,ctcat_cd_4,,public.ref_award_category,award_category_code,,13
 C,W,"CT1,CTA1,CTA2",Invalid contract category 5,,,ctcat_cd_5,,public.ref_award_category,award_category_code,,14
 C,W,"CT1,CTA1,CTA2",Missing header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,15
+C,W,"CT1,CTA1,CTA2",Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,16
+C,V,"CT1,CTA1,CTA2",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,17
+C,V,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,18
+C,V,"CT1,CTA1,CTA2",Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,19
+C,C,"CT1,CTA1,CTA2",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,20
+C,C,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,21
+C,C,"CT1,CTA1,CTA2",Missing header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,22
+C,A,"CT1,CTA1,CTA2",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,23
+C,A,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,24
+C,A,"CT1,CTA1,CTA2",Missing header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,25
+C,H,"CT1,CTA1,CTA2",Invalid component - award detail,,etl.stg_con_ct_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,26
+C,H,"CT1,CTA1,CTA2",Invalid component - vendor,,etl.stg_con_ct_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,27
+C,H,"CT1,CTA1,CTA2",Invalid component - commodity,,etl.stg_con_ct_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,28
+C,H,"CT1,CTA1,CTA2",Invalid component - accounting line,,etl.stg_con_ct_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,29
 C,W,"CT1,CTA1,CTA2",Invalid component - header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,30
 C,W,"CT1,CTA1,CTA2",Invalid component - vendor,,etl.stg_con_ct_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,31
 C,W,"CT1,CTA1,CTA2",Invalid component - commodity,,etl.stg_con_ct_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,32
 C,W,"CT1,CTA1,CTA2",Invalid component - accounting line,,etl.stg_con_ct_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,33
-C,W,"CT1,CTA1,CTA2",Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,16
-C,V,"CT1,CTA1,CTA2",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,17
-C,V,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,18
-C,V,"CT1,CTA1,CTA2",Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,18
-C,C,"CT1,CTA1,CTA2",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,20
-C,C,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,21
-C,C,"CT1,CTA1,CTA2",Missing header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,22
 C,C,"CT1,CTA1,CTA2",Invalid component - header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,34
 C,C,"CT1,CTA1,CTA2",Invalid component - award detail,,etl.stg_con_ct_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,35
 C,C,"CT1,CTA1,CTA2",Invalid component - vendor,,etl.stg_con_ct_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,36
 C,C,"CT1,CTA1,CTA2",Invalid component - commodity,,etl.stg_con_ct_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,37
 C,C,"CT1,CTA1,CTA2",Invalid component - accounting line,,etl.stg_con_ct_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,38
-C,A,"CT1,CTA1,CTA2",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,23
-C,A,"CT1,CTA1,CTA2",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,24
-C,A,"CT1,CTA1,CTA2",Missing header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,25
 C,A,"CT1,CTA1,CTA2",Invalid component - header,etl.stg_con_ct_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,39
 C,A,"CT1,CTA1,CTA2",Invalid component - award detail,,etl.stg_con_ct_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,40
 C,A,"CT1,CTA1,CTA2",Invalid component - vendor,,etl.stg_con_ct_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,41
@@ -80,20 +80,12 @@ C,H,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,52
 C,H,"POC,PCC1,POD",Invalid start date,,,,,,,cntrct_strt_dt > cntrct_end_dt,53
 C,H,"POC,PCC1,POD",Invalid contract amount,,,,,,,max_cntrc_am < 0,54
 C,H,"POC,PCC1,POD",Missing award detail,,etl.stg_con_po_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,55
-C,H,"POC,PCC1,POD",Invalid component - award detail,,etl.stg_con_po_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,76
-C,H,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,77
-C,H,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,78
-C,H,"POC,PCC1,POD",Invalid component - accounting line,,etl.stg_con_po_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,79
 C,W,"POC,PCC1,POD",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd",,,,,56
 C,W,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd",,,,,57
 C,W,"POC,PCC1,POD",Invalid award method,,,awd_meth_cd,,public.ref_award_method,award_method_code,,58
 C,W,"POC,PCC1,POD",Invalid contract type,,,cttyp_cd,,public.ref_agreement_type,agreement_type_code,,59
 C,W,"POC,PCC1,POD",Invalid contract category 1,,,ctcat_cd_1,,public.ref_award_category,award_category_code,,60
 C,W,"POC,PCC1,POD",Missing header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,65
-C,W,"POC,PCC1,POD",Invalid component - header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,80
-C,W,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,81
-C,W,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,82
-C,W,"POC,PCC1,POD",Invalid component - accounting line,,etl.stg_con_po_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,83
 C,W,"POC,PCC1,POD",Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,66
 C,V,"POC,PCC1,POD",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,67
 C,V,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,68
@@ -101,14 +93,22 @@ C,V,"POC,PCC1,POD",Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,69
 C,C,"POC,PCC1,POD",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,70
 C,C,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,71
 C,C,"POC,PCC1,POD",Missing header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,72
+C,A,"POC,PCC1,POD",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,73
+C,A,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,74
+C,A,"POC,PCC1,POD",Missing header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,75
+C,H,"POC,PCC1,POD",Invalid component - award detail,,etl.stg_con_po_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,76
+C,H,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,77
+C,H,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,78
+C,H,"POC,PCC1,POD",Invalid component - accounting line,,etl.stg_con_po_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,79
+C,W,"POC,PCC1,POD",Invalid component - header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,80
+C,W,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,81
+C,W,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,82
+C,W,"POC,PCC1,POD",Invalid component - accounting line,,etl.stg_con_po_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,83
 C,C,"POC,PCC1,POD",Invalid component - header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,84
 C,C,"POC,PCC1,POD",Invalid component - award detail,,etl.stg_con_po_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,85
 C,C,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,86
 C,C,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,87
 C,C,"POC,PCC1,POD",Invalid component - accounting line,,etl.stg_con_po_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,88
-C,A,"POC,PCC1,POD",Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,73
-C,A,"POC,PCC1,POD",Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,74
-C,A,"POC,PCC1,POD",Missing header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,75
 C,A,"POC,PCC1,POD",Invalid component - header,etl.stg_con_po_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,89
 C,A,"POC,PCC1,POD",Invalid component - award detail,,etl.stg_con_po_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,90
 C,A,"POC,PCC1,POD",Invalid component - vendor,,etl.stg_con_po_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,91
@@ -116,22 +116,22 @@ C,A,"POC,PCC1,POD",Invalid component - commodity,,etl.stg_con_po_commodity,"doc_
 C,A,"POC,PCC1,POD",Invalid component - accounting line,,etl.stg_con_po_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,93
 C,H,DO1,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,101
 C,H,DO1,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,102
-C,H,DO1,Invalid component -vendor,,etl.stg_con_do1_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,114
-C,H,DO1,Invalid component -commodity,,etl.stg_con_do1_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,115
-C,H,DO1,Invalid component -accounting line,,etl.stg_con_do1_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,116
 C,V,DO1,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,105
 C,V,DO1,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no",,,,,106
 C,V,DO1,Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,107
 C,C,DO1,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,108
 C,C,DO1,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no",,,,,109
 C,C,DO1,Missing header,etl.stg_con_do1_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,110
+C,A,DO1,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,111
+C,A,DO1,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,112
+C,A,DO1,Missing header,etl.stg_con_do1_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,113
+C,H,DO1,Invalid component -vendor,,etl.stg_con_do1_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,114
+C,H,DO1,Invalid component -commodity,,etl.stg_con_do1_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,115
+C,H,DO1,Invalid component -accounting line,,etl.stg_con_do1_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,116
 C,C,DO1,Invalid component - header,etl.stg_con_do1_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,117
 C,C,DO1,Invalid component - vendor,,etl.stg_con_do1_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,118
 C,C,DO1,Invalid component - commodity,,etl.stg_con_do1_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,119
 C,C,DO1,Invalid component - accounting line,,etl.stg_con_do1_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,120
-C,A,DO1,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,111
-C,A,DO1,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no",,,,,112
-C,A,DO1,Missing header,etl.stg_con_do1_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,113
 C,A,DO1,Invalid component - header,etl.stg_con_do1_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,121
 C,A,DO1,Invalid component - vendor,,etl.stg_con_do1_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,122
 C,A,DO1,Invalid component - commodity,,etl.stg_con_do1_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,123
