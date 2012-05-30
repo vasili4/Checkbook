@@ -54,6 +54,7 @@ CREATE SEQUENCE seq_ref_month_month_id;
 CREATE SEQUENCE seq_payroll_payroll_id;
 CREATE SEQUENCE seq_employee_employee_id;
 CREATE SEQUENCE seq_employee_history_employee_history_id;
+CREATE SEQUENCE seq_revenue_budget_revenue_budget_id;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1179,6 +1180,37 @@ ALTER TABLE  budget ADD constraint fk_budget_ref_budget_code foreign key (budget
 ALTER TABLE  budget ADD constraint fk_budget_ref_object_class_history foreign key (object_class_history_id) references ref_object_class_history (object_class_history_id);
 ALTER TABLE  budget ADD constraint fk_budget_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 ALTER TABLE  budget ADD constraint fk_budget_ref_date foreign key (source_updated_date_id) references ref_date (date_id);
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE TABLE revenue_budget
+(
+  budget_id integer NOT NULL DEFAULT nextval('seq_revenue_budget_revenue_budget_id'::regclass),
+  budget_fiscal_year smallint,
+  budget_code character varying,
+  agency_code character varying,
+  revenue_source_code character varying,
+  adopted_amount numeric(20,2),
+  current_modified_budget_amount numeric(20,2),
+  fund_class_id smallint,
+  agency_history_id smallint,
+  budget_code_id integer,
+  agency_id smallint,
+  revenue_source_id smallint,
+  agency_name character varying,
+  revenue_source_name character varying,
+  created_load_id integer,
+  updated_load_id integer,
+  created_date timestamp without time zone,
+  updated_date timestamp without time zone,
+  budget_fiscal_year_id smallint
+)
+
+ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load (load_id);
+ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_agency_history FOREIGN KEY (agency_history_id)  REFERENCES ref_agency_history (agency_history_id);
+ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_budget_code FOREIGN KEY (budget_code_id) REFERENCES ref_budget_code (budget_code_id);
+ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_fund_class FOREIGN KEY (fund_class_id) REFERENCES ref_fund_class (fund_class_id);
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE fact_agreement
