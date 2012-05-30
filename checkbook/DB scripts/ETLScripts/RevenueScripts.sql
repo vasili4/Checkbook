@@ -758,7 +758,7 @@ BEGIN
 			    created_date, fiscal_year_id, budget_fiscal_year_id)
 	SELECT 	b.record_date_id, a.per_dc, a.fy_dc, a.bfy, a.fqtr, 
 		a.evnt_cat_id, a.evnt_typ_id, a.bank_acct_cd, a.pstng_pr_typ, a.pstng_cd_id, 
-		a.drcr_ind, a.ln_func_cd, a.pstng_am, a.incr_dcrs_ind, a.run_tmdt, 
+		a.drcr_ind, a.ln_func_cd, -1 * a.pstng_am, a.incr_dcrs_ind, a.run_tmdt, 
 		a.bsa_cd, a.bsa_typ_ind, b.expenditure_object_history_id, a.govt_brn_cd, a.cab_cd, 
 		b.agency_history_id, b.department_history_id, a.actv_cd, b.budget_code_id, a.fcat_cd, 
 		a.ftyp_cd, a.fgrp_cd, a.bscl_cd, a.bsct_cd, a.bsg_cd, 
