@@ -104,12 +104,12 @@ CREATE TABLE ref_agency (
     agency_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_agency_agency_id'::regclass) NOT NULL,
     agency_code character varying(20),
     agency_name character varying(50),
-    agency_short_name character varying(15),
     original_agency_name character varying(50),
     created_date timestamp without time zone,
     updated_date timestamp,
     created_load_id integer,
-    updated_load_id integer
+    updated_load_id integer,
+    agency_short_name character varying(15)
 ) distributed by (agency_id);
 
  ALTER TABLE  ref_agency ADD constraint fk_ref_agency_etl_data_load FOREIGN KEY(created_load_id) references etl_data_load(load_id);
@@ -119,9 +119,9 @@ CREATE TABLE ref_agency_history (
     agency_history_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_agency_history_id'::regclass) NOT NULL,
     agency_id smallint,    
     agency_name character varying(50),
-    agency_short_name character varying(15),
     created_date timestamp without time zone,
-    load_id integer
+    load_id integer,
+    agency_short_name character varying(15)
 ) distributed by (agency_history_id);
 
  ALTER TABLE  ref_agency_history ADD constraint fk_ref_agency_history_etl_data_load FOREIGN KEY(load_id) references etl_data_load(load_id);
@@ -165,7 +165,6 @@ CREATE TABLE ref_department (
     department_id integer PRIMARY KEY DEFAULT nextval('seq_ref_department_department_id'::regclass) NOT NULL,
     department_code character varying(20),
     department_name character varying(100),
-    department_short_name character varying(15),
     agency_id smallint,
     fund_class_id smallint,
     fiscal_year smallint,
@@ -173,7 +172,8 @@ CREATE TABLE ref_department (
     created_date timestamp without time zone,
     updated_date timestamp,
     created_load_id integer,
-    updated_load_id integer    
+    updated_load_id integer,
+    department_short_name character varying(15),
 ) distributed by (department_id);
 
  ALTER TABLE  ref_department ADD constraint fk_ref_department_ref_fund_class FOREIGN KEY(fund_class_id) references ref_fund_class (fund_class_id);
@@ -185,12 +185,12 @@ CREATE TABLE ref_department_history (
     department_history_id integer PRIMARY KEY DEFAULT nextval('seq_ref_department_history_id'::regclass) NOT NULL,
     department_id integer,
     department_name character varying(100),
-    department_short_name character varying(15),
     agency_id smallint,
     fund_class_id smallint,
     fiscal_year smallint,
     created_date timestamp without time zone,
-    load_id integer
+    load_id integer,
+    department_short_name character varying(15)
 ) distributed by (department_history_id);
 
  ALTER TABLE  ref_department_history ADD constraint fk_ref_department_history_ref_fund_class FOREIGN KEY(fund_class_id) references ref_fund_class (fund_class_id);
