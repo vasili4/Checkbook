@@ -15,7 +15,7 @@ Functions defined
 CREATE OR REPLACE FUNCTION etl.processCOAAgency(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
-	CREATE TEMPORARY TABLE tmp_ref_agency(uniq_id bigint,agency_code varchar(20),agency_name varchar(15),agency_short_name varchar(15), exists_flag char(1), modified_flag char(1))
+	CREATE TEMPORARY TABLE tmp_ref_agency(uniq_id bigint,agency_code varchar(20),agency_name varchar,agency_short_name varchar(15), exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
 	
 	-- For all records check if data is modified/new
@@ -112,7 +112,8 @@ BEGIN
 		inner_tbl.fund_class_id,
 		inner_tbl.department_code, 
 		inner_tbl.fiscal_year,
-	                 inner_tbl.department_name,
+	        inner_tbl.department_name,
+	        inner_tbl.department_short_name,
 	       (CASE WHEN b.department_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
 	       (CASE WHEN b.department_code IS NOT NULL AND (inner_tbl.department_name  <> b.department_name OR inner_tbl.department_short_name <>b.department_short_name)
 THEN 'Y' ELSE 'N' END) as modified_flag
@@ -207,8 +208,8 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM	tmp_fund_class_id_id b
 	WHERE 	a.uniq_id = b.uniq_id;
 	
-	INSERT INTO ref_fund_class(fund_class_id,fund_class_code)
-	SELECT a.fund_class_id,b.fund_class_code
+	INSERT INTO ref_fund_class(fund_class_id,fund_class_code,created_load_id,created_date)
+	SELECT a.fund_class_id,b.fund_class_code,p_load_id_in,now()::timestamp
 	FROM 	etl.ref_fund_class_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id;
 	
 	RAISE NOTICE '3.2';
@@ -1019,11 +1020,11 @@ BEGIN
 
 	RAISE NOTICE 'RS - 4';
 
-	CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar,rsrc_sh_nm varchar, revenue_source_id smallint)
+	CREATE TEMPORARY TABLE tmp_ref_revenue_source_1(rsrc_nm varchar,rsrc_sh_nm varchar, revenue_source_id int, revenue_category_id smallint, revenue_class_id smallint, funding_class_id smallint)
 	DISTRIBUTED BY (revenue_source_id);
 
 	INSERT INTO tmp_ref_revenue_source_1
-	SELECT a.rsrc_nm,a.rsrc_sh_nm,b.revenue_source_id 
+	SELECT a.rsrc_nm,a.rsrc_sh_nm,b.revenue_source_id ,a.rscat_id,a.rcls_id,a.funding_class_id
 	FROM tmp_ref_revenue_source a JOIN ref_revenue_source b ON a.rsrc_cd = b.revenue_source_code AND a.fy = b.fiscal_year
 	WHERE exists_flag ='Y' and modified_flag='Y';
 
@@ -1033,6 +1034,9 @@ BEGIN
 	UPDATE ref_revenue_source a
 	SET revenue_source_name = b.rsrc_nm,
 	    revenue_source_short_name = b.rsrc_sh_nm,
+	    revenue_category_id = b.revenue_category_id,
+	    revenue_class_id = b.revenue_class_id,
+	    funding_class_id = b.funding_class_id,
 	    updated_date = now()::timestamp,
 	    updated_load_id =  p_load_id_in
 	FROM tmp_ref_revenue_source_1 b		
