@@ -4,8 +4,7 @@
         line = $0;
         delimiter="|";
         no_of_attributes = split(line,attributes,delimiter);
-        echo $no_of_attributes
-        if(no_of_attributes==16){
+        if(no_of_attributes==18){
                 print $0 >> "goodfile.txt"
         } else
         {
