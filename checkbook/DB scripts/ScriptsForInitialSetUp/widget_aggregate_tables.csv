@@ -147,18 +147,8 @@ GROUP BY 1,2,3,4,5,6","SELECT a.agreement_id,
           ON COALESCE(b.master_agreement_id, b.agreement_id) =
                 a.agreement_id
 GROUP BY 1,2,3,4,5,6"
-RevenueByCategoryId,aggregateon_revenue_category,"SELECT b.revenue_category_id, fiscal_period::smallint,
-       budget_fiscal_year_id, SUM(posting_amount) as posting_amount,
-       0 as adopted_budget,
-       0 as current_modified_budget
-FROM   revenue_details a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
-GROUP BY 1,2,3;",
-RevenueByFundingClassId,aggregateon_revenue_funding_class,"SELECT b.funding_class_id,fiscal_period::smallint,
-       a.budget_fiscal_year_id, SUM(posting_amount) as posting_amount,
-       0 as adopted_budget,
-       0 as current_modified_budget
-FROM   revenue_details a LEFT JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id
-GROUP BY 1,2,3;",
+RevenueByCategoryId,aggregateon_revenue_category,"SELECT a.revenue_category_id,a.budget_fiscal_year,sum(a.posting_amount) AS posting_amount,SUM(a1.adopted_amount) AS adopted_amount,SUM(a1.current_budget_amount) AS current_budget_amount   FROM (SELECT y.revenue_category_id,x.budget_fiscal_year,sum(x.posting_amount) AS posting_amount FROM   revenue_details x JOIN ref_revenue_source y ON x.revenue_source_id = y.revenue_source_id GROUP BY 1, 2 ORDER BY 1,2) a full outer join (SELECT b.revenue_category_id,  a.budget_fiscal_year,   sum(a.adopted_amount) as adopted_amount,sum(a.current_modified_budget_amount) as current_budget_amount   FROM revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id GROUP BY 1,2) a1 on a.revenue_category_id = a1.revenue_category_id and a.budget_fiscal_year = a1.budget_fiscal_year group by 1,2 order by 1,2",
+RevenueByFundingClassId,aggregateon_revenue_funding_class,"SELECT a.funding_class_id,a.budget_fiscal_year,sum(a.posting_amount) as posting_amount,SUM(a1.adopted_amount) AS adopted_amount,SUM(a1.current_budget_amount) AS current_modified_amount  FROM (SELECT y.funding_class_id, x.budget_fiscal_year, sum(x.posting_amount) AS posting_amount FROM  revenue_details x  JOIN ref_revenue_source y ON x.revenue_source_id = y.revenue_source_id GROUP BY 1, 2 ORDER BY 1,2) afull outer join(SELECT b.funding_class_id, a.budget_fiscal_year,  sum(a.adopted_amount) as adopted_amount,sum(a.current_modified_budget_amount) as current_budget_amount  FROM revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id  GROUP BY 1,2) a1 on a.funding_class_id = a1.funding_class_id and a.budget_fiscal_year = a1.budget_fiscal_year group by 1,2 order by 1,2",
 SpendingByVendorExpObject,aggregateon_spending_vendor_exp_object,"SELECT vendor_id,expenditure_object_id,
  check_eft_issued_nyc_year_id AS year_id, 'B' as type_of_year,SUM(check_amount) as total_spending_amount
  FROM disbursement_line_item_details
@@ -228,7 +218,7 @@ GROUP BY 1,2,3,4,5) e JOIN (SELECT d.employee_id,d.agency_id,d.calendar_fiscal_y
 	JOIN (SELECT employee_id, agency_id,min(pay_date) as start_date
 	      FROM   payroll
 	      GROUP BY 1,2) as start_date_table ON e.employee_id = start_date_table.employee_id
-		     			AND e.agency_id = start_date_table.agency_id;"	
+		     			AND e.agency_id = start_date_table.agency_id;	"
 PayrollByAgency,aggregateon_payroll_agency,"SELECT agency_id,fiscal_year_id,'B' as type_of_year, 
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
