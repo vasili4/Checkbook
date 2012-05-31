@@ -56,7 +56,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_coa_entities__0 (
     agency_id smallint,
     spending_category_id smallint,
     expenditure_object_id integer,
-    month_id smallint,
+    month_id int,
     year_id smallint,
     type_of_year char(1),
     total_spending_amount numeric,
@@ -108,7 +108,7 @@ CREATE VIEW aggregateon_spending_contract AS
 CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor__0 (
     vendor_id integer,
     agency_id smallint,
-    month_id smallint,
+    month_id int,
     year_id smallint,
     type_of_year char(1),
     total_spending_amount numeric,
@@ -137,7 +137,7 @@ CREATE EXTERNAL WEB TABLE agreement__0 (
     document_id character varying,
     document_version integer,
     tracking_number character varying,
-    record_date_id smallint,
+    record_date_id int,
     budget_fiscal_year smallint,
     document_fiscal_year smallint,
     document_period bpchar,
@@ -151,11 +151,11 @@ CREATE EXTERNAL WEB TABLE agreement__0 (
     award_status_id smallint,
     procurement_id character varying,
     procurement_type_id smallint,
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
     reason_modification character varying,
-    source_created_date_id smallint,
-    source_updated_date_id smallint,
+    source_created_date_id int,
+    source_updated_date_id int,
     document_function_code_id smallint,
     award_method_id smallint,
     award_level_id smallint,
@@ -176,12 +176,12 @@ CREATE EXTERNAL WEB TABLE agreement__0 (
     vendor_history_id integer,
     vendor_preference_level integer,
     original_contract_amount numeric,
-    registered_date_id smallint,
+    registered_date_id int,
     oca_number character varying,
     number_solicitation integer,
     document_name character varying,
-    original_term_begin_date_id smallint,
-    original_term_end_date_id smallint,
+    original_term_begin_date_id int,
+    original_term_end_date_id int,
     privacy_flag bpchar,
     created_load_id integer,
     updated_load_id integer,
@@ -216,7 +216,7 @@ CREATE EXTERNAL WEB TABLE agreement_accounting_line__0 (
     agency_history_id smallint,
     department_history_id integer,
     expenditure_object_history_id integer,
-    revenue_source_id smallint,
+    revenue_source_id int,
     location_code character varying,
     budget_code_id integer,
     reporting_code character varying,
@@ -310,7 +310,7 @@ CREATE EXTERNAL WEB TABLE budget__0 (
     cash_expense_amount numeric,
     post_closing_adjustment_amount numeric,
     total_expenditure_amount numeric,
-    source_updated_date_id smallint,
+    source_updated_date_id int,
     budget_fiscal_year_id smallint,
     agency_id smallint,
     object_class_id integer,
@@ -353,13 +353,13 @@ CREATE EXTERNAL WEB TABLE disbursement__0 (
     agency_history_id smallint,
     document_id character varying,
     document_version integer,
-    record_date_id smallint,
+    record_date_id int,
     budget_fiscal_year smallint,
     document_fiscal_year smallint,
     document_period bpchar,
     check_eft_amount numeric,
-    check_eft_issued_date_id smallint,
-    check_eft_record_date_id smallint,
+    check_eft_issued_date_id int,
+    check_eft_record_date_id int,
     expenditure_status_id smallint,
     expenditure_cancel_type_id smallint,
     expenditure_cancel_reason_id integer,
@@ -431,9 +431,9 @@ CREATE EXTERNAL WEB TABLE fact_agreement__0 (
     agency_id smallint,
     document_id character varying,
     document_version integer,
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
-    registered_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
+    registered_date_id int,
     maximum_contract_amount numeric,
     award_method_id smallint,
     vendor_id integer,
@@ -458,7 +458,7 @@ CREATE EXTERNAL WEB TABLE fact_agreement__0 (
 	registered_date date,
 	has_parent_yn char(1),
 	total_child_records smallint,
-	record_date_id smallint
+	record_date_id int
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.fact_agreement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -499,10 +499,10 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
    disbursement_line_item_id bigint,
    	disbursement_id integer,
    	line_number integer,
-   	check_eft_issued_date_id smallint,
+   	check_eft_issued_date_id int,
    	check_eft_issued_nyc_year_id smallint,
    	fiscal_year smallint,
-   	check_eft_issued_cal_month_id smallint,
+   	check_eft_issued_cal_month_id int,
    	agreement_id bigint,
    	master_agreement_id bigint,
    	fund_class_id smallint,
@@ -565,7 +565,7 @@ CREATE EXTERNAL WEB TABLE revenue_details__0 (
     fiscal_period bpchar,
     posting_amount numeric,
     revenue_category_id smallint,
-    revenue_source_id smallint,
+    revenue_source_id int,
     fiscal_year_id smallint,
     agency_id smallint,
 	department_id integer,	
@@ -617,7 +617,7 @@ CREATE EXTERNAL WEB TABLE history_agreement__0 (
     document_id character varying,
     document_version integer,
     tracking_number character varying,
-    record_date_id smallint,
+    record_date_id int,
     budget_fiscal_year smallint,
     document_fiscal_year smallint,
     document_period bpchar,
@@ -631,11 +631,11 @@ CREATE EXTERNAL WEB TABLE history_agreement__0 (
     award_status_id smallint,
     procurement_id character varying,
     procurement_type_id smallint,
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
     reason_modification character varying,
-    source_created_date_id smallint,
-    source_updated_date_id smallint,
+    source_created_date_id int,
+    source_updated_date_id int,
     document_function_code_id smallint,
     award_method_id smallint,
     award_level_id smallint,
@@ -656,12 +656,12 @@ CREATE EXTERNAL WEB TABLE history_agreement__0 (
     vendor_history_id integer,
     vendor_preference_level integer,
     original_contract_amount numeric,
-    registered_date_id smallint,
+    registered_date_id int,
     oca_number character varying,
     number_solicitation integer,
     document_name character varying,
-    original_term_begin_date_id smallint,
-    original_term_end_date_id smallint,
+    original_term_begin_date_id int,
+    original_term_end_date_id int,
     privacy_flag bpchar,
     created_load_id integer,
     updated_load_id integer,
@@ -696,7 +696,7 @@ CREATE EXTERNAL WEB TABLE history_agreement_accounting_line__0 (
     agency_history_id smallint,
     department_history_id integer,
     expenditure_object_history_id integer,
-    revenue_source_id smallint,
+    revenue_source_id int,
     location_code character varying,
     budget_code_id integer,
     reporting_code character varying,
@@ -781,7 +781,7 @@ CREATE EXTERNAL WEB TABLE history_master_agreement__0 (
     document_id character varying,
     document_version integer,
     tracking_number character varying,
-    record_date_id smallint,
+    record_date_id int,
     budget_fiscal_year smallint,
     document_fiscal_year smallint,
     document_period bpchar,
@@ -793,11 +793,11 @@ CREATE EXTERNAL WEB TABLE history_master_agreement__0 (
     award_status_id smallint,
     procurement_id character varying,
     procurement_type_id smallint,
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
     reason_modification character varying,
-    source_created_date_id smallint,
-    source_updated_date_id smallint,
+    source_created_date_id int,
+    source_updated_date_id int,
     document_function_code_id smallint,
     award_method_id smallint,
     agreement_type_id smallint,
@@ -816,12 +816,12 @@ CREATE EXTERNAL WEB TABLE history_master_agreement__0 (
     vendor_history_id integer,
     vendor_preference_level integer,
     board_approved_award_no character varying,
-    board_approved_award_date_id smallint,
+    board_approved_award_date_id int,
     original_contract_amount numeric,
     oca_number character varying,
-    original_term_begin_date_id smallint,
-    original_term_end_date_id smallint,
-    registered_date_id smallint,
+    original_term_begin_date_id int,
+    original_term_end_date_id int,
+    registered_date_id int,
     maximum_amount numeric,
     maximum_spending_limit numeric,
     award_level_id smallint,
@@ -855,7 +855,7 @@ CREATE EXTERNAL WEB TABLE master_agreement__0 (
     document_id character varying,
     document_version integer,
     tracking_number character varying,
-    record_date_id smallint,
+    record_date_id int,
     budget_fiscal_year smallint,
     document_fiscal_year smallint,
     document_period bpchar,
@@ -867,11 +867,11 @@ CREATE EXTERNAL WEB TABLE master_agreement__0 (
     award_status_id smallint,
     procurement_id character varying,
     procurement_type_id smallint,
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
     reason_modification character varying,
-    source_created_date_id smallint,
-    source_updated_date_id smallint,
+    source_created_date_id int,
+    source_updated_date_id int,
     document_function_code_id smallint,
     award_method_id smallint,
     agreement_type_id smallint,
@@ -890,12 +890,12 @@ CREATE EXTERNAL WEB TABLE master_agreement__0 (
     vendor_history_id integer,
     vendor_preference_level integer,
     board_approved_award_no character varying,
-    board_approved_award_date_id smallint,
+    board_approved_award_date_id int,
     original_contract_amount numeric,
     oca_number character varying,
-    original_term_begin_date_id smallint,
-    original_term_end_date_id smallint,
-    registered_date_id smallint,
+    original_term_begin_date_id int,
+    original_term_end_date_id int,
+    registered_date_id int,
     maximum_amount numeric,
     maximum_spending_limit numeric,
     award_level_id smallint,
@@ -1220,10 +1220,10 @@ CREATE VIEW ref_data_source AS
 --
 
 CREATE EXTERNAL WEB TABLE ref_date__0 (
-    date_id smallint,
+    date_id int,
     date date,
     nyc_year_id smallint,
-    calendar_month_id smallint
+    calendar_month_id int
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_date to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -1661,7 +1661,7 @@ CREATE VIEW ref_miscellaneous_vendor AS
 --
 
 CREATE EXTERNAL WEB TABLE ref_month__0 (
-    month_id smallint,
+    month_id int,
     month_value smallint,
     month_name character varying,
     year_id smallint,
@@ -1688,8 +1688,8 @@ CREATE EXTERNAL WEB TABLE ref_object_class__0 (
     object_class_name character varying,
     object_class_short_name character varying,
     active_flag bit(1),
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
     budget_allowed_flag bit(1),
     description character varying,
     source_updated_date timestamp without time zone,
@@ -1724,8 +1724,8 @@ CREATE EXTERNAL WEB TABLE ref_object_class_history__0 (
     object_class_name character varying,
     object_class_short_name character varying,
     active_flag bit(1),
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
     budget_allowed_flag bit(1),
     description character varying,
     source_updated_date timestamp without time zone,
@@ -1804,7 +1804,7 @@ CREATE VIEW ref_revenue_class AS
 --
 
 CREATE EXTERNAL WEB TABLE ref_revenue_source__0 (
-    revenue_source_id smallint,
+    revenue_source_id int,
     fiscal_year smallint,
     revenue_source_code character varying,
     revenue_source_name character varying,
@@ -1922,7 +1922,7 @@ CREATE VIEW ref_year AS
 
 CREATE EXTERNAL WEB TABLE revenue__0 (
     revenue_id bigint,
-    record_date_id smallint,
+    record_date_id int,
     fiscal_period bpchar,
     fiscal_year smallint,
     budget_fiscal_year smallint,
@@ -1976,15 +1976,15 @@ CREATE EXTERNAL WEB TABLE revenue__0 (
     ref_posting_line integer,
     reference_type smallint,
     line_description character varying,
-    service_start_date_id smallint,
-    service_end_date_id smallint,
+    service_start_date_id int,
+    service_end_date_id int,
     reason_code character varying,
     reclassification_flag integer,
     closing_classification_code character varying,
     closing_classification_name character varying,
     revenue_category_id smallint,
     revenue_class_id smallint,
-    revenue_source_id smallint,
+    revenue_source_id int,
     funding_source_id smallint,
     fund_class_id smallint,
     reporting_code character varying,
@@ -2042,8 +2042,8 @@ CREATE EXTERNAL WEB TABLE vendor_address__0 (
     vendor_history_id integer,
     address_id integer,
     address_type_id smallint,
-    effective_begin_date_id smallint,
-    effective_end_date_id smallint,
+    effective_begin_date_id int,
+    effective_end_date_id int,
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
@@ -2228,13 +2228,13 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
 CREATE EXTERNAL WEB TABLE payroll__0(
 	payroll_id bigint,
 	pay_cycle_code CHAR(1),
-	pay_date_id smallint,
+	pay_date_id int,
 	employee_history_id bigint,
 	payroll_number varchar,
 	job_sequence_number varchar,
 	agency_history_id smallint,
 	fiscal_year smallint,	
-	orig_pay_date_id smallint,
+	orig_pay_date_id int,
 	pay_frequency varchar,
 	department_history_id int,
 	annual_salary numeric(16,2),
@@ -2306,6 +2306,8 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_agency__0(
 	agency_id smallint,	
 	fiscal_year_id smallint,
 	type_of_year char(1),
+	base_pay numeric(16,2),
+	other_payments numeric(16,2),
 	gross_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	total_employees int,
@@ -2318,6 +2320,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_a
   
  CREATE VIEW  aggregateon_payroll_agency AS
  	SELECT aggregateon_payroll_agency__0.agency_id, aggregateon_payroll_agency__0.fiscal_year_id, aggregateon_payroll_agency__0.type_of_year,
+ 		aggregateon_payroll_agency__0.base_pay, aggregateon_payroll_agency__0.other_payments, 
  		aggregateon_payroll_agency__0.gross_pay, aggregateon_payroll_agency__0.overtime_pay, aggregateon_payroll_agency__0.total_employees, 
  		aggregateon_payroll_agency__0.total_salaried_employees, aggregateon_payroll_agency__0.total_hourly_employees, aggregateon_payroll_agency__0.total_overtime_employees
  	FROM 	aggregateon_payroll_agency__0;	
@@ -2328,6 +2331,8 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_dept__0(
 	department_id integer,
 	fiscal_year_id smallint,
 	type_of_year char(1),
+	pay_frequency varchar,
+	type_of_employment varchar,
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
@@ -2339,7 +2344,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_e
   
   CREATE VIEW aggregateon_payroll_employee_dept AS
   	SELECT aggregateon_payroll_employee_dept__0.employee_id, aggregateon_payroll_employee_dept__0.agency_id,aggregateon_payroll_employee_dept__0.department_id, aggregateon_payroll_employee_dept__0.fiscal_year_id,
-  		aggregateon_payroll_employee_dept__0.type_of_year,aggregateon_payroll_employee_dept__0.annual_salary, aggregateon_payroll_employee_dept__0.base_pay,
+  		aggregateon_payroll_employee_dept__0.type_of_year,aggregateon_payroll_employee_dept__0.pay_frequency,aggregateon_payroll_employee_dept__0.type_of_employment,aggregateon_payroll_employee_dept__0.annual_salary, aggregateon_payroll_employee_dept__0.base_pay,
   		aggregateon_payroll_employee_dept__0.overtime_pay, aggregateon_payroll_employee_dept__0.other_payments,aggregateon_payroll_employee_dept__0.gross_pay
   	FROM	aggregateon_payroll_employee_dept__0;	 
 
@@ -2348,6 +2353,8 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_dept__0(
 	department_id integer,
 	fiscal_year_id smallint,
 	type_of_year char(1),
+	base_pay numeric(16,2),
+	other_payments numeric(16,2),
 	gross_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	total_employees int,
@@ -2360,6 +2367,43 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_d
   
    CREATE VIEW  aggregateon_payroll_dept AS
    	SELECT aggregateon_payroll_dept__0.agency_id, aggregateon_payroll_dept__0.department_id,aggregateon_payroll_dept__0.fiscal_year_id, aggregateon_payroll_dept__0.type_of_year,
+   		aggregateon_payroll_dept__0.base_pay, aggregateon_payroll_dept__0.other_payments,
    		aggregateon_payroll_dept__0.gross_pay, aggregateon_payroll_dept__0.overtime_pay, aggregateon_payroll_dept__0.total_employees, 
    		aggregateon_payroll_dept__0.total_salaried_employees, aggregateon_payroll_dept__0.total_hourly_employees, aggregateon_payroll_dept__0.total_overtime_employees
  	FROM 	aggregateon_payroll_dept__0;	
+ 	
+ CREATE  EXTERNAL WEB TABLE aggregateon_payroll_coa_month__0(	
+	agency_id smallint,
+	department_id integer,
+	fiscal_year_id smallint,
+	month_id int,
+	type_of_year char(1),	
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay numeric(16,2) )
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_coa_month to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+  CREATE VIEW aggregateon_payroll_coa_month AS
+  	SELECT aggregateon_payroll_coa_month__0.agency_id, aggregateon_payroll_coa_month__0.department_id, aggregateon_payroll_coa_month__0.fiscal_year_id, 
+  		aggregateon_payroll_coa_month__0.month_id, aggregateon_payroll_coa_month__0.type_of_year, aggregateon_payroll_coa_month__0.base_pay, 
+  		aggregateon_payroll_coa_month__0.overtime_pay, aggregateon_payroll_coa_month__0.other_payments, aggregateon_payroll_coa_month__0.gross_pay 
+  	FROM aggregateon_payroll_coa_month__0;	
+	
+ CREATE  EXTERNAL WEB TABLE aggregateon_payroll_year__0(	
+	fiscal_year_id smallint,
+	type_of_year char(1),	
+	total_employees int,
+	total_salaried_employees int,
+	total_hourly_employees int,
+	total_overtime_employees int)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_year to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';	
+  
+  CREATE VIEW aggregateon_payroll_year AS
+  	SELECT aggregateon_payroll_year__0.fiscal_year_id ,aggregateon_payroll_year__0.type_of_year ,aggregateon_payroll_year__0.total_employees ,
+  		aggregateon_payroll_year__0.total_salaried_employees ,aggregateon_payroll_year__0.total_hourly_employees ,aggregateon_payroll_year__0.total_overtime_employees 
+  	FROM aggregateon_payroll_year__0;	
