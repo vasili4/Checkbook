@@ -234,6 +234,7 @@ CREATE EXTERNAL TABLE ext_stg_coa_expenditure_object_feed(
  ENCODING 'UTF8';
  
  CREATE EXTERNAL TABLE ext_stg_coa_object_class_feed(
+ 	doc_dept_cd varchar,
  	object_class_code varchar(3),
  	object_class_name varchar(100),
  	short_name varchar(100),
@@ -249,7 +250,8 @@ CREATE EXTERNAL TABLE ext_stg_coa_expenditure_object_feed(
  	cntrc_pos_fl char(1),
  	pyrl_typ char(1),
  	dscr_ext varchar(100),
-	rltd_ocls_cd varchar(3))
+	rltd_ocls_cd varchar(3),
+	col18 varchar)
 LOCATION (
   	    'gpfdist://mdw1:8081/datafiles/COA_object_class_feed.txt')
   	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
@@ -440,7 +442,8 @@ bud_func character varying,
 dscr_ext character varying,
 tbl_last_dt character varying,
 func_attr_nm_up character varying,
-fin_plan_sav_fl character varying
+fin_plan_sav_fl character varying,
+col23 varchar
 )
 location 
 (
