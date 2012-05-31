@@ -973,7 +973,7 @@ CREATE TABLE disbursement_line_item (
     department_history_id integer,
     expenditure_object_history_id integer,
     budget_code_id integer,
-    fund_code varchar,
+    fund_code varchar(4),
     reporting_code character varying(15),
     check_amount numeric(16,2),
     agreement_id bigint,
@@ -988,6 +988,10 @@ CREATE TABLE disbursement_line_item (
 ) distributed by (disbursement_line_item_id);
 
 
+CREATE TABLE disbursement_line_item_deleted (
+  disbursement_line_item_id bigint NOT NULL,
+  load_id integer
+) DISTRIBUTED BY (disbursement_line_item_id);
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE payroll_summary (
@@ -1293,7 +1297,8 @@ CREATE TABLE disbursement_line_item_details(
 	spending_category_id smallint,
 	spending_category_name varchar,
 	calendar_fiscal_year_id smallint,
-	calendar_fiscal_year smallint
+	calendar_fiscal_year smallint,
+	load_id integer
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 

@@ -1133,7 +1133,7 @@ BEGIN
 	WHERE   a.agreement_id = b.agreement_id 
 		AND a.commodity_line_number = b.commodity_line_number
 		AND a.line_number = b.line_number
-		AND a.agreement_id = b.agreement_id
+		AND a.agreement_id = c.agreement_id
 		AND b.action_flag = 'D' AND c.action_flag='U';
 
 	RAISE NOTICE '10';
