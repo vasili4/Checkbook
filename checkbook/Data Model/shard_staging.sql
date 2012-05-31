@@ -1287,7 +1287,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_department_history AS
-    SELECT ref_department_history__0.department_history_id, ref_department_history__0.department_id, ref_department_history__0.department_name, ref_department_history__0.agency_id, ref_department_history__0.fund_class_id, ref_department_history__0.fiscal_year, ref_department_history__0.created_date, ref_department_history__0.load_id, ref_department_history__0.department_history_name FROM ONLY ref_department_history__0;
+    SELECT ref_department_history__0.department_history_id, ref_department_history__0.department_id, ref_department_history__0.department_name, ref_department_history__0.agency_id, ref_department_history__0.fund_class_id, ref_department_history__0.fiscal_year, ref_department_history__0.created_date, ref_department_history__0.load_id, ref_department_history__0.department_short_name FROM ONLY ref_department_history__0;
 
 --
 -- Name: ref_document_code__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
