@@ -10,7 +10,8 @@ SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,"SELECT dep
   FROM (SELECT agency_id,
                (CASE
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
-                        AND b.fund_class_code in ('400','402')
+                        AND b.fund_class_code in ('400
+','402')
                    THEN
                       3
                    WHEN     COALESCE(master_agreement_id, agreement_id) > 0
@@ -147,8 +148,34 @@ GROUP BY 1,2,3,4,5,6","SELECT a.agreement_id,
           ON COALESCE(b.master_agreement_id, b.agreement_id) =
                 a.agreement_id
 GROUP BY 1,2,3,4,5,6"
-RevenueByCategoryId,aggregateon_revenue_category,"SELECT a.revenue_category_id,a.budget_fiscal_year,sum(a.posting_amount) AS posting_amount,SUM(a1.adopted_amount) AS adopted_amount,SUM(a1.current_budget_amount) AS current_budget_amount   FROM (SELECT y.revenue_category_id,x.budget_fiscal_year,sum(x.posting_amount) AS posting_amount FROM   revenue_details x JOIN ref_revenue_source y ON x.revenue_source_id = y.revenue_source_id GROUP BY 1, 2 ORDER BY 1,2) a full outer join (SELECT b.revenue_category_id,  a.budget_fiscal_year,   sum(a.adopted_amount) as adopted_amount,sum(a.current_modified_budget_amount) as current_budget_amount   FROM revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id GROUP BY 1,2) a1 on a.revenue_category_id = a1.revenue_category_id and a.budget_fiscal_year = a1.budget_fiscal_year group by 1,2 order by 1,2",
-RevenueByFundingClassId,aggregateon_revenue_funding_class,"SELECT a.funding_class_id,a.budget_fiscal_year,sum(a.posting_amount) as posting_amount,SUM(a1.adopted_amount) AS adopted_amount,SUM(a1.current_budget_amount) AS current_modified_amount  FROM (SELECT y.funding_class_id, x.budget_fiscal_year, sum(x.posting_amount) AS posting_amount FROM  revenue_details x  JOIN ref_revenue_source y ON x.revenue_source_id = y.revenue_source_id GROUP BY 1, 2 ORDER BY 1,2) afull outer join(SELECT b.funding_class_id, a.budget_fiscal_year,  sum(a.adopted_amount) as adopted_amount,sum(a.current_modified_budget_amount) as current_budget_amount  FROM revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id  GROUP BY 1,2) a1 on a.funding_class_id = a1.funding_class_id and a.budget_fiscal_year = a1.budget_fiscal_year group by 1,2 order by 1,2",
+RevenueByCategoryId,aggregateon_revenue_category,"select c.revenue_category_id,
+	budget_fiscal_year,
+	sum(posting_amount) as posting_amount,
+	sum(adopted_amount) as adopted_amount,
+	sum(current_modified_budget_amount) as current_modified_budget_amount
+FROM	
+(select COALESCE(a.revenue_source_id,b.revenue_source_id) as revenue_source_id,
+	COALESCE(a.budget_fiscal_year,b.budget_fiscal_year) as budget_fiscal_year,
+	sum(a.posting_amount) as posting_amount,
+	sum(b.adopted_amount) as adopted_amount,
+	sum(b.current_modified_budget_amount) as current_modified_budget_amount
+from revenue_details a full outer join revenue_budget b on a.revenue_source_id = b.revenue_source_id and a.budget_fiscal_year = b.budget_fiscal_year
+group by 1,2 ) amt_tbl join ref_revenue_source c on amt_tbl.revenue_source_id = c.revenue_source_id 
+group by 1,2",
+RevenueByFundingClassId,aggregateon_revenue_funding_class,"select c.funding_class_id,
+	budget_fiscal_year,
+	sum(posting_amount) as posting_amount,
+	sum(adopted_amount) as adopted_amount,
+	sum(current_modified_budget_amount) as current_modified_budget_amount
+FROM	
+(select COALESCE(a.revenue_source_id,b.revenue_source_id) as revenue_source_id,
+	COALESCE(a.budget_fiscal_year,b.budget_fiscal_year) as budget_fiscal_year,
+	sum(a.posting_amount) as posting_amount,
+	sum(b.adopted_amount) as adopted_amount,
+	sum(b.current_modified_budget_amount) as current_modified_budget_amount
+from revenue_details a full outer join revenue_budget b on a.revenue_source_id = b.revenue_source_id and a.budget_fiscal_year = b.budget_fiscal_year
+group by 1,2 ) amt_tbl join ref_revenue_source c on amt_tbl.revenue_source_id = c.revenue_source_id 
+group by 1,2;",
 SpendingByVendorExpObject,aggregateon_spending_vendor_exp_object,"SELECT vendor_id,expenditure_object_id,
  check_eft_issued_nyc_year_id AS year_id, 'B' as type_of_year,SUM(check_amount) as total_spending_amount
  FROM disbursement_line_item_details
@@ -166,7 +193,7 @@ PayrollByEmployeeAgency,aggregateon_payroll_employee_agency,"SELECT e.employee_i
 	other_payments,
 	gross_pay_ytd	
 FROM
-(SELECT employee_id,agency_id,fiscal_year_id,
+(SELECT employee_id,payroll_number,job_sequence_number,agency_id,fiscal_year,fiscal_year_id,
 	pay_frequency,
 	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,		
 	SUM(base_pay) as base_pay,
@@ -175,19 +202,24 @@ FROM
 	SUM(gross_pay) as gross_pay_ytd	
 FROM payroll p
 JOIN ref_amount_basis z ON p.amount_basis_id = z.amount_basis_id		 
-GROUP BY 1,2,3,4,5) e JOIN (SELECT d.employee_id,d.agency_id,d.fiscal_year_id,d.annual_salary
-		     FROM (SELECT employee_id,agency_id,fiscal_year_id,max(pay_date) as pay_date
+GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.fiscal_year,d.annual_salary
+		     FROM (SELECT employee_id,payroll_number,job_sequence_number,fiscal_year,max(pay_date) as pay_date
 		     	   FROM payroll a 
-		           GROUP BY 1,2,3) c JOIN payroll d ON d.employee_id = c.employee_id
-					     AND d.agency_id = c.agency_id 
-					     AND d.fiscal_year_id = c.fiscal_year_id
+		     	   JOIN ref_amount_basis f ON a.amount_basis_id = f.amount_basis_id
+		     	   WHERE amount_basis_name ='ANNUAL'
+		           GROUP BY 1,2,3,4) c JOIN payroll d ON d.employee_id = c.employee_id
+					     AND d.payroll_number = c.payroll_number 
+					     AND d.job_sequence_number = c.job_sequence_number
+					     AND d.fiscal_year = c.fiscal_year
 					     AND d.pay_date = c.pay_date) annual_sal_table ON e.employee_id = annual_sal_table.employee_id
-		     			AND e.agency_id = annual_sal_table.agency_id 
-		     			AND e.fiscal_year_id = annual_sal_table.fiscal_year_id		     			
+		     			AND e.payroll_number = annual_sal_table.payroll_number 
+		     			AND e.fiscal_year = annual_sal_table.fiscal_year
+		     			AND e.job_sequence_number = annual_sal_table.job_sequence_number	     			
 	JOIN (SELECT employee_id, agency_id,min(pay_date) as start_date
 	      FROM   payroll
 	      GROUP BY 1,2) as start_date_table ON e.employee_id = start_date_table.employee_id
-		     			AND e.agency_id = start_date_table.agency_id;","SELECT e.employee_id,e.agency_id,e.calendar_fiscal_year_id,'C' as type_of_year,
+		     			AND e.agency_id = start_date_table.agency_id
+ORDER BY 1,2,3;","SELECT e.employee_id,e.agency_id,e.calendar_fiscal_year_id,'C' as type_of_year,
 	pay_frequency,
 	type_of_employment,
 	start_date,
@@ -197,7 +229,7 @@ GROUP BY 1,2,3,4,5) e JOIN (SELECT d.employee_id,d.agency_id,d.fiscal_year_id,d.
 	other_payments,
 	gross_pay_ytd	
 FROM
-(SELECT employee_id,agency_id,calendar_fiscal_year_id,
+(SELECT employee_id,payroll_number,job_sequence_number,agency_id,calendar_fiscal_year,calendar_fiscal_year_id,
 	pay_frequency,
 	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,		
 	SUM(base_pay) as base_pay,
@@ -206,20 +238,26 @@ FROM
 	SUM(gross_pay) as gross_pay_ytd	
 FROM payroll p
 JOIN ref_amount_basis z ON p.amount_basis_id = z.amount_basis_id		 
-GROUP BY 1,2,3,4,5) e JOIN (SELECT d.employee_id,d.agency_id,d.calendar_fiscal_year_id,d.annual_salary
-		     FROM (SELECT employee_id,agency_id,calendar_fiscal_year_id,max(pay_date) as pay_date
+GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.calendar_fiscal_year,d.annual_salary
+		     FROM (SELECT employee_id,payroll_number,job_sequence_number,calendar_fiscal_year,max(pay_date) as pay_date
 		     	   FROM payroll a 
-		           GROUP BY 1,2,3) c JOIN payroll d ON d.employee_id = c.employee_id
-					     AND d.agency_id = c.agency_id 
-					     AND d.calendar_fiscal_year_id = c.calendar_fiscal_year_id
+		     	   JOIN ref_amount_basis f ON a.amount_basis_id = f.amount_basis_id
+		     	   WHERE amount_basis_name ='ANNUAL'
+		           GROUP BY 1,2,3,4) c JOIN payroll d ON d.employee_id = c.employee_id
+					     AND d.payroll_number = c.payroll_number 
+					     AND d.job_sequence_number = c.job_sequence_number
+					     AND d.calendar_fiscal_year = c.calendar_fiscal_year
 					     AND d.pay_date = c.pay_date) annual_sal_table ON e.employee_id = annual_sal_table.employee_id
-		     			AND e.agency_id = annual_sal_table.agency_id 
-		     			AND e.calendar_fiscal_year_id = annual_sal_table.calendar_fiscal_year_id		     			
+		     			AND e.payroll_number = annual_sal_table.payroll_number 
+		     			AND e.calendar_fiscal_year = annual_sal_table.calendar_fiscal_year
+		     			AND e.job_sequence_number = annual_sal_table.job_sequence_number	     			
 	JOIN (SELECT employee_id, agency_id,min(pay_date) as start_date
 	      FROM   payroll
 	      GROUP BY 1,2) as start_date_table ON e.employee_id = start_date_table.employee_id
-		     			AND e.agency_id = start_date_table.agency_id;	"
+		     			AND e.agency_id = start_date_table.agency_id"	
 PayrollByAgency,aggregateon_payroll_agency,"SELECT agency_id,fiscal_year_id,'B' as type_of_year, 
+	SUM(base_pay) as base_pay,
+	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
        COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
@@ -229,6 +267,8 @@ PayrollByAgency,aggregateon_payroll_agency,"SELECT agency_id,fiscal_year_id,'B' 
        COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 GROUP BY 1,2,3; ","SELECT agency_id,calendar_fiscal_year_id,'C' as type_of_year, 
+	SUM(base_pay) as base_pay,
+	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
        COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
@@ -239,6 +279,8 @@ GROUP BY 1,2,3; ","SELECT agency_id,calendar_fiscal_year_id,'C' as type_of_year,
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 GROUP BY 1,2,3; "
 PayrollByEmployeeDept,aggregateon_payroll_employee_dept,"SELECT e.employee_id,e.agency_id,e.department_id,e.fiscal_year_id,'B' as type_of_year,
+	pay_frequency,
+	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,		
 	min(annual_sal_table.annual_salary) as annual_salary,
 	SUM(base_pay) as base_pay,
 	sum(overtime_pay) as overtime_pay,
@@ -258,8 +300,9 @@ FROM payroll e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number
 		     			AND e.fiscal_year = annual_sal_table.fiscal_year
 		     			AND e.job_sequence_number = annual_sal_table.job_sequence_number
 	JOIN ref_amount_basis z ON e.amount_basis_id = z.amount_basis_id	
-	WHERE amount_basis_name ='ANNUAL' 
-GROUP BY 1,2,3,4;","SELECT e.employee_id,e.agency_id,e.department_id,e.calendar_fiscal_year_id,'C' as type_of_year,
+GROUP BY 1,2,3,4,5,6,7;","SELECT e.employee_id,e.agency_id,e.department_id,e.calendar_fiscal_year_id,'C' as type_of_year,
+	pay_frequency,
+	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,		
 	min(annual_sal_table.annual_salary) as annual_salary,
 	SUM(base_pay) as base_pay,
 	sum(overtime_pay) as overtime_pay,
@@ -279,9 +322,10 @@ FROM payroll e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number
 		     			AND e.calendar_fiscal_year = annual_sal_table.calendar_fiscal_year
 		     			AND e.job_sequence_number = annual_sal_table.job_sequence_number
 	JOIN ref_amount_basis z ON e.amount_basis_id = z.amount_basis_id	
-	WHERE amount_basis_name ='ANNUAL' 
-GROUP BY 1,2,3,4;"
+GROUP BY 1,2,3,4,5,6,7;;"
 PayrollByDept,aggregateon_payroll_dept,"SELECT agency_id,department_id,fiscal_year_id,'B' as type_of_year, 
+	SUM(base_pay) as base_pay,
+	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
        COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
@@ -291,6 +335,8 @@ PayrollByDept,aggregateon_payroll_dept,"SELECT agency_id,department_id,fiscal_ye
        COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 GROUP BY 1,2,3,4;","SELECT agency_id,department_id,calendar_fiscal_year_id,'C' as type_of_year, 
+	SUM(base_pay) as base_pay,
+	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
        COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
@@ -300,3 +346,31 @@ GROUP BY 1,2,3,4;","SELECT agency_id,department_id,calendar_fiscal_year_id,'C' a
        COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 GROUP BY 1,2,3,4;"
+PayrollByMonth,aggregateon_payroll_coa_month,"SELECT agency_id,department_id,fiscal_year_id,calendar_month_id,'B' as type_of_year,
+	SUM(base_pay) as base_pay,
+	SUM(overtime_pay) as overtime_pay,
+	SUM(other_payments) as other_payments,
+	SUM(gross_pay) as gross_pay_ytd	
+	FROM payroll a JOIN ref_date b ON a.pay_date_id = b.date_id
+	GROUP BY 1,2,3,4,5","SELECT agency_id,department_id,calendar_fiscal_year_id,calendar_month_id,'C' as type_of_year,
+	SUM(base_pay) as base_pay,
+	SUM(overtime_pay) as overtime_pay,
+	SUM(other_payments) as other_payments,
+	SUM(gross_pay) as gross_pay_ytd	
+	FROM payroll a JOIN ref_date b ON a.pay_date_id = b.date_id
+	GROUP BY 1,2,3,4,5"
+PayrollByYear,aggregateon_payroll_year,"SELECT fiscal_year_id,'B' as type_of_year,
+	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
+	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
+	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
+	GROUP BY 1,2","SELECT calendar_fiscal_year_id,'C' as type_of_year,
+	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
+	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
+	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
+	GROUP BY 1,2"
