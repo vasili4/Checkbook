@@ -326,7 +326,9 @@ CREATE EXTERNAL WEB TABLE budget__0 (
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
-    updated_date timestamp without time zone
+    updated_date timestamp without time zone,
+    agency_short_name varchar,
+    department_short_name varchar
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.budget to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -341,7 +343,9 @@ CREATE VIEW budget AS
     budget__0.agency_name, budget__0.object_class_name,budget__0.department_name,
     budget__0.budget_code, budget__0.budget_code_name,
     budget__0.agency_code, budget__0.department_code,budget__0.object_class_code,
-    budget__0.created_load_id, budget__0.updated_load_id,budget__0.created_date,budget__0.updated_date FROM ONLY budget__0;
+    budget__0.created_load_id, budget__0.updated_load_id,budget__0.created_date,budget__0.updated_date,
+    budget__0.agency_short_name, budget__0.department_short_name
+    FROM ONLY budget__0;
 
 --
 -- Name: disbursement__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -537,7 +541,9 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
    	spending_category_id smallint,
 	spending_category_name varchar,
 	calendar_fiscal_year_id smallint,
-	calendar_fiscal_year smallint
+	calendar_fiscal_year smallint,
+	agency_short_name varchar(15),
+	department_short_name varchar(15)
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.disbursement_line_item_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -552,7 +558,8 @@ CREATE VIEW disbursement_line_item_details AS
     disbursement_line_item_details__0.location_name,disbursement_line_item_details__0.location_code, disbursement_line_item_details__0.department_name,disbursement_line_item_details__0.department_code, disbursement_line_item_details__0.expenditure_object_name,disbursement_line_item_details__0.expenditure_object_code, disbursement_line_item_details__0.budget_code_id,disbursement_line_item_details__0.budget_code,
      disbursement_line_item_details__0.budget_name, disbursement_line_item_details__0.contract_number, disbursement_line_item_details__0.purpose,
     disbursement_line_item_details__0.reporting_code,disbursement_line_item_details__0.location_id,disbursement_line_item_details__0.fund_class_name,disbursement_line_item_details__0.fund_class_code,
-    disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year
+    disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year,
+    disbursement_line_item_details__0.agency_short_name,disbursement_line_item_details__0.department_short_name
 FROM ONLY disbursement_line_item_details__0;
 
 --
@@ -587,7 +594,9 @@ CREATE EXTERNAL WEB TABLE revenue_details__0 (
 	fund_class_code varchar,
 	funding_class_code varchar,
 	revenue_category_code varchar,
-	revenue_source_code varchar
+	revenue_source_code varchar,
+	agency_short_name varchar,
+	department_short_name varchar
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -602,7 +611,7 @@ CREATE VIEW revenue_details AS
     revenue_details__0.budget_code_id,revenue_details__0.budget_fiscal_year_id,revenue_details__0.agency_name, revenue_details__0.revenue_category_name,revenue_details__0.revenue_source_name,
     revenue_details__0.budget_fiscal_year,revenue_details__0.department_name,revenue_details__0.revenue_class_name,revenue_details__0.fund_class_name,revenue_details__0.funding_class_name, 
     revenue_details__0.agency_code,revenue_details__0.revenue_class_code,revenue_details__0.fund_class_code,revenue_details__0.funding_class_code,revenue_details__0.revenue_category_code,
-    revenue_details__0.revenue_source_code
+    revenue_details__0.revenue_source_code,revenue_details__0.agency_short_name,revenue_details__0.department_short_name
     FROM  ONLY revenue_details__0;
 
 --
@@ -2372,6 +2381,61 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_d
    		aggregateon_payroll_dept__0.total_salaried_employees, aggregateon_payroll_dept__0.total_hourly_employees, aggregateon_payroll_dept__0.total_overtime_employees
  	FROM 	aggregateon_payroll_dept__0;	
  	
+ 	
+ 	
+ 	
+ 	
+
+	
+	--
+	-- Name: revenue_budget__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
+	--
+	
+	
+	CREATE EXTERNAL WEB TABLE staging.revenue_budget__0
+	(
+	  budget_id integer,
+	  budget_fiscal_year smallint,
+	  budget_code character varying,
+	  agency_code character varying,
+	  revenue_source_code character varying,
+	  adopted_amount numeric(20,2),
+	  current_modified_budget_amount numeric(20,2),
+	  fund_class_id smallint,
+	  agency_history_id smallint,
+	  budget_code_id integer,
+	  agency_id smallint,
+	  revenue_source_id integer,
+	  agency_name character varying,
+	  revenue_source_name character varying,
+	  created_load_id integer,
+	  updated_load_id integer,
+	  created_date timestamp without time zone,
+	  updated_date timestamp without time zone,
+	  budget_fiscal_year_id smallint,
+	  agency_short_name character varying(15)
+	  )
+	 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
+	 FORMAT 'csv' (delimiter ',' null '' escape '"' quote '"')
+	ENCODING 'UTF8';
+	
+	
+	
+	
+	--
+	-- Name: revenue_budget; Type: VIEW; Schema: staging; Owner: gpadmin
+	--
+	
+	
+	CREATE  VIEW staging.revenue_budget AS 
+	 SELECT revenue_budget__0.budget_id, revenue_budget__0.budget_fiscal_year, revenue_budget__0.budget_code, revenue_budget__0.agency_code, revenue_budget__0.revenue_source_code, revenue_budget__0.adopted_amount, revenue_budget__0.current_modified_budget_amount, revenue_budget__0.fund_class_id, revenue_budget__0.agency_history_id, revenue_budget__0.budget_code_id, revenue_budget__0.agency_id, revenue_budget__0.revenue_source_id, revenue_budget__0.agency_name, revenue_budget__0.revenue_source_name, revenue_budget__0.created_load_id, revenue_budget__0.updated_load_id, revenue_budget__0.created_date, revenue_budget__0.updated_date, revenue_budget__0.budget_fiscal_year_id
+	   FROM ONLY staging.revenue_budget__0;
+	
+	
+	
+	
+	
+	 	
  CREATE  EXTERNAL WEB TABLE aggregateon_payroll_coa_month__0(	
 	agency_id smallint,
 	department_id integer,
@@ -2406,4 +2470,4 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_y
   CREATE VIEW aggregateon_payroll_year AS
   	SELECT aggregateon_payroll_year__0.fiscal_year_id ,aggregateon_payroll_year__0.type_of_year ,aggregateon_payroll_year__0.total_employees ,
   		aggregateon_payroll_year__0.total_salaried_employees ,aggregateon_payroll_year__0.total_hourly_employees ,aggregateon_payroll_year__0.total_overtime_employees 
-  	FROM aggregateon_payroll_year__0;	
+  	FROM aggregateon_payroll_year__0;
