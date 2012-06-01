@@ -541,9 +541,7 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
    	spending_category_id smallint,
 	spending_category_name varchar,
 	calendar_fiscal_year_id smallint,
-	calendar_fiscal_year smallint,
-	agency_short_name varchar(15),
-	department_short_name varchar(15)
+	calendar_fiscal_year smallint
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.disbursement_line_item_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -558,8 +556,7 @@ CREATE VIEW disbursement_line_item_details AS
     disbursement_line_item_details__0.location_name,disbursement_line_item_details__0.location_code, disbursement_line_item_details__0.department_name,disbursement_line_item_details__0.department_code, disbursement_line_item_details__0.expenditure_object_name,disbursement_line_item_details__0.expenditure_object_code, disbursement_line_item_details__0.budget_code_id,disbursement_line_item_details__0.budget_code,
      disbursement_line_item_details__0.budget_name, disbursement_line_item_details__0.contract_number, disbursement_line_item_details__0.purpose,
     disbursement_line_item_details__0.reporting_code,disbursement_line_item_details__0.location_id,disbursement_line_item_details__0.fund_class_name,disbursement_line_item_details__0.fund_class_code,
-    disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year,
-    disbursement_line_item_details__0.agency_short_name,disbursement_line_item_details__0.department_short_name
+    disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year
 FROM ONLY disbursement_line_item_details__0;
 
 --
