@@ -300,7 +300,9 @@ CREATE TABLE budget (
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
-    updated_date timestamp without time zone
+    updated_date timestamp without time zone,
+    agency_short_name varchar,
+    department_short_name varchar
 ) DISTRIBUTED BY (budget_id);
 
 --
@@ -456,7 +458,9 @@ CREATE TABLE disbursement_line_item_details(
 	spending_category_id smallint,
 	spending_category_name varchar,
 	calendar_fiscal_year_id smallint,
-	calendar_fiscal_year smallint	
+	calendar_fiscal_year smallint,	
+	agency_short_name varchar(15),
+	department_short_name varchar(15)
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -488,12 +492,14 @@ CREATE TABLE revenue_details
 	revenue_class_name varchar,
 	fund_class_name varchar,
 	funding_class_name varchar,
-	agency code varchar,
+	agency_code varchar,
 	revenue_class_code varchar,
 	fund_class_code varchar,
 	funding_class_code varchar,
 	revenue_category_code varchar,
-	revenue_source_code varchar
+	revenue_source_code varchar,
+	agency_short_name varchar,
+	department_short_name varchar
 ) DISTRIBUTED BY (revenue_id);
 
 --
@@ -1730,6 +1736,38 @@ CREATE TABLE aggregateon_payroll_dept(
 	total_hourly_employees int,
 	total_overtime_employees int)
 DISTRIBUTED BY (agency_id);
+
+
+
+
+
+
+
+CREATE TABLE revenue_budget
+(
+  budget_id integer,
+  budget_fiscal_year smallint,
+  budget_code character varying,
+  agency_code character varying,
+  revenue_source_code character varying,
+  adopted_amount numeric(20,2),
+  current_modified_budget_amount numeric(20,2),
+  fund_class_id smallint,
+  agency_history_id smallint,
+  budget_code_id integer,
+  agency_id smallint,
+  revenue_source_id smallint,
+  agency_name character varying,
+  revenue_source_name character varying,
+  created_load_id integer,
+  updated_load_id integer,
+  created_date timestamp without time zone,
+  updated_date timestamp without time zone,
+  budget_fiscal_year_id smallint,
+  agency_short_name varchar(15)
+)
+DISTRIBUTED BY (budget_id);
+
 
 
 CREATE TABLE aggregateon_payroll_coa_month(	
