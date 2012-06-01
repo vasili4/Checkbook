@@ -20,7 +20,7 @@ $BODY$
   						     budget_code_id integer,revenue_source_id integer,updated_date_id smallint,
   						     budget_fiscal_year_id smallint,agency_id smallint,
   						     agency_name varchar,budget_code varchar, budget_code_name varchar,revenue_source_name varchar,
-  						     agency_code varchar,revenue_source_code varchar)
+  						     agency_code varchar,revenue_source_code varchar,agency_short_name varchar)
   	DISTRIBUTED BY (uniq_id);
   	
   	-- FK:fund_class_id
@@ -32,9 +32,9 @@ $BODY$
 
   	-- FK:Agency_history_id
   	
-  	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code)
+  	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code,agency_short_name)
   	SELECT	a.uniq_id, max(c.agency_history_id)as agency_history_id,max(b.agency_id) as agency_id,
-  		max(c.agency_name) as agency_name,b.agency_code
+  		max(c.agency_name) as agency_name,b.agency_code,b.agency_short_name
   	FROM etl.stg_revenue_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
   		JOIN ref_agency_history c ON b.agency_id = c.agency_id
   	GROUP BY 1,5;
@@ -58,8 +58,8 @@ $BODY$
   	SELECT uniq_id
   	FROM   tmp_fk_bdgt_values_new_agencies;
   	
-  	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
-  	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
+  	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
+  	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
   	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_bdgt_values_new_agencies b ON a.uniq_id = b.uniq_id;
   
   	
@@ -79,8 +79,8 @@ $BODY$
   	SELECT uniq_id
   	FROM   tmp_fk_bdgt_values_new_agencies;
   
-  	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
-  	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
+  	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id,agency_short_name)
+  	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'N/A'
   	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
   
   
@@ -206,7 +206,8 @@ $BODY$
   		budget_fiscal_year_id = ct_table.budget_fiscal_year_id,
   		agency_name = ct_table.agency_name,
   		revenue_source_name = ct_table.revenue_source_name,
-  		revenue_source_id = ct_table.revenue_source_id
+  		revenue_source_id = ct_table.revenue_source_id,
+  		agency_short_name = ct_table.agency_short_name
   	FROM	(SELECT uniq_id, max(fund_class_id) as fund_class_id, 
   				 max(agency_history_id) as agency_history_id,
   				 max(agency_id) as agency_id,
@@ -307,11 +308,13 @@ BEGIN
 	INSERT INTO revenue_budget(budget_fiscal_year, fund_class_id, agency_history_id,  budget_code_id, 
 			    adopted_amount, current_modified_budget_amount,   
 			  created_load_id,created_date,budget_fiscal_year_id,agency_id,
-			   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id)
+			   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
+			   agency_short_name)
 	SELECT budget_fiscal_year, fund_class_id, agency_history_id, budget_code_id, 
 		 adopted_amount, current_budget_amount, 
 		 p_load_id_in,now()::timestamp,budget_fiscal_year_id,agency_id,
-		agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id
+		agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
+		agency_short_name
 	FROM  etl.stg_revenue_budget 
 	WHERE action_flag = 'I' AND budget_id IS NULL;		
 
