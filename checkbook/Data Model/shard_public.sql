@@ -458,9 +458,7 @@ CREATE TABLE disbursement_line_item_details(
 	spending_category_id smallint,
 	spending_category_name varchar,
 	calendar_fiscal_year_id smallint,
-	calendar_fiscal_year smallint,	
-	agency_short_name varchar(15),
-	department_short_name varchar(15)
+	calendar_fiscal_year smallint	
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
