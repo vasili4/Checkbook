@@ -2425,7 +2425,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_d
 	
 	
 	CREATE  VIEW staging.revenue_budget AS 
-	 SELECT revenue_budget__0.budget_id, revenue_budget__0.budget_fiscal_year, revenue_budget__0.budget_code, revenue_budget__0.agency_code, revenue_budget__0.revenue_source_code, revenue_budget__0.adopted_amount, revenue_budget__0.current_modified_budget_amount, revenue_budget__0.fund_class_id, revenue_budget__0.agency_history_id, revenue_budget__0.budget_code_id, revenue_budget__0.agency_id, revenue_budget__0.revenue_source_id, revenue_budget__0.agency_name, revenue_budget__0.revenue_source_name, revenue_budget__0.created_load_id, revenue_budget__0.updated_load_id, revenue_budget__0.created_date, revenue_budget__0.updated_date, revenue_budget__0.budget_fiscal_year_id
+	 SELECT revenue_budget__0.budget_id, revenue_budget__0.budget_fiscal_year, revenue_budget__0.budget_code, revenue_budget__0.agency_code, revenue_budget__0.revenue_source_code, revenue_budget__0.adopted_amount, revenue_budget__0.current_modified_budget_amount, revenue_budget__0.fund_class_id, revenue_budget__0.agency_history_id, revenue_budget__0.budget_code_id, revenue_budget__0.agency_id, revenue_budget__0.revenue_source_id, revenue_budget__0.agency_name, revenue_budget__0.revenue_source_name, revenue_budget__0.created_load_id, revenue_budget__0.updated_load_id, revenue_budget__0.created_date, revenue_budget__0.updated_date, revenue_budget__0.budget_fiscal_year_id,revenue_budget__0.agency_short_name
 	   FROM ONLY staging.revenue_budget__0;
 	
 	
