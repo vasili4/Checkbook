@@ -16,17 +16,16 @@ V,M,,Invalid business type status,,,bus_typ_sta,,public.ref_business_type_status
 V,M,,Inconsistent minority type,,,,,,,"bus_typ='MNRT' AND bus_typ_sta=2 AND COALESCE(min_typ,0)=0",5
 V,M,,Inconsistent business type,,,,,,,"COALESCE(bus_typ,'')<>'MNRT' AND  COALESCE(min_typ,0) >0",6
 V,M,,Invalid component - business type,,etl.stg_fmsv_business_type,vend_cust_cd,,,,,7
-F,H,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_rec_dt_dc,doc_bfy,doc_per_dc,chk_eft_am,chk_eft_iss_dt",,,,,1
+F,H,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_bfy,doc_per_dc,chk_eft_iss_dt",,,,,1
 F,H,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,2
 F,H,,Missing vendor,,etl.stg_fms_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,3
 F,H,,Missing disbursement line item,,etl.stg_fms_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,4
 F,H,,Invalid vendor,,etl.stg_fms_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,12
 F,H,,Invalid disbursement line item,,etl.stg_fms_accounting_line,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,13
-F,H,,Inter-load duplicate,,,,public.disbursement,"public.ref_agency, public.ref_document_code,public.ref_agency_history",,stg_fms_header.doc_id = disbursement.document_id AND stg_fms_header.doc_dept_cd = ref_agency.agency_code and stg_fms_header.doc_cd = ref_document_code.document_code AND disbursement.agency_history_id = ref_agency_history.agency_history_id AND disbursement.document_code_id = ref_document_code.document_code_id AND ref_agency.agency_id = ref_agency_history.agency_id,5
 F,V,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,vend_cust_cd,doc_vend_ln_no",,,,,6
 F,V,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,vend_cust_cd,doc_vend_ln_no",,,,,7
 F,V,,Multiple,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,8
-F,A,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_actg_ln_no,dept_cd,bfy,fy_dc,per_dc,chk_amt,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_actg_ln_no",,,,,9
+F,A,,Missing key elements,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_actg_ln_no,dept_cd,bfy,fy_dc,per_dc,chk_amt",,,,,9
 F,A,,Duplicate,,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_actg_ln_no",,,,,10
 F,A,,Missing disbursement,etl.stg_fms_header,,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,11
 F,A,,Invalid disbursement,,etl.stg_fms_header,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,14

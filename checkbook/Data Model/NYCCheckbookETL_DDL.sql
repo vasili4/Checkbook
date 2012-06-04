@@ -3102,7 +3102,7 @@ CREATE TABLE stg_fms_accounting_line(
 	location_history_id int,
 	agreement_id bigint,
 	masked_agency_history_id smallint,
-	masked_department_history_id smallint,
+	masked_department_history_id int,
 	uniq_id bigint default nextval('seq_stg_fms_accounting_line_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar		)

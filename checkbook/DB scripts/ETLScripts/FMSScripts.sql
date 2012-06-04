@@ -604,6 +604,8 @@ BEGIN
 		AND d.agency_code=a.rqporf_doc_dept_cd
 	GROUP BY 1;
 	
+	RAISE NOTICE '1.7';
+	
 	UPDATE etl.stg_fms_accounting_line a
 	SET	fund_class_id =ct_table.fund_class_id ,
 		agency_history_id =ct_table.agency_history_id ,
@@ -703,12 +705,13 @@ BEGIN
 	-- Identify the CON ones which have to be created
 	
 	CREATE TEMPORARY TABLE tmp_new_ct_fms_con(con_document_code varchar,con_agency_code varchar, con_document_id varchar,
-					   con_agency_history_id smallint,con_document_code_id smallint,uniq_id bigint);
+					   con_agency_history_id smallint,con_document_code_id smallint,uniq_id bigint)
+					   DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_new_ct_fms_con
 	SELECT 	con_document_code,con_agency_code, con_document_id,con_agency_history_id,con_document_code_id,min(uniq_id)
 	FROM	tmp_ct_fms
-	WHERE	agreement_id =0
+	WHERE	agreement_id =0 AND con_document_code in ('CT1','CTA1','CTA2','DO1','POD','POC','PCC1')
 	GROUP BY 1,2,3,4,5;
 	
 	TRUNCATE etl.agreement_id_seq;
@@ -717,8 +720,8 @@ BEGIN
 	SELECT uniq_id
 	FROM  tmp_new_ct_fms_con;
 	
-	INSERT INTO history_agreement(agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag,original_version_flag,latest_flag,original_agreement_id)
-	SELECT  b.agreement_id, a.con_document_code_id,a.con_agency_history_id,a.con_document_id,1 as document_version,p_privacy_flag_in,'Y','Y', b.agreement_id
+	INSERT INTO history_agreement(agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag,original_version_flag,latest_flag,original_agreement_id,created_load_id,created_date)
+	SELECT  b.agreement_id, a.con_document_code_id,a.con_agency_history_id,a.con_document_id,1 as document_version,p_privacy_flag_in,'Y','Y', b.agreement_id, p_load_id_in, now()::timestamp
 	FROM	tmp_new_ct_fms_con a JOIN etl.agreement_id_seq b ON a.uniq_id = b.uniq_id;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
@@ -782,26 +785,26 @@ BEGIN
 	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
 						check_eft_issued_nyc_year_id,fiscal_year, check_eft_issued_cal_month_id,
 						agreement_id,master_agreement_id,fund_class_id,
-						check_amount,agency_id,agency_code,expenditure_object_id,
+						check_amount,agency_id,agency_history_id,agency_code,expenditure_object_id,
 						vendor_id,maximum_contract_amount,maximum_spending_limit,department_id,						
-						document_id,vendor_name,vendor_customer_code,check_eft_issued_date,agency_name,location_name,
-						department_name,department_code,expenditure_object_name,expenditure_object_code,
+						document_id,vendor_name,vendor_customer_code,check_eft_issued_date,agency_name,agency_short_name,location_name,
+						department_name,department_short_name,department_code,expenditure_object_name,expenditure_object_code,
 						budget_code_id,budget_code,budget_name,reporting_code,location_id,location_code,fund_class_name,fund_class_code,
 						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,load_id)
 	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
 		f.nyc_year_id,l.year_value,f.calendar_month_id,
 		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
-		b.check_amount,c.agency_id,m.agency_code,d.expenditure_object_id,
+		b.check_amount,c.agency_id,b.agency_history_id,m.agency_code,d.expenditure_object_id,
 		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit, g.department_id,
-		a.document_id,COALESCE(e.legal_name,e.alias_name) as vendor_name,q.vendor_customer_code,f.date,c.agency_name,COALESCE(i.location_short_name,i.location_name),
-		g.department_name,o.department_code,d.expenditure_object_name,p.expenditure_object_code,
+		a.document_id,COALESCE(e.legal_name,e.alias_name) as vendor_name,q.vendor_customer_code,f.date,c.agency_name,c.agency_short_name, COALESCE(i.location_short_name,i.location_name),
+		g.department_name,g.department_short_name,o.department_code,d.expenditure_object_name,p.expenditure_object_code,
 		j.budget_code_id,j.budget_code,j.budget_code_name,b.reporting_code,i.location_id,n.location_code,k.fund_class_name,k.fund_class_code,
-		(CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code = '400' THEN 3
-		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code <> '400' THEN 1
+		(CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 3
+		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 1
 		      ELSE 4
 		 END) as spending_category_id,
-		 (CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code = '400' THEN 'Capital Contracts'
-		 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code <> '400' THEN 'Contracts'
+		 (CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 'Capital Contracts'
+		 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 'Contracts'
 		 		      ELSE 'Others'
 		 END) as spending_category_name,x.year_id,x.year_value,p_load_id_in
 		FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
@@ -825,28 +828,134 @@ BEGIN
 	
 	RAISE NOTICE 'FMS RF 2';
 	
-	CREATE TEMPORARY TABLE tmp_agreement_con(disbursement_line_item_id bigint,agreement_id bigint,master_agreement_id bigint, 
-						maximum_contract_amount numeric(16,2),description varchar,
-						contract_number varchar, maximum_spending_limit numeric(16,2))
+	CREATE TEMPORARY TABLE tmp_agreement_con(disbursement_line_item_id bigint,agreement_id bigint,fiscal_year smallint,calendar_fiscal_year smallint,master_agreement_id bigint, master_agreement_id_cy bigint, maximum_contract_amount numeric(16,2),
+												maximum_contract_amount_cy numeric(16,2), maximum_spending_limit numeric(16,2), maximum_spending_limit_cy numeric(16,2),
+												purpose varchar, purpose_cy varchar, contract_number varchar, contract_number_cy varchar)
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
-	INSERT INTO tmp_agreement_con
-	SELECT a.disbursement_line_item_id, b.original_agreement_id,b.master_agreement_id,b.maximum_contract_amount, 
-		b.description,b.contract_number,b.maximum_spending_limit
-	FROM disbursement_line_item_details a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND b.latest_flag='Y'
+	INSERT INTO tmp_agreement_con(disbursement_line_item_id,agreement_id,fiscal_year,calendar_fiscal_year)
+	SELECT DISTINCT a.disbursement_line_item_id, a.agreement_id, a.fiscal_year, a.calendar_fiscal_year 
+	FROM disbursement_line_item_details a JOIN disbursement_line_item b ON a.disbursement_line_item_id = b.disbursement_line_item_id
+		 JOIN disbursement c ON b.disbursement_id = c.disbursement_id
+		WHERE c.created_load_id = p_load_id_in OR c.updated_load_id = p_load_id_in ;
+	
+		
+	-- Getting maximum_contract_amount, master_agreement_id, purpose and contract_number for FY 
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_fy(disbursement_line_item_id bigint,agreement_id bigint, 
+						maximum_contract_amount_fy numeric(16,2),maximum_contract_amount_latest numeric(16,2), description_fy varchar,
+						description_latest varchar, contract_number_fy varchar, contract_number_latest varchar, master_agreement_id_fy bigint, master_agreement_id_latest bigint)
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_fy
+    SELECT a.disbursement_line_item_id, b.original_agreement_id,
+	SUM(CASE WHEN a.fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_fy ,
+	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_latest ,
+	MIN(CASE WHEN a.fiscal_year between b.starting_year and b.ending_year THEN b.description ELSE NULL END) as description_fy ,
+	MIN(CASE WHEN b.latest_flag='Y' THEN b.description ELSE NULL END) as description_latest ,
+	MIN(CASE WHEN a.fiscal_year between b.starting_year and b.ending_year THEN b.contract_number ELSE NULL END) as contract_number_fy,
+	MIN(CASE WHEN b.latest_flag='Y' THEN b.contract_number ELSE NULL END) as contract_number_latest,
+	MIN(CASE WHEN a.fiscal_year between b.starting_year and b.ending_year THEN b.master_agreement_id ELSE NULL END) as master_agreement_id_fy,
+	MIN(CASE WHEN b.latest_flag='Y' THEN b.master_agreement_id ELSE NULL END) as master_agreement_id_latest
+	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id 
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
 		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
-		WHERE d.created_load_id = p_load_id_in OR d.updated_load_id = p_load_id_in;
-
+		GROUP BY 1,2;
+		
+	UPDATE tmp_agreement_con a
+	SET master_agreement_id = COALESCE(b.master_agreement_id_fy,b.master_agreement_id_latest),
+		maximum_contract_amount = COALESCE(b.maximum_contract_amount_fy, b.maximum_contract_amount_latest),
+		purpose = COALESCE(b.description_fy,b.description_latest),
+		contract_number = COALESCE(b.contract_number_fy, b.contract_number_latest)		
+	FROM tmp_agreement_con_fy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	-- Getting maximum_spending_limit for FY
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_master_fy(disbursement_line_item_id bigint, master_agreement_id bigint, maximum_spending_limit_fy numeric(16,2),  maximum_spending_limit_latest numeric(16,2))
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_master_fy
+	SELECT a.disbursement_line_item_id, a.master_agreement_id,
+	SUM(CASE WHEN a.fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_fy ,
+	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_latest
+	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y'
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		GROUP BY 1,2;
+		
+	UPDATE tmp_agreement_con a
+	SET maximum_spending_limit = COALESCE(b.maximum_spending_limit_fy, b.maximum_spending_limit_latest)
+	FROM tmp_agreement_con_master_fy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	
+	
 	RAISE NOTICE 'FMS RF 3';
-			
+	
+	-- Getting maximum_contract_amount, master_agreement_id, purpose and contract_number for CY 
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_cy(disbursement_line_item_id bigint,agreement_id bigint, 
+						maximum_contract_amount_cy numeric(16,2),maximum_contract_amount_latest numeric(16,2), description_cy varchar,
+						description_latest varchar, contract_number_cy varchar, contract_number_latest varchar, master_agreement_id_cy bigint, master_agreement_id_latest bigint)
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_cy
+    SELECT a.disbursement_line_item_id, b.original_agreement_id,
+	SUM(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_cy ,
+	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_latest ,
+	MIN(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.description ELSE NULL END) as description_cy ,
+	MIN(CASE WHEN b.latest_flag='Y' THEN b.description ELSE NULL END) as description_latest ,
+	MIN(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.contract_number ELSE NULL END) as contract_number_cy,
+	MIN(CASE WHEN b.latest_flag='Y' THEN b.contract_number ELSE NULL END) as contract_number_latest,
+	MIN(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.master_agreement_id ELSE NULL END) as master_agreement_id_cy,
+	MIN(CASE WHEN b.latest_flag='Y' THEN b.master_agreement_id ELSE NULL END) as master_agreement_id_latest
+	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id 
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		GROUP BY 1,2;
+		
+	UPDATE tmp_agreement_con a
+	SET master_agreement_id_cy = COALESCE(b.master_agreement_id_cy,b.master_agreement_id_latest),
+		maximum_contract_amount_cy = COALESCE(b.maximum_contract_amount_cy, b.maximum_contract_amount_latest),
+		purpose_cy = COALESCE(b.description_cy,b.description_latest),
+		contract_number_cy = COALESCE(b.contract_number_cy, b.contract_number_latest)		
+	FROM tmp_agreement_con_cy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	-- Getting maximum_spending_limit for CY
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_master_cy(disbursement_line_item_id bigint, master_agreement_id_cy bigint, maximum_spending_limit_cy numeric(16,2),  maximum_spending_limit_latest numeric(16,2))
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_master_cy
+	SELECT a.disbursement_line_item_id, a.master_agreement_id_cy,
+	SUM(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_cy ,
+	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_latest
+	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id_cy = b.original_agreement_id AND b.master_agreement_yn = 'Y'
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		GROUP BY 1,2;
+		
+	UPDATE tmp_agreement_con a
+	SET maximum_spending_limit_cy = COALESCE(b.maximum_spending_limit_cy, b.maximum_spending_limit_latest)
+	FROM tmp_agreement_con_master_cy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	RAISE NOTICE 'FMS RF 4';
+	
 	UPDATE disbursement_line_item_details a
-	SET	master_agreement_id = b.master_agreement_id,
-		agreement_id = a.agreement_id,
+	SET	agreement_id = a.agreement_id,
+		master_agreement_id = b.master_agreement_id,		
 		maximum_contract_amount =b.maximum_contract_amount,
 		maximum_spending_limit = b.maximum_spending_limit,
-		purpose = b.description,
-		contract_number = b.contract_number
+		purpose = b.purpose,
+		contract_number = b.contract_number,
+		master_agreement_id_cy = b.master_agreement_id_cy,
+		maximum_contract_amount_cy =b.maximum_contract_amount_cy,
+		maximum_spending_limit_cy = b.maximum_spending_limit_cy,
+		purpose_cy = b.purpose_cy,
+		contract_number_cy = b.contract_number_cy
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
@@ -1136,7 +1245,20 @@ BEGIN
 		
 		
 	 RAISE NOTICE 'FMS 19';
-	 
+	
+	CREATE TEMPORARY TABLE tmp_disbs_line_items_update AS
+	SELECT f.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, b.agency_history_id, b.department_history_id, b.expenditure_object_history_id, b.budget_code_id,	
+		  b.fund_cd, b.rpt_cd, b.chk_amt, b.agreement_id, b.rqporf_actg_ln_no, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id
+	FROM etl.stg_fms_header a, etl.stg_fms_accounting_line b,
+		tmp_all_disbs d,tmp_disbs_lines_actions e,disbursement_line_item f	      	      
+	WHERE  d.action_flag = 'U' AND e.action_flag='U'
+	       AND a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
+	       AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
+	       AND a.uniq_id = d.uniq_id
+	       AND d.disbursement_id = e.disbursement_id AND b.doc_actg_ln_no = e.line_number
+	       AND f.disbursement_id = d.disbursement_id AND f.line_number = e.line_number AND f.disbursement_id = e.disbursement_id
+	DISTRIBUTED BY (disbursement_line_item_id);	
+	
 	UPDATE  disbursement_line_item f
 	SET budget_fiscal_year = b.bfy,
 		fiscal_year = b.fy_dc,
@@ -1153,27 +1275,24 @@ BEGIN
 		agreement_accounting_line_number = b.rqporf_actg_ln_no,
 		location_history_id = b.location_history_id,
 		retainage_amount = b.rtg_ln_am,
-		check_eft_issued_nyc_year_id = a.check_eft_issued_nyc_year_id,
+		check_eft_issued_nyc_year_id = b.check_eft_issued_nyc_year_id,
 		updated_load_id = p_load_id_in,
 		updated_date = now()::timestamp
-	FROM   etl.stg_fms_header a, etl.stg_fms_accounting_line b,
-		tmp_all_disbs d,tmp_disbs_lines_actions e			      	      
-	WHERE  d.action_flag = 'U' AND e.action_flag='U'
-	       AND a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
-	       AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
-	       AND a.uniq_id = d.uniq_id
-	       AND d.disbursement_id = e.disbursement_id AND b.doc_actg_ln_no = e.line_number
-	       AND f.disbursement_id = d.disbursement_id AND f.line_number = e.line_number AND f.disbursement_id = e.disbursement_id ;	
+	FROM   tmp_disbs_line_items_update b			      	      
+	WHERE   f.disbursement_line_item_id = b.disbursement_line_item_id ;	
 	
 	RAISE NOTICE 'FMS 20';	
 
-	IF l_fk_update = 1 THEN
+	/*
+	 IF l_fk_update = 1 THEN
 		l_fk_update := etl.refreshFactsForFMS(p_load_id_in);
 	ELSE
 		RETURN -2;
 	END IF;	
+	*/
 	
 	RETURN 1;
+	
 	
 EXCEPTION
 	WHEN OTHERS THEN
