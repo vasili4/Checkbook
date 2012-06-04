@@ -779,26 +779,30 @@ BEGIN
 		
 	/******************
 	INSERT into revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,
-				revenue_category_id,revenue_source_id,fiscal_year_id,agency_id,
-				department_id,revenue_class_id,fund_class_id,funding_class_id,
-				budget_code_id,budget_fiscal_year_id,agency_name,revenue_category_name,
-				revenue_source_name,budget_fiscal_year,department_name,revenue_class_name,
-				fund_class_name,funding_class_name,agency_short_name,department_short_name,agency_history_id)
+					revenue_category_id,revenue_source_id,fiscal_year_id,agency_id,
+					department_id,revenue_class_id,fund_class_id,funding_class_id,
+					budget_code_id,budget_fiscal_year_id,agency_name,revenue_category_name,
+					revenue_source_name,budget_fiscal_year,department_name,revenue_class_name,
+					fund_class_name,funding_class_name,agency_code,revenue_class_code,fund_class_code,funding_class_code,
+					revenue_category_code,revenue_source_code,agency_short_name,department_short_name,agency_history_id)
 	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,
-		a.revenue_category_id,a.revenue_source_id,d.year_id,b.agency_id,
-		c.department_id,a.revenue_class_id,a.fund_class_id,e.funding_class_id,
-		a.budget_code_id,f.year_id,b.agency_name,g.revenue_category_name,
-		e.revenue_source_name,a.budget_fiscal_year,c.department_name,i.revenue_class_name,
-		j.fund_class_name,k.funding_class_name,b.agency_short_name,c.department_short_name,b.agency_history_id
+			a.revenue_category_id,a.revenue_source_id,d.year_id,b.agency_id,
+			c.department_id,a.revenue_class_id,a.fund_class_id,e.funding_class_id,
+			a.budget_code_id,f.year_id,b.agency_name,g.revenue_category_name,
+			e.revenue_source_name,a.budget_fiscal_year,c.department_name,i.revenue_class_name,
+			j.fund_class_name,k.funding_class_name,l.agency_code,i.revenue_class_code,j.fund_class_code,k.funding_class_code,
+			g.revenue_category_code,e.revenue_source_code,b.agency_short_name,c.department_short_name,b.agency_history_id
 	FROM    revenue a join ref_agency_history b on a.agency_history_id = b.agency_history_id
-		join ref_department_history c on a.department_history_id = c.department_history_id
-		join ref_year d on a.fiscal_year = d.year_value
-		join ref_revenue_source e on a.revenue_source_id = e.revenue_source_id
-		join ref_year f on a.budget_fiscal_year = f.year_value
-		join ref_revenue_category g on a.revenue_category_id = g.revenue_category_id
-		join ref_revenue_class i on a.revenue_class_id = i.revenue_class_id
-		join ref_fund_class j on a.fund_class_id = j.fund_class_id
-		join ref_funding_class k on e.funding_class_id = k.funding_class_id;
+			join ref_department_history c on a.department_history_id = c.department_history_id
+			join ref_year d on a.fiscal_year = d.year_value
+			join ref_revenue_source e on a.revenue_source_id = e.revenue_source_id
+			join ref_year f on a.budget_fiscal_year = f.year_value
+			join ref_revenue_category g on a.revenue_category_id = g.revenue_category_id
+			join ref_revenue_class i on a.revenue_class_id = i.revenue_class_id
+			join ref_fund_class j on a.fund_class_id = j.fund_class_id
+			join ref_funding_class k on e.funding_class_id = k.funding_class_id
+			join ref_agency l on b.agency_id = l.agency_id;
+
 	*********************/
 	RETURN 1;
 	
