@@ -129,38 +129,42 @@ SELECT funding_class_code,name,short_name,category_name,
 from etl.stg_funding_class;
 
 */
-select initializedate('1990-01-01'::date,'2020-12-31'::date);
+select etl.initializedate('1900-01-01'::date,'2020-12-31'::date);
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
-COPY etl.stg_award_method FROM '/home/gpadmin/athiagarajan/NYC/datafiles/AwardMethodFromSQLServer.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_method FROM '/home/gpadmin/athiagarajan/NYC/AwardMethod.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_method(award_method_code,award_method_name,created_date) SELECT  award_method_code,award_method_name,now()::timestamp  FROM etl.stg_award_method;
 
-COPY etl.stg_agreement_type FROM '/home/gpadmin/athiagarajan/NYC/datafiles/AgreementTypeFromSQLServer.csv' DELIMITER AS ',' ;
+COPY etl.stg_agreement_type FROM '/home/gpadmin/athiagarajan/NYC/AgreementType.csv' DELIMITER AS ',' ;
   
 insert into ref_agreement_type(agreement_type_code,agreement_type_name,created_date) SELECT agreement_type_code,name,now()::timestamp from etl.stg_agreement_type;											
 
 
-COPY etl.stg_award_category FROM '/home/gpadmin/athiagarajan/NYC/datafiles/AgreementCategoryFromSQLServer.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_category FROM '/home/gpadmin/athiagarajan/NYC/AgreementCategory.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_category(award_category_code,award_category_name,created_date) SELECT award_category_code, award_method_name,now()::timestamp  from etl.stg_award_category;  
 
 
 INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES ('CT1','General Contract',now()::timestamp),
 										('CTA1', 'Multiple Award Contract',now()::timestamp),
-										('CTA2',NULL,now()::timestamp),
+										('CTA2','Consortium Contract',now()::timestamp),
 										('DO1', 'Delivery Order',now()::timestamp),
 										('MA1', 'Master agreement',now()::timestamp),
 										('MMA1','Multiple Award Master Agreement',now()::timestamp),
 										('RCT1',NULL,now()::timestamp),
 										('MAC1',NULL,now()::timestamp),
-										('POC',NULL,now()::timestamp),
-										('POD',NULL,now()::timestamp),
-										('PCC1',NULL,now()::timestamp),
-										('AD',NULL,now()::timestamp),
-										('EFT',NULL,now()::timestamp);
-
+										('POC','Commodity Purchase Order -Small Purchase',now()::timestamp),
+										('POD','Commodity Purchase Order -Micro Purchase',now()::timestamp),
+										('PCC1','Commodity Purchase Order -Small Purchase Construction',now()::timestamp),
+										('AD','Automated Disbursement',now()::timestamp),
+										('MD1','Manual Disbursement',now()::timestamp),
+										('MD2','Manual Disbursement specific for SCA',now()::timestamp),
+										('OD1','Online Disbursement',now()::timestamp),
+										('OD2','Online Disbursement specific for SCA',now()::timestamp),
+										('EFT','EFT',now()::timestamp),
+										('N/A','N/A (PRIVACY/SECURITY)',now()::timestamp);
 										
 INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values ('JUDGCLAIMS',now()::timestamp),('MISCPAYVEN',now()::timestamp);
 
@@ -182,11 +186,6 @@ INSERT INTO ref_fiscal_period VALUES (1,'July'),
 				      ;
 
 -- Dummy values
-insert into ref_award_status(award_status_id) values (1),(2),(3),(4);
-insert into ref_award_level(award_level_code) values ('1'),('2'),('3');
-insert into ref_procurement_type(procurement_type_id,procurement_type_name) values ('1','Unclassified');
-insert into ref_document_function_code(document_function_code_id) values (1),(2);
-insert into ref_commodity_type (commodity_type_id ) values (1),(2);
 insert into vendor(vendor_id,vendor_customer_code,legal_name) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)');
 insert into vendor_history(vendor_history_id,vendor_id,legal_name) 
 select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
