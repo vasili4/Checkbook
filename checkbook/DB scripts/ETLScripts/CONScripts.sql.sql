@@ -7,6 +7,7 @@ Functions defined
 	updateForeignKeysForCTInAccLine
 	processCONGeneralContracts
 	processCon
+	postProcessContracts
 
 */
 set search_path=etl;
