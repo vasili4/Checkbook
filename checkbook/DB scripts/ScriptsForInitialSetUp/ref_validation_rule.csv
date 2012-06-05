@@ -177,7 +177,7 @@ RY,,,Missing key elements,,,rscat_cd,,,,,1
 RY,,,Duplicate,,,rscat_cd,,,,,2
 RC,,,Missing key elements,,,rscls_cd,,,,,1
 RC,,,Duplicate,,,rscls_cd,,,,,2
-RS,,,Missing key elements,,,rsrc_cd,,,,,1
+RS,,,Missing key elements,,,"rsrc_cd,fy",,,,,1
 RS,,,Duplicate,,,"rsrc_cd,fy",,,,,2
 BC,,,Missing key elements,,,"func_cd,fy,fcls_cd,dept_cd",,,,,1
 BC,,,Duplicate,,,"func_cd,fy,fcls_cd,dept_cd",,,,,2
