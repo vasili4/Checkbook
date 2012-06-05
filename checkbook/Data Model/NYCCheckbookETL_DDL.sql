@@ -41,6 +41,7 @@ create sequence seq_stg_budget_code_uniq_id;
 create sequence seq_etl_job_id;
 create sequence seq_stg_pms_uniq_id;
 create sequence seq_stg_revenue_budget_uniq_id;
+create sequence seq_stg_funding_class_uniq_id;
 
 CREATE TABLE ref_data_source (
     data_source_code varchar(2),
@@ -834,6 +835,63 @@ CREATE TABLE etl.ref_budget_code_id_seq
 
 
 DISTRIBUTED BY (uniq_id);
+
+
+
+CREATE EXTERNAL table etl.ext_stg_funding_class
+(
+fy varchar,
+funding_class_code varchar,
+name varchar,
+short_name varchar,
+category_name varchar,
+cty_fund_fl varchar,
+intr_cty_fl varchar,
+fund_aloc_req_fl varchar,
+tbl_last_dt varchar,
+ams_row_vers_no varchar,
+rsfcls_nm_up varchar,
+fund_category varchar
+)location
+(
+'gpfdist://mdw1:8081/datafiles/COA_funding_class_feed.txt'
+)
+FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
+encoding 'utf8';
+
+CREATE TABLE etl.stg_funding_class 
+(fy int,
+ funding_class_code varchar(5),
+ name varchar(52),
+ short_name varchar(50),
+ category_name varchar(52),
+ cty_fund_fl varchar,
+ intr_cty_fl varchar,
+ fund_aloc_req_fl varchar,
+ tbl_last_dt varchar(20),
+ ams_row_vers_no char(1),
+ rsfcls_nm_up  varchar(52),
+ fund_category  varchar(50),
+ uniq_id bigint DEFAULT nextval('etl.seq_stg_funding_class_uniq_id'::regclass),
+ invalid_flag character(1),
+ invalid_reason character varying
+)
+WITH (
+  OIDS=FALSE
+)
+DISTRIBUTED BY (uniq_id);
+ALTER TABLE etl.stg_funding_class
+  OWNER TO gpadmin;
+
+
+
+CREATE TABLE etl.archive_funding_class (LIKE etl.stg_funding_class)DISTRIBUTED BY (uniq_id);
+ALTER TABLE etl.archive_funding_class ADD COLUMN load_file_id bigint;
+
+
+CREATE TABLE etl.invalid_funding_class (LIKE etl.archive_funding_class) DISTRIBUTED BY (uniq_id);
+
+
 
 -- End of COA related tables
  
