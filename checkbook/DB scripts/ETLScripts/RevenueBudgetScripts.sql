@@ -305,19 +305,55 @@ BEGIN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'RB',l_count,'# of records updated in revenue budget ');
 	
+	
+	-To popluate revenue_category_id,code and name
+	CREATE TEMPORARY TABLE tmp_revenue_category(uniq_id int,revenue_source_id int,revenue_category_id smallint,revenue_category_code varchar,revenue_category_name varchar) 
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_revenue_category 
+	SELECT a.uniq_id,a.revenue_source_id,b.revenue_category_id,c.revenue_category_code,c.revenue_category_name  
+	FROM etl.stg_revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id 
+	                              JOIN ref_revenue_category c ON b.revenue_category_id = c.revenue_category_id;
+	
+	
+	--To populate funding_class_id,code and name
+	CREATE TEMPORARY TABLE tmp_funding_class(uniq_id int,revenue_source_id int,funding_class_id smallint,funding_class_code varchar,funding_class_name varchar)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_funding_class 
+	SELECT a.uniq_id,a.revenue_source_id,b.funding_class_id,c.funding_class_code,c.funding_class_name 
+	FROM etl.stg_revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id 
+				      JOIN ref_funding_class c ON b.funding_class_id = c.funding_class_id;
+	
+	
+	--To pouplate budget_code_name
+	
+	CREATE TEMPORARY TABLE tmp_budget_code(uniq_id int,budget_code varchar,budget_code_name varchar)
+		DISTRIBUTED BY (uniq_id);
+		
+		INSERT INTO tmp_budget_code
+		SELECT a.uniq_id,a.budget_code,b.budget_code_name
+	FROM etl.stg_revenue_budget a JOIN ref_budget_code b ON a.budget_code_id = b.budget_code_id ;
+	
+	
+	
 	INSERT INTO revenue_budget(budget_fiscal_year, fund_class_id, agency_history_id,  budget_code_id, 
 			    adopted_amount, current_modified_budget_amount,   
 			  created_load_id,created_date,budget_fiscal_year_id,agency_id,
 			   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
-			   agency_short_name)
-	SELECT budget_fiscal_year, fund_class_id, agency_history_id, budget_code_id, 
-		 adopted_amount, current_budget_amount, 
-		 p_load_id_in,now()::timestamp,budget_fiscal_year_id,agency_id,
-		agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
-		agency_short_name
-	FROM  etl.stg_revenue_budget 
-	WHERE action_flag = 'I' AND budget_id IS NULL;		
-
+			   agency_short_name,revenue_category_id,revenue_category_code,revenue_category_name,
+			   funding_class_id.funding_class_code,funding_class_name,budget_code_name)				      
+	   SELECT a.budget_fiscal_year, a.fund_class_id, a.agency_history_id, a.budget_code_id, 
+					 a.adopted_amount, a.current_budget_amount, 
+					 p_load_id_in,now()::timestamp,a.budget_fiscal_year_id,a.agency_id,
+					a.agency_name,a.budget_code,a.agency_code,a.revenue_source_code,a.revenue_source_name,a.revenue_source_id,
+					a.agency_short_name,b.revenue_category_id,b.revenue_category_code,b.revenue_category_name,
+					c.funding_class_id,c.funding_class_code,c.funding_class_name,budget_code_name
+	   FROM  etl.stg_revenue_budget a JOIN tmp_revenue_category b ON a.uniq_id = b.uniq_id
+		          		  JOIN tmp_funding_class c ON a.uniq_id = c.uniq_id
+		          		  JOIN tmp_budget_code d on a.uniq_id = d.uniq_id
+	   WHERE a.action_flag = 'I' AND a.budget_id IS NULL;		
+   
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted in revenue_budget ');
