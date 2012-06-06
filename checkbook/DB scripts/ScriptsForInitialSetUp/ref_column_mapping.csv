@@ -978,7 +978,7 @@ etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_po_vendor,doc_vers_no,int,
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_po_vendor,doc_vend_ln_no,int,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_po_vendor,vend_cust_cd,varchar,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_po_vendor,lgl_nm,varchar,8
-etl.ext_stg_con_data_feed,col9,varchar,etl.stg_con_po_vendor,vend_cust_alias_nm,varchar,9
+etl.ext_stg_con_data_feed,col9,varchar,etl.stg_con_po_vendor,alias_nm,varchar,9
 etl.ext_stg_con_data_feed,col10,varchar,etl.stg_con_po_vendor,ad_id,varchar,10
 etl.ext_stg_con_data_feed,col11,varchar,etl.stg_con_po_vendor,ad_ln_1,varchar,11
 etl.ext_stg_con_data_feed,col12,varchar,etl.stg_con_po_vendor,ad_ln_2,varchar,12
