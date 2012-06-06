@@ -18,10 +18,10 @@ DECLARE
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	
-	CREATE TEMPORARY TABLE tmp_fk_values (uniq_id bigint, document_code_id smallint,agency_history_id smallint,record_date_id smallint,
-					      effective_begin_date_id smallint,effective_end_date_id smallint,source_created_date_id smallint,
-					      source_updated_date_id smallint,registered_date_id smallint, original_term_begin_date_id smallint,
-					      original_term_end_date_id smallint,registered_fiscal_year smallint,registered_fiscal_year_id smallint, registered_calendar_year smallint,
+	CREATE TEMPORARY TABLE tmp_fk_values (uniq_id bigint, document_code_id smallint,agency_history_id smallint,record_date_id int,
+					      effective_begin_date_id int,effective_end_date_id int,source_created_date_id int,
+					      source_updated_date_id int,registered_date_id int, original_term_begin_date_id int,
+					      original_term_end_date_id int,registered_fiscal_year smallint,registered_fiscal_year_id smallint, registered_calendar_year smallint,
 					      registered_calendar_year_id smallint,effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id smallint, effective_begin_calendar_year smallint,
 					      effective_begin_calendar_year_id smallint,effective_end_fiscal_year smallint,effective_end_fiscal_year_id smallint, effective_end_calendar_year smallint,
 					      effective_end_calendar_year_id smallint,source_updated_fiscal_year smallint,source_updated_calendar_year smallint,source_updated_calendar_year_id smallint,
@@ -1077,18 +1077,19 @@ BEGIN
 	RAISE NOTICE '6';
 	-- Identify the agreement accounting lines which need to be deleted/updated
 
-	CREATE TEMPORARY TABLE tmp_acc_lines_actions(agreement_id bigint, commodity_line_number integer,line_number integer,action_flag char(1))
+	CREATE TEMPORARY TABLE tmp_acc_lines_actions(agreement_id bigint, commodity_line_number integer,line_number integer,action_flag char(1),uniq_id bigint)
 	DISTRIBUTED BY (agreement_id);
 	
 	INSERT INTO tmp_acc_lines_actions
 	SELECT  COALESCE(latest_tbl.agreement_id,old_tbl.agreement_id) as agreement_id,
 		COALESCE(latest_tbl.doc_comm_ln_no, old_tbl.commodity_line_number) as commodity_line_number,
 		COALESCE(latest_tbl.doc_actg_ln_no, old_tbl.line_number) as line_number,
-		(CASE WHEN latest_tbl.agreement_id = old_tbl.agreement_id AND latest_tbl.doc_actg_ln_no = old_tbl.line_number THEN 'U'
-		      WHEN latest_tbl.agreement_id IS NOT NULL AND old_tbl.line_number IS NULL THEN 'I'
-		      WHEN latest_tbl.agreement_id IS NULL AND old_tbl.line_number IS NOT NULL THEN 'D' END) as action_flag	
+		(CASE WHEN latest_tbl.agreement_id = old_tbl.agreement_id THEN 'U'
+		      WHEN old_tbl.agreement_id IS NULL THEN 'I'
+		      WHEN latest_tbl.agreement_id IS NULL THEN 'D' END) as action_flag	,
+		      uniq_id
 	FROM	      
-		(SELECT a.agreement_id,c.doc_comm_ln_no,c.doc_actg_ln_no
+		(SELECT a.agreement_id,c.doc_comm_ln_no,c.doc_actg_ln_no,c.uniq_id
 		FROM   tmp_ct_con a JOIN etl.stg_con_ct_header b ON a.uniq_id = b.uniq_id
 			JOIN etl.stg_con_ct_accounting_line c ON c.doc_cd = b.doc_cd AND c.doc_dept_cd = b.doc_dept_cd 
 						     AND c.doc_id = b.doc_id AND c.doc_vers_no = b.doc_vers_no
@@ -1161,7 +1162,7 @@ BEGIN
 	       AND a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 	       AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 	       AND a.uniq_id = d.uniq_id
-	       AND d.agreement_id = e.agreement_id AND b.doc_actg_ln_no = e.line_number
+	       AND d.agreement_id = e.agreement_id AND b.uniq_id = e.uniq_id
 	       AND f.agreement_id = d.agreement_id AND f.line_number = e.line_number AND f.agreement_id = e.agreement_id AND f.commodity_line_number = e.commodity_line_number;	       
 
 	RAISE NOTICE '11';
