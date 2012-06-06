@@ -10,9 +10,9 @@ Functions defined
 	postProcessContracts
 
 */
-set search_path=etl;
+set search_path=public;
 
-CREATE OR REPLACE FUNCTION updateForeignKeysForCTInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForCTInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 	l_count smallint;
 BEGIN
@@ -232,7 +232,7 @@ $$ language plpgsql;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION updateForeignKeysForCTInAwardDetail() RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateForeignKeysForCTInAwardDetail() RETURNS INT AS $$
 DECLARE
 BEGIN
 	-- UPDATING FK VALUES IN AWARD DETAIL
@@ -318,7 +318,7 @@ END;
 $$ language plpgsql;
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION associateMAGToCT(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.associateMAGToCT(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 	l_worksite_col_array VARCHAR ARRAY[10];
 	l_array_ctr smallint;
