@@ -15,14 +15,14 @@ DECLARE
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	
-	CREATE TEMPORARY TABLE tmp_fk_values (uniq_id bigint, document_code_id smallint,agency_history_id smallint,record_date_id smallint,
-					      effective_begin_date_id smallint,effective_end_date_id smallint,source_created_date_id smallint,
-					      source_updated_date_id smallint,registered_date_id smallint, original_term_begin_date_id smallint,
-					      original_term_end_date_id smallint,registered_fiscal_year smallint,registered_fiscal_year_id smallint, registered_calendar_year smallint,
+	CREATE TEMPORARY TABLE tmp_fk_values (uniq_id bigint, document_code_id smallint,agency_history_id smallint,record_date_id int,
+					      effective_begin_date_id int,effective_end_date_id int,source_created_date_id int,
+					      source_updated_date_id int,registered_date_id int, original_term_begin_date_id int,
+					      original_term_end_date_id int,registered_fiscal_year smallint,registered_fiscal_year_id smallint, registered_calendar_year smallint,
 					      registered_calendar_year_id smallint,effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id smallint, effective_begin_calendar_year smallint,
 					      effective_begin_calendar_year_id smallint,effective_end_fiscal_year smallint,effective_end_fiscal_year_id smallint, effective_end_calendar_year smallint,
 					      effective_end_calendar_year_id smallint,source_updated_fiscal_year smallint,source_updated_calendar_year smallint,source_updated_calendar_year_id smallint,
-					      source_updated_fiscal_year_id smallint, board_approved_award_date_id smallint)
+					      source_updated_fiscal_year_id smallint, board_approved_award_date_id int)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:Document_Code_id
@@ -463,7 +463,7 @@ BEGIN
 		a.doc_fy_dc,a.doc_per_dc,a.doc_dscr,
 		a.doc_actu_am,a.ord_tot_am,a.ma_prch_lmt_am,
 		0 as replacing_master_agreement_id,0 as replaced_by_master_agreement_id,
-		a.award_status_id,a.prcu_id,a.prcu_typ_id,
+		a.cntrc_sta,a.prcu_id,a.prcu_typ_id,
 		a.effective_begin_date_id,a.effective_end_date_id,a.reas_mod_dc,
 		a.source_created_date_id,a.source_updated_date_id,a.doc_func_cd,
 		c.award_method_id,c.awd_lvl_cd,c.agreement_type_id,
@@ -847,11 +847,11 @@ BEGIN
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
-	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year
-	        		      ELSE b.effective_end_fiscal_year END),
+	        		      WHEN a.effective_end_fiscal_year < a.starting_year THEN a.starting_year
+	        		      ELSE a.effective_end_fiscal_year END),
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
-	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
-	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
+	        		      WHEN a.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
+	        		      ELSE a.effective_end_fiscal_year_id END),b.contract_number,
 	        b.original_contract_amount,b.maximum_spending_limit,b.description,
 		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),
 		b.maximum_spending_limit - b.original_contract_amount ,
