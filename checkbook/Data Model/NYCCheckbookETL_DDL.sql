@@ -3267,14 +3267,14 @@ CREATE EXTERNAL TABLE etl.ext_stg_budget_feed
   accrued_expense_amount  character varying(60),
   cash_expense_amount  character varying(60),
   post_closing_adjustment_amount character varying(60),
-  updated_date character varying(60)
+  updated_date character varying(60),
+  col15 character varying
 )
  LOCATION (
     'gpfdist://mdw1:8081/datafiles/BUDGET_feed.txt'
 )
  FORMAT 'text' (delimiter '|' null E'\\N' escape '~' fill missing fields)
 ENCODING 'UTF8';
-
 
 CREATE TABLE etl.stg_budget
 (
@@ -3310,7 +3310,10 @@ CREATE TABLE etl.stg_budget
   department_name varchar,
   uniq_id bigint DEFAULT nextval('etl.seq_stg_budget_uniq_id'::regclass),
   invalid_flag character(1),
-  invalid_reason character varying
+  invalid_reason character varying,
+  agency_short_name character varying,
+  department_short_name character varying,
+  budget_code_name character varying
 )
 DISTRIBUTED BY (uniq_id);
 
