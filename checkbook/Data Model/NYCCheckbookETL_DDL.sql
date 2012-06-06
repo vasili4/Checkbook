@@ -294,7 +294,8 @@ ALW_BUD_FL character varying,
 RSCLS_DSCR character varying,
 CNTAC_CD character varying,
 RSCLS_NM_UP character varying,
-TBL_LAST_DT character varying
+TBL_LAST_DT character varying,
+col13 varchar
 )location 
 (
 'gpfdist://mdw1:8081/datafiles/COA_revenue_class_feed.txt'
