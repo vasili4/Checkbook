@@ -10,7 +10,7 @@ Functions defined
 	postProcessContracts
 
 */
-set search_path=public;
+
 
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForCTInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
@@ -473,6 +473,12 @@ BEGIN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 		VALUES(p_load_file_id_in,'C',l_count, 'New fund class records inserted from general contracts accounting lines');	
 	END IF;	
+	
+	INSERT INTO tmp_fk_values_do1_acc_line(uniq_id,fund_class_id)
+	SELECT	a.uniq_id, b.fund_class_id 
+	FROM etl.stg_con_ct_accounting_line a JOIN ref_fund_class b ON COALESCE(a.fund_cd,'---') = b.fund_class_code
+		JOIN etl.ref_fund_class_id_seq c ON c.fund_class_id = b.fund_class_id
+	GROUP BY 1	;	
 	
 	-- FK:agency_history_id
 
@@ -1051,6 +1057,13 @@ BEGIN
 	FROM	tmp_con_ct_update b
 	WHERE	a.agreement_id = b.agreement_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
+		VALUES(p_load_file_id_in,'C','CT1',l_count,'# of General Contracts updated in history_agreement');
+	END IF;
+	
 	RAISE NOTICE '5';
 	
 	-- Agreement line changes
@@ -1122,12 +1135,13 @@ BEGIN
 	WHERE   d.action_flag = 'U' AND e.action_flag='I';
 	
 	RAISE NOTICE '8';
-	/* TO DO
+	
 	INSERT INTO deleted_agreement_accounting_line
 	SELECT a.*,now()::timestamp, p_load_id_in as deleted_load_id
 	FROM   history_agreement_accounting_line a JOIN tmp_acc_lines_actions b  ON a.agreement_id = b.agreement_id AND a.line_number = b.line_number
-	WHERE	b.action_flag = 'D';
-	*/
+		JOIN tmp_ct_con c ON a.agreement_id = c.agreement_id
+	WHERE	b.action_flag = 'D' AND c.action_flag='U';
+	
 	RAISE NOTICE '9';
 	
 	DELETE FROM ONLY history_agreement_accounting_line a 
@@ -1308,19 +1322,29 @@ BEGIN
 	
 	-- Updating the original flag for non first agreements 
 	
+	CREATE TEMPORARY TABLE tmp_agreements_update(agreement_id bigint,first_agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_agreements_update
+	SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
+		first_agreement_id
+		FROM	tmp_agreement_flag_changes;
+		
 	UPDATE history_agreement a 
 	SET    original_version_flag = 'N',
 		original_agreement_id = b.first_agreement_id
-	FROM   (SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
-		first_agreement_id
-		FROM	tmp_agreement_flag_changes ) b
+	FROM   tmp_agreements_update b
 	WHERE  a.agreement_id = b.agreement_id;
 		
+	TRUNCATE tmp_agreements_update;
 	
+	INSERT INTO tmp_agreements_update
+	SELECT unnest(string_to_array(non_latest_agreement_id,','))::int as agreement_id , NULL as first_agreement_id
+		FROM	tmp_agreement_flag_changes;
+		
 	UPDATE history_agreement a 
 	SET    latest_flag = 'N'
-	FROM   (SELECT unnest(string_to_array(non_latest_agreement_id,','))::int as agreement_id 
-		FROM	tmp_agreement_flag_changes ) b
+	FROM   tmp_agreements_update b
 	WHERE  a.agreement_id = b.agreement_id
 		AND a.latest_flag = 'Y';	
 	
@@ -1465,7 +1489,7 @@ BEGIN
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
-		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
+		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		'N' as master_agreement_yn
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
@@ -1481,7 +1505,7 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
 
-		RETURN 1;
+		
 					
 	/* End of one time changes */
 	
@@ -1536,7 +1560,7 @@ BEGIN
 	WHERE	year_value = 2010
 		AND starting_year > 2010
 		AND rank_value = 1
-		AND registered_calendar_year <= 2010;
+		AND registered_fiscal_year <= 2010;
 
 	-- Updating the ending year to be ending year - 1 
 	-- Until this step ending year of a record is equivalent to the staring year of the sucessor. So -1 should be done to ensure no overlapping
@@ -1580,7 +1604,7 @@ BEGIN
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
-		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,b.original_version_flag,
+		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		'N' as master_agreement_yn
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
