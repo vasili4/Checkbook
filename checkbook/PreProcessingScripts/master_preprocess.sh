@@ -62,6 +62,8 @@ elif [ $1 == "PMS" ] ; then
 	
 elif [ $1 == "PendingContracts" ] ; then
 	./removeMalformedPendingContracts.sh $fileName
+elif [ $1 == "FMSV" ] ; then
+	./removeMalformedBusinessTypeRecords.sh $fileName
 	
 fi
 
