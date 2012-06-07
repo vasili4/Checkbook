@@ -23,7 +23,7 @@ BEGIN
 	
 		INSERT INTO ref_year(year_value)
 		SELECT s.a as year_value
-		FROM GENERATE_SERIES(EXTRACT(year from p_start_date_in)::int,EXTRACT(year from p_end_date_in)::int,1) as s(a);
+		FROM GENERATE_SERIES(EXTRACT(year from p_start_date_in)::int,(EXTRACT(year from p_end_date_in)::int)+1,1) as s(a);
 		
 		INSERT INTO ref_month(month_value, month_name,year_id)
 		SELECT EXTRACT(month from p_start_date_in) + series_month.month as month_value,
@@ -129,7 +129,7 @@ SELECT funding_class_code,name,short_name,category_name,
 from etl.stg_funding_class;
 
 */
-select etl.initializedate('1900-01-01'::date,'2020-12-31'::date);
+select etl.initializedate('1900-01-01'::date,'2200-12-31'::date);
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
