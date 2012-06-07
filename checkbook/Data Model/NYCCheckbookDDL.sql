@@ -712,7 +712,7 @@ CREATE TABLE history_master_agreement
   source_updated_calendar_year_id smallint,
   contract_number character varying,
   original_master_agreement_id bigint,
-  originial_version_flag character(1),
+  original_version_flag character(1),
   latest_flag character(1),
   privacy_flag character(1),
   created_load_id integer,
@@ -1560,3 +1560,6 @@ DISTRIBUTED BY (fiscal_year_id);
 
 	
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
+
+CREATE TABLE deleted_agreement_accounting_line (LIKE history_agreement_accounting_line) DISTRIBUTED BY (agreement_id);
+ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp, ADD COLUMN deleted_load_id bigint;
