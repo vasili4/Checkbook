@@ -683,7 +683,7 @@ BEGIN
 			l_processed := etl.processCOAObjectClass(p_load_file_id_in,l_load_id);	
 
 		ELSIF 	l_data_source_code ='V' THEN
-			l_processed := etl.processFMSVVendor(p_load_file_id_in,l_load_id);	
+			l_processed := etl.processFMSVVendorBusType(p_load_file_id_in,l_load_id);	
 
 		ELSIF 	l_data_source_code ='M' THEN
 			l_processed := etl.processMAG(p_load_file_id_in,l_load_id);
