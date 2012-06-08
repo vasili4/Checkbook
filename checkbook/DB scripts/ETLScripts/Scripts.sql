@@ -713,6 +713,12 @@ BEGIN
 		ELSIF 	l_data_source_code ='R' THEN
 			l_processed := etl.processrevenue(p_load_file_id_in,l_load_id);	
 			
+		ELSIF 	l_data_source_code ='FC' THEN
+			l_processed := etl.processfundingclass(p_load_file_id_in,l_load_id);	
+		
+		ELSIF 	l_data_source_code ='RB' THEN
+			l_processed := etl.processrevenuebudget(p_load_file_id_in,l_load_id);	
+			
 		END IF;
 
 	-- Updating the processed flag to Y to indicate that the data is posted to the transaction table.
