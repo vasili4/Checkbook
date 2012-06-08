@@ -3757,6 +3757,20 @@ ALTER TABLE etl.archive_revenue_budget ADD COLUMN load_file_id bigint;
 CREATE TABLE etl.invalid_revenue_budget (LIKE etl.archive_revenue_budget) DISTRIBUTED BY (uniq_id);
 
 
+
+CREATE TABLE etl.ref_revenue_budget_code_id_seq
+(
+  uniq_id bigint,
+ 
+ budget_code_id integer DEFAULT nextval('seq_revenue_budget_revenue_budget_id'::regclass)
+
+)
+
+DISTRIBUTED BY (uniq_id);
+
+
+
+
 --------------------------------------------------------------------------------------------------------------------------------
 /* Reference tables from SQL server */
 
