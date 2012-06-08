@@ -1,5 +1,3 @@
-
-
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Function: etl.updateforeignkeysforrevenuebudget(bigint)
@@ -18,8 +16,8 @@ $BODY$
   	
   	CREATE TEMPORARY TABLE tmp_fk_revenue_budget_values (uniq_id bigint, fund_class_id smallint, agency_history_id smallint, 
   						     budget_code_id integer,revenue_source_id integer,updated_date_id smallint,
-  						     budget_fiscal_year_id smallint,agency_id smallint,
-  						     agency_name varchar,budget_code varchar, budget_code_name varchar,revenue_source_name varchar,
+  						     budget_fiscal_year_id smallint,agency_id smallint,agency_name varchar,
+						     budget_code varchar, budget_code_name varchar,revenue_source_name varchar,
   						     agency_code varchar,revenue_source_code varchar,agency_short_name varchar)
   	DISTRIBUTED BY (uniq_id);
   	
