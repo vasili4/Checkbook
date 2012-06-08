@@ -202,6 +202,7 @@ COPY  etl.trends_capital_projects_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_
 
  -- 5)            Below are the commands to populate the data from trends_capital_projects_temp to trends_capital_projects table.
 
+
 INSERT INTO trends_capital_projects (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from etl.trends_capital_projects_temp;
 INSERT INTO trends_capital_projects (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from etl.trends_capital_projects_temp;
 INSERT INTO trends_capital_projects (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from etl.trends_capital_projects_temp;
