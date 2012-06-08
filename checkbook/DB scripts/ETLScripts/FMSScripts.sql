@@ -152,6 +152,11 @@ DECLARE
 BEGIN
 	-- UPDATING FK VALUES IN ETL.STG_FMS_ACCOUNTING_LINE
 	
+	UPDATE etl.stg_fms_accounting_line 
+	SET loc_cd = NULL
+	WHERE loc_cd = '';
+	
+	
 	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line(uniq_id bigint,fund_class_id smallint,agency_history_id smallint,
 							department_history_id int, expenditure_object_history_id integer,budget_code_id integer,
 							fund_id smallint, location_history_id int, masked_agency_history_id smallint, masked_department_history_id int)
@@ -453,7 +458,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,location_history_id)
 	SELECT	a.uniq_id, max(c.location_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_location b ON a.loc_cd = b.location_code
+	FROM etl.stg_fms_accounting_line a JOIN ref_location b ON COALESCE(a.loc_cd,'----') = COALESCE(b.location_code,'----') 
 		JOIN ref_location_history c ON b.location_id = c.location_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 	GROUP BY 1	;	
@@ -525,7 +530,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,location_history_id)
 	SELECT	a.uniq_id, max(c.location_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_location b ON COALESCE(a.loc_cd,'----') = b.location_code OR (a.loc_cd ='' AND b.location_code='----')
+	FROM etl.stg_fms_accounting_line a JOIN ref_location b ON COALESCE(a.loc_cd,'----') = COALESCE(b.location_code,'----') 
 		JOIN ref_location_history c ON b.location_id = c.location_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 		JOIN etl.ref_location_history_id_seq f ON c.location_history_id = f.location_history_id
@@ -1157,7 +1162,7 @@ BEGIN
 		a.bfy,a.fy_dc,a.per_dc,
 		a.fund_class_id,a.agency_history_id,a.department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
-		a.rpt_cd,a.chk_amt,a.agreement_id,
+		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as check_amount,a.agreement_id,
 		a.rqporf_actg_ln_no,a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
 		p_load_id_in, now()::timestamp
 	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
@@ -1207,7 +1212,7 @@ BEGIN
 		a.bfy,a.fy_dc,a.per_dc,
 		a.fund_class_id,a.agency_history_id,a.department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
-		a.rpt_cd,a.chk_amt,a.agreement_id,
+		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as chk_amt,a.agreement_id,
 		a.rqporf_actg_ln_no,a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
 		p_load_id_in, now()::timestamp
 	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
@@ -1239,7 +1244,7 @@ BEGIN
 	
         CREATE TEMPORARY TABLE tmp_disbs_line_items_update AS
                 SELECT e.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, b.agency_history_id, b.department_history_id, b.expenditure_object_history_id, b.budget_code_id,             
-                                  b.fund_cd, b.rpt_cd, b.chk_amt, b.agreement_id, b.rqporf_actg_ln_no, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id
+                                  b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id
                 FROM etl.stg_fms_header a, etl.stg_fms_accounting_line b,
                                 tmp_all_disbs d,tmp_disbs_lines_actions e
                 WHERE  d.action_flag = 'U' AND e.action_flag='U'
