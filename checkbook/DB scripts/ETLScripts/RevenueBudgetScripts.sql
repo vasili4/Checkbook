@@ -37,7 +37,7 @@ $BODY$
   		max(c.agency_name) as agency_name,b.agency_code,b.agency_short_name
   	FROM etl.stg_revenue_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
   		JOIN ref_agency_history c ON b.agency_id = c.agency_id
-  	GROUP BY 1,5;
+  	GROUP BY 1,5,6;
 
   	CREATE TEMPORARY TABLE tmp_fk_bdgt_values_new_agencies(dept_cd varchar,uniq_id bigint)
   	DISTRIBUTED BY (uniq_id);
@@ -216,7 +216,8 @@ $BODY$
   				 max(agency_name) as agency_name,
 				 max(revenue_source_name) as revenue_source_name,
   				 max(budget_code_name) as budget_code_name,
-  				 max(revenue_source_id) as revenue_source_id
+  				 max(revenue_source_id) as revenue_source_id,
+  				 max(agency_short_name) as agency_short_name
   				 FROM	tmp_fk_revenue_budget_values
   		 GROUP BY 1) ct_table
   	WHERE	a.uniq_id = ct_table.uniq_id;	
@@ -253,7 +254,7 @@ BEGIN
 
 	l_fk_update := etl.updateForeignKeysForRevenueBudget(p_load_id_in);
 
-
+	
 	RAISE NOTICE 'REVENUE BUDGET 1';
 
 	UPDATE etl.stg_revenue_budget 
@@ -272,7 +273,9 @@ BEGIN
 		AND a.revenue_source_id = b.revenue_source_id
 		AND a.budget_code_id = b.budget_code_id 
 		AND a.agency_id = b.agency_id;
-		
+
+Raise NOTICE 'Revenue Budget 1.1';
+			
 	UPDATE etl.stg_revenue_budget a
 	SET	action_flag = b.action_flag,
 		budget_id = b.budget_id
@@ -339,13 +342,15 @@ BEGIN
 	
 	INSERT INTO revenue_budget(budget_fiscal_year, fund_class_id, agency_history_id,  budget_code_id, 
 			    adopted_amount, current_modified_budget_amount,   
-			  created_load_id,created_date,budget_fiscal_year_id,agency_id,
+			 created_load_id,created_date,
+			 budget_fiscal_year_id,agency_id,
 			   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
 			   agency_short_name,revenue_category_id,revenue_category_code,revenue_category_name,
-			   funding_class_id.funding_class_code,funding_class_name,budget_code_name)				      
+			   funding_class_id,funding_class_code,funding_class_name,budget_code_name)				      
 	   SELECT a.budget_fiscal_year, a.fund_class_id, a.agency_history_id, a.budget_code_id, 
 					 a.adopted_amount, a.current_budget_amount, 
-					 p_load_id_in,now()::timestamp,a.budget_fiscal_year_id,a.agency_id,
+					 p_load_id_in,now()::timestamp,
+					 a.budget_fiscal_year_id,a.agency_id,
 					a.agency_name,a.budget_code,a.agency_code,a.revenue_source_code,a.revenue_source_name,a.revenue_source_id,
 					a.agency_short_name,b.revenue_category_id,b.revenue_category_code,b.revenue_category_name,
 					c.funding_class_id,c.funding_class_code,c.funding_class_name,budget_code_name
