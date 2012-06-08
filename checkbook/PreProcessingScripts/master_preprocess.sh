@@ -65,6 +65,9 @@ elif [ $1 == "PendingContracts" ] ; then
 elif [ $1 == "FMSV" ] ; then
 	./removeMalformedBusinessTypeRecords.sh $fileName
 	
+elif [ $1 == "RevenueBudget" ] ; then
+	./removeMalformedRevenueBudgetRecords.sh $fileName
+
 fi
 
 if ! [ -f "goodfile.txt" ]; then
