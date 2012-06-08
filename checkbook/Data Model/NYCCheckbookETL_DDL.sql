@@ -3737,7 +3737,8 @@ CREATE TABLE etl.stg_revenue_budget
   uniq_id bigint DEFAULT nextval('etl.seq_stg_revenue_budget_uniq_id'::regclass),
   invalid_flag character(1),
   invalid_reason character varying,
-  revenue_source_id int
+  revenue_source_id int,
+  agency_short_name int
 )
 WITH (
   OIDS=FALSE
