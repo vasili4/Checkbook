@@ -306,7 +306,7 @@ BEGIN
 	VALUES(p_load_file_id_in,'RB',l_count,'# of records updated in revenue budget ');
 	
 	
-	-To popluate revenue_category_id,code and name
+	--To popluate revenue_category_id,code and name
 	CREATE TEMPORARY TABLE tmp_revenue_category(uniq_id int,revenue_source_id int,revenue_category_id smallint,revenue_category_code varchar,revenue_category_name varchar) 
 	DISTRIBUTED BY (uniq_id);
 	
