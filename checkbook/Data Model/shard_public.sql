@@ -1738,9 +1738,6 @@ DISTRIBUTED BY (agency_id);
 
 
 
-
-
-
 CREATE TABLE revenue_budget
 (
   budget_id integer,
@@ -1762,7 +1759,15 @@ CREATE TABLE revenue_budget
   created_date timestamp without time zone,
   updated_date timestamp without time zone,
   budget_fiscal_year_id smallint,
-  agency_short_name varchar(15)
+  agency_short_name varchar(15),
+  revenue_category_id character varying,
+  revenue_category_code character varying,
+  revenue_category_name character varying,
+  funding_class_id smallint,
+  funding_class_code character varying,
+  funding_class_name character varying,
+  budget_code_name character varying
+
 )
 DISTRIBUTED BY (budget_id);
 
