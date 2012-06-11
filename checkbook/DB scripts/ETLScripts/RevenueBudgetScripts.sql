@@ -104,7 +104,7 @@ $BODY$
   	-- FK:budget_code_id
 
   	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,budget_code_id,budget_code,budget_code_name)
-  	SELECT	a.uniq_id, b.budget_code_id as budget_code_id,b.budget_code,b.budget_code_name
+  	SELECT	a.uniq_id, b.budget_code_id as budget_code_id,b.budget_code,b.attribute_name
   	FROM etl.stg_revenue_budget a JOIN ref_budget_code b ON a.budget_code = b.budget_code and a.budget_fiscal_year = b.fiscal_year
   		JOIN ref_agency d ON a.agency_code = d.agency_code AND b.agency_id = d.agency_id
   		JOIN ref_fund_class e ON a.fund_class_code = e.fund_class_code AND e.fund_class_id = b.fund_class_id;
@@ -133,10 +133,10 @@ $BODY$
   	
   
   	INSERT INTO ref_budget_code( budget_code_id,fiscal_year,budget_code,agency_id,
-  				     fund_class_id,budget_code_name, 
+  				     fund_class_id,attribute_name, 
   				     created_date,load_id)
   	SELECT  a.budget_code_id,b.budget_fiscal_year,b.budget_code,agency_id,
-  		fund_class_id,'<Unknown Budget Code>',
+  		fund_class_id,'<Unknown>',
   		now()::timestamp,p_load_id_in
   	FROM	etl.ref_budget_code_id_seq a JOIN tmp_fk_values_bdgt_new_budget_code b ON a.uniq_id = b.uniq_id;
   	
@@ -327,15 +327,7 @@ Raise NOTICE 'Revenue Budget 1.1';
 				      JOIN ref_funding_class c ON b.funding_class_id = c.funding_class_id;
 	
 	
-	--To pouplate budget_code_name
-	
-	CREATE TEMPORARY TABLE tmp_budget_code(uniq_id int,budget_code varchar,budget_code_name varchar)
-		DISTRIBUTED BY (uniq_id);
-		
-		INSERT INTO tmp_budget_code
-		SELECT a.uniq_id,a.budget_code,b.budget_code_name
-	FROM etl.stg_revenue_budget a JOIN ref_budget_code b ON a.budget_code_id = b.budget_code_id ;
-	
+
 	
 	
 	INSERT INTO revenue_budget(budget_fiscal_year, fund_class_id, agency_history_id,  budget_code_id, 
@@ -351,10 +343,9 @@ Raise NOTICE 'Revenue Budget 1.1';
 					 a.budget_fiscal_year_id,a.agency_id,
 					a.agency_name,a.budget_code,a.agency_code,a.revenue_source_code,a.revenue_source_name,a.revenue_source_id,
 					a.agency_short_name,b.revenue_category_id,b.revenue_category_code,b.revenue_category_name,
-					c.funding_class_id,c.funding_class_code,c.funding_class_name,budget_code_name
+					c.funding_class_id,c.funding_class_code,c.funding_class_name,a.budget_code_name
 	   FROM  etl.stg_revenue_budget a JOIN tmp_revenue_category b ON a.uniq_id = b.uniq_id
 		          		  JOIN tmp_funding_class c ON a.uniq_id = c.uniq_id
-		          		  JOIN tmp_budget_code d on a.uniq_id = d.uniq_id
 	   WHERE a.action_flag = 'I' AND a.budget_id IS NULL;		
    
 	GET DIAGNOSTICS l_count = ROW_COUNT;
