@@ -17,7 +17,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_fk_revenue_values (uniq_id bigint, agency_history_id smallint, document_agency_history_id smallint, ref_document_agency_history_id smallint, budget_code_id integer, record_date_id smallint,service_start_date_id smallint,
 						service_end_date_id smallint, department_history_id integer, document_code_id smallint, ref_document_code_id smallint,  expenditure_object_history_id integer,
-						fund_class_id smallint, funding_source_id smallint, object_class_history_id integer, revenue_category_id smallint, revenue_class_id smallint, revenue_source_id smallint, vendor_history_id integer,
+						fund_class_id smallint, funding_source_id smallint, object_class_history_id integer, revenue_category_id smallint, revenue_class_id smallint, revenue_source_id integer, vendor_history_id integer,
 						fiscal_year_id smallint, budget_fiscal_year_id smallint)
 	DISTRIBUTED BY (uniq_id);
 	
@@ -688,7 +688,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_fk_revenue_values1 (uniq_id bigint, agency_history_id smallint, document_agency_history_id smallint, ref_document_agency_history_id smallint, budget_code_id integer, record_date_id smallint,service_start_date_id smallint,
 						service_end_date_id smallint, department_history_id integer, document_code_id smallint, ref_document_code_id smallint,  expenditure_object_history_id integer,
-						fund_class_id smallint, funding_source_id smallint, object_class_history_id integer, revenue_category_id smallint, revenue_class_id smallint, revenue_source_id smallint, vendor_history_id integer,
+						fund_class_id smallint, funding_source_id smallint, object_class_history_id integer, revenue_category_id smallint, revenue_class_id smallint, revenue_source_id integer, vendor_history_id integer,
 						fiscal_year_id smallint, budget_fiscal_year_id smallint)
 	DISTRIBUTED BY (uniq_id);
 
@@ -749,7 +749,7 @@ BEGIN
 			    fund_type,  fund_group,  balance_sheet_account_class_code,  balance_sheet_account_category_code,  balance_sheet_account_group_code, 
 			    balance_sheet_account_override_flag,  object_class_history_id,  object_category_code,  object_type_code,  object_group_code,  
 			    document_category,  document_type,  document_code_id,  document_agency_history_id,  document_id, 
-			    document_version_number,  document_function_code_id,  document_unit,  commodity_line,  accounting_line,  
+			    document_version_number,  document_function_code,  document_unit,  commodity_line,  accounting_line,  
 			    document_posting_line,  ref_document_code_id,  ref_document_agency_history_id,  ref_document_id,  ref_commodity_line, 
 			    ref_accounting_line,  ref_posting_line,  reference_type,  line_description,  service_start_date_id,  
 			    service_end_date_id,  reason_code,  reclassification_flag,  closing_classification_code,  closing_classification_name, 
