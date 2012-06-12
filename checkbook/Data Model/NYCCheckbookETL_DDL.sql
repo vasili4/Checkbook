@@ -824,7 +824,7 @@ CREATE TABLE etl.stg_budget_code
 ---archive and invalid tables
 
 CREATE TABLE archive_budget_code (LIKE etl.stg_budget_code) DISTRIBUTED BY (uniq_id);
-ALTER TABLE archive_budget_code ADD COLUMN load_id bigint;
+ALTER TABLE archive_budget_code ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_budget_code (LIKE archive_budget_code) DISTRIBUTED BY (uniq_id);
 
