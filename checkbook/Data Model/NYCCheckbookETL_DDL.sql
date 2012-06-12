@@ -4182,8 +4182,24 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
  	con_internal_pin varchar(15),
  	con_batch_suffix varchar(10),
 	con_version varchar(5),
-	document_code_id smallint,
-	agency_history_id smallint,
+	submitting_agency_history_id  smallint,
+	submitting_agency_name varchar,
+	submitting_agency_short_name varchar,
+	awarding_agency_history_id  smallint,
+	awarding_agency_name varchar,
+	awarding_agency_short_name varchar,
+	start_date_id int,
+	end_date_id int,	
+	revised_start_date_id int,
+	revised_end_date_id int,	
+	cif_received_date_id int,
+ 	document_code_id smallint,
+ 	document_agency_history_id  smallint,
+  	parent_document_code_id smallint,
+  	parent_document_agency_history_id  smallint, 	
+	document_agency_code varchar, 
+	document_agency_name varchar, 
+	document_agency_short_name varchar ,
  	uniq_id bigint default nextval('seq_stg_payroll_summary_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar	
@@ -4193,6 +4209,3 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
  ALTER TABLE archive_pending_contracts ADD COLUMN load_file_id bigint;
  
  CREATE TABLE invalid_pending_contracts (LIKE archive_pending_contracts) DISTRIBUTED BY (uniq_id);	
-
- CREATE TABLE pending_contract_id_seq(uniq_id bigint,contract_id bigint default nextval('public.seq_pending_contract_contract_id'))
- DISTRIBUTED BY (uniq_id);
