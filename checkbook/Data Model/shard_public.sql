@@ -1670,11 +1670,35 @@ CREATE TABLE payroll(
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	gross_pay_cytd numeric(16,2),
+	agency_short_name varchar,
+	department_short_name varchar,	
 	created_date timestamp,
 	created_load_id int,
 	updated_date timestamp,
 	updated_load_id int)
 DISTRIBUTED BY (fiscal_year);
+
+CREATE TABLE payroll_summary (
+    payroll_summary_id bigint,
+    agency_history_id smallint,
+    pay_cycle_code char(1),
+    expenditure_object_history_id integer,
+    payroll_number varchar,
+    payroll_description varchar,
+    department_history_id integer,
+    pms_fiscal_year smallint,
+    budget_code_id integer,
+    total_amount numeric(15,2),
+    pay_date_id int,
+    fiscal_year smallint,
+    fiscal_year_id smallint,
+    calendar_fiscal_year_id smallint, 
+    calendar_fiscal_year smallint,
+    created_load_id integer,
+    created_date timestamp without time zone,
+    updated_date timestamp without time zone,
+    updated_load_id integer
+) distributed by (payroll_summary_id);
 
 CREATE TABLE aggregateon_payroll_employee_agency(
 	employee_id bigint,
