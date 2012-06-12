@@ -47,7 +47,6 @@ CREATE SEQUENCE seq_payroll_payroll_id;
 CREATE SEQUENCE seq_employee_employee_id;
 CREATE SEQUENCE seq_employee_history_employee_history_id;
 CREATE SEQUENCE seq_revenue_budget_revenue_budget_id;
-CREATE SEQUENCE seq_pending_contract_contract_id;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /*Sequences for FMSV data feed*/
@@ -902,6 +901,7 @@ CREATE TABLE history_agreement (
  	registered_date_id int,
  	brd_awd_no varchar,
  	tracking_number varchar,
+ 	award_method_id smallint,
  	master_agreement_yn char(1),
  	original_version_flag char(1),
  	latest_flag char(1)
@@ -1563,3 +1563,52 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
 
 CREATE TABLE deleted_agreement_accounting_line (LIKE history_agreement_accounting_line) DISTRIBUTED BY (agreement_id);
 ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp, ADD COLUMN deleted_load_id bigint;
+
+ CREATE TABLE pending_contracts(
+ 	document_code_id smallint,
+ 	document_agency_history_id  smallint,
+ 	document_id  varchar,
+  	parent_document_code_id smallint,
+  	parent_document_agency_history_id  smallint,
+ 	parent_document_id  varchar,
+ 	encumbrance_mount numeric(15,2),
+ 	original_maximum_amount numeric(15,2),
+ 	revised_maximum_amount numeric(15,2),
+ 	vendor_legal_name varchar(80),
+ 	vendor_customer_code varchar(20),
+ 	description varchar(78),
+ 	submitting_agency_history_id  smallint,
+ 	oaisis_submitting_agency_desc	 varchar(50),
+ 	submitting_agency_code	 varchar(4),
+ 	awarding_agency_history_id  smallint,
+ 	oaisis_awarding_agency_desc	 varchar(50),
+ 	awarding_agency_code	 varchar(4),
+ 	contract_type_name varchar(40),
+ 	cont_type_code  varchar(2),
+ 	award_method_name varchar(50),
+ 	award_method_code varchar(3),
+ 	start_date date,
+ 	end_date date,
+ 	revised_start_date date,
+ 	revised_end_date date,
+ 	cif_received_date date,
+ 	tracking_number varchar(30),
+ 	board_award_number varchar(15),
+ 	oca_number varchar(10),
+	version_number varchar(5),
+	contract_number varchar,
+	fms_parent_contract_number varchar,
+	submitting_agency_name varchar,
+	submitting_agency_short_name varchar,
+	awarding_agency_name varchar,
+	awarding_agency_short_name varchar,
+	start_date_id int,
+	end_date_id int,	
+	revised_start_date_id int,
+	revised_end_date_id int,	
+	cif_received_date_id int,
+	document_agency_code varchar, 
+	document_agency_name varchar, 
+	document_agency_short_name varchar 
+ );
+ 
