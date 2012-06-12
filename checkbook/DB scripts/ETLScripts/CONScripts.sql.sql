@@ -1366,12 +1366,19 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
 	DISTRIBUTED BY (disbursement_line_item_id);
 	
+	CREATE TEMPORARY TABLE tmp_agreement(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_agreement
+	SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
+		first_agreement_id,
+		latest_maximum_contract_amount
+	FROM   tmp_agreement_flag_changes;
+	
+					     
 	INSERT INTO tmp_ct_fms_line_item
 	SELECT disbursement_line_item_id, b.first_agreement_id
-	FROM disbursement_line_item a JOIN  (SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
-						    first_agreement_id,
-						    latest_maximum_contract_amount
-					     FROM   tmp_agreement_flag_changes ) b ON a.agreement_id = b.agreement_id;
+	FROM disbursement_line_item a JOIN  tmp_agreement b ON a.agreement_id = b.agreement_id;
 		
 	
 	
@@ -1472,7 +1479,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn)
+					master_agreement_yn,award_method_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year
@@ -1491,7 +1498,7 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn
+		'N' as master_agreement_yn,b.award_method_id
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
@@ -1587,7 +1594,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn)
+					master_agreement_yn,award_method_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 				      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
@@ -1606,7 +1613,7 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn
+		'N' as master_agreement_yn,b.award_method_id
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
