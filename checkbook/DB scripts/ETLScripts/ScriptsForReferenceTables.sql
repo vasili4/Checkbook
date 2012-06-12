@@ -164,7 +164,9 @@ INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES (
 										('OD1','Online Disbursement',now()::timestamp),
 										('OD2','Online Disbursement specific for SCA',now()::timestamp),
 										('EFT','EFT',now()::timestamp),
-										('N/A','N/A (PRIVACY/SECURITY)',now()::timestamp);
+										('N/A','N/A (PRIVACY/SECURITY)',now()::timestamp),
+										('MAR','MAR',now()::timestamp),
+										('CTR','CTR',now()::timestamp);
 										
 INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values ('JUDGCLAIMS',now()::timestamp),('MISCPAYVEN',now()::timestamp);
 
