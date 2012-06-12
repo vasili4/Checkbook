@@ -1010,12 +1010,16 @@ BEGIN
 	FROM	tmp_contracts_for_disbs b
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
+	-- updating maximum_spending_limit in disbursement_line_item_details
+
 	UPDATE disbursement_line_item_details a
 	SET	maximum_spending_limit = c.maximum_contract_amount
 	FROM	tmp_contracts_for_disbs b, agreement_snapshot c
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;;
+		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
 	
+	-- updating maximum_spending_limit_cy in disbursement_line_item_details
+
 	UPDATE disbursement_line_item_details a
 	SET	maximum_spending_limit_cy = c.maximum_contract_amount
 	FROM	tmp_contracts_for_disbs b, agreement_snapshot_cy c

@@ -1361,40 +1361,7 @@ BEGIN
 	WHERE  a.agreement_id = b.latest_agreement_id
 		AND COALESCE(a.latest_flag,'N') = 'N';	
 
-	-- Associate Disbursement line item to the original version of the agreement
-	
-	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
-	DISTRIBUTED BY (disbursement_line_item_id);
-	
-	CREATE TEMPORARY TABLE tmp_agreement(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
-	DISTRIBUTED BY (agreement_id);
-	
-	INSERT INTO tmp_agreement
-	SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
-		first_agreement_id,
-		latest_maximum_contract_amount
-	FROM   tmp_agreement_flag_changes;
-	
-					     
-	INSERT INTO tmp_ct_fms_line_item
-	SELECT disbursement_line_item_id, b.first_agreement_id
-	FROM disbursement_line_item a JOIN  tmp_agreement b ON a.agreement_id = b.agreement_id;
-		
-	
-	
-	UPDATE disbursement_line_item a
-	SET	agreement_id = b.agreement_id
-	FROM	tmp_ct_fms_line_item b
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	UPDATE disbursement_line_item_details a
-	SET	agreement_id = b.agreement_id,
-		--updated_date = (CASE WHEN a.maximum_contract_amount <> b.maximum_contract_amount THEN now()::timestamp ELSE updated_date END),		
-		maximum_contract_amount = b.maximum_contract_amount		
-	FROM	tmp_ct_fms_line_item b
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	-- End of associating Disbursement line item to the original version of an agreement
+
 	
 	-- Populating the agreement_snapshot tables
 
@@ -1466,21 +1433,21 @@ BEGIN
 	
 	DELETE FROM ONLY agreement_snapshot a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 	
-	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,
+	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
 				       original_contract_amount,maximum_contract_amount,description,
 					vendor_history_id,vendor_id,vendor_name,
 					dollar_difference,
 					percent_difference,
 					master_agreement_id, master_contract_number,agreement_type_id,
-					agreement_type_name,award_category_id,award_category_name,
+					agreement_type_name,award_category_id,award_category_name,award_method_id,award_method_name,
 					expenditure_object_names,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn,award_method_id)
-	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
+					master_agreement_yn)
+	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ah.agency_name,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year
 	        		      ELSE b.effective_end_fiscal_year END),
@@ -1492,18 +1459,20 @@ BEGIN
 		b.maximum_contract_amount - b.original_contract_amount,
 		(CASE WHEN b.original_contract_amount = 0 THEN 0 ELSE ROUND(((b.maximum_contract_amount - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END) as percentage,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
-		e.agreement_type_name,f.award_category_id, f.award_category_name,
+		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn,b.award_method_id
+		'N' as master_agreement_yn
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
 		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
 		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
 			   JOIN tmp_agreement_snapshot x ON x.agreement_id = z.agreement_id
@@ -1581,21 +1550,21 @@ BEGIN
 
 	DELETE FROM ONLY agreement_snapshot_cy a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 
-	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,
+	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
 				       original_contract_amount,maximum_contract_amount,description,
 					vendor_history_id,vendor_id,vendor_name,
 					dollar_difference,
 					percent_difference,
 					master_agreement_id, master_contract_number,agreement_type_id,
-					agreement_type_name,award_category_id,award_category_name,
+					agreement_type_name,award_category_id,award_category_name,award_method_id,award_method_name,
 					expenditure_object_names,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn,award_method_id)
-	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
+					master_agreement_yn)
+	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 				      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
 				      ELSE b.effective_end_calendar_year END),
@@ -1607,18 +1576,20 @@ BEGIN
 		b.maximum_contract_amount - b.original_contract_amount,
 		(CASE WHEN b.original_contract_amount = 0 THEN 0 ELSE ROUND(((b.maximum_contract_amount - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END) as percentage,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
-		e.agreement_type_name,f.award_category_id, f.award_category_name,
+		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn,b.award_method_id
+		'N' as master_agreement_yn
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
 		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
 		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
 			   JOIN tmp_agreement_snapshot x ON x.agreement_id = z.agreement_id
@@ -1627,6 +1598,77 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
 
+	
+			-- Associate Disbursement line item to the original version of the agreement
+	
+	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
+	DISTRIBUTED BY (disbursement_line_item_id);
+	
+	CREATE TEMPORARY TABLE tmp_agreement(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_agreement
+	SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
+		first_agreement_id,
+		latest_maximum_contract_amount
+	FROM   tmp_agreement_flag_changes;
+	
+					     
+	INSERT INTO tmp_ct_fms_line_item
+	SELECT disbursement_line_item_id, b.first_agreement_id
+	FROM disbursement_line_item a JOIN  tmp_agreement b ON a.agreement_id = b.agreement_id;	
+	
+	
+	UPDATE disbursement_line_item a
+	SET	agreement_id = b.agreement_id
+	FROM	tmp_ct_fms_line_item b
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	UPDATE disbursement_line_item_details a
+	SET	agreement_id = b.agreement_id
+	FROM	tmp_ct_fms_line_item b
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	UPDATE disbursement_line_item_details a
+	SET	master_agreement_id = c.master_agreement_id		
+	FROM	tmp_ct_fms_line_item b, history_agreement c
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
+	 AND a.agreement_id = c.agreement_id;
+
+	 -- updating maximum_contract_amount in disbursement_line_item_details
+	 
+	UPDATE disbursement_line_item_details a
+	SET	maximum_contract_amount = c.maximum_contract_amount		
+	FROM	tmp_ct_fms_line_item b, agreement_snapshot c
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
+		AND a.agreement_id = c.original_agreement_id AND master_agreement_yn = 'N' AND a.fiscal_year between c.starting_year AND c.ending_year;
+	
+	 -- updating maximum_contract_amount_cy in disbursement_line_item_details
+	 
+	UPDATE disbursement_line_item_details a
+	SET	maximum_contract_amount_cy = c.maximum_contract_amount		
+	FROM	tmp_ct_fms_line_item b, agreement_snapshot_cy c
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
+		AND a.agreement_id = c.original_agreement_id AND master_agreement_yn = 'N' AND a.fiscal_year between c.starting_year AND c.ending_year;
+	
+	 -- updating maximum_spending_limit in disbursement_line_item_details
+	 
+	UPDATE disbursement_line_item_details a
+	SET	maximum_spending_limit = c.maximum_contract_amount		
+	FROM	tmp_ct_fms_line_item b, agreement_snapshot c
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
+		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
+	
+	 -- updating maximum_spending_limit_cy in disbursement_line_item_details
+	 
+	UPDATE disbursement_line_item_details a
+	SET	maximum_spending_limit_cy = c.maximum_contract_amount		
+	FROM	tmp_ct_fms_line_item b, agreement_snapshot_cy c
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
+		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
+	
+	-- End of associating Disbursement line item to the original version of an agreement
+	
 			RETURN 1;
 						
 	/* End of one time changes */
