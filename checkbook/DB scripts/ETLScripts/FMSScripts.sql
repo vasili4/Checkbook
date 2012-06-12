@@ -803,7 +803,7 @@ BEGIN
 		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit, g.department_id,
 		a.document_id,COALESCE(e.legal_name,e.alias_name) as vendor_name,q.vendor_customer_code,f.date,c.agency_name,c.agency_short_name, COALESCE(i.location_short_name,i.location_name),
 		g.department_name,g.department_short_name,o.department_code,d.expenditure_object_name,p.expenditure_object_code,
-		j.budget_code_id,j.budget_code,j.budget_code_name,b.reporting_code,i.location_id,n.location_code,k.fund_class_name,k.fund_class_code,
+		j.budget_code_id,j.budget_code,j.attribute_name,b.reporting_code,i.location_id,n.location_code,k.fund_class_name,k.fund_class_code,
 		(CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 3
 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 1
 		      ELSE 4
