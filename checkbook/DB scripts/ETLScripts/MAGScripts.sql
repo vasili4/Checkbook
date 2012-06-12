@@ -741,27 +741,6 @@ BEGIN
 
 	
 	RAISE NOTICE 'PMAG3'; 
-	-- Associate contracts/agreements to the original version of the master agreement
-	
-	CREATE TEMPORARY TABLE tmp_contracts_for_mag(agreement_id bigint, master_agreement_id bigint)
-	DISTRIBUTED BY (agreement_id);
-	
-	INSERT INTO tmp_contracts_for_mag
-	SELECT a.agreement_id, b.first_master_agreement_id
-	FROM history_agreement a JOIN  (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
-						    first_master_agreement_id
-					     FROM   tmp_master_agreement_flag_changes ) b ON a.master_agreement_id = b.master_agreement_id;
-		
-	
-	
-	UPDATE history_agreement a
-	SET	master_agreement_id = b.master_agreement_id
-	FROM	tmp_contracts_for_mag b
-	WHERE	a.agreement_id = b.agreement_id;
-	
-	
-	
-	RAISE NOTICE 'PMAG4'; 
 	
 	-- Populating the agreement_snapshot tables
 
@@ -832,20 +811,20 @@ BEGIN
 	
 	RAISE NOTICE 'PMAG6'; 
 	
-	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,
+	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
 				       original_contract_amount,maximum_contract_amount,description,
 					vendor_history_id,vendor_id,vendor_name,
 					dollar_difference,
 					percent_difference,
 					agreement_type_id,
-					agreement_type_name,award_category_id,award_category_name,
+					agreement_type_name,award_category_id,award_category_name,award_method_id,award_method_name,
 					expenditure_object_names,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn)
-	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
+	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN a.effective_end_fiscal_year < a.starting_year THEN a.starting_year
 	        		      ELSE a.effective_end_fiscal_year END),
@@ -858,7 +837,7 @@ BEGIN
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
 		ROUND((( b.maximum_spending_limit - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END),
 		e.agreement_type_id,
-		e.agreement_type_name,f.award_category_id, f.award_category_name,
+		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
@@ -866,8 +845,10 @@ BEGIN
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn
 	FROM	tmp_master_agreement_snapshot a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
 		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
 			   JOIN tmp_master_agreement_snapshot x ON x.master_agreement_id = z.agreement_id
@@ -942,20 +923,20 @@ BEGIN
 	
 	RAISE NOTICE 'PMAG8'; 
 	
-	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,
+	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
 				       original_contract_amount,maximum_contract_amount,description,
 					vendor_history_id,vendor_id,vendor_name,
 					dollar_difference,
 					percent_difference,
 					agreement_type_id,
-					agreement_type_name,award_category_id,award_category_name,
+					agreement_type_name,award_category_id,award_category_name,award_method_id,award_method_name,
 					expenditure_object_names,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn)
-	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,
+	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id, b.agency_history_id, ah.agency_id,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
 	        		      ELSE b.effective_end_calendar_year END),
@@ -968,7 +949,7 @@ BEGIN
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
 		ROUND(((b.maximum_spending_limit - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END),
 		e.agreement_type_id,
-		e.agreement_type_name,f.award_category_id, f.award_category_name,
+		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
@@ -976,8 +957,10 @@ BEGIN
 		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn
 	FROM	tmp_master_agreement_snapshot_cy a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
 		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
 			   JOIN tmp_master_agreement_snapshot x ON x.master_agreement_id = z.agreement_id
@@ -986,7 +969,59 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
 
+	
+	-- Associate contracts/agreements to the original version of the master agreement
+	
+	CREATE TEMPORARY TABLE tmp_contracts_for_mag(agreement_id bigint, master_agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_contracts_for_mag
+	SELECT a.agreement_id, b.first_master_agreement_id
+	FROM history_agreement a JOIN  (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
+						    first_master_agreement_id
+					     FROM   tmp_master_agreement_flag_changes ) b ON a.master_agreement_id = b.master_agreement_id;
 		
+	
+	
+	UPDATE history_agreement a
+	SET	master_agreement_id = b.master_agreement_id
+	FROM	tmp_contracts_for_mag b
+	WHERE	a.agreement_id = b.agreement_id;
+	
+	
+	
+	RAISE NOTICE 'PMAG9'; 
+	
+	-- Updating to the original version of the master agreement in disbursement line item details
+	
+	CREATE TEMPORARY TABLE tmp_contracts_for_disbs(disbursement_line_item_id bigint, master_agreement_id bigint)
+	DISTRIBUTED BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_contracts_for_disbs
+	SELECT a.disbursement_line_item_id, b.first_master_agreement_id
+	FROM disbursement_line_item_details a JOIN  (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
+						    first_master_agreement_id
+					     FROM   tmp_master_agreement_flag_changes ) b ON a.master_agreement_id = b.master_agreement_id;
+		
+	
+	
+	UPDATE disbursement_line_item_details a
+	SET	master_agreement_id = b.master_agreement_id
+	FROM	tmp_contracts_for_disbs b
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	UPDATE disbursement_line_item_details a
+	SET	maximum_spending_limit = c.maximum_contract_amount
+	FROM	tmp_contracts_for_disbs b, agreement_snapshot c
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
+		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;;
+	
+	UPDATE disbursement_line_item_details a
+	SET	maximum_spending_limit_cy = c.maximum_contract_amount
+	FROM	tmp_contracts_for_disbs b, agreement_snapshot_cy c
+	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
+		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
+	
 		RETURN 1;
 		
 					
