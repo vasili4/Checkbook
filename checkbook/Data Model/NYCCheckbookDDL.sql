@@ -7,7 +7,6 @@ CREATE SEQUENCE seq_ref_fund_class_fund_class_id;
 CREATE SEQUENCE seq_ref_department_department_id;
 CREATE SEQUENCE seq_ref_award_category_award_category_id;
 CREATE SEQUENCE seq_ref_award_method_award_method_id;
-CREATE SEQUENCE seq_ref_balance_number_balance_number_id;
 CREATE SEQUENCE seq_ref_budget_code_budget_code_id;
 CREATE SEQUENCE seq_ref_business_type_business_type_id;
 CREATE SEQUENCE seq_ref_document_code_document_code_id;
@@ -211,13 +210,6 @@ CREATE TABLE ref_award_method (
   award_method_name varchar
   created_date timestamp
 ) DISTRIBUTED BY (award_method_id);
-
-CREATE TABLE ref_balance_number (
-  balance_number_id smallint PRIMARY KEY default nextval('seq_ref_balance_number_balance_number_id'),
-  balance_number varchar(5) ,
-  description varchar(50),
-  created_date timestamp 
-) DISTRIBUTED BY (balance_number_id);
 
 CREATE TABLE ref_budget_code (
     budget_code_id integer PRIMARY KEY DEFAULT nextval('seq_ref_budget_code_budget_code_id'::regclass) NOT NULL,
@@ -473,8 +465,8 @@ CREATE TABLE ref_revenue_class (
   budget_allowed_flag bit ,
   description varchar(100),
   created_date timestamp,
-created_load_id integer,  
-updated_load_id integer,
+  created_load_id integer,  
+  updated_load_id integer,
   updated_date timestamp without time zone
 ) DISTRIBUTED BY (revenue_class_id);
 
