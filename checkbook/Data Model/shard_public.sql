@@ -134,136 +134,6 @@ CREATE TABLE aggregateon_spending_vendor (
     total_spending_amount numeric(16,2),
     total_contract_amount numeric(16,2)
 ) DISTRIBUTED BY (vendor_id);
-
---
--- Name: agreement; Type: TABLE; Schema: public; Owner: athiagarajan; Tablespace: 
---
-
-CREATE TABLE agreement (
-    agreement_id bigint NOT NULL,
-    master_agreement_id bigint,
-    document_code_id smallint,
-    agency_history_id smallint,
-    document_id character varying(20),
-    document_version integer,
-    tracking_number character varying(30),
-    record_date_id int,
-    budget_fiscal_year smallint,
-    document_fiscal_year smallint,
-    document_period character(2),
-    description character varying(60),
-    actual_amount numeric(16,2),
-    obligated_amount numeric(16,2),
-    maximum_contract_amount numeric(16,2),
-    amendment_number character varying(19),
-    replacing_agreement_id bigint,
-    replaced_by_agreement_id bigint,
-    award_status_id smallint,
-    procurement_id character varying(20),
-    procurement_type_id smallint,
-    effective_begin_date_id int,
-    effective_end_date_id int,
-    reason_modification character varying,
-    source_created_date_id int,
-    source_updated_date_id int,
-    document_function_code_id smallint,
-    award_method_id smallint,
-    award_level_id smallint,
-    agreement_type_id smallint,
-    contract_class_code character varying(2),
-    award_category_id_1 smallint,
-    award_category_id_2 smallint,
-    award_category_id_3 smallint,
-    award_category_id_4 smallint,
-    award_category_id_5 smallint,
-    number_responses integer,
-    location_service character varying(255),
-    location_zip character varying(10),
-    borough_code character varying(10),
-    block_code character varying(10),
-    lot_code character varying(10),
-    council_district_code character varying(10),
-    vendor_history_id integer,
-    vendor_preference_level integer,
-    original_contract_amount numeric(16,2),
-    registered_date_id int,
-    oca_number character varying(20),
-    number_solicitation integer,
-    document_name character varying(60),
-    original_term_begin_date_id int,
-    original_term_end_date_id int,
-    privacy_flag character(1),
-    created_load_id integer,
-    updated_load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
-
---
--- Name: agreement_accounting_line; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE agreement_accounting_line (
-    agreement_accounting_line_id bigint NOT NULL,
-    agreement_id bigint,
-    line_number integer,
-    event_type_id smallint,
-    description character varying(100),
-    line_amount numeric(16,2),
-    budget_fiscal_year smallint,
-    fiscal_year smallint,
-    fiscal_period character(2),
-    fund_class_id smallint,
-    agency_history_id smallint,
-    department_history_id integer,
-    expenditure_object_history_id integer,
-    revenue_source_id int,
-    location_code character varying(4),
-    budget_code_id integer,
-    reporting_code character varying(15),
-    load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
-
---
--- Name: agreement_commodity; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE agreement_commodity (
-    agreement_commodity_id bigint NOT NULL,
-    agreement_id bigint,
-    line_number integer,
-    master_agreement_yn character(1),
-    description character varying(60),
-    commodity_code character varying(14),
-    commodity_type_id integer,
-    quantity numeric(27,5),
-    unit_of_measurement character varying(4),
-    unit_price numeric(28,6),
-    contract_amount numeric(16,2),
-    commodity_specification character varying,
-    load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
-
---
--- Name: agreement_worksite; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE agreement_worksite (
-    agreement_worksite_id bigint NOT NULL,
-    agreement_id bigint,
-    worksite_id integer,
-    percentage numeric(17,4),
-    amount numeric(17,4),
-    master_agreement_yn character(1),
-    load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
-
 --
 -- Name: budget; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
@@ -310,7 +180,7 @@ CREATE TABLE budget (
 --
 
 CREATE TABLE disbursement (
-    disbursement_id integer NOT NULL,
+    disbursement_id integer,
     document_code_id smallint,
     agency_history_id smallint,
     document_id character varying(20),
@@ -328,18 +198,20 @@ CREATE TABLE disbursement (
     total_accounting_line_amount numeric(16,2),
     vendor_history_id integer,
     retainage_amount numeric(16,2),
-    privacy_flag character(1),
-    load_id integer,
+    privacy_flag char(1),
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) DISTRIBUTED BY (disbursement_id);
+) distributed by (disbursement_id);
+
 
 --
 -- Name: disbursement_line_item; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE disbursement_line_item (
-    disbursement_line_item_id bigint NOT NULL,
+    disbursement_line_item_id bigint,
     disbursement_id integer,
     line_number integer,
     budget_fiscal_year smallint,
@@ -350,7 +222,7 @@ CREATE TABLE disbursement_line_item (
     department_history_id integer,
     expenditure_object_history_id integer,
     budget_code_id integer,
-    fund_id smallint,
+    fund_code varchar(4),
     reporting_code character varying(15),
     check_amount numeric(16,2),
     agreement_id bigint,
@@ -359,58 +231,10 @@ CREATE TABLE disbursement_line_item (
     retainage_amount numeric(16,2),
     check_eft_issued_nyc_year_id smallint,
     created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
-    updated_date timestamp without time zone,
-    updated_load_id integer
-) DISTRIBUTED BY (disbursement_line_item_id);
-
---
--- Name: fact_agreement; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE fact_agreement (
-    agreement_id bigint,
-    master_agreement_id bigint,
-    document_code_id smallint,
-    agency_id smallint,
-    document_id character varying(20),
-    document_version integer,
-    effective_begin_date_id int,
-    effective_end_date_id int,
-    registered_date_id int,
-    maximum_contract_amount numeric(16,2),
-    award_method_id smallint,
-    vendor_id integer,
-    original_contract_amount numeric(16,2),
-    master_agreement_yn character(1),
-    description character varying(60),
-    	document_code varchar,
-    	master_document_id  varchar,
-    	amount_spent numeric(16,2),
-    	agency_history_id smallint,
-    	agency_name varchar,
-    	vendor_history_id integer,
-    	vendor_name varchar,
-    	worksites_name varchar,
-    	agreement_type_id smallint,
-    	award_category_id_1 smallint,
-    	expenditure_objects_name varchar,
-    	record_date date,
-    	effective_begin_date date,
-    	effective_end_date date,
-	tracking_number varchar,
-	registered_date date,
-	has_parent_yn char(1)
-) DISTRIBUTED BY (agreement_id);
-
---
--- Name: fact_agreement_accounting_line; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE fact_agreement_accounting_line (
-    agreement_id bigint,
-    line_amount numeric(16,2)
-) DISTRIBUTED BY (agreement_id);
+    updated_date timestamp without time zone
+) distributed by (disbursement_line_item_id);
 
 --
 -- Name: disbursement_line_item_details; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -429,20 +253,25 @@ CREATE TABLE disbursement_line_item_details(
 	fund_class_id smallint,
 	check_amount numeric(16,2),
 	agency_id smallint,
+	agency_history_id smallint,
 	agency_code varchar(20),
 	expenditure_object_id integer,
 	vendor_id integer,
 	department_id integer,
 	maximum_contract_amount numeric(16,2),
+	maximum_contract_amount_cy numeric(16,2),
 	maximum_spending_limit numeric(16,2),
+	maximum_spending_limit_cy numeric(16,2),
 	document_id varchar(20),
 	vendor_name varchar,
-	vendor_customer_code varchar(20),
+	vendor_customer_code varchar(20), 
 	check_eft_issued_date date,
-	agency_name varchar(50),
+	agency_name varchar(50),	
+	agency_short_name character varying(15),  	
 	location_name varchar,
 	location_code varchar(4),
 	department_name varchar(100),
+	department_short_name character varying(15),
 	department_code varchar(20),
 	expenditure_object_name varchar(40),
 	expenditure_object_code varchar(4),
@@ -451,6 +280,7 @@ CREATE TABLE disbursement_line_item_details(
 	budget_name varchar(60),
 	contract_number varchar,
 	purpose varchar,
+	purpose_cy varchar,
 	reporting_code varchar(15),
 	location_id integer,
 	fund_class_name varchar(50),
@@ -458,7 +288,8 @@ CREATE TABLE disbursement_line_item_details(
 	spending_category_id smallint,
 	spending_category_name varchar,
 	calendar_fiscal_year_id smallint,
-	calendar_fiscal_year smallint	
+	calendar_fiscal_year smallint,
+	load_id integer
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -505,7 +336,7 @@ CREATE TABLE revenue_details
 --
 
 CREATE TABLE history_agreement (
-    agreement_id bigint NOT NULL,
+    agreement_id bigint,
     master_agreement_id bigint,
     document_code_id smallint,
     agency_history_id smallint,
@@ -531,9 +362,9 @@ CREATE TABLE history_agreement (
     reason_modification character varying,
     source_created_date_id int,
     source_updated_date_id int,
-    document_function_code_id smallint,
+    document_function_code varchar,
     award_method_id smallint,
-    award_level_id smallint,
+    award_level_code varchar,
     agreement_type_id smallint,
     contract_class_code character varying(2),
     award_category_id_1 smallint,
@@ -556,23 +387,45 @@ CREATE TABLE history_agreement (
     number_solicitation integer,
     document_name character varying(60),
     original_term_begin_date_id int,
-    original_term_end_date_id int,
-    privacy_flag character(1),
+    original_term_end_date_id int,    
+    brd_awd_no varchar,
+    registered_fiscal_year smallint,
+    registered_fiscal_year_id smallint, 
+    registered_calendar_year smallint,
+    registered_calendar_year_id smallint,
+    effective_end_fiscal_year smallint,
+    effective_end_fiscal_year_id smallint, 
+    effective_end_calendar_year smallint,
+    effective_end_calendar_year_id smallint,
+    effective_begin_fiscal_year smallint,
+    effective_begin_fiscal_year_id smallint,
+    effective_begin_calendar_year smallint,
+    effective_begin_calendar_year_id smallint,
+    source_updated_fiscal_year smallint,
+    source_updated_fiscal_year_id smallint, 
+    source_updated_calendar_year smallint,
+    source_updated_calendar_year_id smallint,
+    contract_number varchar,
+    original_agreement_id bigint,
+    original_version_flag char(1),
+    latest_flag char(1),
+    privacy_flag char(1),
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
+) distributed by (agreement_id);
 
 --
 -- Name: history_agreement_accounting_line; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE history_agreement_accounting_line (
-    agreement_accounting_line_id bigint NOT NULL,
+    agreement_accounting_line_id bigint,
     agreement_id bigint,
+    commodity_line_number integer,
     line_number integer,
-    event_type_id smallint,
+    event_type_code char(4),
     description character varying(100),
     line_amount numeric(16,2),
     budget_fiscal_year smallint,
@@ -586,17 +439,18 @@ CREATE TABLE history_agreement_accounting_line (
     location_code character varying(4),
     budget_code_id integer,
     reporting_code character varying(15),
-    load_id integer,
+    created_load_id integer,
+    updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
+) distributed by (agreement_id);
 
 --
 -- Name: history_agreement_commodity; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE history_agreement_commodity (
-    agreement_commodity_id bigint NOT NULL,
+    agreement_commodity_id bigint  ,
     agreement_id bigint,
     line_number integer,
     master_agreement_yn character(1),
@@ -611,7 +465,8 @@ CREATE TABLE history_agreement_commodity (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
+) distributed by (agreement_id);
+
 
 
 --
@@ -619,213 +474,102 @@ CREATE TABLE history_agreement_commodity (
 --
 
 CREATE TABLE history_agreement_worksite (
-    agreement_worksite_id bigint NOT NULL,
+    agreement_worksite_id bigint,
     agreement_id bigint,
-    worksite_id integer,
+    worksite_code varchar(3),
     percentage numeric(17,4),
     amount numeric(17,4),
     master_agreement_yn character(1),
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) DISTRIBUTED BY (agreement_id);
+) distributed by (agreement_id);
 
 --
 -- Name: history_master_agreement; Type: TABLE; Schema: public; Owner: athiagarajan; Tablespace: 
 --
 
-CREATE TABLE history_master_agreement (
-    master_agreement_id bigint NOT NULL,
-    document_code_id smallint,
-    agency_history_id smallint,
-    document_id character varying(20),
-    document_version integer,
-    tracking_number character varying(30),
-    record_date_id int,
-    budget_fiscal_year smallint,
-    document_fiscal_year smallint,
-    document_period character(2),
-    description character varying(60),
-    actual_amount numeric(16,2),
-    total_amount numeric(16,2),
-    replacing_master_agreement_id bigint,
-    replaced_by_master_agreement_id bigint,
-    award_status_id smallint,
-    procurement_id character varying(20),
-    procurement_type_id smallint,
-    effective_begin_date_id int,
-    effective_end_date_id int,
-    reason_modification character varying,
-    source_created_date_id int,
-    source_updated_date_id int,
-    document_function_code_id smallint,
-    award_method_id smallint,
-    agreement_type_id smallint,
-    award_category_id_1 smallint,
-    award_category_id_2 smallint,
-    award_category_id_3 smallint,
-    award_category_id_4 smallint,
-    award_category_id_5 smallint,
-    number_responses integer,
-    location_service character varying(255),
-    location_zip character varying(10),
-    borough_code character varying(10),
-    block_code character varying(10),
-    lot_code character varying(10),
-    council_district_code character varying(10),
-    vendor_history_id integer,
-    vendor_preference_level integer,
-    board_approved_award_no character varying(15),
-    board_approved_award_date_id int,
-    original_contract_amount numeric(20,2),
-    oca_number character varying(20),
-    original_term_begin_date_id int,
-    original_term_end_date_id int,
-    registered_date_id int,
-    maximum_amount numeric(20,2),
-    maximum_spending_limit numeric(20,2),
-    award_level_id smallint,
-    contract_class_code character varying(2),
-    number_solicitation integer,
-    document_name character varying(60),
-    privacy_flag character(1),
-    created_load_id integer,
-    updated_load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) DISTRIBUTED BY (master_agreement_id);
-
---
--- Name: history_master_agreement__0; Type: EXTERNAL TABLE; Schema: public; Owner: athiagarajan; Tablespace: 
---
-
-CREATE EXTERNAL WEB TABLE history_master_agreement__0 (
-    master_agreement_id bigint,
-    document_code_id smallint,
-    agency_history_id smallint,
-    document_id character varying,
-    document_version integer,
-    tracking_number character varying,
-    record_date_id int,
-    budget_fiscal_year smallint,
-    document_fiscal_year smallint,
-    document_period bpchar,
-    description character varying,
-    actual_amount numeric,
-    total_amount numeric,
-    replacing_master_agreement_id bigint,
-    replaced_by_master_agreement_id bigint,
-    award_status_id smallint,
-    procurement_id character varying,
-    procurement_type_id smallint,
-    effective_begin_date_id int,
-    effective_end_date_id int,
-    reason_modification character varying,
-    source_created_date_id int,
-    source_updated_date_id int,
-    document_function_code_id smallint,
-    award_method_id smallint,
-    agreement_type_id smallint,
-    award_category_id_1 smallint,
-    award_category_id_2 smallint,
-    award_category_id_3 smallint,
-    award_category_id_4 smallint,
-    award_category_id_5 smallint,
-    number_responses integer,
-    location_service character varying,
-    location_zip character varying,
-    borough_code character varying,
-    block_code character varying,
-    lot_code character varying,
-    council_district_code character varying,
-    vendor_history_id integer,
-    vendor_preference_level integer,
-    board_approved_award_no character varying,
-    board_approved_award_date_id int,
-    original_contract_amount numeric,
-    oca_number character varying,
-    original_term_begin_date_id int,
-    original_term_end_date_id int,
-    registered_date_id int,
-    maximum_amount numeric,
-    maximum_spending_limit numeric,
-    award_level_id smallint,
-    contract_class_code character varying,
-    number_solicitation integer,
-    document_name character varying,
-    privacy_flag bpchar,
-    created_load_id integer,
-    updated_load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.history_master_agreement to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
-
---
--- Name: master_agreement; Type: TABLE; Schema: public; Owner: athiagarajan; Tablespace: 
---
-
-CREATE TABLE master_agreement (
-    master_agreement_id bigint NOT NULL,
-    document_code_id smallint,
-    agency_history_id smallint,
-    document_id character varying(20),
-    document_version integer,
-    tracking_number character varying(30),
-    record_date_id int,
-    budget_fiscal_year smallint,
-    document_fiscal_year smallint,
-    document_period character(2),
-    description character varying(60),
-    actual_amount numeric(16,2),
-    total_amount numeric(16,2),
-    replacing_master_agreement_id bigint,
-    replaced_by_master_agreement_id bigint,
-    award_status_id smallint,
-    procurement_id character varying(20),
-    procurement_type_id smallint,
-    effective_begin_date_id int,
-    effective_end_date_id int,
-    reason_modification character varying,
-    source_created_date_id int,
-    source_updated_date_id int,
-    document_function_code_id smallint,
-    award_method_id smallint,
-    agreement_type_id smallint,
-    award_category_id_1 smallint,
-    award_category_id_2 smallint,
-    award_category_id_3 smallint,
-    award_category_id_4 smallint,
-    award_category_id_5 smallint,
-    number_responses integer,
-    location_service character varying(255),
-    location_zip character varying(10),
-    borough_code character varying(10),
-    block_code character varying(10),
-    lot_code character varying(10),
-    council_district_code character varying(10),
-    vendor_history_id integer,
-    vendor_preference_level integer,
-    board_approved_award_no character varying(15),
-    board_approved_award_date_id int,
-    original_contract_amount numeric(20,2),
-    oca_number character varying(20),
-    original_term_begin_date_id int,
-    original_term_end_date_id int,
-    registered_date_id int,
-    maximum_amount numeric(20,2),
-    maximum_spending_limit numeric(20,2),
-    award_level_id smallint,
-    contract_class_code character varying(2),
-    number_solicitation integer,
-    document_name character varying(60),
-    privacy_flag character(1),
-    created_load_id integer,
-    updated_load_id integer,
-    created_date timestamp without time zone,
-    updated_date timestamp without time zone
-) DISTRIBUTED BY (master_agreement_id);
+CREATE TABLE history_master_agreement
+(
+  master_agreement_id bigint,
+  document_code_id smallint,
+  agency_history_id smallint,
+  document_id character varying(20),
+  document_version integer,
+  tracking_number character varying(30),
+  record_date_id int,
+  budget_fiscal_year smallint,
+  document_fiscal_year smallint,
+  document_period character(2),
+  description character varying(60),
+  actual_amount numeric(16,2),
+  total_amount numeric(16,2),
+  replacing_master_agreement_id bigint,
+  replaced_by_master_agreement_id bigint,
+  award_status_id smallint,
+  procurement_id character varying(20),
+  procurement_type_id smallint,
+  effective_begin_date_id int,
+  effective_end_date_id int,
+  reason_modification character varying,
+  source_created_date_id int,
+  source_updated_date_id int,
+  document_function_code character varying,
+  award_method_id smallint,
+  agreement_type_id smallint,
+  award_category_id_1 smallint,
+  award_category_id_2 smallint,
+  award_category_id_3 smallint,
+  award_category_id_4 smallint,
+  award_category_id_5 smallint,
+  number_responses integer,
+  location_service character varying(255),
+  location_zip character varying(10),
+  borough_code character varying(10),
+  block_code character varying(10),
+  lot_code character varying(10),
+  council_district_code character varying(10),
+  vendor_history_id integer,
+  vendor_preference_level integer,
+  board_approved_award_no character varying(15),
+  board_approved_award_date_id int,
+  original_contract_amount numeric(20,2),
+  oca_number character varying(20),
+  original_term_begin_date_id int,
+  original_term_end_date_id int,
+  registered_date_id int,
+  maximum_amount numeric(20,2),
+  maximum_spending_limit numeric(20,2),
+  award_level_code character(2),
+  contract_class_code character varying(2),
+  number_solicitation integer,
+  document_name character varying(60),
+  registered_fiscal_year smallint,
+  registered_fiscal_year_id smallint,
+  registered_calendar_year smallint,
+  registered_calendar_year_id smallint,
+  effective_end_fiscal_year smallint,
+  effective_end_fiscal_year_id smallint,
+  effective_end_calendar_year smallint,
+  effective_end_calendar_year_id smallint,
+  effective_begin_fiscal_year smallint,
+  effective_begin_fiscal_year_id smallint,
+  effective_begin_calendar_year smallint,
+  effective_begin_calendar_year_id smallint,
+  source_updated_fiscal_year smallint,
+  source_updated_fiscal_year_id smallint,
+  source_updated_calendar_year smallint,
+  source_updated_calendar_year_id smallint,
+  contract_number character varying,
+  original_master_agreement_id bigint,
+  original_version_flag character(1),
+  latest_flag character(1),
+  privacy_flag character(1),
+  created_load_id integer,
+  updated_load_id integer,
+  created_date timestamp without time zone,
+  updated_date timestamp without time zone)
+DISTRIBUTED BY (master_agreement_id);
 
 --
 -- Name: ref_address_type; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -846,12 +590,12 @@ CREATE TABLE ref_agency (
     agency_id smallint NOT NULL,
     agency_code character varying(20),
     agency_name character varying(50),
+    agency_short_name character varying(15),
     original_agency_name character varying(50),
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
-    updated_load_id integer,
-    agency_short_name character varying(15)
+    updated_load_id integer
 ) DISTRIBUTED BY (agency_id);
 
 --
@@ -862,9 +606,9 @@ CREATE TABLE ref_agency_history (
     agency_history_id smallint NOT NULL,
     agency_id smallint,
     agency_name character varying(50),
+    agency_short_name character varying(15),
     created_date timestamp without time zone,
-    load_id integer,
-    agency_short_name character varying(15)
+    load_id integer
 ) DISTRIBUTED BY (agency_history_id);
 
 --
@@ -889,18 +633,6 @@ CREATE TABLE ref_award_category (
     created_date timestamp without time zone
 ) DISTRIBUTED BY (award_category_id);
 
-
---
--- Name: ref_award_level; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_award_level (
-    award_level_id smallint NOT NULL,
-    award_level_code character varying(2),
-    award_level_name character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (award_level_id);
-
 --
 -- Name: ref_award_method; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
@@ -911,28 +643,6 @@ CREATE TABLE ref_award_method (
     award_method_name character varying,
     created_date timestamp without time zone
 ) DISTRIBUTED BY (award_method_id);
-
---
--- Name: ref_award_status; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_award_status (
-    award_status_id smallint NOT NULL,
-    award_status_name character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (award_status_id);
-
---
--- Name: ref_balance_number; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_balance_number (
-    balance_number_id smallint NOT NULL,
-    balance_number character varying(5),
-    description character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (balance_number_id);
-
 
 --
 -- Name: ref_budget_code; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -981,16 +691,6 @@ CREATE TABLE ref_business_type_status (
 ) DISTRIBUTED BY (business_type_status_id);
 
 --
--- Name: ref_commodity_type; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_commodity_type (
-    commodity_type_id smallint NOT NULL,
-    commodity_type_name character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (commodity_type_id);
-
---
 -- Name: ref_data_source; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
@@ -1019,6 +719,7 @@ CREATE TABLE ref_department (
     department_id integer NOT NULL,
     department_code character varying(20),
     department_name character varying(100),
+    department_short_name character varying(15),
     agency_id smallint,
     fund_class_id smallint,
     fiscal_year smallint,
@@ -1026,8 +727,7 @@ CREATE TABLE ref_department (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
-    updated_load_id integer,
-    department_short_name character varying(15)
+    updated_load_id integer
 ) DISTRIBUTED BY (department_id);
 
 --
@@ -1038,12 +738,12 @@ CREATE TABLE ref_department_history (
     department_history_id integer NOT NULL,
     department_id integer,
     department_name character varying(100),
+    department_short_name character varying,
     agency_id smallint,
     fund_class_id smallint,
     fiscal_year smallint,
     created_date timestamp without time zone,
-    load_id integer,
-    department_short_name charcater varying
+    load_id integer
 ) DISTRIBUTED BY (department_history_id);
 
 --
@@ -1056,27 +756,6 @@ CREATE TABLE ref_document_code (
     document_name character varying(100),
     created_date timestamp without time zone
 ) DISTRIBUTED BY (document_code_id);
-
---
--- Name: ref_document_function_code; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_document_function_code (
-    document_function_code_id smallint NOT NULL,
-    document_function_name character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (document_function_code_id);
-
---
--- Name: ref_event_type; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_event_type (
-    event_type_id smallint NOT NULL,
-    event_type_code character varying(4),
-    event_type_name character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (event_type_id);
 
 
 --
@@ -1149,16 +828,6 @@ CREATE TABLE ref_expenditure_status (
     created_date timestamp without time zone
 ) DISTRIBUTED BY (expenditure_status_id);
 
---
--- Name: ref_fund; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_fund (
-    fund_id smallint NOT NULL,
-    fund_code character varying(20),
-    fund_name character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (fund_id);
 
 --
 -- Name: ref_fund_class; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -1331,6 +1000,7 @@ CREATE TABLE ref_revenue_category (
     budget_allowed_flag bit(1),
     description character varying(100),
     created_date timestamp without time zone,
+    created_load_id integer,
     updated_load_id integer,
     updated_date timestamp without time zone
 ) DISTRIBUTED BY (revenue_category_id);
@@ -1348,6 +1018,7 @@ CREATE TABLE ref_revenue_class (
     budget_allowed_flag bit(1),
     description character varying(100),
     created_date timestamp without time zone,
+    created_load_id integer,
     updated_load_id integer,
     updated_date timestamp without time zone
 ) DISTRIBUTED BY (revenue_class_id);
@@ -1404,16 +1075,6 @@ CREATE TABLE ref_spending_category (
     spending_category_name character varying(100)
 ) DISTRIBUTED BY (spending_category_id);
 
---
--- Name: ref_worksite; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
---
-
-CREATE TABLE ref_worksite (
-    worksite_id integer NOT NULL,
-    worksite_code character varying(3),
-    worksite_name character varying(50),
-    created_date timestamp without time zone
-) DISTRIBUTED BY (worksite_id);
 
 --
 -- Name: ref_year; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -1759,9 +1420,6 @@ CREATE TABLE aggregateon_payroll_dept(
 	total_overtime_employees int)
 DISTRIBUTED BY (agency_id);
 
-
-
-
 CREATE TABLE revenue_budget
 (
   budget_id integer,
@@ -1775,7 +1433,7 @@ CREATE TABLE revenue_budget
   agency_history_id smallint,
   budget_code_id integer,
   agency_id smallint,
-  revenue_source_id smallint,
+  revenue_source_id int,
   agency_name character varying,
   revenue_source_name character varying,
   created_load_id integer,
