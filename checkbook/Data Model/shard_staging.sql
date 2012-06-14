@@ -1793,38 +1793,33 @@ CREATE VIEW ref_fiscal_period AS
 	SELECT ref_fiscal_period__0.fiscal_period, ref_fiscal_period__0.fiscal_period_name FROM ref_fiscal_period__0;
 	
 
-CREATE EXTERNAL WEB TABLE aggregateon_revenue_category__0(
+
+
+CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_class__0(
 	revenue_category_id smallint,
+	funding_class_id smallint,
+	funding_class_code character varying,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
 	current_modified_amount numeric(16,2)
 )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_revenue_category to stdout csv"' ON SEGMENT 0 
+
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_category_funding_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
-CREATE VIEW aggregateon_revenue_category AS
-	SELECT aggregateon_revenue_category__0.revenue_category_id, aggregateon_revenue_category__0.budget_fiscal_year_id,
-		aggregateon_revenue_category__0.posting_amount, aggregateon_revenue_category__0.adopted_amount, aggregateon_revenue_category__0.current_modified_amount
-	FROM aggregateon_revenue_category__0;
-	
-CREATE EXTERNAL WEB TABLE aggregateon_revenue_funding_class__0(
-	funding_class_id smallint,
-	budget_fiscal_year_id smallint,
-	posting_amount numeric(16,2),
-	adopted_amount numeric(16,2),
-	current_modified_amount numeric(16,2)
-)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_revenue_funding_class to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';	
 
-CREATE VIEW aggregateon_revenue_funding_class AS
-	SELECT aggregateon_revenue_funding_class__0.funding_class_id,aggregateon_revenue_funding_class__0.budget_fiscal_year_id,
-		aggregateon_revenue_funding_class__0.posting_amount,aggregateon_revenue_funding_class__0.adopted_amount,aggregateon_revenue_funding_class__0.current_modified_amount
-	FROM aggregateon_revenue_funding_class__0;	
+CREATE VIEW aggregateon_revenue_category_funding_class AS
+	SELECT aggregateon_revenue_category_funding_class__0.revenue_category_id,aggregateon_revenue_category_funding_class__0.funding_class_id,
+	              aggregateon_revenue_category_funding_class__0.funding_class_code,aggregateon_revenue_category_funding_class__0.budget_fiscal_year_id,
+		aggregateon_revenue_category_funding_class__0.posting_amount, aggregateon_revenue_category_funding_class__0.adopted_amount,
+		 aggregateon_revenue_category_funding_class__0.current_modified_amount
+	FROM aggregateon_revenue_category_funding_class__0;
 	
+
+
+
 	
 CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor_exp_object__0(
 	vendor_id integer,
