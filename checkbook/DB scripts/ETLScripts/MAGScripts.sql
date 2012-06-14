@@ -338,7 +338,7 @@ DECLARE
 	l_fk_update int;
 	l_worksite_per_array VARCHAR ARRAY[10];
 	l_insert_sql VARCHAR;
-	l_count int;
+	l_count bigint;
 BEGIN
 	l_worksite_col_array := ARRAY['wk_site_cd_01',
 				      'wk_site_cd_02',
@@ -489,6 +489,13 @@ BEGIN
 					 JOIN tmp_mag d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag='I';
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'M',l_count, 'New MAG records inserted from MAG Feed');
+	END IF;	
+	
 	RAISE NOTICE 'MAG 6';
 	/* Updates */
 	CREATE TEMPORARY TABLE tmp_mag_update AS
@@ -599,6 +606,13 @@ BEGIN
 	FROM	tmp_mag_update b
 	WHERE	a.master_agreement_id = b.master_agreement_id;
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'M',l_count, 'MAG records updated from MAG Feed');
+	END IF;
+	
 	RAISE NOTICE 'MAG 7';
  --   agreement worksite changes
 	
@@ -607,6 +621,13 @@ BEGIN
 	WHERE a.agreement_id = b.master_agreement_id
 	      AND b.action_flag ='U';
 	      
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'M',l_count, 'MAG worksite records deleted due to the updated from MAG Feed');
+	END IF;
+	
 	FOR l_array_ctr IN 1..array_upper(l_worksite_col_array,1) LOOP
 
 		l_insert_sql := ' INSERT INTO history_agreement_worksite(agreement_id,worksite_code,percentage,amount,master_agreement_yn,load_id,created_date) '||
