@@ -706,7 +706,6 @@ BEGIN
 		ELSIF 	l_data_source_code ='F' THEN
 			l_processed := etl.processFMS(p_load_file_id_in,l_load_id);	
 			
-
 		ELSIF 	l_data_source_code ='BC' THEN
 			l_processed := etl.processbudgetcode(p_load_file_id_in,l_load_id);	
 			
@@ -718,6 +717,15 @@ BEGIN
 		
 		ELSIF 	l_data_source_code ='RB' THEN
 			l_processed := etl.processrevenuebudget(p_load_file_id_in,l_load_id);	
+
+		ELSIF 	l_data_source_code ='PC' THEN
+			l_processed := etl.processPendingContracts(p_load_file_id_in,l_load_id);	
+
+		ELSIF 	l_data_source_code ='PS' THEN
+			l_processed := etl.processPayrollSummary(p_load_file_id_in,l_load_id);	
+
+		ELSIF 	l_data_source_code ='P' THEN
+			l_processed := etl.processPayroll(p_load_file_id_in,l_load_id);	
 			
 		END IF;
 
