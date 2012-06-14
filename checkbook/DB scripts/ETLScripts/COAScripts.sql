@@ -14,6 +14,7 @@ Functions defined
 
 CREATE OR REPLACE FUNCTION etl.processCOAAgency(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
+	l_count smallint;
 BEGIN
 	CREATE TEMPORARY TABLE tmp_ref_agency(uniq_id bigint,agency_code varchar(20),agency_name varchar,agency_short_name varchar(15), exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
@@ -42,6 +43,13 @@ BEGIN
 	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
 	SELECT a.agency_id,b.agency_code,b.agency_name,now()::timestamp,p_load_id_in,b.agency_name,b.agency_short_name
 	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_agency b ON a.uniq_id = b.uniq_id;
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'A',l_count, 'New agency records inserted from COA Agency Feed');
+	END IF;
 	
 	-- Generate the agency history id for history records
 	
@@ -73,6 +81,13 @@ BEGIN
 	FROM	tmp_ref_agency_1 b		
 	WHERE	a.agency_id = b.agency_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'A',l_count, 'Agency records updated from COA Agency Feed');
+	END IF;
+	
 	RAISE NOTICE '2';
 	
 	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id,agency_short_name)
@@ -81,6 +96,13 @@ BEGIN
 		JOIN ref_agency c ON b.agency_code = c.agency_code
 	WHERE   exists_flag ='N'
 		OR (exists_flag ='Y' and modified_flag='Y') 	;
+		
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'A',l_count, 'New agency history records inserted from COA Agency Feed');
+	END IF;		
 
 	RETURN 1;
 EXCEPTION
@@ -96,6 +118,7 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.processCOADepartment(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
+	l_count int;
 BEGIN
 	CREATE TEMPORARY TABLE tmp_ref_department(uniq_id bigint,agency_code varchar,agency_id int,fund_class_code varchar,fund_class_id int,
 						  department_code varchar(20),fiscal_year smallint,department_name varchar, department_short_name varchar, exists_flag char(1), 
@@ -159,12 +182,17 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	WHERE 	a.uniq_id = b.uniq_id;
 
 	RAISE NOTICE '2';
-
-	
 	
 	INSERT INTO ref_agency(agency_id,agency_code,created_date,created_load_id)
 	SELECT a.agency_id,b.agency_code,now()::timestamp,p_load_id_in
 	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'D',l_count, 'New agency records inserted from COA Department Feed');
+	END IF;
 	
 	TRUNCATE etl.ref_agency_history_id_seq;
 	
@@ -174,13 +202,19 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	RAISE NOTICE '3';
 
-
 	
 	INSERT INTO ref_agency_history(agency_history_id,agency_id,created_date,load_id)
 	SELECT a.agency_history_id,c.agency_id,now()::timestamp,p_load_id_in
 	FROM   etl.ref_agency_history_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id
 		JOIN ref_agency c ON b.agency_code = c.agency_code;
 		
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'D',l_count, 'New agency history records inserted from COA Department Feed');
+	END IF;
 	
 	-- Generate the fund class identifier for new fund class
 	
@@ -212,6 +246,13 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	SELECT a.fund_class_id,b.fund_class_code,p_load_id_in,now()::timestamp
 	FROM 	etl.ref_fund_class_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id;
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'D',l_count, 'New fund class records inserted from COA Department Feed');
+	END IF;
+	
 	RAISE NOTICE '3.2';
 	
 	-- Generate the department id for new records
@@ -227,6 +268,13 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	SELECT a.department_id,b.department_code,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_name,b.department_short_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'D',l_count, 'New department records inserted from COA Department Feed');
+	END IF;
+	
 	RAISE NOTICE '3.3';
 	-- Generate the department history id for history records
 	
@@ -260,6 +308,13 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM	tmp_ref_department_1 b		
 	WHERE	a.department_id = b.department_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'D',l_count, 'Department records updated from COA Department Feed');
+	END IF;
+	
 	RAISE NOTICE '5';
 	
 	INSERT INTO ref_department_history(department_history_id,department_id,department_name,agency_id,fund_class_id,fiscal_year,created_date,load_id,department_short_name)
@@ -270,6 +325,13 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	WHERE	exists_flag ='N'
 		OR (exists_flag ='Y' and modified_flag='Y');			
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'D',l_count, 'New Department history records inserted from COA Department Feed');
+	END IF;
+	
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
@@ -283,6 +345,7 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.processCOAExpenditureObject(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
+	l_count int;
 BEGIN
 	CREATE TEMPORARY TABLE tmp_ref_expenditure_object(uniq_id bigint,expenditure_object_code varchar(20),fiscal_year smallint,expenditure_object_name varchar, exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
@@ -312,6 +375,13 @@ BEGIN
 	SELECT a.expenditure_object_id,b.expenditure_object_code,b.expenditure_object_name,fiscal_year,now()::timestamp,p_load_id_in,b.expenditure_object_name
 	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_ref_expenditure_object b ON a.uniq_id = b.uniq_id;
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'E',l_count, 'New expenditure object records inserted from COA Expenditure Object Feed');
+	END IF;
+	
 	-- Generate the expenditure_object history id for history records
 	
 	TRUNCATE etl.ref_expenditure_object_history_id_seq;
@@ -339,6 +409,13 @@ BEGIN
 	FROM	tmp_ref_expenditure_object_1 b		
 	WHERE	a.expenditure_object_id = b.expenditure_object_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'E',l_count, 'Expenditure Object records updated from COA Expenditure Object Feed');
+	END IF;
+	
 	RAISE NOTICE '2';
 	
 	INSERT INTO ref_expenditure_object_history(expenditure_object_history_id,expenditure_object_id,fiscal_year,expenditure_object_name,created_date,load_id)
@@ -347,6 +424,13 @@ BEGIN
 		JOIN ref_expenditure_object c ON b.expenditure_object_code = c.expenditure_object_code AND b.fiscal_year = c.fiscal_year
 	WHERE	exists_flag ='N'
 		OR (exists_flag ='Y' and modified_flag='Y');
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'E',l_count, 'Expenditure Object history records inserted from COA Expenditure Object Feed');
+	END IF;		
 		
 	RETURN 1;
 EXCEPTION
@@ -363,6 +447,7 @@ $$ language plpgsql;
 -- Schema: etl
 CREATE OR REPLACE FUNCTION etl.processCOALocation(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
+	l_count int;
 BEGIN
 	CREATE TEMPORARY TABLE tmp_ref_location(uniq_id bigint,agency_code varchar,agency_id int,
 						  location_code varchar(20),location_name varchar,location_short_name varchar, exists_flag char(1), 
@@ -424,6 +509,13 @@ BEGIN
 	SELECT a.agency_id,b.agency_code,now()::timestamp,p_load_id_in
 	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_location b ON a.uniq_id = b.uniq_id;
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'L',l_count, 'New agency records inserted from COA Location Feed');
+	END IF;
+	
 	TRUNCATE etl.ref_agency_history_id_seq;
 	
 	INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
@@ -439,6 +531,12 @@ BEGIN
 	FROM   etl.ref_agency_history_id_seq a JOIN tmp_ref_location b ON a.uniq_id = b.uniq_id
 		JOIN ref_agency c ON b.agency_code = c.agency_code;
 		
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'L',l_count, 'Agency history records inserted from COA Location Feed');
+	END IF;
 	
 	-- Generate the location id for new records
 		
@@ -453,6 +551,13 @@ BEGIN
 	SELECT a.location_id,b.location_code,b.location_name,b.agency_id,b.location_short_name,now()::timestamp,p_load_id_in,b.location_name
 	FROM   etl.ref_location_id_seq a JOIN tmp_ref_location b ON a.uniq_id = b.uniq_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'L',l_count, 'Location records inserted from COA Location Feed');
+	END IF;
+	
 	RAISE NOTICE '3.3';
 	-- Generate the location history id for history records
 	
@@ -484,6 +589,13 @@ BEGIN
 	FROM	tmp_ref_location_1 b		
 	WHERE	a.location_id = b.location_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'L',l_count, 'Location records updated from COA Location Feed');
+	END IF;
+	
 	RAISE NOTICE '5';
 	
 	INSERT INTO ref_location_history(location_history_id,location_id,location_name,agency_id,location_short_name,created_date,load_id)
@@ -493,6 +605,13 @@ BEGIN
 	WHERE	exists_flag ='N'
 		OR (exists_flag ='Y' and modified_flag='Y');
 		
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'L',l_count, 'Location history records inserted from COA Location Feed');
+	END IF;
+	
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
@@ -506,6 +625,7 @@ $$ language plpgsql;
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION etl.processCOAObjectClass(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
+	l_count int;
 BEGIN
 	CREATE TEMPORARY TABLE tmp_ref_object_class(uniq_id bigint,object_class_code varchar(4),object_class_name varchar(60),exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
@@ -545,6 +665,13 @@ BEGIN
 		LEFT JOIN ref_date d ON c.effective_begin_date::date = d.date
 		LEFT JOIN ref_date e ON c.effective_end_date::date = e.date;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'O',l_count, 'Object class records inserted from COA Object Class Feed');
+	END IF;
+	
 	RAISE NOTICE 'start.2';
 	
 	-- Generate the object_class history id for history records
@@ -574,6 +701,13 @@ BEGIN
 	FROM	tmp_ref_object_class_1 b		
 	WHERE	a.object_class_id = b.object_class_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'O',l_count, 'Object class records updated from COA Object Class Feed');
+	END IF;
+	
 	RAISE NOTICE '2';
 	
 	INSERT INTO ref_object_class_history(object_class_history_id,object_class_id,object_class_name,object_class_short_name,
@@ -592,6 +726,13 @@ BEGIN
 	WHERE 	exists_flag ='N'
 		OR (exists_flag ='Y' and modified_flag='Y');
 		
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+
+	IF l_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'O',l_count, 'Object Class history records inserted from COA Object Class Feed');
+	END IF;
+	
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
@@ -610,9 +751,7 @@ DECLARE
 	ry_count int:=0;
 	ry_ins_count int:=0;
 	ry_update_count int:=0;
-
-
-
+	
 BEGIN
 
 	--Initialise variables
@@ -631,8 +770,6 @@ BEGIN
 
 	-- For all records check if data is modified/new
 
-
-
 	INSERT INTO tmp_ref_revenue_category
 	SELECT  a.uniq_id,
 		a.rscat_cd, 
@@ -645,8 +782,6 @@ BEGIN
 	RAISE NOTICE '1';
 
 	-- Generate the revenue category id for new records
-
-
 
 	TRUNCATE etl.ref_revenue_category_id_seq;
 
@@ -663,9 +798,11 @@ BEGIN
 
 	GET DIAGNOSTICS ry_count = ROW_COUNT;
 	ry_ins_count := ry_count;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,ry_data_source_code,ry_ins_count, '# of records inserted into revenue_category');
-
+	
+	IF ry_ins_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,ry_data_source_code,ry_ins_count, '# of records inserted into revenue_category');
+	END IF;
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_category_1(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar,rscat_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_category_id smallint)
 	DISTRIBUTED BY (revenue_category_id);
@@ -673,8 +810,6 @@ BEGIN
 	INSERT INTO tmp_ref_revenue_category_1
 	SELECT a.*,b.revenue_category_id FROM tmp_ref_revenue_category a JOIN ref_revenue_category b ON a.rscat_cd = b.revenue_category_code
 	WHERE exists_flag ='Y' and modified_flag='Y';
-
-
 
 	RAISE NOTICE '2';
 
@@ -689,9 +824,11 @@ BEGIN
 
 	GET DIAGNOSTICS ry_count = ROW_COUNT;
 	ry_update_count := ry_count;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,ry_data_source_code,ry_update_count, '# of records updated in revenue_category ');
-
+	
+	IF ry_update_count > 0 THEN 
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,ry_data_source_code,ry_update_count, '# of records updated in revenue_category ');
+	END IF;
 
 	RAISE NOTICE 'INSIDE';
 
@@ -716,9 +853,6 @@ DECLARE
 	rc_count int:=0;
 	rc_ins_count int:=0;
 	rc_update_count int:=0;
-
-
-
 BEGIN
 	--Initialise variables
 	rc_data_source_code :='';
@@ -761,13 +895,13 @@ BEGIN
 	SELECT a.revenue_class_id,b.rscls_cd,b.rscls_nm,b.rscls_sh_nm, now()::timestamp, p_load_id_in
 	FROM   etl.ref_revenue_class_id_seq a JOIN tmp_ref_revenue_class b ON a.uniq_id = b.uniq_id;
 
-
-
 	GET DIAGNOSTICS rc_count = ROW_COUNT;
 	rc_ins_count := rc_count;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rc_data_source_code,rc_ins_count, '# of records inserted into revenue_class');
-
+	
+	IF rc_ins_count > 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,rc_data_source_code,rc_ins_count, '# of records inserted into revenue_class');
+	END IF;
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),
 						rscls_nm varchar,rscls_sh_nm varchar, 
@@ -793,9 +927,12 @@ BEGIN
 
 	GET DIAGNOSTICS rc_count = ROW_COUNT;
 	rc_update_count := rc_count;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rc_data_source_code,rc_update_count, '# of records updated in revenue_class');
-
+	
+	IF rc_update_count > 0 THEN 
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,rc_data_source_code,rc_update_count, '# of records updated in revenue_class');
+	END IF;
+	
 	RAISE NOTICE 'INSIDE';
 
 	Return 1;
@@ -817,8 +954,6 @@ DECLARE
 	rs_count int:=0;
 	rs_ins_count int:=0;
 	rs_update_count int:=0;
-
-
 BEGIN
 	--Initialise variables
 	rs_data_source_code :='';
@@ -1014,9 +1149,11 @@ BEGIN
 
 	GET DIAGNOSTICS rs_count = ROW_COUNT;
 	rs_ins_count := rs_count;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rs_data_source_code,rs_ins_count,'# of records inserted in revenue_source');
-
+	
+	IF rs_ins_count > 0 THEN 
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,rs_data_source_code,rs_ins_count,'# of records inserted in revenue_source');
+	END IF;
 
 	RAISE NOTICE 'RS - 4';
 
@@ -1044,9 +1181,11 @@ BEGIN
 
 	GET DIAGNOSTICS rs_count = ROW_COUNT;
 	rs_update_count := rs_count;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,rs_data_source_code,rs_update_count, '# of records updated in revenue_source');
-
+	
+	IF rs_update_count > 0 THEN 
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,rs_data_source_code,rs_update_count, '# of records updated in revenue_source');
+	END IF;
 
 	RAISE NOTICE 'INSIDE';
 
