@@ -1187,7 +1187,14 @@ CREATE TABLE revenue_budget
   updated_load_id integer,
   created_date timestamp without time zone,
   updated_date timestamp without time zone,
-  budget_fiscal_year_id smallint
+  budget_fiscal_year_id smallint,
+  revenue_category_id smallint,
+  revenue_category_code varchar(4),
+  revenue_category_name varchar(60),
+  revenue_category_id smallint,
+  revenue_category_code varchar(4),
+  revenue_category_name varchar(60),
+  budget_code_name varchar(60)
 ) DISTRIBUTED BY (budget_id);
 
 
@@ -1366,22 +1373,15 @@ CREATE TABLE ref_fiscal_period(
 )
 DISTRIBUTED BY (fiscal_period);
 
-
-CREATE TABLE aggregateon_revenue_category(
+CREATE TABLE aggregateon_revenue_category_funding_class(
 	revenue_category_id smallint,
+	funding_class_id smallint,
+	funding_class_code character varying,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
 	current_modified_amount numeric(16,2))
 DISTRIBUTED BY (revenue_category_id);	
-
-CREATE TABLE aggregateon_revenue_funding_class(
-	funding_class_id smallint,
-	budget_fiscal_year_id smallint,
-	posting_amount numeric(16,2),
-	adopted_amount numeric(16,2),
-	current_modified_amount numeric(16,2))
-DISTRIBUTED BY (funding_class_id);	
 
 CREATE TABLE aggregateon_spending_vendor_exp_object(
 	vendor_id integer,
