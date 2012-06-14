@@ -725,8 +725,8 @@ BEGIN
 	SELECT uniq_id
 	FROM  tmp_new_ct_fms_con;
 	
-	INSERT INTO history_agreement(agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag,original_version_flag,latest_flag,original_agreement_id,created_load_id,created_date)
-	SELECT  b.agreement_id, a.con_document_code_id,a.con_agency_history_id,a.con_document_id,1 as document_version,p_privacy_flag_in,'Y','Y', b.agreement_id, p_load_id_in, now()::timestamp
+	INSERT INTO history_agreement(agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag,original_version_flag,latest_flag,original_agreement_id,created_load_id,created_date,contract_number)
+	SELECT  b.agreement_id, a.con_document_code_id,a.con_agency_history_id,a.con_document_id,1 as document_version,p_privacy_flag_in,'Y','Y', b.agreement_id, p_load_id_in, now()::timestamp,a.con_document_code||a.con_agency_code||a.con_document_id as contract_number
 	FROM	tmp_new_ct_fms_con a JOIN etl.agreement_id_seq b ON a.uniq_id = b.uniq_id;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
@@ -854,7 +854,7 @@ BEGIN
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_agreement_con_fy
-    SELECT a.disbursement_line_item_id, b.original_agreement_id,b.master_agreement_id,b.contract_number,
+	SELECT a.disbursement_line_item_id, b.original_agreement_id,b.master_agreement_id,b.contract_number,
 	b.maximum_contract_amount as maximum_contract_amount_fy ,
 	b.description as purpose_fy ,
 	b.vendor_id as contract_vendor_id_fy,
@@ -875,8 +875,7 @@ BEGIN
 		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
 		LEFT JOIN tmp_agreement_con_fy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
 		WHERE f.disbursement_line_item_id IS NULL ;
-   
-		
+   	
 	UPDATE tmp_agreement_con a
 	SET master_agreement_id = b.master_agreement_id,
 		maximum_contract_amount = b.maximum_contract_amount_fy,
