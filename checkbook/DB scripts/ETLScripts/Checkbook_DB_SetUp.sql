@@ -25,7 +25,6 @@ psql -d $DB_NAME -f $SCRIPT_DIR/CON-POScripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/FMSScripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/BudgetScripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/Scripts.sql
-psql -d $DB_NAME -f $SCRIPT_DIR/RulesInPublicSchema.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/PMSScripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/RevenueScripts.sql
 
