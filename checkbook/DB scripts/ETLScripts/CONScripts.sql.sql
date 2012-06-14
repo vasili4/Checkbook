@@ -381,8 +381,8 @@ BEGIN
 	SELECT uniq_id
 	FROM  tmp_new_ct_mag_con;
 	
-	INSERT INTO history_master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag,created_load_id,created_date)
-	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,1 as document_version,'F' as privacy_flag,p_load_id_in,now()::timestamp
+	INSERT INTO history_master_agreement(master_agreement_id,document_code_id,agency_history_id,document_id,document_version,privacy_flag,created_load_id,created_date,contract_number)
+	SELECT  b.agreement_id, a.mag_document_code_id,a.mag_agency_history_id,a.mag_document_id,1 as document_version,'F' as privacy_flag,p_load_id_in,now()::timestamp,mag_document_code||mag_agency_code||mag_document_id as contract_number
 	FROM	tmp_new_ct_mag_con a JOIN etl.agreement_id_seq b ON a.uniq_id = b.uniq_id;	
 		
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
