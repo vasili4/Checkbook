@@ -1173,21 +1173,16 @@ CREATE TABLE ref_fiscal_period(
 )
 DISTRIBUTED BY (fiscal_period);
 
-CREATE TABLE aggregateon_revenue_category(
+
+CREATE TABLE aggregateon_revenue_category_funding_class(
 	revenue_category_id smallint,
+	funding_class_id smallint,
+	funding_class_code character varying,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
 	current_modified_amount numeric(16,2))
 DISTRIBUTED BY (revenue_category_id);	
-
-CREATE TABLE aggregateon_revenue_funding_class(
-	funding_class_id smallint,
-	budget_fiscal_year_id smallint,
-	posting_amount numeric(16,2),
-	adopted_amount numeric(16,2),
-	current_modified_amount numeric(16,2))
-DISTRIBUTED BY (funding_class_id);	
 
 CREATE TABLE aggregateon_spending_vendor_exp_object(
 	vendor_id integer,
