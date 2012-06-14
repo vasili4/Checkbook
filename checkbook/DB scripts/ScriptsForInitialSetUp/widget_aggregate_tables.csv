@@ -148,54 +148,37 @@ GROUP BY 1,2,3,4,5,6","SELECT a.agreement_id,
           ON COALESCE(b.master_agreement_id, b.agreement_id) =
                 a.agreement_id
 GROUP BY 1,2,3,4,5,6"
-RevenueByCategoryId,aggregateon_revenue_category,"SELECT COALESCE(a.revenue_category_id,a1.revenue_category_id),
-       COALESCE(a.budget_fiscal_year,a1.budget_fiscal_year) as budget_fiscal_year,
+RevenueByCategoryIdByFundingClass,aggregateon_revenue_category_funding_class,"SELECT b1.revenue_category_id,b1.funding_class_id,f.funding_class_code,budget_fiscal_year_id,
+               posting_amount,adopted_amount,current_budget_amount
+FROM
+(
+SELECT COALESCE(a.revenue_category_id,a1.revenue_category_id) as revenue_category_id,
+               COALESCE(a.funding_class_id,a1.funding_class_id) as funding_class_id,
+       COALESCE(a.budget_fiscal_year_id,a1.budget_fiscal_year_id) as budget_fiscal_year_id,
        sum(a.posting_amount) AS posting_amount,
        SUM(a1.adopted_amount) AS adopted_amount,
        SUM(a1.current_budget_amount) AS current_budget_amount
   FROM (SELECT y.revenue_category_id,
-               x.budget_fiscal_year,
+                      y.funding_class_id,
+               x.budget_fiscal_year_id,
                sum(x.posting_amount) AS posting_amount
           FROM   revenue_details x
                           JOIN
                              ref_revenue_source y
                           ON x.revenue_source_id = y.revenue_source_id
-                   GROUP BY 1,2) a
+                   GROUP BY 1, 2,3) a
           full outer join
 (SELECT b.revenue_category_id,
- a.budget_fiscal_year,
+  b.funding_class_id,
+a.budget_fiscal_year_id,
   sum(a.adopted_amount) as adopted_amount,
        sum(a.current_modified_budget_amount) as current_budget_amount
   FROM revenue_budget a
        JOIN ref_revenue_source b
           ON a.revenue_source_id = b.revenue_source_id
-  GROUP BY 1,2) a1 on a.revenue_category_id = a1.revenue_category_id and a.budget_fiscal_year = a1.budget_fiscal_year
-group by 1,2
-order by 1,2",
-RevenueByFundingClassId,aggregateon_revenue_funding_class,"SELECT COALESCE(a.funding_class_id,a1.funding_class_id),
-       COALESCE(a.budget_fiscal_year,a1.budget_fiscal_year) as budget_fiscal_year,
-       sum(a.posting_amount) as posting_amount,
-       SUM(a1.adopted_amount) AS adopted_amount,
-       SUM(a1.current_budget_amount) AS current_modified_amount
-  FROM (SELECT y.funding_class_id,
-               x.budget_fiscal_year,
-               sum(x.posting_amount) AS posting_amount
-          FROM   revenue_details x
-                          JOIN
-                             ref_revenue_source y
-                          ON x.revenue_source_id = y.revenue_source_id
-                   GROUP BY 1, 2) a
-full outer join
-(SELECT b.funding_class_id,
- a.budget_fiscal_year,
-  sum(a.adopted_amount) as adopted_amount,
-       sum(a.current_modified_budget_amount) as current_budget_amount
-  FROM revenue_budget a
-       JOIN ref_revenue_source b
-          ON a.revenue_source_id = b.revenue_source_id
-  GROUP BY 1,2) a1 on a.funding_class_id = a1.funding_class_id and a.budget_fiscal_year = a1.budget_fiscal_year
-group by 1,2
-order by 1,2",
+  GROUP BY 1,2,3) a1 on a.revenue_category_id = a1.revenue_category_id and a.funding_class_id = a1.funding_class_id and a.budget_fiscal_year_id = a1.budget_fiscal_year_id
+group by 1,2,3 ) b1 left join ref_funding_class f on b1.funding_class_id = f.funding_class_id
+ORDER BY 4",
 SpendingByVendorExpObject,aggregateon_spending_vendor_exp_object,"SELECT vendor_id,expenditure_object_id,
  check_eft_issued_nyc_year_id AS year_id, 'B' as type_of_year,SUM(check_amount) as total_spending_amount
  FROM disbursement_line_item_details
