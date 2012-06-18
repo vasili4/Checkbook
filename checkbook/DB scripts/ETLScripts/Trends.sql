@@ -441,3 +441,958 @@ INSERT INTO trends_personal_income (category, fips, area, line_code, fiscal_year
 INSERT INTO trends_personal_income (category, fips, area, line_code, fiscal_year, income_or_population, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), fips, area, line_code, 1980, fy_1980, display_order, highlight_yn, amount_display_type, indentation_level from etl.trends_personal_income_temp;
 
 
+-- 6) Trends_collection_cancellation_abatements
+
+CREATE TABLE trends_collection_cancellation_abatements_temp
+(fiscal_year smallint,
+tax_levy numeric(20,2),
+collection numeric(4,2),
+cancellations numeric(4,2),
+abatement_and_discounts numeric(4,2),
+uncollected_balance_percent numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+
+CREATE TABLE trends_collection_cancellation_abatements
+(fiscal_year smallint,
+tax_levy numeric(20,2),
+collection numeric(4,2),
+cancellations numeric(4,2),
+abatement_and_discounts numeric(4,2),
+uncollected_balance_percent numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+
+/*
+1)            Modified the attached source excel by adding  the header names.
+2)            Removed commas by formatting the amount fields.
+3)            Created the CSV of modified excel. 
+4)            And then ran the below commands to populate the data in trends_collection_cancellation_abatements_temp table 
+*/
+
+
+COPY  trends_collection_cancellation_abatements_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_collection_cancellation_abatements.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_collection_cancellation_abatements  select * from trends_collection_cancellation_abatements_temp;
+
+
+-- 7) trends_employement_status_of_resident_population
+
+
+
+CREATE TABLE trends_employement_status_of_resident_population_temp
+(
+fiscal_year smallint,
+civilian_labor_force_new_york_city_employed numeric(20,2),
+civilian_labor_force_unemployed numeric(20,2),	
+unemployment_rate_city_precent	numeric(4,2),
+unemployment_rate_united_states_percent numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+
+CREATE TABLE trends_employement_status_of_resident_population
+(
+fiscal_year smallint,
+civilian_labor_force_new_york_city_employed numeric(20,2),
+civilian_labor_force_unemployed numeric(20,2),	
+unemployment_rate_city_precent	numeric(4,2),
+unemployment_rate_united_states_percent numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+/*
+1)            Modified the attached source excel by adding  the header names.
+2)            Removed commas by formatting the amount fields.
+3)            Created the CSV of modified excel. 
+4)            And then ran the below commands to populate the data in trends_employement_status_of_resident_population_temp table 
+*/
+
+
+COPY  employement_status_of_resident_population_temp FROM '/home/gpadmin/TREDDY/TRENDS/employement_status_of_resident_population.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO employement_status_of_resident_population  select * from employement_status_of_resident_population_temp;
+
+
+-- 8) trends_non_agricultural_wage_salary_employement
+
+CREATE TABLE trends_non_agricultural_wage_salary_employement_temp
+(
+category character varying,
+fy_2011 numeric(20,2),
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),	
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),	
+fy_2004 numeric(20,2),	
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+fy_2001 numeric(20,2),
+fy_2000 numeric(20,2),
+fy_1999 numeric(20,2),
+fy_1998 numeric(20,2),
+fy_1997 numeric(20,2),
+fy_1996 numeric(20,2),
+fy_1995 numeric(20,2),
+fy_1994 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+
+CREATE TABLE trends_non_agricultural_wage_salary_employement
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+
+COPY  trends_non_agricultural_wage_salary_employement_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_non_agricultural_wage_salary_employement.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001, fy_2001, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000, fy_2000, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999, fy_1999, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998, fy_1998, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_non_agricultural_wage_salary_employement_temp;
+
+-- 9)
+
+CREATE TABLE trends_numberofcityemployees_temp
+(
+category character varying,
+fy_2011 numeric(20,2),
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),	
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),	
+fy_2004 numeric(20,2),	
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+fy_2001 numeric(20,2),
+fy_2000 numeric(20,2),
+fy_1999 numeric(20,2),
+fy_1998 numeric(20,2),
+fy_1997 numeric(20,2),
+fy_1996 numeric(20,2),
+fy_1995 numeric(20,2),
+fy_1994 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+
+CREATE TABLE trends_numberofcityemployees
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+
+COPY  trends_numberofcityemployees_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_numberofcityemployees.csv' CSV HEADER QUOTE as '"';
+
+
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001, fy_2001, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000, fy_2000, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999, fy_1999, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998, fy_1998, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_numberofcityemployees_temp;
+
+
+-- 10)  trends_new_york_city_educational_construction
+
+CREATE TABLE trends_new_york_city_educational_construction_temp
+(
+fiscal_year smallint,
+rental_revenue	numeric(20,2),
+interest_revenue	numeric(20,2),
+total_revenue numeric(20,2),
+interest numeric(20,2),
+pricipal numeric(20,2),
+total	numeric(20,2),
+operating_expenses numeric(20,2),
+total_to_be_covered numeric(20,2),
+coverage_ratio numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+
+CREATE TABLE trends_new_york_city_educational_construction
+(
+fiscal_year smallint,
+rental_revenue	numeric(20,2),
+interest_revenue	numeric(20,2),
+total_revenue numeric(20,2),
+interest numeric(20,2),
+pricipal numeric(20,2),
+total	numeric(20,2),
+operating_expenses numeric(20,2),
+total_to_be_covered numeric(20,2),
+coverage_ratio numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+COPY  trends_new_york_city_educational_construction_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_new_york_city_educational_construction.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_new_york_city_educational_construction  select * from trends_new_york_city_educational_construction_temp;
+
+
+
+-- 11) trends_changes_in_fund_balances
+
+CREATE TABLE trends_changes_in_fund_balances_temp
+(
+category character varying,
+fy_2011 numeric(20,2),
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),	
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),	
+fy_2004 numeric(20,2),	
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+fy_2001 numeric(20,2),
+fy_2000 numeric(20,2),
+fy_1999 numeric(20,2),
+fy_1998 numeric(20,2),
+fy_1997 numeric(20,2),
+fy_1996 numeric(20,2),
+fy_1995 numeric(20,2),
+fy_1994 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+
+CREATE TABLE trends_changes_in_fund_balances
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+
+COPY  trends_changes_in_fund_balances_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_changes_in_fund_balances.csv' CSV HEADER QUOTE as '"';
+
+
+
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001, fy_2001, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000, fy_2000, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999, fy_1999, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998, fy_1998, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+
+
+
+-- 12) trends_capital_assets_statistics_function_program
+
+CREATE TABLE trends_capital_assets_statistics_function_program_temp
+(
+category character varying,
+fy_2011 numeric(20,2),
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),	
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),	
+fy_2004 numeric(20,2),	
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+
+CREATE TABLE trends_capital_assets_statistics_function_program
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+COPY  trends_capital_assets_statistics_function_program_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_capital_assets_statistics_function_program.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_capital_assets_statistics_function_program_temp;
+
+
+-- 13) trends_assesed_valuation_tax_rate_class
+
+
+CREATE TABLE trends_assesed_valuation_tax_rate_class_temp
+(
+category character varying,
+fy2011assesed_value_million numeric(20,2),
+fy2011percentage_taxable_real_estate numeric(20,2),
+fy2011_direct_tax_rate numeric(20,2),
+fy2010assesed_value_million numeric(20,2),
+fy2010percentage_taxable_real_estate	 numeric(20,2),
+fy2010_direct_tax_rate numeric(20,2),
+fy2009assesed_value_million numeric(20,2),
+fy2009percentage_taxable_real_estate numeric(20,2),
+fy2009_direct_tax_rate	 numeric(20,2),
+fy2008assesed_value_million numeric(20,2),
+fy2008percentage_taxable_real_estate numeric(20,2),
+fy2008_direct_tax_rate numeric(20,2),
+fy2007assesed_value_million numeric(20,2),
+fy2007percentage_taxable_real_estate	 numeric(20,2),
+fy2007_direct_tax_rate numeric(20,2),
+fy2006assesed_value_million numeric(20,2),
+fy2006percentage_taxable_real_estate numeric(20,2),
+fy2006_direct_tax_rate	 numeric(20,2),
+fy2005assesed_value_million numeric(20,2),
+fy2005percentage_taxable_real_estate numeric(20,2),
+fy2005_direct_tax_rate numeric(20,2),
+fy2004assesed_value_million numeric(20,2),
+fy2004percentage_taxable_real_estate numeric(20,2),
+fy2004_direct_tax_rate numeric(20,2),
+fy2003assesed_value_million numeric(20,2),
+fy2003percentage_taxable_real_estate	 numeric(20,2),
+fy2003_direct_tax_rate numeric(20,2),
+fy2002assesed_value_million numeric(20,2),
+fy2002percentage_taxable_real_estate numeric(20,2),
+fy2002_direct_tax_rate numeric(20,2),
+fy2001assesed_value_million numeric(20,2),
+fy2001percentage_taxable_real_estate	 numeric(20,2),
+fy2001_direct_tax_rate	 numeric(20,2),
+fy2000assesed_value_million	 numeric(20,2),
+fy2000percentage_taxable_real_estate numeric(20,2),
+fy1999assesed_value_million numeric(20,2),
+fy2000_direct_tax_rate	 numeric(20,2),
+fy1999percentage_taxable_real_estate numeric(20,2),
+fy1999_direct_tax_rate numeric(20,2),
+fy1998assesed_value_million numeric(20,2),
+fy1998percentage_taxable_real_estate numeric(20,2),
+fy1998_direct_tax_rate numeric(20,2),
+fy1997assesed_value_million numeric(20,2),
+fy1997percentage_taxable_real_estate	 numeric(20,2),
+fy1997_direct_tax_rate numeric(20,2),
+fy1996assesed_value_million numeric(20,2),
+fy1996percentage_taxable_real_estate numeric(20,2),
+fy1996_direct_tax_rate numeric(20,2),
+fy1995assesed_value_million numeric(20,2),
+fy1995percentage_taxable_real_estate numeric(20,2),
+fy1995_direct_tax_rate numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+distributed by (category);
+
+
+CREATE TABLE trends_assesed_valuation_tax_rate_class
+(
+category character varying,
+fiscal_year smallint,
+assesed_value_million_amount numeric(20,2),
+percentage_taxable_real_estate numeric(20,2),
+direct_tax_rate numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+COPY  trends_assesed_valuation_tax_rate_class_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_assesed_valuation_tax_rate_class.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011,fy2011assesed_value_million,fy2011percentage_taxable_real_estate,fy2011_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010,fy2010assesed_value_million,fy2010percentage_taxable_real_estate,fy2010_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009,fy2009assesed_value_million,fy2009percentage_taxable_real_estate,fy2009_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008,fy2008assesed_value_million,fy2008percentage_taxable_real_estate,fy2008_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007,fy2007assesed_value_million,fy2007percentage_taxable_real_estate,fy2007_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006,fy2006assesed_value_million,fy2006percentage_taxable_real_estate,fy2006_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005,fy2005assesed_value_million,fy2005percentage_taxable_real_estate,fy2005_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004,fy2004assesed_value_million,fy2004percentage_taxable_real_estate,fy2004_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003,fy2003assesed_value_million,fy2003percentage_taxable_real_estate,fy2003_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002,fy2002assesed_value_million,fy2002percentage_taxable_real_estate,fy2002_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001,fy2001assesed_value_million,fy2001percentage_taxable_real_estate,fy2001_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000,fy2000assesed_value_million,fy2000percentage_taxable_real_estate,fy2000_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999,fy1999assesed_value_million,fy1999percentage_taxable_real_estate,fy1999_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998,fy1998assesed_value_million,fy1998percentage_taxable_real_estate,fy1998_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997,fy1997assesed_value_million,fy1997percentage_taxable_real_estate,fy1997_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996,fy1996assesed_value_million,fy1996percentage_taxable_real_estate,fy1996_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, assesed_value_million_amount,percentage_taxable_real_estate,direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995,fy1995assesed_value_million,fy1995percentage_taxable_real_estate,fy1995_direct_tax_rate, display_order, highlight_yn, amount_display_type, indentation_level from trends_assesed_valuation_tax_rate_class_temp;
+
+
+-- 14) trends_assesed_estimated_actual_taxable_property
+
+
+CREATE TABLE trends_assesed_estimated_actual_taxable_property_temp
+(
+fiscal_year smallint,
+class_one numeric(20,2),
+class_two numeric(20,2),
+class_three numeric(20,2),
+class_four numeric(20,2),
+less_tax_exempt_property numeric(20,2),
+total_taxable_assesed_value numeric(20,2),
+totl_direct_tax numeric(20,2),
+estimated_actual_taxable_value numeric(20,2),
+assesed_value_percentage numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+
+CREATE TABLE trends_assesed_estimated_actual_taxable_property
+(
+fiscal_year smallint,
+class_one numeric(20,2),
+class_two numeric(20,2),
+class_three numeric(20,2),
+class_four numeric(20,2),
+less_tax_exempt_property numeric(20,2),
+total_taxable_assesed_value numeric(20,2),
+totl_direct_tax numeric(20,2),
+estimated_actual_taxable_value numeric(20,2),
+assesed_value_percentage numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+/*
+1)            Modified the attached source excel by adding  the header names.
+2)            Removed commas by formatting the amount fields.
+3)            Created the CSV of modified excel. 
+4)            And then ran the below commands to populate the data in trends_assesed_estimated_actual_taxable_property table 
+*/
+
+
+COPY  trends_assesed_estimated_actual_taxable_property_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_assesed_estimated_actual_taxable_property.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_assesed_estimated_actual_taxable_property  select * from trends_assesed_estimated_actual_taxable_property_temp;
+
+
+-- 15)  trends_nyc_population_temp
+
+CREATE TABLE trends_nyc_population_temp
+(
+fiscal_year smallint,
+united_states integer,
+percentage_change_from_prior_period numeric(4,2),
+city_of_new_york integer,
+percentage_change_prior_period numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+
+CREATE TABLE trends_nyc_population
+(
+fiscal_year smallint,
+united_states integer,
+percentage_change_from_prior_period numeric(4,2),
+city_of_new_york integer,
+percentage_change_prior_period numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+
+COPY  trends_nyc_population_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_nyc_population.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_nyc_population  select * from trends_nyc_population_temp;
+
+-- 16)  trends_property_tax
+
+CREATE TABLE trends_property_tax_temp
+(
+fiscal_year smallint,
+basic_rate numeric(4,2),
+obligation_debt numeric(4,2),
+total_direct numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+
+CREATE TABLE trends_property_tax
+(
+fiscal_year smallint,
+basic_rate numeric(4,2),
+obligation_debt numeric(4,2),
+total_direct numeric(4,2)
+)
+Distributed by (fiscal_year);
+
+
+COPY  trends_property_tax_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_property_tax.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_property_tax select * from trends_property_tax_temp;
+
+
+
+-- 17) trends_person_receiving_pubic_assistance
+
+CREATE TABLE trends_person_receiving_pubic_assistance_temp
+(
+fiscal_year smallint,
+public_assistance integer,
+SSI integer
+)
+Distributed by (fiscal_year);
+
+CREATE TABLE trends_person_receiving_pubic_assistance
+(
+fiscal_year smallint,
+public_assistance integer,
+SSI integer
+)
+Distributed by (fiscal_year);
+
+
+COPY  trends_person_receiving_pubic_assistance_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_person_recieving_public_asssistance.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_person_receiving_pubic_assistance select * from trends_person_receiving_pubic_assistance_temp;
+
+
+
+-- 18)
+
+CREATE TABLE trends_pledged_revenue_temp
+(
+fiscal_year smallint,
+PIT_revenue integer,
+sales_tax_revenue integer,
+total_receipt	 integer,
+other integer,
+investment_earnings integer,
+total_revenue integer,
+interest integer,
+pricipal integer,
+total integer,
+operating_expenses integer,
+total_to_be_covered integer
+)
+Distributed by (fiscal_year);
+
+
+
+CREATE TABLE trends_pledged_revenue
+(
+fiscal_year smallint,
+PIT_revenue integer,
+sales_tax_revenue integer,
+total_receipt	 integer,
+other integer,
+investment_earnings integer,
+total_revenue integer,
+interest integer,
+pricipal integer,
+total integer,
+operating_expenses integer,
+total_to_be_covered integer
+)
+Distributed by (fiscal_year);
+
+
+
+
+COPY  trends_pledged_revenue_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_pledged_revenue.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_pledged_revenue select * from trends_pledged_revenue_temp;
+
+
+-- 19)
+
+CREATE TABLE trends_uncollected_parking_violation_temp
+(
+category varchar,	
+fy_2011	numeric(20,2),
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),
+fy_2004 numeric(20,2),
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+fy_2001 numeric(20,2),
+fy_2000 numeric(20,2),
+fy_1999 numeric(20,2),
+fy_1998 numeric(20,2),
+fy_1997 numeric(20,2),
+fy_1996 numeric(20,2),
+fy_1995 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+CREATE TABLE trends_uncollected_parking_violation
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+COPY  trends_uncollected_parking_violation_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_uncollected_parking_violation.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001, fy_2001, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000, fy_2000, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999, fy_1999, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998, fy_1998, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
+
+- 20)  trends_changes_net_assets
+
+CREATE TABLE trends_changes_net_assets_temp
+(
+category varchar,	
+fy_2011	numeric(20,2),
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),
+fy_2004 numeric(20,2),
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+fy_2001 numeric(20,2),
+fy_2000 numeric(20,2),
+fy_1999 numeric(20,2),
+fy_1998 numeric(20,2),
+fy_1997 numeric(20,2),
+fy_1996 numeric(20,2),
+fy_1995 numeric(20,2),
+fy_1994 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+CREATE TABLE trends_changes_net_assets
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+COPY  trends_changes_net_assets_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_changes_net_assets.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001, fy_2001, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000, fy_2000, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999, fy_1999, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998, fy_1998, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
+
+-- 21) trends_government_funds
+
+CREATE TABLE trends_government_funds_temp
+(
+category varchar,	
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),
+fy_2004 numeric(20,2),
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+fy_2001 numeric(20,2),
+fy_2000 numeric(20,2),
+fy_1999 numeric(20,2),
+fy_1998 numeric(20,2),
+fy_1997 numeric(20,2),
+fy_1996 numeric(20,2),
+fy_1995 numeric(20,2),
+fy_1994 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+CREATE TABLE trends_government_funds
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+COPY  trends_government_funds_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_government_funds.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001, fy_2001, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000, fy_2000, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999, fy_1999, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998, fy_1998, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
+
+-- 22)  trends_hudson_yards_infrastructure
+
+CREATE TABLE trends_hudson_yards_infrastructure_temp
+(
+fiscal_year	smallint,
+dib_revenue_1 numeric(20,2),
+tep_revenue_2 numeric(20,2),
+isp_revenue_3 numeric(20,2),
+other_4	 numeric(20,2),
+investment_earnings numeric(20,2),
+total_revenue numeric(20,2),
+interest	 numeric(20,2),
+principal	 numeric(20,2),
+total numeric(20,2),
+operating_expenses numeric(20,2),
+total_to_be_covered numeric(20,2),
+coverage_on_total_revenue_5 numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+CREATE TABLE trends_hudson_yards_infrastructure
+(
+fiscal_year	smallint,
+dib_revenue_1 numeric(20,2),
+tep_revenue_2 numeric(20,2),
+isp_revenue_3 numeric(20,2),
+other_4	 numeric(20,2),
+investment_earnings numeric(20,2),
+total_revenue numeric(20,2),
+interest	 numeric(20,2),
+principal	 numeric(20,2),
+total numeric(20,2),
+operating_expenses numeric(20,2),
+total_to_be_covered numeric(20,2),
+coverage_on_total_revenue_5 numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+COPY  trends_hudson_yards_infrastructure_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_hudson_yards_infrastructure.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_hudson_yards_infrastructure_temp  select * from trends_hudson_yards_infrastructure_temp;
+
+
+-- 23)
+
+CREATE TABLE trends_legal_debt_margin_temp
+(
+category varchar,	
+fy_2011	numeric(20,2),
+fy_2010 numeric(20,2),
+fy_2009 numeric(20,2),
+fy_2008 numeric(20,2),
+fy_2007 numeric(20,2),
+fy_2006 numeric(20,2),
+fy_2005 numeric(20,2),
+fy_2004 numeric(20,2),
+fy_2003 numeric(20,2),
+fy_2002 numeric(20,2),
+fy_2001 numeric(20,2),
+fy_2000 numeric(20,2),
+fy_1999 numeric(20,2),
+fy_1998 numeric(20,2),
+fy_1997 numeric(20,2),
+fy_1996 numeric(20,2),
+fy_1995 numeric(20,2),
+fy_1994 numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+Distributed by (category);
+
+CREATE TABLE trends_legal_debt_margin
+(
+category character varying,
+fiscal_year smallint,
+amount numeric(20,2),
+display_order smallint,
+highlight_yn character(1),
+amount_display_type character(1),
+indentation_level smallint
+)
+DISTRIBUTED BY (category);
+
+
+COPY  trends_legal_debt_margin_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_legal_debt_margin.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2007, fy_2007, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2006, fy_2006, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2005, fy_2005, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2004, fy_2004, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2003, fy_2003, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2002, fy_2002, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2001, fy_2001, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2000, fy_2000, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1999, fy_1999, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1998, fy_1998, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
+
+
+-- 24) trends_ratios_general_bonded_debt_outstanding
+
+CREATE TABLE trends_ratios_general_bonded_debt_outstanding_temp
+(
+fiscal_year smallint,
+general_obligation_bonds numeric(20,2),
+percentage_atcual_taxable_property numeric(20,2),
+per_capita_general_obligations numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+CREATE TABLE trends_ratios_general_bonded_debt_outstanding
+(
+fiscal_year smallint,
+general_obligation_bonds numeric(20,2),
+percentage_atcual_taxable_property numeric(20,2),
+per_capita_general_obligations numeric(20,2)
+)
+Distributed by (fiscal_year);
+
+COPY  trends_ratios_general_bonded_debt_outstanding_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_ratios_general_bonded_debt_outstanding.csv' CSV HEADER QUOTE as '"';
+
+INSERT INTO trends_ratios_general_bonded_debt_outstanding select * from trends_ratios_general_bonded_debt_outstanding_temp;
+
