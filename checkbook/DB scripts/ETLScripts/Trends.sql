@@ -478,11 +478,11 @@ COPY  trends_collection_cancellation_abatements_temp FROM '/home/gpadmin/TREDDY/
 INSERT INTO trends_collection_cancellation_abatements  select * from trends_collection_cancellation_abatements_temp;
 
 
--- 7) trends_employement_status_of_resident_population
+-- 7) trends_employment_status_of_resident_population
 
 
 
-CREATE TABLE trends_employement_status_of_resident_population_temp
+CREATE TABLE trends_employment_status_of_resident_population_temp
 (
 fiscal_year smallint,
 civilian_labor_force_new_york_city_employed numeric(20,2),
@@ -493,7 +493,7 @@ unemployment_rate_united_states_percent numeric(4,2)
 Distributed by (fiscal_year);
 
 
-CREATE TABLE trends_employement_status_of_resident_population
+CREATE TABLE trends_employment_status_of_resident_population
 (
 fiscal_year smallint,
 civilian_labor_force_new_york_city_employed numeric(20,2),
@@ -507,13 +507,13 @@ Distributed by (fiscal_year);
 1)            Modified the attached source excel by adding  the header names.
 2)            Removed commas by formatting the amount fields.
 3)            Created the CSV of modified excel. 
-4)            And then ran the below commands to populate the data in trends_employement_status_of_resident_population_temp table 
+4)            And then ran the below commands to populate the data in trends_employment_status_of_resident_population_temp table 
 */
 
 
-COPY  employement_status_of_resident_population_temp FROM '/home/gpadmin/TREDDY/TRENDS/employement_status_of_resident_population.csv' CSV HEADER QUOTE as '"';
+COPY  employment_status_of_resident_population_temp FROM '/home/gpadmin/TREDDY/TRENDS/employment_status_of_resident_population.csv' CSV HEADER QUOTE as '"';
 
-INSERT INTO employement_status_of_resident_population  select * from employement_status_of_resident_population_temp;
+INSERT INTO employment_status_of_resident_population  select * from employment_status_of_resident_population_temp;
 
 
 -- 8) trends_non_agricultural_wage_salary_employement
