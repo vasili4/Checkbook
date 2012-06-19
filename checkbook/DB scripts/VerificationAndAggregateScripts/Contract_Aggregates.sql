@@ -313,7 +313,7 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
 	percent_difference numeric(16,2),
 	status_flag char(1),
 	type_of_year char(1)	
-) DISTRIBUTED BY (original_agreement_id);	
+) DISTRIBUTED BY (vendor_id);	
 
 
 -- For Fiscal year 
