@@ -3842,7 +3842,8 @@ CREATE EXTERNAL TABLE ext_stg_pension_fund(
   widget_name character varying(150),
   aggregate_table_name character varying(150),
   query1 text,
-  query2 text
+  query2 text,
+  execution_order smallint
 )
 DISTRIBUTED BY (aggregate_table_name);
 

@@ -2089,10 +2089,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	 EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
 	 FORMAT 'csv' (delimiter ',' null '' escape '"' quote '"')
 	ENCODING 'UTF8';
-	
-	
-	
-	
+		
 	--
 	-- Name: revenue_budget; Type: VIEW; Schema: staging; Owner: gpadmin
 	--
@@ -2182,3 +2179,355 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.payroll_summary t
   		payroll_summary__0.fiscal_year_id ,payroll_summary__0.calendar_fiscal_year_id ,payroll_summary__0.calendar_fiscal_year ,payroll_summary__0.created_load_id ,
   		payroll_summary__0.created_date ,payroll_summary__0.updated_date,payroll_summary__0.updated_load_id
   	FROM payroll_summary__0;
+
+ CREATE EXTERNAL WEB TABLE agreement_snapshot_expanded__0(
+ 	original_agreement_id bigint,
+ 	fiscal_year smallint,
+ 	description varchar,
+ 	contract_number varchar,
+ 	vendor_id int,
+ 	agency_id smallint,
+ 	original_contract_amount numeric(16,2) ,
+ 	maximum_contract_amount numeric(16,2),
+ 	starting_year smallint,	
+ 	ending_year smallint,
+ 	dollar_difference numeric(16,2), 
+ 	percent_difference numeric(17,4),
+ 	award_method_id smallint,
+ 	document_code_id smallint,
+ 	master_agreement_id bigint,
+ 	master_agreement_yn character(1),
+ 	status_flag char(1)
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot_expanded to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+
+CREATE VIEW agreement_snapshot_expanded AS
+	 SELECT agreement_snapshot_expanded__0.original_agreement_id,agreement_snapshot_expanded__0.fiscal_year,agreement_snapshot_expanded__0.description,
+	 	agreement_snapshot_expanded__0.contract_number,agreement_snapshot_expanded__0.vendor_id,agreement_snapshot_expanded__0.agency_id,
+	 	agreement_snapshot_expanded__0.original_contract_amount,agreement_snapshot_expanded__0.maximum_contract_amount,
+	 	agreement_snapshot_expanded__0.starting_year,agreement_snapshot_expanded__0.ending_year,agreement_snapshot_expanded__0.dollar_difference,
+	 	agreement_snapshot_expanded__0.percent_difference,agreement_snapshot_expanded__0.award_method_id,agreement_snapshot_expanded__0.document_code_id,
+	 	agreement_snapshot_expanded__0.master_agreement_id,agreement_snapshot_expanded__0.master_agreement_yn,agreement_snapshot_expanded__0.status_flag
+	 FROM 	agreement_snapshot_expanded__0;
+	 
+CREATE EXTERNAL WEB TABLE agreement_snapshot_expanded_cy__0(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	description varchar,
+	contract_number varchar,
+	vendor_id int,
+	agency_id smallint,
+	original_contract_amount numeric(16,2) ,
+	maximum_contract_amount numeric(16,2),
+	starting_year smallint,	
+	ending_year smallint,
+	dollar_difference numeric(16,2), 
+	percent_difference numeric(17,4),
+	award_method_id smallint,
+	document_code_id smallint,
+	master_agreement_id bigint,
+	master_agreement_yn character(1),
+	status_flag char(1)
+	)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot_expanded_cy to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';	 
+  
+  CREATE VIEW agreement_snapshot_expanded_cy AS
+  	SELECT agreement_snapshot_expanded_cy__0.original_agreement_id,agreement_snapshot_expanded_cy__0.fiscal_year,agreement_snapshot_expanded_cy__0.description,
+  		agreement_snapshot_expanded_cy__0.contract_number,agreement_snapshot_expanded_cy__0.vendor_id,agreement_snapshot_expanded_cy__0.agency_id,
+  		agreement_snapshot_expanded_cy__0.original_contract_amount,agreement_snapshot_expanded_cy__0.maximum_contract_amount,
+  		agreement_snapshot_expanded_cy__0.starting_year,agreement_snapshot_expanded_cy__0.ending_year,agreement_snapshot_expanded_cy__0.dollar_difference,
+  		agreement_snapshot_expanded_cy__0.percent_difference,agreement_snapshot_expanded_cy__0.award_method_id,agreement_snapshot_expanded_cy__0.document_code_id,
+  		agreement_snapshot_expanded_cy__0.master_agreement_id,agreement_snapshot_expanded_cy__0.master_agreement_yn,agreement_snapshot_expanded_cy__0.status_flag
+  	FROM agreement_snapshot_expanded_cy__0;	
+
+CREATE EXTERNAL WEB TABLE aggregateon_contracts_cumulative_spending__0(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	document_code_id smallint,
+	master_agreement_yn character(1),
+	description varchar,
+	contract_number varchar,
+	vendor_id bigint,
+	award_method_id smallint,
+	agency_id smallint,
+	original_contract_amount numeric(16,2),
+	maximum_contract_amount numeric(16,2),
+	spending_amount numeric(16,2),
+	dollar_difference numeric(16,2),
+	percent_difference numeric(16,2),
+	status_flag char(1),
+	type_of_year char(1)	
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_cumulative_spending to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';	 
+  
+  CREATE VIEW aggregateon_contracts_cumulative_spending AS
+  	SELECT aggregateon_contracts_cumulative_spending__0.original_agreement_id,aggregateon_contracts_cumulative_spending__0.fiscal_year,
+  		aggregateon_contracts_cumulative_spending__0.document_code_id,aggregateon_contracts_cumulative_spending__0.master_agreement_yn,
+  		aggregateon_contracts_cumulative_spending__0.description,aggregateon_contracts_cumulative_spending__0.contract_number,
+  		aggregateon_contracts_cumulative_spending__0.vendor_id,aggregateon_contracts_cumulative_spending__0.award_method_id,
+  		aggregateon_contracts_cumulative_spending__0.agency_id,aggregateon_contracts_cumulative_spending__0.original_contract_amount,
+  		aggregateon_contracts_cumulative_spending__0.maximum_contract_amount,aggregateon_contracts_cumulative_spending__0.spending_amount,
+  		aggregateon_contracts_cumulative_spending__0.dollar_difference,aggregateon_contracts_cumulative_spending__0.percent_difference,
+  		aggregateon_contracts_cumulative_spending__0.status_flag,aggregateon_contracts_cumulative_spending__0.type_of_year
+  	FROM 	  aggregateon_contracts_cumulative_spending__0;
+  	
+  CREATE EXTERNAL WEB TABLE aggregateon_total_contracts_agency__0
+  (
+  	fiscal_year smallint,
+  	agency_id smallint,
+  	total_contracts bigint,
+  	total_commited_contracts bigint,
+  	total_master_agreements bigint,
+  	total_standalone_contracts bigint,
+  	total_commited_contracts_amount numeric(16,2),
+  	total_contracts_amount numeric(16,2),
+  	total_spending_amount numeric(16,2), 
+  	status_flag char(1),
+  	type_of_year char(1)
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total_contracts_agency to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+  CREATE VIEW aggregateon_total_contracts_agency AS
+  	SELECT aggregateon_total_contracts_agency__0.fiscal_year,aggregateon_total_contracts_agency__0.agency_id,aggregateon_total_contracts_agency__0.total_contracts,
+  		aggregateon_total_contracts_agency__0.total_commited_contracts,aggregateon_total_contracts_agency__0.total_master_agreements,
+  		aggregateon_total_contracts_agency__0.total_standalone_contracts,aggregateon_total_contracts_agency__0.total_commited_contracts_amount,
+  		aggregateon_total_contracts_agency__0.total_contracts_amount,aggregateon_total_contracts_agency__0.total_spending_amount,
+  		aggregateon_total_contracts_agency__0.status_flag,aggregateon_total_contracts_agency__0.type_of_year
+  	FROM  aggregateon_total_contracts_agency__0;
+  	
+ CREATE EXTERNAL WEB TABLE aggregateon_total_contracts__0
+(
+	fiscal_year smallint,
+	total_contracts bigint,
+	total_commited_contracts bigint,
+	total_master_agreements bigint,
+	total_standalone_contracts bigint,
+	total_commited_contracts_amount numeric(16,2),
+	total_contracts_amount numeric(16,2),
+	total_spending_amount numeric(16,2), 
+	status_flag char(1),
+	type_of_year char(1)
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total_contracts to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+  CREATE VIEW aggregateon_total_contracts AS
+  	SELECT aggregateon_total_contracts__0.fiscal_year,aggregateon_total_contracts__0.total_contracts,aggregateon_total_contracts__0.total_commited_contracts,aggregateon_total_contracts__0.total_master_agreements,aggregateon_total_contracts__0.total_standalone_contracts,aggregateon_total_contracts__0.total_commited_contracts_amount,aggregateon_total_contracts__0.total_contracts_amount,aggregateon_total_contracts__0.total_spending_amount,aggregateon_total_contracts__0.status_flag,aggregateon_total_contracts__0.type_of_year
+  	FROM   aggregateon_total_contracts__0;
+  	
+CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
+ 	original_agreement_id bigint,
+ 	document_version smallint,
+ 	document_code_id smallint,
+ 	agency_history_id smallint,
+ 	agency_id smallint,
+ 	agency_name character varying(50),
+ 	agreement_id bigint,
+ 	starting_year smallint,
+ 	starting_year_id smallint,
+ 	ending_year smallint,
+ 	ending_year_id smallint,
+ 	registered_year smallint,
+ 	registered_year_id smallint,
+ 	contract_number varchar,
+ 	original_contract_amount numeric(16,2),
+ 	maximum_contract_amount numeric(16,2),
+ 	description varchar,
+ 	vendor_history_id integer,
+ 	vendor_id integer,
+ 	vendor_name varchar,
+ 	dollar_difference numeric(16,2),
+ 	percent_difference numeric(17,4),
+ 	master_agreement_id bigint,
+ 	master_contract_number varchar,
+ 	agreement_type_id smallint,
+ 	agreement_type_name varchar,
+ 	award_category_id smallint,
+ 	award_category_name varchar,
+ 	award_method_id smallint,
+        award_method_name character varying,
+ 	expenditure_object_names varchar,
+ 	effective_begin_date date,
+ 	effective_begin_date_id int,
+ 	effective_begin_year smallint,
+ 	effective_begin_year_id smallint,
+ 	effective_end_date date,
+ 	effective_end_date_id int,
+ 	effective_end_year smallint,
+ 	effective_end_year_id smallint,
+ 	registered_date date,
+ 	registered_date_id int,
+ 	brd_awd_no varchar,
+ 	tracking_number varchar, 	
+ 	master_agreement_yn char(1),
+ 	original_version_flag char(1),
+ 	latest_flag char(1)
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+  CREATE VIEW agreement_snapshot AS
+  	SELECT agreement_snapshot__0.original_agreement_id,agreement_snapshot__0.document_version,agreement_snapshot__0.document_code_id,
+  		agreement_snapshot__0.agency_history_id,agreement_snapshot__0.agency_id,agreement_snapshot__0.agency_name,agreement_snapshot__0.agreement_id,
+  		agreement_snapshot__0.starting_year,agreement_snapshot__0.starting_year_id,agreement_snapshot__0.ending_year,agreement_snapshot__0.ending_year_id,
+  		agreement_snapshot__0.registered_year,agreement_snapshot__0.registered_year_id,agreement_snapshot__0.contract_number,
+  		agreement_snapshot__0.original_contract_amount,agreement_snapshot__0.maximum_contract_amount,agreement_snapshot__0.description,
+  		agreement_snapshot__0.vendor_history_id,agreement_snapshot__0.vendor_id,agreement_snapshot__0.vendor_name,agreement_snapshot__0.dollar_difference,
+  		agreement_snapshot__0.percent_difference,agreement_snapshot__0.master_agreement_id,agreement_snapshot__0.master_contract_number,
+  		agreement_snapshot__0.agreement_type_id,agreement_snapshot__0.agreement_type_name,agreement_snapshot__0.award_category_id,
+  		agreement_snapshot__0.award_category_name,agreement_snapshot__0.award_method_id,agreement_snapshot__0.award_method_name,
+  		agreement_snapshot__0.expenditure_object_names,agreement_snapshot__0.effective_begin_date,agreement_snapshot__0.effective_begin_date_id,
+  		agreement_snapshot__0.effective_begin_year,agreement_snapshot__0.effective_begin_year_id,agreement_snapshot__0.effective_end_date,
+  		agreement_snapshot__0.effective_end_date_id,agreement_snapshot__0.effective_end_year,agreement_snapshot__0.effective_end_year_id,
+  		agreement_snapshot__0.registered_date,agreement_snapshot__0.registered_date_id,agreement_snapshot__0.brd_awd_no,agreement_snapshot__0.tracking_number,
+  		agreement_snapshot__0.master_agreement_yn,agreement_snapshot__0.original_version_flag,agreement_snapshot__0.latest_flag
+  	FROM  agreement_snapshot__0;
+  	
+CREATE EXTERNAL WEB TABLE agreement_snapshot_cy__0(
+ 	original_agreement_id bigint,
+ 	document_version smallint,
+ 	document_code_id smallint,
+ 	agency_history_id smallint,
+ 	agency_id smallint,
+ 	agency_name character varying(50),
+ 	agreement_id bigint,
+ 	starting_year smallint,
+ 	starting_year_id smallint,
+ 	ending_year smallint,
+ 	ending_year_id smallint,
+ 	registered_year smallint,
+ 	registered_year_id smallint,
+ 	contract_number varchar,
+ 	original_contract_amount numeric(16,2),
+ 	maximum_contract_amount numeric(16,2),
+ 	description varchar,
+ 	vendor_history_id integer,
+ 	vendor_id integer,
+ 	vendor_name varchar,
+ 	dollar_difference numeric(16,2),
+ 	percent_difference numeric(17,4),
+ 	master_agreement_id bigint,
+ 	master_contract_number varchar,
+ 	agreement_type_id smallint,
+ 	agreement_type_name varchar,
+ 	award_category_id smallint,
+ 	award_category_name varchar,
+ 	award_method_id smallint,
+        award_method_name character varying,
+ 	expenditure_object_names varchar,
+ 	effective_begin_date date,
+ 	effective_begin_date_id int,
+ 	effective_begin_year smallint,
+ 	effective_begin_year_id smallint,
+ 	effective_end_date date,
+ 	effective_end_date_id int,
+ 	effective_end_year smallint,
+ 	effective_end_year_id smallint,
+ 	registered_date date,
+ 	registered_date_id int,
+ 	brd_awd_no varchar,
+ 	tracking_number varchar, 	
+ 	master_agreement_yn char(1),
+ 	original_version_flag char(1),
+ 	latest_flag char(1)
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot_cy to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+  CREATE VIEW agreement_snapshot_cy AS
+  	SELECT agreement_snapshot_cy__0.original_agreement_id,agreement_snapshot_cy__0.document_version,agreement_snapshot_cy__0.document_code_id,
+  		agreement_snapshot_cy__0.agency_history_id,agreement_snapshot_cy__0.agency_id,agreement_snapshot_cy__0.agency_name,agreement_snapshot_cy__0.agreement_id,
+  		agreement_snapshot_cy__0.starting_year,agreement_snapshot_cy__0.starting_year_id,agreement_snapshot_cy__0.ending_year,agreement_snapshot_cy__0.ending_year_id,
+  		agreement_snapshot_cy__0.registered_year,agreement_snapshot_cy__0.registered_year_id,agreement_snapshot_cy__0.contract_number,
+  		agreement_snapshot_cy__0.original_contract_amount,agreement_snapshot_cy__0.maximum_contract_amount,agreement_snapshot_cy__0.description,
+  		agreement_snapshot_cy__0.vendor_history_id,agreement_snapshot_cy__0.vendor_id,agreement_snapshot_cy__0.vendor_name,agreement_snapshot_cy__0.dollar_difference,
+  		agreement_snapshot_cy__0.percent_difference,agreement_snapshot_cy__0.master_agreement_id,agreement_snapshot_cy__0.master_contract_number,
+  		agreement_snapshot_cy__0.agreement_type_id,agreement_snapshot_cy__0.agreement_type_name,agreement_snapshot_cy__0.award_category_id,
+  		agreement_snapshot_cy__0.award_category_name,agreement_snapshot_cy__0.award_method_id,agreement_snapshot_cy__0.award_method_name,
+  		agreement_snapshot_cy__0.expenditure_object_names,agreement_snapshot_cy__0.effective_begin_date,agreement_snapshot_cy__0.effective_begin_date_id,
+  		agreement_snapshot_cy__0.effective_begin_year,agreement_snapshot_cy__0.effective_begin_year_id,agreement_snapshot_cy__0.effective_end_date,
+  		agreement_snapshot_cy__0.effective_end_date_id,agreement_snapshot_cy__0.effective_end_year,agreement_snapshot_cy__0.effective_end_year_id,
+  		agreement_snapshot_cy__0.registered_date,agreement_snapshot_cy__0.registered_date_id,agreement_snapshot_cy__0.brd_awd_no,agreement_snapshot_cy__0.tracking_number,
+  		agreement_snapshot_cy__0.master_agreement_yn,agreement_snapshot_cy__0.original_version_flag,agreement_snapshot_cy__0.latest_flag
+  	FROM  agreement_snapshot_cy__0;  	
+  	
+CREATE EXTERNAL WEB TABLE pending_contracts__0(
+ 	document_code_id smallint,
+ 	document_agency_history_id  smallint,
+ 	document_id  varchar,
+  	parent_document_code_id smallint,
+  	parent_document_agency_history_id  smallint,
+ 	parent_document_id  varchar,
+ 	encumbrance_mount numeric(15,2),
+ 	original_maximum_amount numeric(15,2),
+ 	revised_maximum_amount numeric(15,2),
+ 	vendor_legal_name varchar(80),
+ 	vendor_customer_code varchar(20),
+ 	description varchar(78),
+ 	submitting_agency_history_id  smallint,
+ 	oaisis_submitting_agency_desc	 varchar(50),
+ 	submitting_agency_code	 varchar(4),
+ 	awarding_agency_history_id  smallint,
+ 	oaisis_awarding_agency_desc	 varchar(50),
+ 	awarding_agency_code	 varchar(4),
+ 	contract_type_name varchar(40),
+ 	cont_type_code  varchar(2),
+ 	award_method_name varchar(50),
+ 	award_method_code varchar(3),
+ 	start_date date,
+ 	end_date date,
+ 	revised_start_date date,
+ 	revised_end_date date,
+ 	cif_received_date date,
+ 	tracking_number varchar(30),
+ 	board_award_number varchar(15),
+ 	oca_number varchar(10),
+	version_number varchar(5),
+	contract_number varchar,
+	fms_parent_contract_number varchar,
+	submitting_agency_name varchar,
+	submitting_agency_short_name varchar,
+	awarding_agency_name varchar,
+	awarding_agency_short_name varchar,
+	start_date_id int,
+	end_date_id int,	
+	revised_start_date_id int,
+	revised_end_date_id int,	
+	cif_received_date_id int,
+	document_agency_code varchar, 
+	document_agency_name varchar, 
+	document_agency_short_name varchar 
+ )
+ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.pending_contracts to stdout csv"' ON SEGMENT 0 
+      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+   ENCODING 'UTF8';
+   
+
+ 
+ CREATE VIEW pending_contracts AS 
+ 	SELECT pending_contracts__0.document_code_id,pending_contracts__0.document_agency_history_id,pending_contracts__0.document_id,
+ 		pending_contracts__0.parent_document_code_id,pending_contracts__0.parent_document_agency_history_id,pending_contracts__0.parent_document_id,
+ 		pending_contracts__0.encumbrance_mount,pending_contracts__0.original_maximum_amount,pending_contracts__0.revised_maximum_amount,
+ 		pending_contracts__0.vendor_legal_name,pending_contracts__0.vendor_customer_code,pending_contracts__0.description,
+ 		pending_contracts__0.submitting_agency_history_id,pending_contracts__0.oaisis_submitting_agency_desc,pending_contracts__0.submitting_agency_code,
+ 		pending_contracts__0.awarding_agency_history_id,pending_contracts__0.oaisis_awarding_agency_desc,pending_contracts__0.awarding_agency_code,
+ 		pending_contracts__0.contract_type_name,pending_contracts__0.cont_type_code,pending_contracts__0.award_method_name,pending_contracts__0.award_method_code,
+ 		pending_contracts__0.start_date,pending_contracts__0.end_date,pending_contracts__0.revised_start_date,pending_contracts__0.revised_end_date,
+ 		pending_contracts__0.cif_received_date,pending_contracts__0.tracking_number,pending_contracts__0.board_award_number,pending_contracts__0.oca_number,
+ 		pending_contracts__0.version_number,pending_contracts__0.contract_number,pending_contracts__0.fms_parent_contract_number,
+ 		pending_contracts__0.submitting_agency_name,pending_contracts__0.submitting_agency_short_name,pending_contracts__0.awarding_agency_name,
+ 		pending_contracts__0.awarding_agency_short_name,pending_contracts__0.start_date_id,pending_contracts__0.end_date_id,
+ 		pending_contracts__0.revised_start_date_id,pending_contracts__0.revised_end_date_id,pending_contracts__0.cif_received_date_id,
+ 		pending_contracts__0.document_agency_code,pending_contracts__0.document_agency_name,pending_contracts__0.document_agency_short_name
+ 	FROM pending_contracts__0;

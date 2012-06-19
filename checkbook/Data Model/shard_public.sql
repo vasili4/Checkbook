@@ -1470,3 +1470,194 @@ CREATE TABLE aggregateon_payroll_year(
 	total_hourly_employees int,
 	total_overtime_employees int)
 DISTRIBUTED BY (fiscal_year_id);
+
+ CREATE TABLE agreement_snapshot_expanded(
+ 	original_agreement_id bigint,
+ 	fiscal_year smallint,
+ 	description varchar,
+ 	contract_number varchar,
+ 	vendor_id int,
+ 	agency_id smallint,
+ 	original_contract_amount numeric(16,2) ,
+ 	maximum_contract_amount numeric(16,2),
+ 	starting_year smallint,	
+ 	ending_year smallint,
+ 	dollar_difference numeric(16,2), 
+ 	percent_difference numeric(17,4),
+ 	award_method_id smallint,
+ 	document_code_id smallint,
+ 	master_agreement_id bigint,
+ 	master_agreement_yn character(1),
+ 	status_flag char(1)
+ 	)
+DISTRIBUTED BY (original_agreement_id);	
+
+CREATE TABLE agreement_snapshot_expanded_cy(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	description varchar,
+	contract_number varchar,
+	vendor_id int,
+	agency_id smallint,
+	original_contract_amount numeric(16,2) ,
+	maximum_contract_amount numeric(16,2),
+	starting_year smallint,	
+	ending_year smallint,
+	dollar_difference numeric(16,2), 
+	percent_difference numeric(17,4),
+	award_method_id smallint,
+	document_code_id smallint,
+	master_agreement_id bigint,
+	master_agreement_yn character(1),
+	status_flag char(1)
+	)
+DISTRIBUTED BY (original_agreement_id);	
+
+CREATE TABLE aggregateon_contracts_cumulative_spending(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	document_code_id smallint,
+	master_agreement_yn character(1),
+	description varchar,
+	contract_number varchar,
+	vendor_id bigint,
+	award_method_id smallint,
+	agency_id smallint,
+	original_contract_amount numeric(16,2),
+	maximum_contract_amount numeric(16,2),
+	spending_amount numeric(16,2),
+	dollar_difference numeric(16,2),
+	percent_difference numeric(16,2),
+	status_flag char(1),
+	type_of_year char(1)	
+) DISTRIBUTED BY (original_agreement_id);	
+
+
+CREATE TABLE aggregateon_total_contracts_agency
+(
+	fiscal_year smallint,
+	agency_id smallint,
+	total_contracts bigint,
+	total_commited_contracts bigint,
+	total_master_agreements bigint,
+	total_standalone_contracts bigint,
+	total_commited_contracts_amount numeric(16,2),
+	total_contracts_amount numeric(16,2),
+	total_spending_amount numeric(16,2), 
+	status_flag char(1),
+	type_of_year char(1)
+) DISTRIBUTED BY (fiscal_year);	
+
+CREATE TABLE aggregateon_total_contracts
+(
+	fiscal_year smallint,
+	total_contracts bigint,
+	total_commited_contracts bigint,
+	total_master_agreements bigint,
+	total_standalone_contracts bigint,
+	total_commited_contracts_amount numeric(16,2),
+	total_contracts_amount numeric(16,2),
+	total_spending_amount numeric(16,2), 
+	status_flag char(1),
+	type_of_year char(1)
+) DISTRIBUTED BY (fiscal_year);	
+
+CREATE TABLE agreement_snapshot(
+ 	original_agreement_id bigint,
+ 	document_version smallint,
+ 	document_code_id smallint,
+ 	agency_history_id smallint,
+ 	agency_id smallint,
+ 	agency_name character varying(50),
+ 	agreement_id bigint,
+ 	starting_year smallint,
+ 	starting_year_id smallint,
+ 	ending_year smallint,
+ 	ending_year_id smallint,
+ 	registered_year smallint,
+ 	registered_year_id smallint,
+ 	contract_number varchar,
+ 	original_contract_amount numeric(16,2),
+ 	maximum_contract_amount numeric(16,2),
+ 	description varchar,
+ 	vendor_history_id integer,
+ 	vendor_id integer,
+ 	vendor_name varchar,
+ 	dollar_difference numeric(16,2),
+ 	percent_difference numeric(17,4),
+ 	master_agreement_id bigint,
+ 	master_contract_number varchar,
+ 	agreement_type_id smallint,
+ 	agreement_type_name varchar,
+ 	award_category_id smallint,
+ 	award_category_name varchar,
+ 	award_method_id smallint,
+        award_method_name character varying,
+ 	expenditure_object_names varchar,
+ 	effective_begin_date date,
+ 	effective_begin_date_id int,
+ 	effective_begin_year smallint,
+ 	effective_begin_year_id smallint,
+ 	effective_end_date date,
+ 	effective_end_date_id int,
+ 	effective_end_year smallint,
+ 	effective_end_year_id smallint,
+ 	registered_date date,
+ 	registered_date_id int,
+ 	brd_awd_no varchar,
+ 	tracking_number varchar,
+ 	master_agreement_yn char(1),
+ 	original_version_flag char(1),
+ 	latest_flag char(1)
+) DISTRIBUTED BY (original_agreement_id);
+
+CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
+
+ CREATE TABLE pending_contracts(
+ 	document_code_id smallint,
+ 	document_agency_history_id  smallint,
+ 	document_id  varchar,
+  	parent_document_code_id smallint,
+  	parent_document_agency_history_id  smallint,
+ 	parent_document_id  varchar,
+ 	encumbrance_mount numeric(15,2),
+ 	original_maximum_amount numeric(15,2),
+ 	revised_maximum_amount numeric(15,2),
+ 	vendor_legal_name varchar(80),
+ 	vendor_customer_code varchar(20),
+ 	description varchar(78),
+ 	submitting_agency_history_id  smallint,
+ 	oaisis_submitting_agency_desc	 varchar(50),
+ 	submitting_agency_code	 varchar(4),
+ 	awarding_agency_history_id  smallint,
+ 	oaisis_awarding_agency_desc	 varchar(50),
+ 	awarding_agency_code	 varchar(4),
+ 	contract_type_name varchar(40),
+ 	cont_type_code  varchar(2),
+ 	award_method_name varchar(50),
+ 	award_method_code varchar(3),
+ 	start_date date,
+ 	end_date date,
+ 	revised_start_date date,
+ 	revised_end_date date,
+ 	cif_received_date date,
+ 	tracking_number varchar(30),
+ 	board_award_number varchar(15),
+ 	oca_number varchar(10),
+	version_number varchar(5),
+	contract_number varchar,
+	fms_parent_contract_number varchar,
+	submitting_agency_name varchar,
+	submitting_agency_short_name varchar,
+	awarding_agency_name varchar,
+	awarding_agency_short_name varchar,
+	start_date_id int,
+	end_date_id int,	
+	revised_start_date_id int,
+	revised_end_date_id int,	
+	cif_received_date_id int,
+	document_agency_code varchar, 
+	document_agency_name varchar, 
+	document_agency_short_name varchar 
+ );
+ 

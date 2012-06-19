@@ -898,8 +898,7 @@ CREATE TABLE history_agreement (
  	registered_date date,
  	registered_date_id int,
  	brd_awd_no varchar,
- 	tracking_number varchar,
- 	award_method_id smallint,
+ 	tracking_number varchar, 	
  	master_agreement_yn char(1),
  	original_version_flag char(1),
  	latest_flag char(1)
@@ -1621,3 +1620,93 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
 	document_agency_short_name varchar 
  );
  
+ CREATE TABLE agreement_snapshot_expanded(
+ 	original_agreement_id bigint,
+ 	fiscal_year smallint,
+ 	description varchar,
+ 	contract_number varchar,
+ 	vendor_id int,
+ 	agency_id smallint,
+ 	original_contract_amount numeric(16,2) ,
+ 	maximum_contract_amount numeric(16,2),
+ 	starting_year smallint,	
+ 	ending_year smallint,
+ 	dollar_difference numeric(16,2), 
+ 	percent_difference numeric(17,4),
+ 	award_method_id smallint,
+ 	document_code_id smallint,
+ 	master_agreement_id bigint,
+ 	master_agreement_yn character(1),
+ 	status_flag char(1)
+ 	)
+DISTRIBUTED BY (original_agreement_id);	
+
+CREATE TABLE agreement_snapshot_expanded_cy(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	description varchar,
+	contract_number varchar,
+	vendor_id int,
+	agency_id smallint,
+	original_contract_amount numeric(16,2) ,
+	maximum_contract_amount numeric(16,2),
+	starting_year smallint,	
+	ending_year smallint,
+	dollar_difference numeric(16,2), 
+	percent_difference numeric(17,4),
+	award_method_id smallint,
+	document_code_id smallint,
+	master_agreement_id bigint,
+	master_agreement_yn character(1),
+	status_flag char(1)
+	)
+DISTRIBUTED BY (original_agreement_id);	
+
+CREATE TABLE aggregateon_contracts_cumulative_spending(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	document_code_id smallint,
+	master_agreement_yn character(1),
+	description varchar,
+	contract_number varchar,
+	vendor_id bigint,
+	award_method_id smallint,
+	agency_id smallint,
+	original_contract_amount numeric(16,2),
+	maximum_contract_amount numeric(16,2),
+	spending_amount numeric(16,2),
+	dollar_difference numeric(16,2),
+	percent_difference numeric(16,2),
+	status_flag char(1),
+	type_of_year char(1)	
+) DISTRIBUTED BY (original_agreement_id);	
+
+
+CREATE TABLE aggregateon_total_contracts_agency
+(
+	fiscal_year smallint,
+	agency_id smallint,
+	total_contracts bigint,
+	total_commited_contracts bigint,
+	total_master_agreements bigint,
+	total_standalone_contracts bigint,
+	total_commited_contracts_amount numeric(16,2),
+	total_contracts_amount numeric(16,2),
+	total_spending_amount numeric(16,2), 
+	status_flag char(1),
+	type_of_year char(1)
+) DISTRIBUTED BY (fiscal_year);	
+
+CREATE TABLE aggregateon_total_contracts
+(
+	fiscal_year smallint,
+	total_contracts bigint,
+	total_commited_contracts bigint,
+	total_master_agreements bigint,
+	total_standalone_contracts bigint,
+	total_commited_contracts_amount numeric(16,2),
+	total_contracts_amount numeric(16,2),
+	total_spending_amount numeric(16,2), 
+	status_flag char(1),
+	type_of_year char(1)
+) DISTRIBUTED BY (fiscal_year);	
