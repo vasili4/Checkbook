@@ -1574,10 +1574,10 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
 
  CREATE TABLE pending_contracts(
  	document_code_id smallint,
- 	document_agency_history_id  smallint,
+ 	document_agency_id  smallint,
  	document_id  varchar,
   	parent_document_code_id smallint,
-  	parent_document_agency_history_id  smallint,
+  	parent_document_agency_id  smallint,
  	parent_document_id  varchar,
  	encumbrance_mount numeric(15,2),
  	original_maximum_amount numeric(15,2),
@@ -1585,10 +1585,10 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
  	vendor_legal_name varchar(80),
  	vendor_customer_code varchar(20),
  	description varchar(78),
- 	submitting_agency_history_id  smallint,
+ 	submitting_agency_id  smallint,
  	oaisis_submitting_agency_desc	 varchar(50),
  	submitting_agency_code	 varchar(4),
- 	awarding_agency_history_id  smallint,
+ 	awarding_agency_id  smallint,
  	oaisis_awarding_agency_desc	 varchar(50),
  	awarding_agency_code	 varchar(4),
  	contract_type_name varchar(40),
@@ -1617,8 +1617,16 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
 	cif_received_date_id int,
 	document_agency_code varchar, 
 	document_agency_name varchar, 
-	document_agency_short_name varchar 
+	document_agency_short_name varchar ,
+	funding_agency_id  smallint,
+	funding_agency_code varchar, 
+	funding_agency_name varchar, 
+	funding_agency_short_name varchar ,
+	original_agreement_id bigint,
+	dollar_difference numeric(16,2),
+  	percent_difference numeric(17,4)
  );
+ 
  
  CREATE TABLE agreement_snapshot_expanded(
  	original_agreement_id bigint,
@@ -1735,3 +1743,17 @@ CREATE TABLE aggregateon_total_contracts
 	status_flag char(1),
 	type_of_year char(1)
 ) DISTRIBUTED BY (fiscal_year);	
+
+CREATE TABLE aggregateon_contracts_department(
+	agency_id smallint,
+	department_id integer,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	award_method_id smallint,
+	vendor_id int,
+	spending_amount numeric(16,2),
+	total_contracts integer,
+	status_flag char(1),
+	type_of_year char(1)
+) DISTRIBUTED BY (department_id);	
+

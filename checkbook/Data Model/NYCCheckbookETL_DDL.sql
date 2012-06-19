@@ -42,6 +42,7 @@ create sequence seq_etl_job_id;
 create sequence seq_stg_pms_uniq_id;
 create sequence seq_stg_revenue_budget_uniq_id;
 create sequence seq_stg_funding_class_uniq_id;
+create sequence seq_stg_pending_contracts_uniq_id;
 
 CREATE TABLE ref_data_source (
     data_source_code varchar(2),
@@ -4153,7 +4154,7 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
   	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
  ENCODING 'UTF8';	
 
- CREATE TABLE stg_pending_contracts(
+ CREATE TABLE stg_pending_contracts( 	
  	con_trans_code varchar(4),
  	con_trans_ad_code  varchar(4),
  	con_no  varchar(11),
@@ -4183,10 +4184,10 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
  	con_internal_pin varchar(15),
  	con_batch_suffix varchar(10),
 	con_version varchar(5),
-	submitting_agency_history_id  smallint,
+	submitting_agency_id  smallint,
 	submitting_agency_name varchar,
 	submitting_agency_short_name varchar,
-	awarding_agency_history_id  smallint,
+	awarding_agency_id  smallint,
 	awarding_agency_name varchar,
 	awarding_agency_short_name varchar,
 	start_date_id int,
@@ -4195,13 +4196,21 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
 	revised_end_date_id int,	
 	cif_received_date_id int,
  	document_code_id smallint,
- 	document_agency_history_id  smallint,
+ 	document_agency_id  smallint,
   	parent_document_code_id smallint,
-  	parent_document_agency_history_id  smallint, 	
+  	parent_document_agency_id  smallint, 	
 	document_agency_code varchar, 
 	document_agency_name varchar, 
 	document_agency_short_name varchar ,
- 	uniq_id bigint default nextval('seq_stg_payroll_summary_uniq_id'),
+	funding_agency_id  smallint,
+	funding_agency_code varchar, 
+	funding_agency_name varchar, 
+	funding_agency_short_name varchar ,
+	original_agreement_id bigint,
+	dollar_difference numeric(16,2),
+  	percent_difference numeric(17,4),
+  	contract_number varchar,
+ 	uniq_id bigint default nextval('seq_stg_pending_contracts_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar	
  );

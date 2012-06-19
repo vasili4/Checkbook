@@ -2092,7 +2092,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	  updated_date timestamp without time zone,
 	  budget_fiscal_year_id smallint,
 	  agency_short_name character varying(15),
-	  revenue_category_id character varying,
+	  revenue_category_id smallint,
 	  revenue_category_code character varying,
 	  revenue_category_name character varying,
 	  funding_class_id smallint,
@@ -2342,6 +2342,30 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total
   CREATE VIEW aggregateon_total_contracts AS
   	SELECT aggregateon_total_contracts__0.fiscal_year,aggregateon_total_contracts__0.total_contracts,aggregateon_total_contracts__0.total_commited_contracts,aggregateon_total_contracts__0.total_master_agreements,aggregateon_total_contracts__0.total_standalone_contracts,aggregateon_total_contracts__0.total_commited_contracts_amount,aggregateon_total_contracts__0.total_contracts_amount,aggregateon_total_contracts__0.total_spending_amount,aggregateon_total_contracts__0.status_flag,aggregateon_total_contracts__0.type_of_year
   	FROM   aggregateon_total_contracts__0;
+ 
+ CREATE EXTERNAL WEB TABLE aggregateon_contracts_department__0(
+	agency_id smallint,
+	department_id integer,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	award_method_id smallint,
+	vendor_id int,
+	spending_amount numeric(16,2),
+	total_contracts integer,
+	status_flag char(1),
+	type_of_year char(1)
+) 	
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_department to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+
+  CREATE VIEW aggregateon_contracts_department AS
+  	SELECT aggregateon_contracts_department__0.agency_id,aggregateon_contracts_department__0.department_id,aggregateon_contracts_department__0.fiscal_year,
+  	aggregateon_contracts_department__0.fiscal_year_id,aggregateon_contracts_department__0.award_method_id,aggregateon_contracts_department__0.vendor_id,
+  	aggregateon_contracts_department__0.spending_amount,aggregateon_contracts_department__0.total_contracts,aggregateon_contracts_department__0.status_flag,aggregateon_contracts_department__0.type_of_year
+  	FROM   aggregateon_contracts_department__0;
+  	
   	
 CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
  	original_agreement_id bigint,
@@ -2483,10 +2507,10 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapsho
   	
 CREATE EXTERNAL WEB TABLE pending_contracts__0(
  	document_code_id smallint,
- 	document_agency_history_id  smallint,
+ 	document_agency_id  smallint,
  	document_id  varchar,
   	parent_document_code_id smallint,
-  	parent_document_agency_history_id  smallint,
+  	parent_document_agency_id  smallint,
  	parent_document_id  varchar,
  	encumbrance_mount numeric(15,2),
  	original_maximum_amount numeric(15,2),
@@ -2494,10 +2518,10 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  	vendor_legal_name varchar(80),
  	vendor_customer_code varchar(20),
  	description varchar(78),
- 	submitting_agency_history_id  smallint,
+ 	submitting_agency_id  smallint,
  	oaisis_submitting_agency_desc	 varchar(50),
  	submitting_agency_code	 varchar(4),
- 	awarding_agency_history_id  smallint,
+ 	awarding_agency_id  smallint,
  	oaisis_awarding_agency_desc	 varchar(50),
  	awarding_agency_code	 varchar(4),
  	contract_type_name varchar(40),
@@ -2526,7 +2550,15 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
 	cif_received_date_id int,
 	document_agency_code varchar, 
 	document_agency_name varchar, 
-	document_agency_short_name varchar 
+	document_agency_short_name varchar ,
+	funding_agency_id  smallint,
+	funding_agency_code varchar, 
+	funding_agency_name varchar, 
+	funding_agency_short_name varchar ,
+	original_agreement_id bigint,
+	dollar_difference numeric(16,2),
+  	percent_difference numeric(17,4)
+	
  )
  EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.pending_contracts to stdout csv"' ON SEGMENT 0 
       FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
@@ -2535,12 +2567,12 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
 
  
  CREATE VIEW pending_contracts AS 
- 	SELECT pending_contracts__0.document_code_id,pending_contracts__0.document_agency_history_id,pending_contracts__0.document_id,
- 		pending_contracts__0.parent_document_code_id,pending_contracts__0.parent_document_agency_history_id,pending_contracts__0.parent_document_id,
+ 	SELECT pending_contracts__0.document_code_id,pending_contracts__0.document_agency_id,pending_contracts__0.document_id,
+ 		pending_contracts__0.parent_document_code_id,pending_contracts__0.parent_document_agency_id,pending_contracts__0.parent_document_id,
  		pending_contracts__0.encumbrance_mount,pending_contracts__0.original_maximum_amount,pending_contracts__0.revised_maximum_amount,
  		pending_contracts__0.vendor_legal_name,pending_contracts__0.vendor_customer_code,pending_contracts__0.description,
- 		pending_contracts__0.submitting_agency_history_id,pending_contracts__0.oaisis_submitting_agency_desc,pending_contracts__0.submitting_agency_code,
- 		pending_contracts__0.awarding_agency_history_id,pending_contracts__0.oaisis_awarding_agency_desc,pending_contracts__0.awarding_agency_code,
+ 		pending_contracts__0.submitting_agency_id,pending_contracts__0.oaisis_submitting_agency_desc,pending_contracts__0.submitting_agency_code,
+ 		pending_contracts__0.awarding_agency_id,pending_contracts__0.oaisis_awarding_agency_desc,pending_contracts__0.awarding_agency_code,
  		pending_contracts__0.contract_type_name,pending_contracts__0.cont_type_code,pending_contracts__0.award_method_name,pending_contracts__0.award_method_code,
  		pending_contracts__0.start_date,pending_contracts__0.end_date,pending_contracts__0.revised_start_date,pending_contracts__0.revised_end_date,
  		pending_contracts__0.cif_received_date,pending_contracts__0.tracking_number,pending_contracts__0.board_award_number,pending_contracts__0.oca_number,
@@ -2548,5 +2580,8 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  		pending_contracts__0.submitting_agency_name,pending_contracts__0.submitting_agency_short_name,pending_contracts__0.awarding_agency_name,
  		pending_contracts__0.awarding_agency_short_name,pending_contracts__0.start_date_id,pending_contracts__0.end_date_id,
  		pending_contracts__0.revised_start_date_id,pending_contracts__0.revised_end_date_id,pending_contracts__0.cif_received_date_id,
- 		pending_contracts__0.document_agency_code,pending_contracts__0.document_agency_name,pending_contracts__0.document_agency_short_name
+ 		pending_contracts__0.document_agency_code,pending_contracts__0.document_agency_name,pending_contracts__0.document_agency_short_name, 		
+ 		pending_contracts__0.funding_agency_id,pending_contracts__0.funding_agency_code,pending_contracts__0.funding_agency_name,
+ 		pending_contracts__0.funding_agency_short_name,pending_contracts__0.original_agreement_id,pending_contracts__0.dollar_difference,
+ 		pending_contracts__0.percent_difference 		
  	FROM pending_contracts__0;

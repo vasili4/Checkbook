@@ -678,11 +678,13 @@ CREATE TABLE aggregateon_contracts_department(
 	department_id integer,
 	fiscal_year smallint,
 	fiscal_year_id smallint,
+	award_method_id smallint,
+	vendor_id int,
 	spending_amount numeric(16,2),
 	total_contracts integer,
 	status_flag char(1),
 	type_of_year char(1)
-) DISTRIBUTED BY (agency_id);	
+) DISTRIBUTED BY (department_id);	
  
  
  INSERT INTO aggregateon_contracts_department
@@ -690,47 +692,55 @@ CREATE TABLE aggregateon_contracts_department(
 		c.department_id,
 		a.fiscal_year,
 		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
 		sum(c.check_amount) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'A' as status_flag,
 		'B' as type_of_year
  FROM agreement_snapshot_expanded a JOIN ref_year b ON a.fiscal_year = b.year_value
  LEFT JOIN disbursement_line_item_details c ON a.original_agreement_id = c.agreement_id AND a.fiscal_year >= c.fiscal_year
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4	
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6	
  UNION ALL 
  SELECT c.agency_id, 
 		c.department_id,
 		a.fiscal_year,
 		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
 		sum(c.check_amount) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'R' as status_flag,
 		'B' as type_of_year
  FROM agreement_snapshot_expanded a JOIN ref_year b ON a.fiscal_year = b.year_value
  LEFT JOIN disbursement_line_item_details c ON a.original_agreement_id = c.agreement_id AND a.fiscal_year >= c.fiscal_year
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4	;
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6	;
  
  INSERT INTO aggregateon_contracts_department
  SELECT c.agency_id, 
 		c.department_id,
 		a.fiscal_year,
 		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
 		sum(c.check_amount) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'A' as status_flag,
 		'C' as type_of_year
  FROM agreement_snapshot_expanded_cy a JOIN ref_year b ON a.fiscal_year = b.year_value
  LEFT JOIN disbursement_line_item_details c ON a.original_agreement_id = c.agreement_id AND a.fiscal_year >= c.calendar_fiscal_year
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4	
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6	
  UNION ALL 
  SELECT c.agency_id, 
 		c.department_id,
 		a.fiscal_year,
 		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
 		sum(c.check_amount) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'R' as status_flag,
 		'C' as type_of_year
  FROM agreement_snapshot_expanded_cy a JOIN ref_year b ON a.fiscal_year = b.year_value
  LEFT JOIN disbursement_line_item_details c ON a.original_agreement_id = c.agreement_id AND a.fiscal_year >= c.calendar_fiscal_year
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4	;
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6	;
