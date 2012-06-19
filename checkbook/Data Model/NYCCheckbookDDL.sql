@@ -1662,9 +1662,33 @@ CREATE TABLE agreement_snapshot_expanded_cy(
 	)
 DISTRIBUTED BY (original_agreement_id);	
 
+CREATE TABLE mid_aggregateon_disbursement_spending_date(
+	original_agreement_id bigint,
+	date_value date,
+	agency_id smallint,
+	check_amount numeric(16,2),
+	date_order int,
+	date_order_cy int,
+	fiscal_year smallint,
+	calendar_year smallint,
+	master_agreement_yn character(1)
+	)
+DISTRIBUTED BY (original_agreement_id) 	;
+
+CREATE TABLE mid_aggregateon_disbursement_spending_year(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	agency_id smallint,
+	check_amount numeric(16,2),
+	type_of_year char(1),
+	master_agreement_yn character(1))
+DISTRIBUTED BY (original_agreement_id) 	;
+
 CREATE TABLE aggregateon_contracts_cumulative_spending(
 	original_agreement_id bigint,
 	fiscal_year smallint,
+	fiscal_year_id smallint,
 	document_code_id smallint,
 	master_agreement_yn character(1),
 	description varchar,
@@ -1675,6 +1699,7 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
 	original_contract_amount numeric(16,2),
 	maximum_contract_amount numeric(16,2),
 	spending_amount numeric(16,2),
+	current_year_spending_amount numeric(16,2),
 	dollar_difference numeric(16,2),
 	percent_difference numeric(16,2),
 	status_flag char(1),

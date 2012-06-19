@@ -1455,9 +1455,10 @@ BEGIN
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
 	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
 	        b.original_contract_amount,b.maximum_contract_amount,b.description,
-		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),
-		b.maximum_contract_amount - b.original_contract_amount,
-		(CASE WHEN b.original_contract_amount = 0 THEN 0 ELSE ROUND(((b.maximum_contract_amount - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END) as percentage,
+		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),		
+		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as dollar_difference,
+		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
+		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
 		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
@@ -1572,9 +1573,10 @@ BEGIN
 				      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year_id
 				      ELSE b.effective_end_calendar_year_id END),b.contract_number,
 		b.original_contract_amount,b.maximum_contract_amount,b.description,
-		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),
-		b.maximum_contract_amount - b.original_contract_amount,
-		(CASE WHEN b.original_contract_amount = 0 THEN 0 ELSE ROUND(((b.maximum_contract_amount - b.original_contract_amount) * 100 )::decimal / b.original_contract_amount,2) END) as percentage,
+		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),		
+		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as  dollar_difference,
+		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
+		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
 		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
