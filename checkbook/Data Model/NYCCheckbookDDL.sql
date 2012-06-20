@@ -207,7 +207,7 @@ CREATE TABLE ref_department_history (
 CREATE TABLE ref_award_method (
   award_method_id smallint PRIMARY KEY default nextval('seq_ref_award_method_award_method_id'),
   award_method_code varchar(3) ,
-  award_method_name varchar
+  award_method_name varchar,
   created_date timestamp
 ) DISTRIBUTED BY (award_method_id);
 
