@@ -302,7 +302,7 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
 	master_agreement_yn character(1),
 	description varchar,
 	contract_number varchar,
-	vendor_id bigint,
+	vendor_id int,
 	award_method_id smallint,
 	agency_id smallint,
 	original_contract_amount numeric(16,2),
