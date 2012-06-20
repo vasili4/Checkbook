@@ -1190,9 +1190,9 @@ CREATE TABLE revenue_budget
   revenue_category_id smallint,
   revenue_category_code varchar(4),
   revenue_category_name varchar(60),
-  revenue_category_id smallint,
-  revenue_category_code varchar(4),
-  revenue_category_name varchar(60),
+  funding_class_id smallint,
+  funding_class_code varchar(4),
+  funding_class_name varchar(60),
   budget_code_name varchar(60)
 ) DISTRIBUTED BY (budget_id);
 
