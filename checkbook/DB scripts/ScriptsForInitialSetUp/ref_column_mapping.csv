@@ -2034,11 +2034,11 @@ etl.ext_stg_pms_summary_data_feed,pyrl_no,varchar,etl.stg_payroll_summary,pyrl_n
 etl.ext_stg_pms_summary_data_feed,pyrl_desc,varchar,etl.stg_payroll_summary,pyrl_desc,varchar,4
 etl.ext_stg_pms_summary_data_feed,uoa,varchar,etl.stg_payroll_summary,uoa,varchar,5
 etl.ext_stg_pms_summary_data_feed,uoa_name,varchar,etl.stg_payroll_summary,uoa_name,varchar,6
-etl.ext_stg_pms_summary_data_feed,fy,varchar,etl.stg_payroll_summary,fy,int,7
+etl.ext_stg_pms_summary_data_feed,fy,varchar,etl.stg_payroll_summary,pms_fy,int,7
 etl.ext_stg_pms_summary_data_feed,object,varchar,etl.stg_payroll_summary,object,varchar,8
 etl.ext_stg_pms_summary_data_feed,object_desc,varchar,etl.stg_payroll_summary,object_desc,varchar,9
 etl.ext_stg_pms_summary_data_feed,agency,varchar,etl.stg_payroll_summary,agency,varchar,10
-etl.ext_stg_pms_summary_data_feed,agency_name,varchar,etl.stg_payroll_summary,agency_name,varchar,11
+etl.ext_stg_pms_summary_data_feed,agency_name,varchar,etl.stg_payroll_summary,pms_agency_name,varchar,11
 etl.ext_stg_pms_summary_data_feed,bud_code,varchar,etl.stg_payroll_summary,bud_code,varchar,12
 etl.ext_stg_pms_summary_data_feed,bud_code_desc,varchar,etl.stg_payroll_summary,bud_code_desc,varchar,13
 etl.ext_stg_pms_summary_data_feed,total_amt,varchar,etl.stg_payroll_summary,total_amt,numeric,14
