@@ -200,14 +200,16 @@ BEGIN
 	VALUES(p_load_file_id_in,l_data_source_code,l_record_identifiers[l_array_ctr],l_document_type_array[l_array_ctr],l_ins_staging_cnt, 'Malformed');
 			
 	-- Updating the processed flag to S to indicate that the data is staged.	
+
+	l_end_time := timeofday()::timestamp;
 	
 	UPDATE  etl.etl_data_load_file
-	SET	processed_flag ='S' 
+	SET	processed_flag ='S', 
+	publish_start_time = l_end_time
 	WHERE	load_file_id = p_load_file_id_in;
 			
 	END IF;
 
-	l_end_time := timeofday()::timestamp;
 
 	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time)
 	VALUES(p_load_file_id_in,'etl.stageandarchivedata',1,l_start_time,l_end_time);
@@ -729,10 +731,13 @@ BEGIN
 			
 		END IF;
 
+		l_end_time := timeofday()::timestamp;
+
 	-- Updating the processed flag to Y to indicate that the data is posted to the transaction table.
 		IF l_processed = 1 THEN
 			UPDATE  etl.etl_data_load_file
-			SET	processed_flag ='Y' 
+			SET	processed_flag ='Y',
+			publish_end_time = l_end_time
 			WHERE	load_file_id = p_load_file_id_in;
 		ELSE
 			UPDATE  etl.etl_data_load_file
@@ -746,7 +751,6 @@ BEGIN
 		END IF;		
 	END IF;
 
-	l_end_time := timeofday()::timestamp;
 
 	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time)
 	VALUES(p_load_file_id_in,'etl.processdata',1,l_start_time,l_end_time);
