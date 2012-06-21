@@ -83,7 +83,9 @@ CREATE TABLE etl_data_load_file (
     display_type  char(1),
     consume_flag char(1),
     pattern_matched_flag char(1),
-    processed_flag char(1))
+    processed_flag char(1),
+    publish_start_time timestamp,
+    publish_end_time timestamp)
 DISTRIBUTED BY (load_id);
     
 CREATE TABLE ref_column_mapping (
