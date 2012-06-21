@@ -709,7 +709,6 @@ fy_1998 numeric(20,2),
 fy_1997 numeric(20,2),
 fy_1996 numeric(20,2),
 fy_1995 numeric(20,2),
-fy_1994 numeric(20,2),
 display_order smallint,
 highlight_yn character(1),
 amount_display_type character(1),
@@ -752,7 +751,7 @@ INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, disp
 INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1997, fy_1997, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
 INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
 INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
-INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_in_fund_balances_temp;
+
 
 
 
@@ -974,6 +973,7 @@ city_of_new_york integer,
 percentage_change_prior_period numeric(4,2)
 )
 Distributed by (fiscal_year);
+
 
 
 COPY  trends_nyc_population_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_nyc_population.csv' CSV HEADER QUOTE as '"';
@@ -1391,6 +1391,7 @@ percentage_atcual_taxable_property numeric(20,2),
 per_capita_general_obligations numeric(20,2)
 )
 Distributed by (fiscal_year);
+
 
 COPY  trends_ratios_general_bonded_debt_outstanding_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_ratios_general_bonded_debt_outstanding.csv' CSV HEADER QUOTE as '"';
 
