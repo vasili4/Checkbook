@@ -23,6 +23,8 @@ BEGIN
 	WHERE  load_id = p_load_id_in
 	INTO   l_data_source_code;
 
+	
+	
 	CREATE TEMPORARY TABLE tmp_stg_vendor(vend_cust_cd varchar(20),	lgl_nm varchar(60), alias_nm varchar(60), ad_id varchar(25), 
 					     org_cls varchar(25), misc_acct_fl integer, ad_ln_1 varchar(75),ad_ln_2 varchar(75), ctry varchar(25), 
 					     st varchar(25), zip varchar(25), city varchar(60),	vendor_history_id integer, uniq_id bigint, address_type_code varchar(2) )
@@ -89,6 +91,8 @@ BEGIN
 	
 	-- Getting all vendors and categorizing if they are new and/or name/address/business type changed.
 	-- TO DO Filter, Address type, Updating vendor history id
+	
+	
 	
 	CREATE TEMPORARY TABLE tmp_all_vendors(uniq_id bigint,vendor_customer_code varchar, vendor_history_id integer, vendor_id integer, misc_acct_fl integer,
 					is_new_vendor char(1), is_name_changed char(1), is_vendor_address_changed char(1), is_address_new char(1), is_bus_type_changed char(1), 
@@ -388,6 +392,11 @@ BEGIN
     	FROM	tmp_all_vendors a JOIN fmsv_business_type b ON a.vendor_customer_code = b.vendor_customer_code    		
 		JOIN etl.vendor_history_id_seq d ON a.uniq_id = d.uniq_id
 		WHERE a.is_new_vendor ='Y' OR a.is_name_changed='Y' OR a.is_vendor_address_changed = 'Y' OR a.is_bus_type_changed = 'Y';
+		
+-- shoud create persistent tables if it does not work
+
+	DROP  TABLE IF EXISTS tmp_stg_vendor;
+	DROP  TABLE IF EXISTS tmp_all_vendors;
 	
 	RETURN 1;
 	

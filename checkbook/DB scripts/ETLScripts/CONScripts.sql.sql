@@ -1271,7 +1271,7 @@ $$ language plpgsql;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.postProcessContracts(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.postProcessContracts(p_job_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
 	/* Common for all types 
@@ -1286,7 +1286,8 @@ BEGIN
 	INSERT INTO tmp_loaded_agreements
 	SELECT distinct document_id,document_version,document_code_id, agency_id
 	FROM history_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
-	WHERE a.created_load_id = p_load_id_in OR a.updated_load_id = p_load_id_in;
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('C','M','F');
 	
 	-- Get the max version and min version
 	

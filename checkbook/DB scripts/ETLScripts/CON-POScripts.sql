@@ -108,7 +108,7 @@ BEGIN
 	
 	INSERT INTO tmp_po_fk_values(uniq_id,effective_begin_date_id,effective_begin_fiscal_year,effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id)
 	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
-	FROM etl.stg_con_po_header a JOIN ref_date b ON a.cntrct_strt_dt = b.date
+	FROM etl.stg_con_po_header a JOIN ref_date b ON a.cntrct_strt_dt = b.date AND a.cntrct_strt_dt IS NOT NULL
 		JOIN ref_year c ON b.nyc_year_id = c.year_id
 		JOIN ref_month d ON b.calendar_month_id = d.month_id
 		JOIN ref_year e ON d.year_id = e.year_id;
@@ -117,7 +117,7 @@ BEGIN
 	
 	INSERT INTO tmp_po_fk_values(uniq_id,effective_end_date_id,effective_end_fiscal_year,effective_end_fiscal_year_id, effective_end_calendar_year,effective_end_calendar_year_id)
 	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
-	FROM etl.stg_con_po_header a JOIN ref_date b ON a.cntrct_end_dt = b.date
+	FROM etl.stg_con_po_header a JOIN ref_date b ON a.cntrct_end_dt = b.date AND a.cntrct_end_dt IS NOT NULL
 		JOIN ref_year c ON b.nyc_year_id = c.year_id
 		JOIN ref_month d ON b.calendar_month_id = d.month_id
 		JOIN ref_year e ON d.year_id = e.year_id;
