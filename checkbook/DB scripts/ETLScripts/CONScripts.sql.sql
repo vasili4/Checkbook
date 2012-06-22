@@ -474,11 +474,10 @@ BEGIN
 		VALUES(p_load_file_id_in,'C',l_count, 'New fund class records inserted from general contracts accounting lines');	
 	END IF;	
 	
-	INSERT INTO tmp_fk_values_do1_acc_line(uniq_id,fund_class_id)
+	INSERT INTO tmp_fk_values_acc_line(uniq_id,fund_class_id)
 	SELECT	a.uniq_id, b.fund_class_id 
 	FROM etl.stg_con_ct_accounting_line a JOIN ref_fund_class b ON COALESCE(a.fund_cd,'---') = b.fund_class_code
-		JOIN etl.ref_fund_class_id_seq c ON c.fund_class_id = b.fund_class_id
-	GROUP BY 1	;	
+		JOIN etl.ref_fund_class_id_seq c ON c.fund_class_id = b.fund_class_id ;	
 	
 	-- FK:agency_history_id
 
