@@ -2101,7 +2101,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	  budget_code_name character varying
 
 	)
-	 EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
+	 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
 	 FORMAT 'csv' (delimiter ',' null '' escape '"' quote '"')
 	ENCODING 'UTF8';
 		
