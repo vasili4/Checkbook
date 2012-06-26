@@ -436,10 +436,14 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_fk_values_acc_line(uniq_id bigint,fund_class_id smallint,agency_history_id smallint,
 							department_history_id int, expenditure_object_history_id integer,budget_code_id integer)
 	DISTRIBUTED BY (uniq_id);
-
+	
+	INSERT INTO tmp_fk_values_acc_line(uniq_id)
+	SELECT DISTINCT  uniq_id
+	FROM etl.stg_con_ct_accounting_line;
 	
 	-- FK:fund_class_id
 
+	
 	INSERT INTO tmp_fk_values_acc_line(uniq_id,fund_class_id)
 	SELECT	a.uniq_id, b.fund_class_id
 	FROM etl.stg_con_ct_accounting_line a JOIN ref_fund_class b ON COALESCE(a.fund_cd,'---') = b.fund_class_code;	
@@ -875,6 +879,8 @@ BEGIN
 	
 	-- Identifying the versions of the agreements for update
 	
+	TRUNCATE etl.agreement_id_seq ;
+	
 	INSERT INTO etl.agreement_id_seq
 	SELECT uniq_id
 	FROM	tmp_ct_con
@@ -1281,7 +1287,7 @@ BEGIN
 	-- Get the contracts (key elements only without version) which have been created or updated
 	
 	CREATE TEMPORARY TABLE tmp_loaded_agreements(document_id varchar,document_version integer,document_code_id smallint, agency_id smallint,
-		latest_version_no smallint,first_version smallint );
+		latest_version_no smallint,first_version smallint ) DISTRIBUTED BY (document_id);
 	
 	INSERT INTO tmp_loaded_agreements
 	SELECT distinct document_id,document_version,document_code_id, agency_id
@@ -1292,7 +1298,7 @@ BEGIN
 	-- Get the max version and min version
 	
 	CREATE TEMPORARY TABLE tmp_loaded_agreements_1(document_id varchar,document_code_id smallint, agency_id smallint,
-		latest_version_no smallint,first_version_no smallint );
+		latest_version_no smallint,first_version_no smallint )  DISTRIBUTED BY (document_id);
 		
 	INSERT INTO tmp_loaded_agreements_1
 	SELECT a.document_id,a.document_code_id, c.agency_id, 
@@ -1301,13 +1307,15 @@ BEGIN
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
 	GROUP BY 1,2,3;	
 	
+	RAISE NOTICE 'PCON1';
+	
 	-- Update the versions which are no more the first versions
 	-- Might have to change the disbursements linkage here
 
 	CREATE TEMPORARY TABLE tmp_agreement_flag_changes (document_id varchar,document_code_id smallint, agency_id smallint,
 					latest_agreement_id bigint, first_agreement_id bigint,non_latest_agreement_id varchar, non_first_agreement_id varchar,
 					latest_maximum_contract_amount numeric(16,2)
-					);
+					) DISTRIBUTED BY (document_id);
 					
 	INSERT INTO tmp_agreement_flag_changes 				
 	SELECT a.document_id,a.document_code_id, b.agency_id, 
@@ -1321,6 +1329,8 @@ BEGIN
 	GROUP BY 1,2,3;	
 	
 	-- Updating the original flag for non first agreements 
+	
+	RAISE NOTICE 'PCON2';
 	
 	CREATE TEMPORARY TABLE tmp_agreements_update(agreement_id bigint,first_agreement_id bigint)
 	DISTRIBUTED BY (agreement_id);
@@ -1362,7 +1372,7 @@ BEGIN
 		AND COALESCE(a.latest_flag,'N') = 'N';	
 
 
-	
+	RAISE NOTICE 'PCON3';
 	-- Populating the agreement_snapshot tables
 
 	
@@ -1399,7 +1409,7 @@ BEGIN
 	WHERE   a.original_agreement_id = b.original_agreement_id
 		AND a.document_version = b.document_version;
 		
-	
+	RAISE NOTICE 'PCON4';
 	-- Updating the POP years from the latest version of the agreement
 	UPDATE tmp_agreement_snapshot a
 	SET	effective_begin_fiscal_year = b.effective_begin_fiscal_year,
@@ -1431,6 +1441,7 @@ BEGIN
 	WHERE	year_value = ending_year - 1
 		AND ending_year is not null;
 	
+	RAISE NOTICE 'PCON5';
 	DELETE FROM ONLY agreement_snapshot a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 	
 	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
@@ -1483,7 +1494,7 @@ BEGIN
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
 
 		
-					
+	RAISE NOTICE 'PCON6';				
 	/* End of one time changes */
 	
 	-- Populating the agreement_snapshot tables related to the calendar year			      
@@ -1517,7 +1528,8 @@ BEGIN
 	WHERE   a.original_agreement_id = b.original_agreement_id
 		AND a.document_version = b.document_version;
 
-
+	RAISE NOTICE 'PCON7';
+	
 	-- Updating the POP years from the latest version of the agreement
 	UPDATE tmp_agreement_snapshot a
 	SET	effective_begin_fiscal_year = b.effective_begin_calendar_year,
@@ -1549,6 +1561,8 @@ BEGIN
 	WHERE	year_value = ending_year - 1
 		AND ending_year is not null;
 
+	RAISE NOTICE 'PCON8';
+	
 	DELETE FROM ONLY agreement_snapshot_cy a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 
 	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
@@ -1600,7 +1614,7 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
 
-	
+	RAISE NOTICE 'PCON9';
 			-- Associate Disbursement line item to the original version of the agreement
 	
 	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
@@ -1637,6 +1651,8 @@ BEGIN
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
 	 AND a.agreement_id = c.agreement_id;
 
+	 RAISE NOTICE 'PCON10';
+	 
 	 -- updating maximum_contract_amount in disbursement_line_item_details
 	 
 	UPDATE disbursement_line_item_details a

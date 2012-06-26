@@ -227,6 +227,7 @@ CREATE TABLE disbursement_line_item (
     check_amount numeric(16,2),
     agreement_id bigint,
     agreement_accounting_line_number integer,
+    agreement_commodity_line_number integer,
     location_history_id integer,
     retainage_amount numeric(16,2),
     check_eft_issued_nyc_year_id smallint,
@@ -300,6 +301,8 @@ CREATE TABLE disbursement_line_item_details(
 	spending_category_name varchar,
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
+	agreement_accounting_line_number integer,
+  	agreement_commodity_line_number integer,
 	load_id integer
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
@@ -339,7 +342,8 @@ CREATE TABLE revenue_details
 	revenue_category_code varchar,
 	revenue_source_code varchar,
 	agency_short_name varchar,
-	department_short_name varchar
+	department_short_name varchar,
+	agency_history_id smallint
 ) DISTRIBUTED BY (revenue_id);
 
 --
@@ -1482,29 +1486,11 @@ CREATE TABLE aggregateon_payroll_year(
 	total_overtime_employees int)
 DISTRIBUTED BY (fiscal_year_id);
 
- CREATE TABLE agreement_snapshot_expanded(
- 	original_agreement_id bigint,
- 	fiscal_year smallint,
- 	description varchar,
- 	contract_number varchar,
- 	vendor_id int,
- 	agency_id smallint,
- 	original_contract_amount numeric(16,2) ,
- 	maximum_contract_amount numeric(16,2),
- 	starting_year smallint,	
- 	ending_year smallint,
- 	dollar_difference numeric(16,2), 
- 	percent_difference numeric(17,4),
- 	award_method_id smallint,
- 	document_code_id smallint,
- 	master_agreement_id bigint,
- 	master_agreement_yn character(1),
- 	status_flag char(1)
- 	)
-DISTRIBUTED BY (original_agreement_id);	
+-- Contracts Aggregate Tables
 
-CREATE TABLE agreement_snapshot_expanded_cy(
+ CREATE TABLE agreement_snapshot_expanded(
 	original_agreement_id bigint,
+	agreement_id bigint,
 	fiscal_year smallint,
 	description varchar,
 	contract_number varchar,
@@ -1523,6 +1509,30 @@ CREATE TABLE agreement_snapshot_expanded_cy(
 	status_flag char(1)
 	)
 DISTRIBUTED BY (original_agreement_id);	
+
+
+CREATE TABLE agreement_snapshot_expanded_cy(
+	original_agreement_id bigint,
+	agreement_id bigint,
+	fiscal_year smallint,
+	description varchar,
+	contract_number varchar,
+	vendor_id int,
+	agency_id smallint,
+	original_contract_amount numeric(16,2) ,
+	maximum_contract_amount numeric(16,2),
+	starting_year smallint,	
+	ending_year smallint,
+	dollar_difference numeric(16,2), 
+	percent_difference numeric(17,4),
+	award_method_id smallint,
+	document_code_id smallint,
+	master_agreement_id bigint,
+	master_agreement_yn character(1),
+	status_flag char(1)
+	)
+DISTRIBUTED BY (original_agreement_id);	
+
 
 CREATE TABLE aggregateon_contracts_cumulative_spending(
 	original_agreement_id bigint,
@@ -1546,9 +1556,27 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
 ) DISTRIBUTED BY (vendor_id);	
 
 
-CREATE TABLE aggregateon_total_contracts_agency
-(
+CREATE TABLE aggregateon_contracts_spending_by_month(
+	original_agreement_id bigint,
 	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	month_id integer,
+	vendor_id int,
+	award_method_id smallint,
+	agency_id smallint,
+	spending_amount numeric(16,2),
+	status_flag char(1),
+	type_of_year char(1)	
+) DISTRIBUTED BY (vendor_id);	
+
+
+
+CREATE TABLE aggregateon_total_contracts(
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	vendor_id int,
+	award_method_id smallint,
 	agency_id smallint,
 	total_contracts bigint,
 	total_commited_contracts bigint,
@@ -1561,21 +1589,9 @@ CREATE TABLE aggregateon_total_contracts_agency
 	type_of_year char(1)
 ) DISTRIBUTED BY (fiscal_year);	
 
-CREATE TABLE aggregateon_total_contracts
-(
-	fiscal_year smallint,
-	total_contracts bigint,
-	total_commited_contracts bigint,
-	total_master_agreements bigint,
-	total_standalone_contracts bigint,
-	total_commited_contracts_amount numeric(16,2),
-	total_contracts_amount numeric(16,2),
-	total_spending_amount numeric(16,2), 
-	status_flag char(1),
-	type_of_year char(1)
-) DISTRIBUTED BY (fiscal_year);	
 
 CREATE TABLE aggregateon_contracts_department(
+	document_agency_id smallint,
 	agency_id smallint,
 	department_id integer,
 	fiscal_year smallint,
@@ -1587,6 +1603,23 @@ CREATE TABLE aggregateon_contracts_department(
 	status_flag char(1),
 	type_of_year char(1)
 ) DISTRIBUTED BY (department_id);	
+
+CREATE TABLE contracts_spending_transactions(
+	disbursement_line_item_id bigint,
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	vendor_id int,
+	award_method_id smallint,
+	document_agency_id smallint,
+	agency_id smallint,
+	department_id integer,
+	status_flag char(1),
+	type_of_year char(1)
+) DISTRIBUTED BY (disbursement_line_item_id);	
+
+-- End Contract Aggregate Tables
 
 
 CREATE TABLE agreement_snapshot(

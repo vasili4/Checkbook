@@ -420,6 +420,8 @@ BEGIN
 	RAISE NOTICE 'MAG 5';
 	-- Identifying the versions of the agreements for update
 	
+	TRUNCATE etl.agreement_id_seq;
+	
 	INSERT INTO etl.agreement_id_seq
 	SELECT uniq_id
 	FROM	tmp_mag
@@ -681,7 +683,7 @@ $$ language plpgsql;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.postProcessMAG(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.postProcessMAG(p_job_id_in bigint) RETURNS INT AS $$
 DECLARE
 BEGIN
 
@@ -694,7 +696,8 @@ BEGIN
 	INSERT INTO tmp_loaded_master_agreements
 	SELECT distinct document_id,document_version,document_code_id, agency_id
 	FROM history_master_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
-	WHERE a.created_load_id = p_load_id_in OR a.updated_load_id = p_load_id_in;
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('C','M','F');
 	
 	-- Get the max version and min version
 	
@@ -993,6 +996,8 @@ BEGIN
 	
 	-- Associate contracts/agreements to the original version of the master agreement
 	
+	RAISE NOTICE 'PMAG9'; 
+	
 	CREATE TEMPORARY TABLE tmp_contracts_for_mag(agreement_id bigint, master_agreement_id bigint)
 	DISTRIBUTED BY (agreement_id);
 	
@@ -1011,7 +1016,7 @@ BEGIN
 	
 	
 	
-	RAISE NOTICE 'PMAG9'; 
+	RAISE NOTICE 'PMAG10'; 
 	
 	-- Updating to the original version of the master agreement in disbursement line item details
 	

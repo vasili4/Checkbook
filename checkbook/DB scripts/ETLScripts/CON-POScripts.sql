@@ -369,6 +369,9 @@ BEGIN
 							department_history_id int, expenditure_object_history_id integer,budget_code_id integer)
 	DISTRIBUTED BY (uniq_id);
 
+	INSERT INTO tmp_po_fk_values_acc_line(uniq_id)
+	SELECT DISTINCT  uniq_id
+	FROM etl.stg_con_po_accounting_line;
 	
 	-- FK:fund_class_id
 
@@ -801,6 +804,8 @@ BEGIN
 	RAISE NOTICE '1';
 	
 	-- Identifying the versions of the agreements for update
+	
+	TRUNCATE etl.agreement_id_seq;
 	
 	INSERT INTO etl.agreement_id_seq
 	SELECT uniq_id

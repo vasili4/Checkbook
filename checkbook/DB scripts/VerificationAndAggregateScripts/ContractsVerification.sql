@@ -446,7 +446,7 @@ FROM
 (select f.original_agreement_id, f.agency_id, MIN(f.original_contract_amount) as original_contract_amount, MIN(f.maximum_contract_amount) as maximum_contract_amount, sum(f.spending_amount) as spending_amount
 FROM
 (SELECT b.original_agreement_id, 
-last_value(c.agency_id) over (partition by b.original_agreement_id  ORDER BY c.fiscal_year asc) as agency_id, 
+first_value(c.agency_id) over (partition by b.original_agreement_id  ORDER BY c.check_eft_issued_date desc,c.agency_id asc) as agency_id, 
 b.original_contract_amount as original_contract_amount,
 b.maximum_contract_amount as maximum_contract_amount, 
 c.check_amount as spending_amount
@@ -459,12 +459,12 @@ history_agreement b join (
 		from history_agreement  ha1 ,
 		(select original_agreement_id
 		from history_agreement 
-		WHERE latest_flag = 'Y' AND 2011 between effective_begin_fiscal_year  AND effective_end_fiscal_year) ha2
+		WHERE latest_flag = 'Y' AND 2012 between effective_begin_fiscal_year  AND effective_end_fiscal_year) ha2
 		where ha1.original_agreement_id = ha2.original_agreement_id 
-		and source_updated_fiscal_year <= 2011
+		and source_updated_fiscal_year <= 2012
 		GROUP BY 1 ) tbl1 on a.original_agreement_id = tbl1.original_agreement_id AND a.source_updated_fiscal_year = tbl1.source_updated_fiscal_year
 	GROUP BY 1 order by 1) tbl2 on  b.original_agreement_id = tbl2.original_agreement_id AND b.document_version = tbl2.document_version
-	LEFT JOIN disbursement_line_item_details c ON b.original_agreement_id = c.agreement_id AND c.fiscal_year <=2011
+	LEFT JOIN disbursement_line_item_details c ON b.original_agreement_id = c.agreement_id AND c.fiscal_year <=2012
 	) f 
 GROUP BY 1,2) g WHERE agency_id IS NOT NULL
 GROUP BY 1
@@ -478,3 +478,92 @@ SELECT agency_id, count(original_agreement_id), sum(original_contract_amount), s
 FROM aggregateon_contracts_cumulative_spending
 WHERE status_flag = 'A' AND type_of_year = 'B' AND fiscal_year = 2011 AND master_agreement_yn = 'N' AND  coalesce(agency_id,0) <> 0
 Group by 1 ORDER BY 4 desc LIMIT 5
+
+
+
+SELECT X.agency_id, X.total_spent_amount - Y.total_spent_amount as difference_amount
+FROM
+(SELECT g.agency_id,sum(g.spending_amount) as total_spent_amount
+FROM
+(select f.original_agreement_id, f.agency_id, MIN(f.original_contract_amount) as original_contract_amount, MIN(f.maximum_contract_amount) as maximum_contract_amount, sum(f.spending_amount) as spending_amount
+FROM
+(SELECT b.original_agreement_id, 
+first_value(c.agency_id) over (partition by b.original_agreement_id  ORDER BY c.check_eft_issued_date desc,c.agency_id asc) as agency_id, 
+b.original_contract_amount as original_contract_amount,
+b.maximum_contract_amount as maximum_contract_amount, 
+c.check_amount as spending_amount
+from
+history_agreement b join (
+	select a.original_agreement_id, max(document_version) as document_version
+	from
+	history_agreement a join 
+		(select ha1.original_agreement_id,max(source_updated_fiscal_year) as source_updated_fiscal_year 
+		from history_agreement  ha1 ,
+		(select original_agreement_id
+		from history_agreement 
+		WHERE latest_flag = 'Y' AND 2012 between effective_begin_fiscal_year  AND effective_end_fiscal_year) ha2
+		where ha1.original_agreement_id = ha2.original_agreement_id 
+		and source_updated_fiscal_year <= 2012
+		GROUP BY 1 ) tbl1 on a.original_agreement_id = tbl1.original_agreement_id AND a.source_updated_fiscal_year = tbl1.source_updated_fiscal_year
+	GROUP BY 1 order by 1) tbl2 on  b.original_agreement_id = tbl2.original_agreement_id AND b.document_version = tbl2.document_version
+	LEFT JOIN disbursement_line_item_details c ON b.original_agreement_id = c.agreement_id AND c.fiscal_year <=2012
+	) f 
+GROUP BY 1,2) g WHERE agency_id IS NOT NULL
+GROUP BY 1) X,
+(SELECT agency_id,  sum(spending_amount) as total_spent_amount
+FROM aggregateon_contracts_department
+WHERE status_flag = 'A'
+AND type_of_year = 'B'
+AND fiscal_year = 2012 
+GROUP BY 1) Y
+WHERE X.agency_id = Y.agency_id order by 2 desc
+
+
+
+-- Reloading MAG, CON and FMS data
+
+-- delete the data 
+
+TRUNCATE history_master_agreement ;
+
+TRUNCATE history_agreement;
+
+TRUNCATE history_agreement_accounting_line ;
+
+TRUNCATE history_agreement_commodity;
+
+TRUNCATE history_agreement_worksite ;
+
+TRUNCATE agreement_snapshot;
+
+TRUNCATE agreement_snapshot_cy;
+
+TRUNCATE vendor ;
+
+TRUNCATE vendor_address ;
+
+TRUNCATE vendor_business_type ;
+
+TRUNCATE vendor_history ;
+
+TRUNCATE disbursement ;
+
+TRUNCATE disbursement_line_item ;
+
+TRUNCATE disbursement_line_item_deleted ;
+
+DELETE FROM disbursement_line_item_details WHERE spending_category_id = 2 ;
+
+
+INSERT INTO  etl.etl_data_load (job_id, data_source_code) VALUES (2, 'M'),(2,'C'),(2,'F'),(2,'F');
+
+INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(26,'AIE0_DLY_MMDSB_MD_20120523195328.txt','20120523195328','D','Y','Y','N');
+
+
+DATA_SOURCE_CODE  		LOAD_ID			LOAD_FILE_ID           DOC_TYPE
+ M						 23					26		
+ C						 24					28
+ F						 25					29					 AD
+ F						 26					30					 MD
+ 
+ 

@@ -4,6 +4,7 @@ set search_path=public;
 	updateForeignKeysForFMSVendors
 	updateForeignKeysForFMSInAccLine	
 	refreshFactsForFMS
+	associateCONToFMS
 	processFMS
 */
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
@@ -161,7 +162,11 @@ BEGIN
 							department_history_id int, expenditure_object_history_id integer,budget_code_id integer,
 							fund_id smallint, location_history_id int, masked_agency_history_id smallint, masked_department_history_id int)
 	DISTRIBUTED BY (uniq_id);
-		
+	
+	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id)
+	SELECT DISTINCT  uniq_id
+	FROM etl.stg_fms_accounting_line;
+	
 	-- FK:fund_class_id
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,fund_class_id)
@@ -774,7 +779,7 @@ $$ language plpgsql;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_load_id_in bigint) RETURNS INT AS
+CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_job_id_in bigint) RETURNS INT AS
 $$
 DECLARE
 BEGIN
@@ -782,10 +787,15 @@ BEGIN
 
 	RAISE NOTICE 'FMS RF 1';
 	
+	
 	DELETE FROM ONLY disbursement_line_item_details a 
-	USING disbursement b
+	USING disbursement b, etl.etl_data_load c
 	WHERE   a.disbursement_id = b.disbursement_id 
-		AND b.updated_load_id = p_load_id_in; 
+	AND updated_load_id = c.load_id
+	AND c.job_id = p_job_id_in AND c.data_source_code IN ('C','M','F'); 
+	
+
+		
 		
 	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
 						check_eft_issued_nyc_year_id,fiscal_year, check_eft_issued_cal_month_id,
@@ -811,7 +821,7 @@ BEGIN
 		 (CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 'Capital Contracts'
 		 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 'Contracts'
 		 		      ELSE 'Others'
-		 END) as spending_category_name,x.year_id,x.year_value,p_load_id_in
+		 END) as spending_category_name,x.year_id,x.year_value,coalesce(a.updated_load_id, a.created_load_id)
 		FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
 			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
 			JOIN ref_agency m on c.agency_id = m.agency_id
@@ -829,7 +839,9 @@ BEGIN
 			JOIN ref_fund_class k ON k.fund_class_id = b.fund_class_id			
 			JOIN ref_month y on f.calendar_month_id = y.month_id
 			JOIN ref_year x on y.year_id = x.year_id
-	WHERE a.created_load_id = p_load_id_in OR a.updated_load_id = p_load_id_in;
+			JOIN etl.etl_data_load z ON coalesce(a.updated_load_id, a.created_load_id) = z.load_id
+		WHERE z.job_id = p_job_id_in AND z.data_source_code IN ('C','M','F');
+		
 	
 	RAISE NOTICE 'FMS RF 2';
 	
@@ -844,7 +856,8 @@ BEGIN
 	SELECT DISTINCT a.disbursement_line_item_id, a.agreement_id, a.fiscal_year, a.calendar_fiscal_year 
 	FROM disbursement_line_item_details a JOIN disbursement_line_item b ON a.disbursement_line_item_id = b.disbursement_line_item_id
 		 JOIN disbursement c ON b.disbursement_id = c.disbursement_id
-		WHERE c.created_load_id = p_load_id_in OR c.updated_load_id = p_load_id_in ;
+		 JOIN etl.etl_data_load d ON coalesce(c.updated_load_id, c.created_load_id) = d.load_id
+		WHERE d.job_id = p_job_id_in AND d.data_source_code IN ('C','M','F');
 	
 		
 	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.

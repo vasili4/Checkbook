@@ -7,7 +7,7 @@
 	#print "attr"attributes[1]
 	#print no_of_attributes
 	if((attributes[1]=="H" && no_of_attributes==22) ||
-	   (attributes[1]=="V" && no_of_attributes==13) ||
+	   (attributes[1]=="V" && no_of_attributes==19) ||
 	   (attributes[1]=="A" && no_of_attributes==49))
 		{
 		       print $0 >> "goodfile.txt"
