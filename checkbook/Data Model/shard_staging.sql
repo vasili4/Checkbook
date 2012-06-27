@@ -1811,6 +1811,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_class__0(
 	revenue_category_id smallint,
 	funding_class_id smallint,
 	funding_class_code character varying,
+	agency_id character varying,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
@@ -1824,9 +1825,9 @@ ENCODING 'UTF8';
 
 CREATE VIEW aggregateon_revenue_category_funding_class AS
 	SELECT aggregateon_revenue_category_funding_class__0.revenue_category_id,aggregateon_revenue_category_funding_class__0.funding_class_id,
-	              aggregateon_revenue_category_funding_class__0.funding_class_code,aggregateon_revenue_category_funding_class__0.budget_fiscal_year_id,
-		aggregateon_revenue_category_funding_class__0.posting_amount, aggregateon_revenue_category_funding_class__0.adopted_amount,
-		 aggregateon_revenue_category_funding_class__0.current_modified_amount
+	              aggregateon_revenue_category_funding_class__0.funding_class_code,aggregateon_revenue_category_funding_class__0.agency_id,
+	              aggregateon_revenue_category_funding_class__0.budget_fiscal_year_id,aggregateon_revenue_category_funding_class__0.posting_amount, 
+	              aggregateon_revenue_category_funding_class__0.adopted_amount,aggregateon_revenue_category_funding_class__0.current_modified_amount
 	FROM aggregateon_revenue_category_funding_class__0;
 	
 
