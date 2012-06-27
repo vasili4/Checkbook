@@ -1193,6 +1193,7 @@ CREATE TABLE aggregateon_revenue_category_funding_class(
 	revenue_category_id smallint,
 	funding_class_id smallint,
 	funding_class_code character varying,
+	agency_id character varying,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
