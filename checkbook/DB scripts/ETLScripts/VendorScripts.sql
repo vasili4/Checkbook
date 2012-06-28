@@ -37,7 +37,7 @@ BEGIN
 	INSERT INTO tmp_stg_vendor(vend_cust_cd, lgl_nm, alias_nm, ad_id, org_cls, misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, 
 							   city, vendor_history_id, uniq_id, address_type_code)
 	SELECT vend_cust_cd, lgl_nm, alias_nm, ad_id, org_cls, misc_acct_fl, ad_ln_1, ad_ln_2, ctry, st, zip, city, 
-							   vendor_history_id, uniq_id, 'PR' as address_type_code
+							   vendor_history_id, uniq_id, 'PA' as address_type_code
 	FROM etl.stg_fms_vendor;
 	
 	ELSIF l_data_source_code = 'M'  THEN

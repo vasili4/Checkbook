@@ -774,7 +774,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_master_agreement_snapshot(original_master_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
 						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id 
-						     smallint,effective_end_fiscal_year smallint,   effective_end_fiscal_year_id smallint, registered_fiscal_year smallint)
+						     smallint,effective_end_fiscal_year smallint,   effective_end_fiscal_year_id smallint, registered_fiscal_year smallint, has_children char(1))
 	DISTRIBUTED BY 	(original_master_agreement_id);				      
 	
 	-- Get the latest version for every year of modification
@@ -790,7 +790,8 @@ BEGIN
 		max(effective_begin_fiscal_year_id) as effective_begin_fiscal_year_id,
 		max(effective_end_fiscal_year) as effective_end_fiscal_year,
 		max(effective_end_fiscal_year_id) as effective_end_fiscal_year_id,
-		max(registered_fiscal_year) as registered_fiscal_year
+		max(registered_fiscal_year) as registered_fiscal_year,
+		NULL as has_children
 	FROM	tmp_master_agreement_flag_changes a JOIN history_master_agreement b ON a.first_master_agreement_id = b.original_master_agreement_id
 	GROUP  BY 1,2,3;
 	
@@ -831,6 +832,20 @@ BEGIN
 	
 	RAISE NOTICE 'PMAG5'; 
 	
+	CREATE TEMPORARY TABLE tmp_master_has_children_fy (original_master_agreement_id bigint, total_children smallint)
+	DISTRIBUTED BY (original_master_agreement_id);
+	
+	INSERT INTO tmp_master_has_children_fy
+	SELECT b.original_master_agreement_id, count(distinct agreement_id) as total_children
+	FROM history_agreement a JOIN tmp_master_agreement_snapshot b 
+	ON a.master_agreement_id = b.original_master_agreement_id
+	GROUP BY 1;
+	
+	UPDATE 	tmp_master_agreement_snapshot a
+	SET has_children = (CASE WHEN b.total_children > 0 THEN 'Y' ELSE 'N' END)
+	FROM tmp_master_has_children_fy b
+	WHERE a.original_master_agreement_id = b.original_master_agreement_id;
+	
 	DELETE FROM ONLY agreement_snapshot a USING  tmp_master_agreement_snapshot b WHERE a.original_agreement_id = b.original_master_agreement_id;
 	
 	RAISE NOTICE 'PMAG6'; 
@@ -847,7 +862,7 @@ BEGIN
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
-					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn)
+					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,has_children)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN a.effective_end_fiscal_year < a.starting_year THEN a.starting_year
@@ -866,7 +881,7 @@ BEGIN
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
 		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
-		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn
+		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn, a.has_children
 	FROM	tmp_master_agreement_snapshot a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
@@ -886,7 +901,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_master_agreement_snapshot_cy(original_master_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
 						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, effective_begin_calendar_year smallint,effective_begin_calendar_year_id 
-						     smallint,effective_end_calendar_year smallint,   effective_end_calendar_year_id smallint, registered_calendar_year smallint)
+						     smallint,effective_end_calendar_year smallint,   effective_end_calendar_year_id smallint, registered_calendar_year smallint, has_children char(1))
 	DISTRIBUTED BY 	(original_master_agreement_id);				      
 			
 	INSERT INTO tmp_master_agreement_snapshot_cy		
@@ -900,7 +915,8 @@ BEGIN
 		max(effective_begin_calendar_year_id) as effective_begin_calendar_year_id,
 		max(effective_end_calendar_year) as effective_end_calendar_year,
 		max(effective_end_calendar_year_id) as effective_end_calendar_year_id,
-		max(registered_calendar_year) as registered_calendar_year
+		max(registered_calendar_year) as registered_calendar_year,
+		NULL as has_children
 	FROM	tmp_master_agreement_flag_changes a JOIN history_master_agreement b ON a.first_master_agreement_id = b.original_master_agreement_id
 	GROUP  BY 1,2,3;
 	
@@ -940,6 +956,23 @@ BEGIN
 	FROM	ref_year 
 	WHERE	year_value = ending_year - 1
 		AND ending_year is not null;
+		
+	
+	CREATE TEMPORARY TABLE tmp_master_has_children_cy (original_master_agreement_id bigint, total_children smallint)
+	DISTRIBUTED BY (original_master_agreement_id);
+	
+	INSERT INTO tmp_master_has_children_cy
+	SELECT b.original_master_agreement_id, count(distinct agreement_id) as total_children
+	FROM history_agreement a JOIN tmp_master_agreement_snapshot_cy b 
+	ON a.master_agreement_id = b.original_master_agreement_id
+	GROUP BY 1;
+	
+	UPDATE 	tmp_master_agreement_snapshot_cy a
+	SET has_children = (CASE WHEN b.total_children > 0 THEN 'Y' ELSE 'N' END)
+	FROM tmp_master_has_children_cy b
+	WHERE a.original_master_agreement_id = b.original_master_agreement_id;
+	
+	
 	
 	RAISE NOTICE 'PMAG7'; 
 	
@@ -959,7 +992,7 @@ BEGIN
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
-					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn)
+					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,has_children)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id, b.agency_history_id, ah.agency_id,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
@@ -978,7 +1011,7 @@ BEGIN
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
 		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,b.original_version_flag,
-		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn
+		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn, a.has_children
 	FROM	tmp_master_agreement_snapshot_cy a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id

@@ -900,6 +900,7 @@ CREATE TABLE history_agreement (
  	brd_awd_no varchar,
  	tracking_number varchar, 	
  	master_agreement_yn char(1),
+ 	has_children char(1),
  	original_version_flag char(1),
  	latest_flag char(1)
 ) DISTRIBUTED BY (original_agreement_id);

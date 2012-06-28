@@ -1818,7 +1818,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_class__0(
 	current_modified_amount numeric(16,2)
 )
 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_category_funding_class to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_revenue_category_funding_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -2099,7 +2099,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	  budget_code_name character varying
 
 	)
-	 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
+	 EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
 	 FORMAT 'csv' (delimiter ',' null '' escape '"' quote '"')
 	ENCODING 'UTF8';
 		
@@ -2448,6 +2448,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
  	brd_awd_no varchar,
  	tracking_number varchar, 	
  	master_agreement_yn char(1),
+ 	has_children char(1),
  	original_version_flag char(1),
  	latest_flag char(1)
 ) 
@@ -2469,7 +2470,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapsho
   		agreement_snapshot__0.effective_begin_year,agreement_snapshot__0.effective_begin_year_id,agreement_snapshot__0.effective_end_date,
   		agreement_snapshot__0.effective_end_date_id,agreement_snapshot__0.effective_end_year,agreement_snapshot__0.effective_end_year_id,
   		agreement_snapshot__0.registered_date,agreement_snapshot__0.registered_date_id,agreement_snapshot__0.brd_awd_no,agreement_snapshot__0.tracking_number,
-  		agreement_snapshot__0.master_agreement_yn,agreement_snapshot__0.original_version_flag,agreement_snapshot__0.latest_flag
+  		agreement_snapshot__0.master_agreement_yn,agreement_snapshot__0.has_children,agreement_snapshot__0.original_version_flag,agreement_snapshot__0.latest_flag
   	FROM  agreement_snapshot__0;
   	
 CREATE EXTERNAL WEB TABLE agreement_snapshot_cy__0(
@@ -2517,6 +2518,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot_cy__0(
  	brd_awd_no varchar,
  	tracking_number varchar, 	
  	master_agreement_yn char(1),
+ 	has_children char(1),
  	original_version_flag char(1),
  	latest_flag char(1)
 ) 
@@ -2538,7 +2540,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapsho
   		agreement_snapshot_cy__0.effective_begin_year,agreement_snapshot_cy__0.effective_begin_year_id,agreement_snapshot_cy__0.effective_end_date,
   		agreement_snapshot_cy__0.effective_end_date_id,agreement_snapshot_cy__0.effective_end_year,agreement_snapshot_cy__0.effective_end_year_id,
   		agreement_snapshot_cy__0.registered_date,agreement_snapshot_cy__0.registered_date_id,agreement_snapshot_cy__0.brd_awd_no,agreement_snapshot_cy__0.tracking_number,
-  		agreement_snapshot_cy__0.master_agreement_yn,agreement_snapshot_cy__0.original_version_flag,agreement_snapshot_cy__0.latest_flag
+  		agreement_snapshot_cy__0.master_agreement_yn,agreement_snapshot_cy__0.has_children,agreement_snapshot_cy__0.original_version_flag,agreement_snapshot_cy__0.latest_flag
   	FROM  agreement_snapshot_cy__0;  	
   	
 CREATE EXTERNAL WEB TABLE pending_contracts__0(
