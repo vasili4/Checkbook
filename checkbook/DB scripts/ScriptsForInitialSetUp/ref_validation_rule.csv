@@ -173,10 +173,6 @@ M,C,,Invalid component - header,etl.stg_mag_header,,"doc_cd,doc_dept_cd,doc_id,d
 M,C,,Invalid component - vendor,,etl.stg_mag_vendor,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,58
 M,C,,Invalid component - commodity,,etl.stg_mag_commodity,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,59
 M,C,,Invalid component - award detail,,etl.stg_mag_award_detail,"doc_cd,doc_dept_cd,doc_id,doc_vers_no",,,,,60
-RY,,,Missing key elements,,,rscat_cd,,,,,1
-RY,,,Duplicate,,,rscat_cd,,,,,2
-RC,,,Missing key elements,,,rscls_cd,,,,,1
-RC,,,Duplicate,,,rscls_cd,,,,,2
 BC,,,Missing key elements,,,"func_cd,fy,fcls_cd,dept_cd",,,,,1
 BC,,,Duplicate,,,"func_cd,fy,fcls_cd,dept_cd",,,,,2
 B,,,Missing key elements,,,"budget_fiscal_year,fund_class_code,agency_code,department_code,budget_code,object_class_code",,,,,1
