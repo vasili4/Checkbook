@@ -292,6 +292,9 @@ BEGIN
 		object_class_code = ct_table.object_class_code,
 		agency_short_name = ct_table.agency_short_name,
 		department_short_name = ct_table.department_short_name
+		agency_id =ct_table.agency_id, 
+		department_id=ct_table.department_id,
+		object_class_id = ct_table.object_id 
 	FROM	(SELECT uniq_id, max(fund_class_id) as fund_class_id, 
 				 max(agency_history_id) as agency_history_id,
 				 max(department_history_id) as department_history_id,
@@ -307,7 +310,10 @@ BEGIN
 				 max(department_code) as department_code,
 				 max(object_class_code) as object_class_code,
 				 max(agency_short_name) as agency_short_name,
-				 max(department_short_name) as department_short_name
+				 max(department_short_name) as department_short_name,
+				 max(agency_id) as agency_id,
+				 max(department_id) as department_id,
+				 max(object_class_id) as object_class_id,
 		 FROM	tmp_fk_budget_values
 		 GROUP BY 1) ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
