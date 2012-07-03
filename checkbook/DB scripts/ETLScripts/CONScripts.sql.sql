@@ -7,6 +7,7 @@ Functions defined
 	updateForeignKeysForCTInAccLine
 	processCONGeneralContracts
 	processCon
+	updateCONFlags
 	postProcessContracts
 
 */
@@ -1261,6 +1262,13 @@ BEGIN
 		ELSE 
 			RETURN 0;
 	END IF;	
+	
+	IF l_status = 1 THEN 
+			l_status := etl.updateCONFlags(p_load_id_in);
+		ELSE 
+			RETURN 0;
+	END IF;	
+	
 		
 	RETURN 1;
 	
@@ -1276,6 +1284,122 @@ $$ language plpgsql;
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.updateCONFlags(p_load_id_in bigint) RETURNS INT AS $$
+DECLARE
+BEGIN
+	/* Common for all types 
+	Can be done once per etl
+	*/
+	
+	-- Get the contracts (key elements only without version) which have been created or updated
+	
+	CREATE TEMPORARY TABLE tmp_loaded_agreements_flags(document_id varchar,document_version integer,document_code_id smallint, agency_id smallint,
+		latest_version_no smallint,first_version smallint ) DISTRIBUTED BY (document_id);
+	
+	INSERT INTO tmp_loaded_agreements_flags
+	SELECT distinct document_id,document_version,document_code_id, agency_id
+	FROM history_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	WHERE coalesce(a.updated_load_id, a.created_load_id) = p_load_id_in ;
+	
+	-- Get the max version and min version
+	
+	CREATE TEMPORARY TABLE tmp_loaded_agreements_1_flags(document_id varchar,document_code_id smallint, agency_id smallint,
+		latest_version_no smallint,first_version_no smallint )  DISTRIBUTED BY (document_id);
+		
+	INSERT INTO tmp_loaded_agreements_1_flags
+	SELECT a.document_id,a.document_code_id, c.agency_id, 
+	       max(a.document_version) as latest_version_no, min(a.document_version) as first_version_no
+	FROM history_agreement a JOIN tmp_loaded_agreements_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
+	GROUP BY 1,2,3;	
+	
+	RAISE NOTICE 'PCON_FLAG1';
+	
+	-- Update the versions which are no more the first versions
+	-- Might have to change the disbursements linkage here
+
+	CREATE TEMPORARY TABLE tmp_agreement_flag_changes_flags (document_id varchar,document_code_id smallint, agency_id smallint,
+					latest_agreement_id bigint, first_agreement_id bigint,non_latest_agreement_id varchar, non_first_agreement_id varchar,
+					latest_maximum_contract_amount numeric(16,2)
+					) DISTRIBUTED BY (document_id);
+					
+	INSERT INTO tmp_agreement_flag_changes_flags 				
+	SELECT a.document_id,a.document_code_id, b.agency_id, 
+		MAX(CASE WHEN a.document_version = b.latest_version_no THEN agreement_id END) as latest_agreement_id,
+		MAX(CASE WHEN a.document_version = b.first_version_no THEN agreement_id END) as first_agreement_id,
+		group_concat(CASE WHEN a.document_version <> b.latest_version_no THEN agreement_id ELSE 0 END) as non_latest_agreement_id,		
+		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN agreement_id ELSE 0 END) as non_first_agreement_id,
+		MAX(CASE WHEN a.document_version = b.latest_version_no THEN maximum_contract_amount END) as latest_current_amount
+	FROM   history_agreement a JOIN tmp_loaded_agreements_1_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id	
+	GROUP BY 1,2,3;	
+	
+	-- Updating the original flag for non first agreements 
+	
+	RAISE NOTICE 'PCON_FLAG2';
+	
+	CREATE TEMPORARY TABLE tmp_agreements_update_flags(agreement_id bigint,first_agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_agreements_update_flags
+	SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
+		first_agreement_id
+		FROM	tmp_agreement_flag_changes_flags;
+		
+	UPDATE history_agreement a 
+	SET    original_version_flag = 'N',
+		original_agreement_id = b.first_agreement_id
+	FROM   tmp_agreements_update_flags b
+	WHERE  a.agreement_id = b.agreement_id;
+		
+	TRUNCATE tmp_agreements_update_flags;
+	
+	INSERT INTO tmp_agreements_update_flags
+	SELECT unnest(string_to_array(non_latest_agreement_id,','))::int as agreement_id , NULL as first_agreement_id
+		FROM	tmp_agreement_flag_changes_flags;
+		
+	UPDATE history_agreement a 
+	SET    latest_flag = 'N'
+	FROM   tmp_agreements_update_flags b
+	WHERE  a.agreement_id = b.agreement_id
+		AND a.latest_flag = 'Y';	
+	
+	UPDATE history_agreement a 
+	SET     original_version_flag = 'Y',
+		original_agreement_id = b.first_agreement_id
+	FROM    tmp_agreement_flag_changes_flags  b
+	WHERE  a.agreement_id = b.first_agreement_id;	
+		
+	
+	UPDATE history_agreement a 
+	SET    latest_flag = 'Y'
+	FROM    tmp_agreement_flag_changes_flags  b
+	WHERE  a.agreement_id = b.latest_agreement_id
+		AND COALESCE(a.latest_flag,'N') = 'N';	
+
+
+	RAISE NOTICE 'PCON_FLAG3';
+	
+	
+			RETURN 1;
+						
+
+	
+
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in updateCONFlags';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
+END;
+$$ language plpgsql;
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION etl.postProcessContracts(p_job_id_in bigint) RETURNS INT AS $$
 DECLARE

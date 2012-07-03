@@ -4,6 +4,7 @@ Functions defined
 	updateForeignKeysForMAGInHeader
 	updateForeignKeysForMAGInAwardDetail
 	processMAG
+	updateMAGFlags
 	postProcessMAG
 
 */
@@ -668,7 +669,13 @@ BEGIN
 						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 						     JOIN tmp_mag d ON a.uniq_id = d.uniq_id;
 		
-
+	
+	l_fk_update := etl.updateMAGFlags(p_load_id_in);
+	
+	IF l_fk_update <> 1 THEN
+		RETURN -1;
+	END IF;
+	
 	RETURN 1;
 	
 EXCEPTION
@@ -682,6 +689,121 @@ $$ language plpgsql;
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.updateMAGFlags(p_load_id_in bigint) RETURNS INT AS $$
+DECLARE
+BEGIN
+
+	
+	-- Get the master agreements (key elements only without version) which have been created or updated
+	
+	CREATE TEMPORARY TABLE tmp_loaded_master_agreements_flags(document_id varchar,document_version integer,document_code_id smallint, agency_id smallint,
+		latest_version_no smallint,first_version smallint ) DISTRIBUTED BY (document_id);
+	
+	INSERT INTO tmp_loaded_master_agreements_flags
+	SELECT distinct document_id,document_version,document_code_id, agency_id
+	FROM history_master_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	WHERE coalesce(a.updated_load_id, a.created_load_id) = p_load_id_in ;
+	
+	-- Get the max version and min version
+	
+	CREATE TEMPORARY TABLE tmp_loaded_master_agreements_1_flags(document_id varchar,document_code_id smallint, agency_id smallint,
+		latest_version_no smallint,first_version_no smallint ) DISTRIBUTED BY (document_id);
+		
+	INSERT INTO tmp_loaded_master_agreements_1_flags
+	SELECT a.document_id,a.document_code_id, b.agency_id, 
+	       max(a.document_version) as latest_version_no, min(a.document_version) as first_version_no
+	FROM history_master_agreement a JOIN tmp_loaded_master_agreements_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
+		GROUP BY 1,2,3;
+	
+	RAISE NOTICE 'PMAG_FLAG1'; 
+	
+	-- Update the versions which are no more the first versions
+	
+	
+	CREATE TEMPORARY TABLE tmp_master_agreement_flag_changes_flags (document_id varchar,document_code_id smallint, agency_id smallint,
+					latest_master_agreement_id bigint, first_master_agreement_id bigint,non_latest_master_agreement_id varchar, non_first_master_agreement_id varchar
+					) DISTRIBUTED BY (document_id);
+					
+	INSERT INTO tmp_master_agreement_flag_changes_flags 				
+	SELECT a.document_id,a.document_code_id, b.agency_id, 
+		MAX(CASE WHEN a.document_version = b.latest_version_no THEN master_agreement_id END) as latest_master_agreement_id,
+		MAX(CASE WHEN a.document_version = b.first_version_no THEN master_agreement_id END) as first_master_agreement_id,
+		group_concat(CASE WHEN a.document_version <> b.latest_version_no THEN master_agreement_id ELSE 0 END) as non_latest_master_agreement_id,		
+		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN master_agreement_id ELSE 0 END) as non_first_master_agreement_id
+	FROM   history_master_agreement a JOIN tmp_loaded_master_agreements_1_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
+	GROUP BY 1,2,3;	
+	
+	RAISE NOTICE 'PMAG_FLAG2'; 
+	
+	-- Updating the original flag for non first agreements 
+	CREATE TEMPORARY TABLE tmp_master_agreement_unnest_flags(master_agreement_id bigint, first_master_agreement_id bigint)
+	DISTRIBUTED BY (master_agreement_id);
+	
+	TRUNCATE TABLE tmp_master_agreement_unnest_flags;
+	
+	INSERT INTO tmp_master_agreement_unnest_flags
+	SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
+		first_master_agreement_id
+	FROM	tmp_master_agreement_flag_changes_flags ;
+	
+	
+	UPDATE history_master_agreement a 
+	SET    original_version_flag = 'N',
+		original_master_agreement_id = b.first_master_agreement_id
+	FROM   tmp_master_agreement_unnest_flags b
+	WHERE  a.master_agreement_id = b.master_agreement_id;
+		
+	TRUNCATE TABLE tmp_master_agreement_unnest_flags;
+	
+	INSERT INTO tmp_master_agreement_unnest_flags
+	SELECT unnest(string_to_array(non_latest_master_agreement_id,','))::int as master_agreement_id,
+	NULL as first_master_agreement_id
+	FROM	tmp_master_agreement_flag_changes_flags ;
+	
+	UPDATE history_master_agreement a 
+	SET    latest_flag = 'N'
+	FROM   tmp_master_agreement_unnest_flags b
+	WHERE  a.master_agreement_id = b.master_agreement_id
+		AND a.latest_flag = 'Y';	
+	
+	UPDATE history_master_agreement a 
+	SET     original_version_flag = 'Y',
+		original_master_agreement_id = b.first_master_agreement_id
+	FROM    tmp_master_agreement_flag_changes_flags  b
+	WHERE  a.master_agreement_id = b.first_master_agreement_id;	
+		
+	
+	UPDATE history_master_agreement a 
+	SET    latest_flag = 'Y'
+	FROM    tmp_master_agreement_flag_changes_flags  b
+	WHERE  a.master_agreement_id = b.latest_master_agreement_id
+		AND COALESCE(a.latest_flag,'N') = 'N';	
+
+	
+	RAISE NOTICE 'PMAG_FLAG3'; 
+	
+	
+	
+		RETURN 1;
+		
+
+
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in updateMAGFlags';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+	
+END;
+$$ language plpgsql;
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 CREATE OR REPLACE FUNCTION etl.postProcessMAG(p_job_id_in bigint) RETURNS INT AS $$
 DECLARE
@@ -733,20 +855,33 @@ BEGIN
 	RAISE NOTICE 'PMAG2'; 
 	
 	-- Updating the original flag for non first agreements 
+	CREATE TEMPORARY TABLE tmp_master_agreement_unnest(master_agreement_id bigint, first_master_agreement_id bigint)
+	DISTRIBUTED BY (master_agreement_id);
+	
+	TRUNCATE TABLE tmp_master_agreement_unnest;
+	
+	INSERT INTO tmp_master_agreement_unnest
+	SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
+		first_master_agreement_id
+	FROM	tmp_master_agreement_flag_changes ;
+	
 	
 	UPDATE history_master_agreement a 
 	SET    original_version_flag = 'N',
 		original_master_agreement_id = b.first_master_agreement_id
-	FROM   (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
-		first_master_agreement_id
-		FROM	tmp_master_agreement_flag_changes ) b
+	FROM   tmp_master_agreement_unnest b
 	WHERE  a.master_agreement_id = b.master_agreement_id;
 		
+	TRUNCATE TABLE tmp_master_agreement_unnest;
+	
+	INSERT INTO tmp_master_agreement_unnest
+	SELECT unnest(string_to_array(non_latest_master_agreement_id,','))::int as master_agreement_id,
+	NULL as first_master_agreement_id
+	FROM	tmp_master_agreement_flag_changes ;
 	
 	UPDATE history_master_agreement a 
 	SET    latest_flag = 'N'
-	FROM   (SELECT unnest(string_to_array(non_latest_master_agreement_id,','))::int as master_agreement_id 
-		FROM	tmp_master_agreement_flag_changes ) b
+	FROM   tmp_master_agreement_unnest b
 	WHERE  a.master_agreement_id = b.master_agreement_id
 		AND a.latest_flag = 'Y';	
 	
@@ -1034,11 +1169,17 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_contracts_for_mag(agreement_id bigint, master_agreement_id bigint)
 	DISTRIBUTED BY (agreement_id);
 	
+	TRUNCATE TABLE tmp_master_agreement_unnest;
+	
+	INSERT INTO tmp_master_agreement_unnest
+	SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
+		first_master_agreement_id
+	FROM	tmp_master_agreement_flag_changes ;
+	
+	
 	INSERT INTO tmp_contracts_for_mag
 	SELECT a.agreement_id, b.first_master_agreement_id
-	FROM history_agreement a JOIN  (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
-						    first_master_agreement_id
-					     FROM   tmp_master_agreement_flag_changes ) b ON a.master_agreement_id = b.master_agreement_id;
+	FROM history_agreement a JOIN  tmp_master_agreement_unnest b ON a.master_agreement_id = b.master_agreement_id;
 		
 	
 	
@@ -1058,9 +1199,7 @@ BEGIN
 	
 	INSERT INTO tmp_contracts_for_disbs
 	SELECT a.disbursement_line_item_id, b.first_master_agreement_id
-	FROM disbursement_line_item_details a JOIN  (SELECT unnest(string_to_array(non_first_master_agreement_id,','))::int as master_agreement_id ,
-						    first_master_agreement_id
-					     FROM   tmp_master_agreement_flag_changes ) b ON a.master_agreement_id = b.master_agreement_id;
+	FROM disbursement_line_item_details a JOIN  tmp_master_agreement_unnest b ON a.master_agreement_id = b.master_agreement_id;
 		
 	
 	
