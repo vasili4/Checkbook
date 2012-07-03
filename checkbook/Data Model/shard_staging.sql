@@ -2352,6 +2352,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total
   	FROM   aggregateon_total_contracts__0;
  
  CREATE EXTERNAL WEB TABLE aggregateon_contracts_department__0(
+ 	document_code_id smallint,
  	document_agency_id smallint,
 	agency_id smallint,
 	department_id integer,
@@ -2370,7 +2371,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
   
 
   CREATE VIEW aggregateon_contracts_department AS
-  	SELECT aggregateon_contracts_department__0.document_agency_id,aggregateon_contracts_department__0.agency_id,aggregateon_contracts_department__0.department_id,aggregateon_contracts_department__0.fiscal_year,
+  	SELECT aggregateon_contracts_department__0.document_code_id,aggregateon_contracts_department__0.document_agency_id,aggregateon_contracts_department__0.agency_id,aggregateon_contracts_department__0.department_id,aggregateon_contracts_department__0.fiscal_year,
   	aggregateon_contracts_department__0.fiscal_year_id,aggregateon_contracts_department__0.award_method_id,aggregateon_contracts_department__0.vendor_id,
   	aggregateon_contracts_department__0.spending_amount,aggregateon_contracts_department__0.total_contracts,aggregateon_contracts_department__0.status_flag,aggregateon_contracts_department__0.type_of_year
   	FROM   aggregateon_contracts_department__0;

@@ -1746,6 +1746,7 @@ CREATE TABLE aggregateon_total_contracts(
 
 
 CREATE TABLE aggregateon_contracts_department(
+	document_code_id smallint,
 	document_agency_id smallint,
 	agency_id smallint,
 	department_id integer,

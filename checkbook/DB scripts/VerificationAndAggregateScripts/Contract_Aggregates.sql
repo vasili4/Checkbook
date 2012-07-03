@@ -740,6 +740,7 @@ LEFT JOIN disbursement_line_item_details  b ON a.original_agreement_id = b.agree
 DROP TABLE IF EXISTS aggregateon_contracts_department;
 
 CREATE TABLE aggregateon_contracts_department(
+	document_code_id smallint,
 	document_agency_id smallint,
 	agency_id smallint,
 	department_id integer,
@@ -755,7 +756,8 @@ CREATE TABLE aggregateon_contracts_department(
  
  
  INSERT INTO aggregateon_contracts_department
- SELECT a.agency_id as document_agency_id,
+ SELECT a.document_code_id,
+ 		a.agency_id as document_agency_id,
  		e.agency_id as agency_id,
 		f.department_id as department_id,
 		a.fiscal_year,
@@ -772,9 +774,10 @@ CREATE TABLE aggregateon_contracts_department(
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7	
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8	
  UNION ALL 
- SELECT a.agency_id as document_agency_id,
+ SELECT a.document_code_id,
+ 		a.agency_id as document_agency_id,
  		e.agency_id as agency_id,
 		f.department_id as department_id,
 		a.fiscal_year,
@@ -791,10 +794,11 @@ CREATE TABLE aggregateon_contracts_department(
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7	;
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8	;
  
  INSERT INTO aggregateon_contracts_department
- SELECT a.agency_id as document_agency_id,
+ SELECT a.document_code_id,
+ 		a.agency_id as document_agency_id,
  		e.agency_id as agency_id,
 		f.department_id as department_id,
 		a.fiscal_year,
@@ -811,9 +815,10 @@ CREATE TABLE aggregateon_contracts_department(
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7	
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8	
  UNION ALL 
- SELECT a.agency_id as document_agency_id,
+ SELECT a.document_code_id,
+ 		a.agency_id as document_agency_id,
  		e.agency_id as agency_id,
 		f.department_id as department_id,
 		a.fiscal_year,
@@ -830,7 +835,7 @@ CREATE TABLE aggregateon_contracts_department(
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7	;
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8	;
  
  
  -- For spending transactions
