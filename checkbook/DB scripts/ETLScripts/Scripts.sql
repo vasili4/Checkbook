@@ -497,11 +497,26 @@ BEGIN
 				 --RAISE notice 'where %',l_where_clause;
 
 
-				l_insert_str := 'INSERT INTO tmp_invalid_uniq_id(uniq_id) '||
-						' SELECT a.uniq_id ' ||
-						' FROM ' || l_rule.staging_table_name ||' a LEFT JOIN ' || COALESCE(l_rule.parent_table_name,l_rule.component_table_name ) || ' b ' ||
-						' ON ' || l_where_clause || 
-						' WHERE b.uniq_id IS NULL ';
+				IF (l_rule.staging_table_name ='etl.stg_con_po_header'  and l_rule.rule_name = 'Missing award detail') THEN
+				
+								RAISE notice '-----------------------------excluding missing award detail as invalid records for pod';
+				
+								l_insert_str := 'INSERT INTO tmp_invalid_uniq_id(uniq_id) '||
+										' SELECT a.uniq_id ' ||
+										' FROM ' || l_rule.staging_table_name ||' a LEFT JOIN ' || COALESCE(l_rule.parent_table_name,l_rule.component_table_name ) || ' b ' ||
+										' ON ' || l_where_clause || 
+										' WHERE b.uniq_id IS NULL AND a.doc_cd !=''POD'' ';
+										
+								RAISE notice 'l_insert_str %',l_insert_str;
+				
+							ELSE
+								
+								l_insert_str := 'INSERT INTO tmp_invalid_uniq_id(uniq_id) '||
+										' SELECT a.uniq_id ' ||
+										' FROM ' || l_rule.staging_table_name ||' a LEFT JOIN ' || COALESCE(l_rule.parent_table_name,l_rule.component_table_name ) || ' b ' ||
+										' ON ' || l_where_clause || 
+										' WHERE b.uniq_id IS NULL ';
+							END IF;
 
 
 				--RAISE notice 'l_insert_str %',l_insert_str;		
