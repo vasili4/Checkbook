@@ -908,6 +908,8 @@ BEGIN
 
 	RAISE NOTICE '11';
 	
+	-- For now not processing commodities
+	/*
 	DELETE FROM history_agreement_commodity a 
 	USING tmp_do1_con b 
 	WHERE a.agreement_id = b.agreement_id
@@ -927,6 +929,7 @@ BEGIN
 						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 						     JOIN tmp_do1_con d ON a.uniq_id = d.uniq_id;
 	
+	*/
 	RETURN 1;
 	
 EXCEPTION

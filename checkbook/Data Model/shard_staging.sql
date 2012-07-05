@@ -248,6 +248,8 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item__0 (
     agreement_id bigint,
     agreement_accounting_line_number integer,
     agreement_commodity_line_number integer,
+    agreement_vendor_line_number integer, 
+    reference_document_number character varying,
     location_history_id integer,
     retainage_amount numeric,
     check_eft_issued_nyc_year_id smallint,
@@ -269,7 +271,8 @@ CREATE VIEW disbursement_line_item AS
     disbursement_line_item__0.fund_class_id, disbursement_line_item__0.agency_history_id, disbursement_line_item__0.department_history_id, 
     disbursement_line_item__0.expenditure_object_history_id, disbursement_line_item__0.budget_code_id, disbursement_line_item__0.fund_code, 
     disbursement_line_item__0.reporting_code, disbursement_line_item__0.check_amount, disbursement_line_item__0.agreement_id, 
-    disbursement_line_item__0.agreement_accounting_line_number, disbursement_line_item__0.agreement_commodity_line_number, disbursement_line_item__0.location_history_id, disbursement_line_item__0.retainage_amount,
+    disbursement_line_item__0.agreement_accounting_line_number, disbursement_line_item__0.agreement_commodity_line_number, disbursement_line_item__0.agreement_vendor_line_number, disbursement_line_item__0.reference_document_number, 
+    disbursement_line_item__0.location_history_id, disbursement_line_item__0.retainage_amount,
     disbursement_line_item__0.check_eft_issued_nyc_year_id, disbursement_line_item__0.created_load_id,disbursement_line_item__0.updated_load_id,
     disbursement_line_item__0.created_date, disbursement_line_item__0.updated_date  FROM ONLY disbursement_line_item__0;
 
@@ -338,7 +341,9 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-  	agreement_commodity_line_number integer,
+    agreement_commodity_line_number integer,
+    agreement_vendor_line_number integer, 
+    reference_document_number character varying,
 	load_id integer
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.disbursement_line_item_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
@@ -367,7 +372,7 @@ CREATE VIEW disbursement_line_item_details AS
     disbursement_line_item_details__0.purpose,disbursement_line_item_details__0.purpose_cy,
     disbursement_line_item_details__0.reporting_code,disbursement_line_item_details__0.location_id,disbursement_line_item_details__0.fund_class_name,disbursement_line_item_details__0.fund_class_code,
     disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year,
-    disbursement_line_item_details__0.agreement_accounting_line_number, disbursement_line_item_details__0.agreement_commodity_line_number, disbursement_line_item_details__0.load_id
+    disbursement_line_item_details__0.agreement_accounting_line_number, disbursement_line_item_details__0.agreement_commodity_line_number, disbursement_line_item_details__0.agreement_vendor_line_number, disbursement_line_item_details__0.reference_document_number,disbursement_line_item_details__0.load_id
 FROM ONLY disbursement_line_item_details__0;
 
 --

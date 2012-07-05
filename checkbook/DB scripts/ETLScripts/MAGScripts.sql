@@ -617,7 +617,11 @@ BEGIN
 	END IF;
 	
 	RAISE NOTICE 'MAG 7';
- --   agreement worksite changes
+
+  -- For now not processing worksite and commodities 
+  --   agreement worksite changes
+	/*
+	 
 	
 	DELETE FROM history_agreement_worksite a 
 	USING tmp_mag b 
@@ -669,7 +673,7 @@ BEGIN
 						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 						     JOIN tmp_mag d ON a.uniq_id = d.uniq_id;
 		
-	
+	*/
 	l_fk_update := etl.updateMAGFlags(p_load_id_in);
 	
 	IF l_fk_update <> 1 THEN

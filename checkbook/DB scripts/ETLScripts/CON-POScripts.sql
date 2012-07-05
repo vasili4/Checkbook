@@ -103,21 +103,27 @@ BEGIN
 	INSERT INTO tmp_po_fk_values(uniq_id,record_date_id)
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_con_po_header a JOIN ref_date b ON a.doc_rec_dt_dc = b.date;
-		
+	
+	-- below two statements are slow. So should be modified.
 	--FK:effective_begin_date_id
+	
+	CREATE TEMPORARY TABLE tmp_stg_con_po_header_ebd AS SELECT * FROM etl.stg_con_po_header WHERE cntrct_strt_dt IS NOT NULL DISTRIBUTED BY (cntrct_strt_dt) ;
+	
 	
 	INSERT INTO tmp_po_fk_values(uniq_id,effective_begin_date_id,effective_begin_fiscal_year,effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id)
 	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
-	FROM etl.stg_con_po_header a JOIN ref_date b ON a.cntrct_strt_dt = b.date AND a.cntrct_strt_dt IS NOT NULL
+	FROM tmp_stg_con_po_header_ebd a JOIN ref_date b ON a.cntrct_strt_dt = b.date 
 		JOIN ref_year c ON b.nyc_year_id = c.year_id
 		JOIN ref_month d ON b.calendar_month_id = d.month_id
 		JOIN ref_year e ON d.year_id = e.year_id;
 	
 	--FK:effective_end_date_id
 	
+	CREATE TEMPORARY TABLE tmp_stg_con_po_header_eed AS SELECT * FROM etl.stg_con_po_header WHERE cntrct_end_dt IS NOT NULL DISTRIBUTED BY (cntrct_end_dt) ;
+	
 	INSERT INTO tmp_po_fk_values(uniq_id,effective_end_date_id,effective_end_fiscal_year,effective_end_fiscal_year_id, effective_end_calendar_year,effective_end_calendar_year_id)
 	SELECT	a.uniq_id, b.date_id,c.year_value,b.nyc_year_id,e.year_value,d.year_id
-	FROM etl.stg_con_po_header a JOIN ref_date b ON a.cntrct_end_dt = b.date AND a.cntrct_end_dt IS NOT NULL
+	FROM tmp_stg_con_po_header_eed a JOIN ref_date b ON a.cntrct_end_dt = b.date 
 		JOIN ref_year c ON b.nyc_year_id = c.year_id
 		JOIN ref_month d ON b.calendar_month_id = d.month_id
 		JOIN ref_year e ON d.year_id = e.year_id;
@@ -1022,12 +1028,15 @@ BEGIN
 	WHERE   d.action_flag = 'U' AND e.action_flag='I';
 	
 	RAISE NOTICE '8';
-	/* TO DO
+	
+
 	INSERT INTO deleted_agreement_accounting_line
 	SELECT a.*,now()::timestamp, p_load_id_in as deleted_load_id
 	FROM   history_agreement_accounting_line a JOIN tmp_po_acc_lines_actions b  ON a.agreement_id = b.agreement_id AND a.line_number = b.line_number
-	WHERE	b.action_flag = 'D';
-	*/
+		JOIN tmp_po_con c ON a.agreement_id = c.agreement_id
+	WHERE	b.action_flag = 'D' AND c.action_flag='U';
+	
+	
 	RAISE NOTICE '9';
 	
 	DELETE FROM ONLY history_agreement_accounting_line a 
@@ -1077,6 +1086,9 @@ BEGIN
 
 	RAISE NOTICE '11';
 	
+	-- For now not processing worksites and commodities
+	/*
+	 
 	DELETE FROM history_agreement_worksite a 
 	USING tmp_po_con b 
 	WHERE a.agreement_id = b.agreement_id
@@ -1121,6 +1133,8 @@ BEGIN
 						     JOIN tmp_po_con d ON a.uniq_id = d.uniq_id;
 		
 
+	*/
+	
 	RETURN 1;
 	
 EXCEPTION

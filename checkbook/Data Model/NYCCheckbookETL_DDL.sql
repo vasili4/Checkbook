@@ -4246,7 +4246,7 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
  	
  		
 	
-CREATE TEMPORARY TABLE tmp_all_vendors(
+CREATE TABLE tmp_all_vendors(
 	uniq_id bigint,
 	vendor_customer_code varchar, 
 	vendor_history_id integer, 

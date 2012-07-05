@@ -524,46 +524,52 @@ WHERE X.agency_id = Y.agency_id order by 2 desc
 
 -- delete the data 
 
-TRUNCATE history_master_agreement ;
+TRUNCATE history_master_agreement CASCADE;
 
-TRUNCATE history_agreement;
+TRUNCATE history_agreement CASCADE;
 
-TRUNCATE history_agreement_accounting_line ;
+TRUNCATE history_agreement_accounting_line CASCADE;
 
-TRUNCATE history_agreement_commodity;
+TRUNCATE history_agreement_commodity CASCADE;
 
-TRUNCATE history_agreement_worksite ;
+TRUNCATE history_agreement_worksite CASCADE;
 
-TRUNCATE agreement_snapshot;
+TRUNCATE agreement_snapshot CASCADE;
 
-TRUNCATE agreement_snapshot_cy;
+TRUNCATE agreement_snapshot_cy CASCADE;
 
-TRUNCATE vendor ;
+TRUNCATE vendor CASCADE;
 
-TRUNCATE vendor_address ;
+TRUNCATE vendor_address CASCADE;
 
-TRUNCATE vendor_business_type ;
+TRUNCATE vendor_business_type CASCADE;
 
-TRUNCATE vendor_history ;
+TRUNCATE vendor_history CASCADE;
 
-TRUNCATE disbursement ;
+TRUNCATE disbursement CASCADE;
 
-TRUNCATE disbursement_line_item ;
+TRUNCATE disbursement_line_item CASCADE;
 
-TRUNCATE disbursement_line_item_deleted ;
+TRUNCATE disbursement_line_item_deleted CASCADE;
 
-DELETE FROM disbursement_line_item_details WHERE spending_category_id = 2 ;
+DELETE FROM disbursement_line_item_details WHERE spending_category_id != 2 ;
 
 
-INSERT INTO  etl.etl_data_load (job_id, data_source_code) VALUES (2, 'M'),(2,'C'),(2,'F'),(2,'F');
+INSERT INTO  etl.etl_data_load (job_id, data_source_code) VALUES (3, 'M'),(3,'C'),(3,'F'),(3,'F');
 
-INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(26,'AIE0_DLY_MMDSB_MD_20120523195328.txt','20120523195328','D','Y','Y','N');
+INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(27,'AIEF_DLY_PCOP_MA_20120523225810.txt','20120523195328','D','Y','Y','N');
+INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(28,'AIE2_DLY_PCO_PO_20120523191824.txt','20120523195328','D','Y','Y','N');
+INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(29,'AIE0_DLY_MMDSB_AD_20120523195328.txt','20120523195328','D','Y','Y','N');
+INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(30,'AIE0_DLY_MMDSB_MD_20120523195328.txt','20120523195328','D','Y','Y','N');
 
 
 DATA_SOURCE_CODE  		LOAD_ID			LOAD_FILE_ID           DOC_TYPE
- M						 23					26		
- C						 24					28
- F						 25					29					 AD
- F						 26					30					 MD
+ M						 27					31		
+ C						 28					32
+ F						 29					33					 AD
+ F						 30					34					 MD
  
+ 
+ gpfdist -d /home/gpadmin/athiagarajan/NYC/ -p 8081 -l /home/gpadmin/athiagarajan/log
+ psql -c " copy (select * from etl.stg_con_po_award_detail) to stdout " checkbook_new | psql -c "copy etl.stg_con_po_award_detail from stdin "  checkbook
  

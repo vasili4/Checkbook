@@ -228,6 +228,8 @@ CREATE TABLE disbursement_line_item (
     agreement_id bigint,
     agreement_accounting_line_number integer,
     agreement_commodity_line_number integer,
+    agreement_vendor_line_number integer, 
+    reference_document_number character varying,
     location_history_id integer,
     retainage_amount numeric(16,2),
     check_eft_issued_nyc_year_id smallint,
@@ -302,7 +304,9 @@ CREATE TABLE disbursement_line_item_details(
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-  	agreement_commodity_line_number integer,
+    agreement_commodity_line_number integer,
+    agreement_vendor_line_number integer, 
+    reference_document_number character varying,
 	load_id integer
 	)
 DISTRIBUTED BY (disbursement_line_item_id);

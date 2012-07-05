@@ -1187,6 +1187,9 @@ BEGIN
 
 	RAISE NOTICE '11';
 	
+	-- For now not processing worksites and commodities
+	/*
+	 
 	DELETE FROM history_agreement_worksite a 
 	USING tmp_ct_con b 
 	WHERE a.agreement_id = b.agreement_id
@@ -1207,7 +1210,7 @@ BEGIN
 
 		GET DIAGNOSTICS l_count = ROW_COUNT;
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id_in,'C','CT1,CTA1,CTA2',l_count,'# of records inserted in all_agreement_worksite ');
+		VALUES(p_load_file_id_in,'C','CT1,CTA1',l_count,'# of records inserted in all_agreement_worksite ');
 		
 	END LOOP; 
 		
@@ -1229,7 +1232,8 @@ BEGIN
 	FROM	etl.stg_con_ct_header a JOIN etl.stg_con_ct_commodity b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 						     JOIN tmp_ct_con d ON a.uniq_id = d.uniq_id;
-		
+		*/
+	
 
 	RETURN 1;
 	

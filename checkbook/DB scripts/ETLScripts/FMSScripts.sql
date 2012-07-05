@@ -721,7 +721,7 @@ BEGIN
 	INSERT INTO tmp_new_ct_fms_con
 	SELECT 	con_document_code,con_agency_code, con_document_id,con_agency_history_id,con_document_code_id,min(uniq_id)
 	FROM	tmp_ct_fms
-	WHERE	agreement_id =0 AND con_document_code in ('CT1','CTA1','CTA2','DO1','POD','POC','PCC1')
+	WHERE	agreement_id =0 AND con_document_code in ('CT1','CTA1','DO1','POD','POC','PCC1')
 	GROUP BY 1,2,3,4,5;
 	
 	TRUNCATE etl.agreement_id_seq;
@@ -742,7 +742,7 @@ BEGIN
 	END IF;		
 	
 	RAISE NOTICE 'FMS AC 3';
-	-- Updating the newly created CON identifier.
+	-- Updating the newly created CON identifier. The below statements are slow. SO need to be modified
 	
 	CREATE TEMPORARY TABLE tmp_new_ct_fms_con_2(uniq_id bigint,agreement_id bigint)
 	DISTRIBUTED BY (uniq_id);
@@ -805,7 +805,8 @@ BEGIN
 						document_id,vendor_name,vendor_customer_code,check_eft_issued_date,agency_name,agency_short_name,location_name,
 						department_name,department_short_name,department_code,expenditure_object_name,expenditure_object_code,
 						budget_code_id,budget_code,budget_name,reporting_code,location_id,location_code,fund_class_name,fund_class_code,
-						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,load_id)
+						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,
+						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number,load_id)
 	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
 		f.nyc_year_id,l.year_value,f.calendar_month_id,
 		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
@@ -821,7 +822,8 @@ BEGIN
 		 (CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 'Capital Contracts'
 		 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 'Contracts'
 		 		      ELSE 'Others'
-		 END) as spending_category_name,x.year_id,x.year_value,coalesce(a.updated_load_id, a.created_load_id)
+		 END) as spending_category_name,x.year_id,x.year_value,
+		 b.agreement_accounting_line_number, b.agreement_commodity_line_number, b.agreement_vendor_line_number, b.reference_document_number,coalesce(a.updated_load_id, a.created_load_id)
 		FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
 			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
 			JOIN ref_agency m on c.agency_id = m.agency_id
@@ -1298,14 +1300,16 @@ BEGIN
 						fund_class_id,agency_history_id,department_history_id,
 						expenditure_object_history_id,budget_code_id,fund_code,
 						reporting_code,check_amount,agreement_id,
-						agreement_accounting_line_number,location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
+						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number, 
+						location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
 						created_load_id,created_date)
 	SELECT  c.disbursement_line_item_id,d.disbursement_id,a.doc_actg_ln_no,
 		a.bfy,a.fy_dc,a.per_dc,
 		a.fund_class_id,a.agency_history_id,a.department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
 		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as check_amount,a.agreement_id,
-		a.rqporf_actg_ln_no,a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
+		a.rqporf_actg_ln_no,a.rqporf_comm_ln_no, a.rqporf_vend_ln_no, a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id ,
+		a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
 		p_load_id_in, now()::timestamp
 	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -1348,14 +1352,16 @@ BEGIN
 						fund_class_id,agency_history_id,department_history_id,
 						expenditure_object_history_id,budget_code_id,fund_code,
 						reporting_code,check_amount,agreement_id,
-						agreement_accounting_line_number,location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
+						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number, 
+						location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
 						created_load_id,created_date)
 	SELECT  d.disbursement_id,a.doc_actg_ln_no,
 		a.bfy,a.fy_dc,a.per_dc,
 		a.fund_class_id,a.agency_history_id,a.department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
 		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as chk_amt,a.agreement_id,
-		a.rqporf_actg_ln_no,a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
+		a.rqporf_actg_ln_no,a.rqporf_comm_ln_no, a.rqporf_vend_ln_no, a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id ,
+		a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
 		p_load_id_in, now()::timestamp
 	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no 
@@ -1386,7 +1392,8 @@ BEGIN
 	
         CREATE TEMPORARY TABLE tmp_disbs_line_items_update AS
                 SELECT e.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, b.agency_history_id, b.department_history_id, b.expenditure_object_history_id, b.budget_code_id,             
-                                  b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id
+                                  b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no,b.rqporf_comm_ln_no, b.rqporf_vend_ln_no, 
+                                  b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id as reference_document_number, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id
                 FROM etl.stg_fms_header a, etl.stg_fms_accounting_line b,
                                 tmp_all_disbs d,tmp_disbs_lines_actions e
                 WHERE  d.action_flag = 'U' AND e.action_flag='U'
@@ -1411,6 +1418,9 @@ BEGIN
 		check_amount = b.chk_amt,
 		agreement_id = b.agreement_id,
 		agreement_accounting_line_number = b.rqporf_actg_ln_no,
+		agreement_commodity_line_number = b.rqporf_comm_ln_no, 
+		agreement_vendor_line_number = b.rqporf_vend_ln_no, 
+		reference_document_number = b.reference_document_number, 
 		location_history_id = b.location_history_id,
 		retainage_amount = b.rtg_ln_am,
 		check_eft_issued_nyc_year_id = b.check_eft_issued_nyc_year_id,
