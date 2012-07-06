@@ -752,84 +752,80 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"SELECT a.document
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
  WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8",19
-ContractsSpendingTransactions,contracts_spending_transactions,"SELECT  d.disbursement_line_item_id, 
-  a.original_agreement_id,
-  a.fiscal_year,
-  b.year_id,
-  a.document_code_id,
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id as document_agency_id,
-  e.agency_id,
-  f.department_id,
-  'A' as status_flag,
-  'B' as type_of_year
- FROM agreement_snapshot_expanded a JOIN ref_year b ON a.fiscal_year = b.year_value
- JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
- JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
- AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year 
- AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
- JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
- JOIN ref_department_history f ON f.department_history_id = c.department_history_id 
- WHERE a.status_flag='A' 
+ContractsSpendingTransactions,contracts_spending_transactions,"SELECT 	d.disbursement_line_item_id, 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		e.agency_id,
+		f.department_id,
+		'A' as status_flag,
+		'B' as type_of_year
+FROM   agreement_snapshot_expanded a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
+WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
+AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
+AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
+AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
+AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+AND a.status_flag='A' 
 UNION ALL
  SELECT d.disbursement_line_item_id, 
-  a.original_agreement_id,
-  a.fiscal_year,
-  b.year_id,
-  a.document_code_id,
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id as document_agency_id,
-  e.agency_id,
-  f.department_id,
-  'R' as status_flag,
-  'B' as type_of_year
- FROM agreement_snapshot_expanded a JOIN ref_year b ON a.fiscal_year = b.year_value
- JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
- JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
- AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
- AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
- JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
- JOIN ref_department_history f ON f.department_history_id = c.department_history_id 
- WHERE a.status_flag='R'","SELECT d.disbursement_line_item_id, 
-  a.original_agreement_id,
-  a.fiscal_year,
-  b.year_id,
-  a.document_code_id,
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id as document_agency_id,
-  e.agency_id,
-  f.department_id,
-  'A' as status_flag,
-  'C' as type_of_year
- FROM agreement_snapshot_expanded_cy a JOIN ref_year b ON a.fiscal_year = b.year_value
- JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
- JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
- AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
- AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
- JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
- JOIN ref_department_history f ON f.department_history_id = c.department_history_id 
- WHERE a.status_flag='A' 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		e.agency_id,
+		f.department_id,
+		'R' as status_flag,
+		'B' as type_of_year
+FROM   agreement_snapshot_expanded a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
+WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
+AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
+AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
+AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
+AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+AND a.status_flag='R'","SELECT d.disbursement_line_item_id, 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		e.agency_id,
+		f.department_id,
+		'A' as status_flag,
+		'C' as type_of_year
+FROM   agreement_snapshot_expanded_cy a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
+WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
+AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
+AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
+AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
+AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+AND a.status_flag='A' 
 UNION ALL
-SELECT  d.disbursement_line_item_id, 
-  a.original_agreement_id,
-  a.fiscal_year,
-  b.year_id,
-  a.document_code_id,
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id as document_agency_id,
-  e.agency_id,
-  f.department_id,
-  'R' as status_flag,
-  'C' as type_of_year
- FROM agreement_snapshot_expanded_cy a JOIN ref_year b ON a.fiscal_year = b.year_value
- JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
- JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
- AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
- AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
- JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
- JOIN ref_department_history f ON f.department_history_id = c.department_history_id 
- WHERE a.status_flag='R'",20
+SELECT 	d.disbursement_line_item_id, 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		e.agency_id,
+		f.department_id,
+		'R' as status_flag,
+		'C' as type_of_year
+FROM   agreement_snapshot_expanded_cy a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
+WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
+AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
+AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
+AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
+AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+AND a.status_flag='R'",20

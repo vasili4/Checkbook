@@ -666,7 +666,7 @@ BEGIN
 		rqporf_doc_cd = 'N/A'
 	WHERE rqporf_doc_id = 'N/A (PRIVACY/SECURITY)';
 	
-	-- Fetch all the contracts associated with MAG
+	-- Fetch all the contracts associated with Disbursements
 	
 	CREATE TEMPORARY TABLE tmp_ct_fms(uniq_id bigint, agreement_id bigint,con_document_id varchar, 
 				con_agency_history_id smallint, con_document_code_id smallint, con_document_code varchar, con_agency_code varchar )	
@@ -675,7 +675,7 @@ BEGIN
 	INSERT INTO tmp_ct_fms
 	SELECT uniq_id, 0 as agreement_id,
 	       max(rqporf_doc_id),
-	       max(d.agency_history_id) as mag_agency_history_id,
+	       max(d.agency_history_id) as con_agency_history_id,
 	       max(c.document_code_id),
 	       max(c.document_code),
 	       max(b.agency_code)
@@ -744,8 +744,11 @@ BEGIN
 	RAISE NOTICE 'FMS AC 3';
 	-- Updating the newly created CON identifier. The below statements are slow. SO need to be modified
 	
+	
+	
 	CREATE TEMPORARY TABLE tmp_new_ct_fms_con_2(uniq_id bigint,agreement_id bigint)
 	DISTRIBUTED BY (uniq_id);
+	
 	
 	INSERT INTO tmp_new_ct_fms_con_2
 	SELECT c.uniq_id,d.agreement_id
