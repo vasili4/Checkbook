@@ -3217,6 +3217,7 @@ DISTRIBUTED BY (uniq_id);
 CREATE TABLE etl.etl_script_execution_status
 (
   load_file_id bigint,
+  job_id bigint,
   script_name character varying,
   completed_flag integer,
   start_time timestamp without time zone,
@@ -3229,6 +3230,7 @@ DISTRIBUTED BY (load_file_id);
 CREATE TABLE etl.etl_data_load_verification
 (
   load_file_id bigint,
+  job_id bigint,
   data_source_code varchar(2),
   record_identifier character(1),
   document_type character varying,
