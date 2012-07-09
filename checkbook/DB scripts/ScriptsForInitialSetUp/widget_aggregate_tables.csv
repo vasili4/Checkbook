@@ -1,5 +1,5 @@
 widget_name,aggregate_table_name,create_table,query1,query2,execution_order
-SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,CREATE TABLE aggregateon_spending_coa_entities (
+SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,"CREATE TABLE aggregateon_spending_coa_entities (
 	department_id integer,
 	agency_id smallint,
 	spending_category_id smallint,
@@ -9,7 +9,7 @@ SpendingByCOAEntitiesAndFiscalYear,aggregateon_spending_coa_entities,CREATE TABL
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
-	) DISTRIBUTED BY (department_id),"SELECT department_id,agency_id,
+	) DISTRIBUTED BY (department_id)","SELECT department_id,agency_id,
        spending_category_id,
        expenditure_object_id,       
        month_id,
