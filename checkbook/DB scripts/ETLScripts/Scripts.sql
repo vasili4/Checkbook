@@ -948,9 +948,9 @@ BEGIN
 
 			l_drop_sql := 'DROP TABLE ' || l_aggregate_table_array[l_array_ctr] ;
 
-			EXECUTE l_truncate_sql ;
+			EXECUTE l_drop_sql ;
 
-			RAISE NOTICE '%', l_truncate_sql;
+			RAISE NOTICE '%', l_drop_sql 
 			
 			SELECT create_table, query1, query2
 			FROM   etl.aggregate_tables	       
