@@ -1663,6 +1663,7 @@ CREATE TABLE agreement_snapshot(
 	  award_method_id smallint,
 	  award_method_code character varying(10),
 	  award_method_name character varying,
+	  expenditure_object_codes character varying,
 	  expenditure_object_names character varying,
 	  effective_begin_date date,
 	  effective_begin_date_id integer,
