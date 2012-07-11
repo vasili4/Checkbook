@@ -1659,6 +1659,7 @@ CREATE TABLE agreement_snapshot(
 	  agreement_type_code character varying(2),
 	  agreement_type_name character varying,
 	  award_category_id smallint,
+	  award_category_code character varying(10),
 	  award_category_name character varying,
 	  award_method_id smallint,
 	  award_method_code character varying(10),

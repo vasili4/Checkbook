@@ -1,5 +1,7 @@
 -- For General Fund Revenue Trend
 
+DROP TABLE IF EXISTS trends_gen_fund_revenue_temp;
+
 CREATE TABLE trends_gen_fund_revenue_temp
 (
   category character varying,
@@ -28,6 +30,7 @@ CREATE TABLE trends_gen_fund_revenue_temp
 )
 DISTRIBUTED BY (category);
 
+DROP TABLE IF EXISTS trends_gen_fund_revenue;
 
 CREATE TABLE trends_gen_fund_revenue
 (
@@ -79,6 +82,8 @@ update trends_gen_fund_revenue set display_yn ='Y' where fiscal_year >=1997;
 
 -- For General Fund Expenditures
 
+DROP TABLE IF EXISTS trends_gen_fund_expenditure_temp;
+
 CREATE TABLE trends_gen_fund_expenditure_temp
 (
   category character varying,
@@ -107,6 +112,7 @@ CREATE TABLE trends_gen_fund_expenditure_temp
 )
 DISTRIBUTED BY (category);
 
+DROP TABLE IF EXISTS trends_gen_fund_expenditure;
 
 CREATE TABLE trends_gen_fund_expenditure
 (
@@ -127,7 +133,7 @@ DISTRIBUTED BY (category);
 3)            Created the CSV of modified excel. Removed some special characters (e.g.   — in line 20 Personal Income— (Non-Resident City Employees))
 4)            And then ran the below commands to populate the data in  trends_gen_fund_expenditure_temp table and public. trends_gen_fund_expenditure tables. */
 
-COPY  trends_gen_fund_expenditure_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_gen_fund_expenditures.csv' CSV HEADER QUOTE as '"';
+COPY  trends_gen_fund_expenditure_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_general_fund_expenditures.csv' CSV HEADER QUOTE as '"';
 
  -- 5)            Below are the commands to populate the data from trends_gen_fund_expenditure_temp to trends_gen_fund_expenditure table.
 
@@ -156,6 +162,7 @@ update trends_gen_fund_expenditure set display_yn ='Y' where fiscal_year >=1997;
 
 -- For Capital Projects
 
+DROP TABLE IF EXISTS trends_capital_projects_temp;
 CREATE TABLE trends_capital_projects_temp
 (
   category character varying,
@@ -184,6 +191,7 @@ CREATE TABLE trends_capital_projects_temp
 )
 DISTRIBUTED BY (category);
 
+DROP TABLE IF EXISTS trends_capital_projects;
 
 CREATE TABLE trends_capital_projects
 (
@@ -235,6 +243,7 @@ update trends_capital_projects set display_yn ='Y' where fiscal_year >=1997;
 
 -- For Ratios of Outstanding debt
 
+DROP TABLE IF EXISTS trends_ratios_outstanding_debt_temp;
 
 CREATE TABLE trends_ratios_outstanding_debt_temp
 (
@@ -256,6 +265,7 @@ CREATE TABLE trends_ratios_outstanding_debt_temp
 )
 DISTRIBUTED BY (fiscal_year);
 
+DROP TABLE IF EXISTS trends_ratios_outstanding_debt;
 
 CREATE TABLE trends_ratios_outstanding_debt
 (
@@ -298,6 +308,8 @@ update trends_ratios_outstanding_debt set display_yn ='Y' where fiscal_year >=19
 
 -- For Property tax Levies
 
+DROP TABLE IF EXISTS trends_property_tax_levies_temp;
+
 CREATE TABLE trends_property_tax_levies_temp
 (
   fiscal_year smallint,
@@ -312,6 +324,7 @@ CREATE TABLE trends_property_tax_levies_temp
 )
 DISTRIBUTED BY (fiscal_year);
 
+DROP TABLE IF EXISTS trends_property_tax_levies;
 
 CREATE TABLE trends_property_tax_levies
 (
@@ -347,6 +360,7 @@ update trends_property_tax_levies set display_yn ='Y' where fiscal_year >=1997;
 
 -- For Personal Income
 
+DROP TABLE IF EXISTS trends_personal_income_temp;
 
 CREATE TABLE trends_personal_income_temp
 (
@@ -391,6 +405,7 @@ CREATE TABLE trends_personal_income_temp
 )
 DISTRIBUTED BY (category);
 
+DROP TABLE IF EXISTS trends_personal_income;
 
 CREATE TABLE trends_personal_income
 (
@@ -459,6 +474,8 @@ update trends_personal_income set display_yn ='Y' where fiscal_year>=1980;
 
 -- 6) Trends_collection_cancellation_abatements
 
+DROP TABLE IF EXISTS trends_collection_cancellation_abatements_temp;
+
 CREATE TABLE trends_collection_cancellation_abatements_temp
 (fiscal_year smallint,
 tax_levy numeric(20,2),
@@ -469,6 +486,7 @@ uncollected_balance_percent numeric(4,2)
 )
 Distributed by (fiscal_year);
 
+DROP TABLE IF EXISTS trends_collection_cancellation_abatements;
 
 CREATE TABLE trends_collection_cancellation_abatements
 (fiscal_year smallint,
@@ -500,6 +518,7 @@ update  trends_collection_cancellation_abatements set display_yn ='Y' where fisc
 -- 7) trends_employment_status_of_resident_population
 
 
+DROP TABLE IF EXISTS trends_employment_status_of_resident_population_temp;
 
 CREATE TABLE trends_employment_status_of_resident_population_temp
 (
@@ -511,6 +530,7 @@ unemployment_rate_united_states_percent numeric(4,2)
 )
 Distributed by (fiscal_year);
 
+DROP TABLE IF EXISTS trends_employment_status_of_resident_population;
 
 CREATE TABLE trends_employment_status_of_resident_population
 (
@@ -540,6 +560,7 @@ update  trends_employment_status_of_resident_population set display_yn ='Y' wher
 
 -- 8) trends_non_agricultural_wage_salary_employement
 
+DROP TABLE IF EXISTS trends_non_agricultural_wage_salary_employement_temp;
 CREATE TABLE trends_non_agricultural_wage_salary_employement_temp
 (
 category character varying,
@@ -569,6 +590,7 @@ indentation_level smallint
 Distributed by (category);
 
 
+DROP TABLE IF EXISTS trends_non_agricultural_wage_salary_employement;
 CREATE TABLE trends_non_agricultural_wage_salary_employement
 (
 category character varying,
@@ -608,6 +630,7 @@ update  trends_non_agricultural_wage_salary_employement set display_yn ='N' wher
 update  trends_non_agricultural_wage_salary_employement set display_yn ='Y' where fiscal_year >=1997;
 -- 9)
 
+DROP TABLE IF EXISTS trends_numberofcityemployees_temp;
 CREATE TABLE trends_numberofcityemployees_temp
 (
 category character varying,
@@ -637,6 +660,7 @@ indentation_level smallint
 Distributed by (category);
 
 
+DROP TABLE IF EXISTS trends_numberofcityemployees;
 CREATE TABLE trends_numberofcityemployees
 (
 category character varying,
@@ -646,7 +670,7 @@ display_order smallint,
 highlight_yn character(1),
 amount_display_type character(1),
 indentation_level smallint,
-display_yn char(1);
+display_yn char(1)
 )
 DISTRIBUTED BY (category);
 
@@ -679,6 +703,7 @@ update  trends_numberofcityemployees  set display_yn ='Y' where fiscal_year >=19
 
 -- 10)  trends_new_york_city_educational_construction
 
+DROP TABLE IF EXISTS trends_new_york_city_educational_construction_temp;
 CREATE TABLE trends_new_york_city_educational_construction_temp
 (
 fiscal_year smallint,
@@ -695,6 +720,7 @@ coverage_ratio numeric(20,2)
 Distributed by (fiscal_year);
 
 
+DROP TABLE IF EXISTS trends_new_york_city_educational_construction;
 CREATE TABLE trends_new_york_city_educational_construction
 (
 fiscal_year smallint,
@@ -720,6 +746,7 @@ update  trends_new_york_city_educational_construction set display_yn ='N' where 
 
 -- 11) trends_changes_in_fund_balances
 
+DROP TABLE IF EXISTS trends_changes_in_fund_balances_temp;
 CREATE TABLE trends_changes_in_fund_balances_temp
 (
 category character varying,
@@ -748,6 +775,7 @@ indentation_level smallint
 Distributed by (category);
 
 
+DROP TABLE IF EXISTS trends_changes_in_fund_balances;
 CREATE TABLE trends_changes_in_fund_balances
 (
 category character varying,
@@ -756,7 +784,8 @@ amount numeric(20,2),
 display_order smallint,
 highlight_yn character(1),
 amount_display_type character(1),
-indentation_level smallint
+indentation_level smallint,
+display_yn char(1)
 )
 DISTRIBUTED BY (category);
 
@@ -789,6 +818,7 @@ update  trends_changes_in_fund_balances set display_yn ='Y' where fiscal_year >=
 
 -- 12) trends_capital_assets_statistics_function_program
 
+DROP TABLE IF EXISTS trends_capital_assets_statistics_function_program_temp;
 CREATE TABLE trends_capital_assets_statistics_function_program_temp
 (
 category character varying,
@@ -810,6 +840,7 @@ indentation_level smallint
 Distributed by (category);
 
 
+DROP TABLE IF EXISTS trends_capital_assets_statistics_function_program;
 CREATE TABLE trends_capital_assets_statistics_function_program
 (
 category character varying,
@@ -842,6 +873,7 @@ update  trends_capital_assets_statistics_function_program set display_yn ='Y' wh
 -- 13) trends_assesed_valuation_tax_rate_class
 
 
+DROP TABLE IF EXISTS trends_assesed_valuation_tax_rate_class_temp;
 CREATE TABLE trends_assesed_valuation_tax_rate_class_temp
 (
 category character varying,
@@ -904,6 +936,7 @@ indentation_level smallint
 distributed by (category);
 
 
+DROP TABLE IF EXISTS trends_assesed_valuation_tax_rate_class;
 CREATE TABLE trends_assesed_valuation_tax_rate_class
 (
 category character varying,
@@ -945,6 +978,7 @@ update  trends_assesed_valuation_tax_rate_class set display_yn ='Y' where fiscal
 -- 14) trends_assesed_estimated_actual_taxable_property
 
 
+DROP TABLE IF EXISTS trends_assesed_estimated_actual_taxable_property_temp;
 CREATE TABLE trends_assesed_estimated_actual_taxable_property_temp
 (
 fiscal_year smallint,
@@ -961,6 +995,7 @@ assesed_value_percentage numeric(20,2)
 Distributed by (fiscal_year);
 
 
+DROP TABLE IF EXISTS trends_assesed_estimated_actual_taxable_property;
 CREATE TABLE trends_assesed_estimated_actual_taxable_property
 (
 fiscal_year smallint,
@@ -995,6 +1030,7 @@ update  trends_assesed_estimated_actual_taxable_property set display_yn ='Y' whe
 
 -- 15)  trends_nyc_population_temp
 
+DROP TABLE IF EXISTS trends_nyc_population_temp;
 CREATE TABLE trends_nyc_population_temp
 (
 fiscal_year smallint,
@@ -1006,6 +1042,7 @@ percentage_change_prior_period numeric(4,2)
 Distributed by (fiscal_year);
 
 
+DROP TABLE IF EXISTS trends_nyc_population;
 CREATE TABLE trends_nyc_population
 (
 fiscal_year smallint,
@@ -1029,6 +1066,7 @@ update  trends_nyc_population set display_yn ='Y' where fiscal_year >=2000;
 
 -- 16)  trends_property_tax
 
+DROP TABLE IF EXISTS trends_property_tax_temp;
 CREATE TABLE trends_property_tax_temp
 (
 fiscal_year smallint,
@@ -1039,12 +1077,14 @@ total_direct numeric(4,2)
 Distributed by (fiscal_year);
 
 
+DROP TABLE IF EXISTS trends_property_tax;
 CREATE TABLE trends_property_tax
 (
 fiscal_year smallint,
 basic_rate numeric(4,2),
 obligation_debt numeric(4,2),
-total_direct numeric(4,2)
+total_direct numeric(4,2),
+display_yn char(1)
 )
 Distributed by (fiscal_year);
 
@@ -1059,6 +1099,7 @@ update  trends_property_tax set display_yn ='Y' where fiscal_year >=1997;
 
 -- 17) trends_person_receiving_pubic_assistance
 
+DROP TABLE IF EXISTS trends_person_receiving_pubic_assistance_temp;
 CREATE TABLE trends_person_receiving_pubic_assistance_temp
 (
 fiscal_year smallint,
@@ -1067,6 +1108,7 @@ SSI integer
 )
 Distributed by (fiscal_year);
 
+DROP TABLE IF EXISTS trends_person_receiving_pubic_assistance;
 CREATE TABLE trends_person_receiving_pubic_assistance
 (
 fiscal_year smallint,
@@ -1081,10 +1123,11 @@ COPY  trends_person_receiving_pubic_assistance_temp FROM '/home/gpadmin/TREDDY/T
 
 INSERT INTO trends_person_receiving_pubic_assistance select * from trends_person_receiving_pubic_assistance_temp;
 
-update trends_person_receiving_pubic_assistance_temp set display_yn ='Y' where fiscal_year >=2002;
+update trends_person_receiving_pubic_assistance set display_yn ='Y' where fiscal_year >=2002;
 
 -- 18)
 
+DROP TABLE IF EXISTS trends_pledged_revenue_temp;
 CREATE TABLE trends_pledged_revenue_temp
 (
 fiscal_year smallint,
@@ -1103,7 +1146,7 @@ total_to_be_covered integer
 Distributed by (fiscal_year);
 
 
-
+DROP TABLE IF EXISTS trends_pledged_revenue;
 CREATE TABLE trends_pledged_revenue
 (
 fiscal_year smallint,
@@ -1132,6 +1175,7 @@ update  trends_pledged_revenue set display_yn ='N' where fiscal_year <2002;
 update  trends_pledged_revenue set display_yn ='Y' where fiscal_year >=2002;
 -- 19)
 
+DROP TABLE IF EXISTS trends_uncollected_parking_violation_temp;
 CREATE TABLE trends_uncollected_parking_violation_temp
 (
 category varchar,	
@@ -1159,6 +1203,7 @@ indentation_level smallint
 )
 Distributed by (category);
 
+DROP TABLE IF EXISTS trends_uncollected_parking_violation;
 CREATE TABLE trends_uncollected_parking_violation
 (
 category character varying,
@@ -1197,8 +1242,9 @@ update  trends_uncollected_parking_violation set display_yn ='Y' where fiscal_ye
 
 
 
-- 20)  trends_changes_net_assets
+-- 20)  trends_changes_net_assets
 
+DROP TABLE IF EXISTS trends_changes_net_assets_temp;
 CREATE TABLE trends_changes_net_assets_temp
 (
 category varchar,	
@@ -1227,6 +1273,7 @@ indentation_level smallint
 )
 Distributed by (category);
 
+DROP TABLE IF EXISTS trends_changes_net_assets;
 CREATE TABLE trends_changes_net_assets
 (
 category character varying,
@@ -1266,6 +1313,7 @@ update  trends_changes_net_assets set display_yn ='Y' where fiscal_year >=2002;
 
 -- 21) trends_government_funds
 
+DROP TABLE IF EXISTS trends_government_funds_temp;
 CREATE TABLE trends_government_funds_temp
 (
 category varchar,	
@@ -1293,6 +1341,7 @@ indentation_level smallint
 )
 Distributed by (category);
 
+DROP TABLE IF EXISTS trends_government_funds;
 CREATE TABLE trends_government_funds
 (
 category character varying,
@@ -1332,6 +1381,7 @@ update  trends_government_funds set display_yn ='Y' where fiscal_year >=1997;
 
 -- 22)  trends_hudson_yards_infrastructure
 
+DROP TABLE IF EXISTS trends_hudson_yards_infrastructure_temp;
 CREATE TABLE trends_hudson_yards_infrastructure_temp
 (
 fiscal_year	smallint,
@@ -1350,6 +1400,7 @@ coverage_on_total_revenue_5 numeric(20,2)
 )
 Distributed by (fiscal_year);
 
+DROP TABLE IF EXISTS trends_hudson_yards_infrastructure;
 CREATE TABLE trends_hudson_yards_infrastructure
 (
 fiscal_year	smallint,
@@ -1364,7 +1415,8 @@ principal	 numeric(20,2),
 total numeric(20,2),
 operating_expenses numeric(20,2),
 total_to_be_covered numeric(20,2),
-coverage_on_total_revenue_5 numeric(20,2)
+coverage_on_total_revenue_5 numeric(20,2),
+display_yn char(1)
 )
 Distributed by (fiscal_year);
 
@@ -1376,6 +1428,7 @@ update trends_hudson_yards_infrastructure set display_yn ='Y';
 
 -- 23)
 
+DROP TABLE IF EXISTS trends_legal_debt_margin_temp;
 CREATE TABLE trends_legal_debt_margin_temp
 (
 category varchar,	
@@ -1404,6 +1457,7 @@ indentation_level smallint
 )
 Distributed by (category);
 
+DROP TABLE IF EXISTS trends_legal_debt_margin;
 CREATE TABLE trends_legal_debt_margin
 (
 category character varying,
@@ -1446,6 +1500,7 @@ update  trends_ratios_general_bonded_debt_outstanding set display_yn ='Y' where 
 
 -- 24) trends_ratios_general_bonded_debt_outstanding
 
+DROP TABLE IF EXISTS trends_ratios_general_bonded_debt_outstanding_temp;
 CREATE TABLE trends_ratios_general_bonded_debt_outstanding_temp
 (
 fiscal_year smallint,
@@ -1455,6 +1510,7 @@ per_capita_general_obligations numeric(20,2)
 )
 Distributed by (fiscal_year);
 
+DROP TABLE IF EXISTS trends_ratios_general_bonded_debt_outstanding;
 CREATE TABLE trends_ratios_general_bonded_debt_outstanding
 (
 fiscal_year smallint,

@@ -1572,21 +1572,21 @@ BEGIN
 	RAISE NOTICE 'PCON5';
 	DELETE FROM ONLY agreement_snapshot a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 	
-	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
+	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
 				       original_contract_amount,maximum_contract_amount,description,
-					vendor_history_id,vendor_id,vendor_name,
+					vendor_history_id,vendor_id,vendor_code,vendor_name,
 					dollar_difference,
 					percent_difference,
 					master_agreement_id, master_contract_number,agreement_type_id,
-					agreement_type_name,award_category_id,award_category_name,award_method_id,award_method_name,
+					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,
 					expenditure_object_names,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
 					master_agreement_yn)
-	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ah.agency_name,
+	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year
 	        		      ELSE b.effective_end_fiscal_year END),
@@ -1594,12 +1594,12 @@ BEGIN
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
 	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
 	        b.original_contract_amount,b.maximum_contract_amount,b.description,
-		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),		
+		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),		
 		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
 		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
-		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
+		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
@@ -1608,13 +1608,16 @@ BEGIN
 		'N' as master_agreement_yn
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
+		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id
 		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
 		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
-		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
+		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct y.expenditure_object_name) as expenditure_object_names, GROUP_CONCAT(distinct expenditure_object_code) as expenditure_object_codes
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
+			   JOIN ref_expenditure_object w ON y.expenditure_object_id = w.expenditure_object_id
 			   JOIN tmp_agreement_snapshot x ON x.agreement_id = z.agreement_id
 			   GROUP BY 1) g ON a.agreement_id = g.agreement_id
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
@@ -1693,21 +1696,21 @@ BEGIN
 	
 	DELETE FROM ONLY agreement_snapshot_cy a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 
-	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_name,
+	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
 				       original_contract_amount,maximum_contract_amount,description,
-					vendor_history_id,vendor_id,vendor_name,
+					vendor_history_id,vendor_id,vendor_code,vendor_name,
 					dollar_difference,
 					percent_difference,
 					master_agreement_id, master_contract_number,agreement_type_id,
-					agreement_type_name,award_category_id,award_category_name,award_method_id,award_method_name,
+					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,
 					expenditure_object_names,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
 					master_agreement_yn)
-	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ah.agency_name,
+	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 				      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
 				      ELSE b.effective_end_calendar_year END),
@@ -1715,12 +1718,12 @@ BEGIN
 				      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year_id
 				      ELSE b.effective_end_calendar_year_id END),b.contract_number,
 		b.original_contract_amount,b.maximum_contract_amount,b.description,
-		b.vendor_history_id,c.vendor_id, COALESCE(c.legal_name,c.alias_name),		
+		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),		
 		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as  dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
 		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
-		e.agreement_type_name,f.award_category_id, f.award_category_name,am.award_method_id,am.award_method_name,
+		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
 		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
@@ -1729,13 +1732,16 @@ BEGIN
 		'N' as master_agreement_yn
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
+		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id
 		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
 		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
-		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct expenditure_object_name) as expenditure_object_names
+		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct y.expenditure_object_name) as expenditure_object_names, GROUP_CONCAT(distinct expenditure_object_code) as expenditure_object_codes
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
+			   JOIN ref_expenditure_object w ON y.expenditure_object_id = w.expenditure_object_id
 			   JOIN tmp_agreement_snapshot x ON x.agreement_id = z.agreement_id
 			   GROUP BY 1) g ON a.agreement_id = g.agreement_id
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
