@@ -230,3 +230,21 @@ INSERT INTO ref_document_code(document_code_id, document_code, document_name, cr
 INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name) VALUES(nextval('seq_ref_agency_agency_id'),'N/A','N/A (PRIVACY/SECURITY)','N/A (PRIVACY/SECURITY)', now()::timestamp, 'N/A');
 
 INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'N/A';
+
+
+/*ref_fund_class*/
+
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(360,2);
+ INSERT INTO ref_fund_class(fund_class_code,fund_class_name,created_load_id) VALUES(001,'General Fund',2);
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(510,2);
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(850,2);
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(320,2);
+ INSERT INTO ref_fund_class(fund_class_code,fund_class_name,created_load_id) VALUES(400,'Captial Fund',2);
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(853,2);
+ INSERT INTO ref_fund_class(fund_class_code,fund_class_name,created_load_id) VALUES(402,'Capital Fund',2);
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(852,2);
+ INSERT INTO ref_fund_class(fund_class_code,fund_class_name,created_load_id) VALUES(700,'Contracts',2);
+ INSERT INTO ref_fund_class(fund_class_code,fund_class_name,created_load_id) VALUES(702,'Contracts',2);
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(520,2);
+ INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES(701,2);
+ update ref_fund_class set created_date = now()::timestamp;
