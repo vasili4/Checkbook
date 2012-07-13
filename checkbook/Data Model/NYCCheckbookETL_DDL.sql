@@ -3768,7 +3768,7 @@ CREATE TABLE etl.ref_revenue_budget_code_id_seq
 (
   uniq_id bigint,
  
- budget_code_id integer DEFAULT nextval('seq_revenue_budget_revenue_budget_id'::regclass)
+ budget_code_id integer DEFAULT nextval('public.seq_revenue_budget_revenue_budget_id'::regclass)
 
 )
 
@@ -3846,6 +3846,7 @@ CREATE EXTERNAL TABLE ext_stg_pension_fund(
 (
   widget_name character varying(150),
   aggregate_table_name character varying(150),
+  create_table text,
   query1 text,
   query2 text,
   execution_order smallint
