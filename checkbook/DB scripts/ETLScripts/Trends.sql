@@ -1061,6 +1061,7 @@ COPY  trends_nyc_population_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_nyc_po
 INSERT INTO trends_nyc_population  select * from trends_nyc_population_temp;
 
 update  trends_nyc_population set display_yn ='Y' where fiscal_year >=2000;
+update  trends_nyc_population set display_yn ='N' where fiscal_year in(2010,2011);
 
 
 
@@ -1493,10 +1494,9 @@ INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_ord
 INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
 INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
 
-update  trends_ratios_general_bonded_debt_outstanding set display_yn ='N' where fiscal_year <1997;
-update  trends_ratios_general_bonded_debt_outstanding set display_yn ='Y' where fiscal_year >=1997;
 
-
+update  trends_legal_debt_margin set display_yn ='N' where fiscal_year <1997;
+update  trends_legal_debt_margin set display_yn ='Y' where fiscal_year >=1997;
 
 -- 24) trends_ratios_general_bonded_debt_outstanding
 
@@ -1526,5 +1526,6 @@ COPY  trends_ratios_general_bonded_debt_outstanding_temp FROM '/home/gpadmin/TRE
 
 INSERT INTO trends_ratios_general_bonded_debt_outstanding select * from trends_ratios_general_bonded_debt_outstanding_temp;
 
-update  trends_legal_debt_margin set display_yn ='N' where fiscal_year <1997;
-update  trends_legal_debt_margin set display_yn ='Y' where fiscal_year >=1997;
+
+update  trends_ratios_general_bonded_debt_outstanding set display_yn ='N' where fiscal_year <1997;
+update  trends_ratios_general_bonded_debt_outstanding set display_yn ='Y' where fiscal_year >=1997;
