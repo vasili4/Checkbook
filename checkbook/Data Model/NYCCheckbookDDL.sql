@@ -1264,7 +1264,7 @@ ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_type FOREIGN KEY (expenditure_cancel_type_id) REFERENCES ref_expenditure_cancel_type(expenditure_cancel_type_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_status FOREIGN KEY (expenditure_status_id) REFERENCES ref_expenditure_status(expenditure_status_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
-ALTER TABLE  disbursement ADD constraint fk_disbursement_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+ALTER TABLE  disbursement ADD constraint fk_disbursement_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date foreign key (record_date_id) references ref_date (date_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_1 foreign key (check_eft_issued_date_id) references ref_date (date_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_2 foreign key (check_eft_record_date_id) references ref_date (date_id);
