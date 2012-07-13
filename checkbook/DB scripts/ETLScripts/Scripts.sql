@@ -950,7 +950,7 @@ BEGIN
 
 			EXECUTE l_drop_sql ;
 
-			RAISE NOTICE '%', l_drop_sql 
+			RAISE NOTICE '%', l_drop_sql ;
 			
 			SELECT create_table, query1, query2
 			FROM   etl.aggregate_tables	       
