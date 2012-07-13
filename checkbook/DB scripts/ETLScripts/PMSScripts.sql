@@ -120,7 +120,7 @@ BEGIN
 					department_name varchar,expenditure_object_id integer,
 					fiscal_year_id smallint, employee_id bigint, employee_name varchar,
 					calendar_fiscal_year_id smallint, calendar_fiscal_year smallint,
-					agency_short_name varchar,department_short_name varchar,)
+					agency_short_name varchar,department_short_name varchar)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:pay_date_id
