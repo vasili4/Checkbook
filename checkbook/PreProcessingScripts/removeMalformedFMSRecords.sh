@@ -14,7 +14,10 @@
 		}
         	else 
         	{
-                	print "Line Number:" NR " " $0 >> "badfile.txt"
+        		if(attributes[1]=="H" || attributes[1]=="V" || attributes[1]=="A" )
+        		{
+                		print "Line Number:" NR " " $0 >> "badfile.txt"
+                	}
         	}	
 }
 

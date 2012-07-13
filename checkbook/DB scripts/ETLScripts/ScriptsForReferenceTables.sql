@@ -1,12 +1,12 @@
-COPY etl.ref_data_source FROM '/home/gpadmin/athiagarajan/NYC/ref_data_source.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_data_source FROM '/home/gpadmin/prerelease/NYC/ref_data_source.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_column_mapping FROM '/home/gpadmin/athiagarajan/NYC/ref_column_mapping.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_column_mapping FROM '/home/gpadmin/prerelease/NYC/ref_column_mapping.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_validation_rule FROM '/home/gpadmin/athiagarajan/NYC/ref_validation_rule.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_validation_rule FROM '/home/gpadmin/prerelease/NYC/ref_validation_rule.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_file_name_pattern FROM '/home/gpadmin/athiagarajan/NYC/ref_file_name_pattern.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_file_name_pattern FROM '/home/gpadmin/prerelease/NYC/ref_file_name_pattern.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.aggregate_tables FROM '/home/gpadmin/athiagarajan/NYC/widget_aggregate_tables.csv' CSV HEADER QUOTE as '"';
+COPY etl.aggregate_tables FROM '/home/gpadmin/prerelease/NYC/widget_aggregate_tables.csv' CSV HEADER QUOTE as '"';
 
 ---------------------------------------------------------------------------------------------------------------------------------
 
@@ -117,7 +117,7 @@ INSERT INTO ref_business_type_status values (1,'Requested',now()::timestamp),
 	rsfcls_nm_up  varchar(52),
 	fund_category  varchar(50));
 	
-COPY etl.stg_funding_class FROM '/home/gpadmin/athiagarajan/NYC/FundingClass.txt' DELIMITER AS '|' ESCAPE '~' FILL MISSING FIELDS;		
+COPY etl.stg_funding_class FROM '/home/gpadmin/prerelease/NYC/FundingClass.txt' DELIMITER AS '|' ESCAPE '~' FILL MISSING FIELDS;		
 
 
 INSERT INTO   ref_funding_class(funding_class_code,funding_class_name,funding_class_short_name,category_name,city_fund_flag,intra_city_flag,fund_allocation_required_flag,category_code,created_date)
@@ -133,16 +133,16 @@ select etl.initializedate('1900-01-01'::date,'2200-12-31'::date);
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
-COPY etl.stg_award_method FROM '/home/gpadmin/athiagarajan/NYC/AwardMethod.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_method FROM '/home/gpadmin/prerelease/NYC/AwardMethod.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_method(award_method_code,award_method_name,created_date) SELECT  award_method_code,award_method_name,now()::timestamp  FROM etl.stg_award_method;
 
-COPY etl.stg_agreement_type FROM '/home/gpadmin/athiagarajan/NYC/AgreementType.csv' DELIMITER AS ',' ;
+COPY etl.stg_agreement_type FROM '/home/gpadmin/prerelease/NYC/AgreementType.csv' DELIMITER AS ',' ;
   
 insert into ref_agreement_type(agreement_type_code,agreement_type_name,created_date) SELECT agreement_type_code,name,now()::timestamp from etl.stg_agreement_type;											
 
 
-COPY etl.stg_award_category FROM '/home/gpadmin/athiagarajan/NYC/AgreementCategory.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_category FROM '/home/gpadmin/prerelease/NYC/AgreementCategory.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_category(award_category_code,award_category_name,created_date) SELECT award_category_code, award_method_name,now()::timestamp  from etl.stg_award_category;  
 

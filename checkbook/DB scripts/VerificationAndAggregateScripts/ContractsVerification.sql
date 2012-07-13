@@ -1,3 +1,19 @@
+select count(*) from etl.stg_con_ct_header
+select count(*) from  etl.stg_con_ct_award_detail
+select count(*) from etl.stg_con_ct_vendor
+select count(*) from etl.stg_con_ct_accounting_line
+select count(*) from etl.stg_con_po_header
+select count(*) from etl.stg_con_po_award_detail
+select count(*) from etl.stg_con_po_vendor
+select count(*) from etl.stg_con_po_accounting_line
+select count(*) from etl.stg_con_do1_header
+select count(*) from etl.stg_con_do1_vendor
+select count(*) from etl.stg_con_do1_accounting_line
+select count(*) from etl.stg_con_do1_header
+select count(*) from etl.stg_con_do1_vendor
+select count(*) from etl.stg_con_do1_accounting_line
+
+
 Verification queries for contracts - Registered
 -----------------------------------  FY 2011 
 
