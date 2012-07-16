@@ -884,8 +884,6 @@ WITH (
   OIDS=FALSE
 )
 DISTRIBUTED BY (uniq_id);
-ALTER TABLE etl.stg_funding_class
-  OWNER TO gpadmin;
 
 
 
@@ -895,6 +893,12 @@ ALTER TABLE etl.archive_funding_class ADD COLUMN load_file_id bigint;
 
 CREATE TABLE etl.invalid_funding_class (LIKE etl.archive_funding_class) DISTRIBUTED BY (uniq_id);
 
+CREATE TABLE etl.ref_funding_class_id_seq
+(
+  uniq_id bigint,
+  funding_class_id integer DEFAULT nextval('seq_ref_funding_class_funding_class_id'::regclass)
+)
+DISTRIBUTED BY (uniq_id);
 
 
 -- End of COA related tables
