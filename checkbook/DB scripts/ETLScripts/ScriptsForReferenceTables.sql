@@ -129,7 +129,7 @@ SELECT funding_class_code,name,short_name,category_name,
 from etl.stg_funding_class;
 
 */
-select etl.initializedate('1900-01-01'::date,'2200-12-31'::date);
+select initializedate('1900-01-01'::date,'2200-12-31'::date);
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
