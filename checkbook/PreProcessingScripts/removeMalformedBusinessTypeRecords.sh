@@ -4,7 +4,7 @@
         line = $0;
         delimiter="|";
         no_of_attributes = split(line,attributes,delimiter);
-        if(no_of_attributes==9){
+        if(no_of_attributes==10){
                 print $0 >> "goodfile.txt"
         } else
         {
