@@ -823,7 +823,7 @@ BEGIN
 	
 	Raise notice '3';
 
-INSERT INTO   ref_funding_class(funding_class_id,fiscal_year,funding_class_code,funding_class_name,funding_class_short_name,category_name,city_fund_flag,intra_city_flag,fund_allocation_required_flag,category_code,created_date,load_id)
+INSERT INTO   ref_funding_class(funding_class_id,fiscal_year,funding_class_code,funding_class_name,funding_class_short_name,category_name,city_fund_flag,intra_city_flag,fund_allocation_required_flag,category_code,created_date,created_load_id)
 SELECT a.funding_class_id,b.fy,b.funding_class_code,b.name,b.short_name,b.category_name,
 	 b.cty_fund_fl,b.intr_cty_fl , b.fund_aloc_req_fl ,b.fund_category,
 	now()::timestamp, p_load_id_in     
