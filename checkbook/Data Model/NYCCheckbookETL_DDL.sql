@@ -473,7 +473,7 @@ DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE stg_agency(
 	agency_code varchar(20),
-	agency_name varchar(50),
+	agency_name varchar(100),
 	agency_short_name varchar(15),
 	uniq_id bigint default nextval('seq_stg_agency_uniq_id'),
 	invalid_flag char(1),
