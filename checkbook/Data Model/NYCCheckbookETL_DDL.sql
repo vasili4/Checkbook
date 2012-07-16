@@ -844,6 +844,7 @@ DISTRIBUTED BY (uniq_id);
 
 CREATE EXTERNAL table etl.ext_stg_funding_class
 (
+ doc_dept_cd varchar,
 fy varchar,
 funding_class_code varchar,
 name varchar,
