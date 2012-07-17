@@ -852,7 +852,7 @@ BEGIN
 
 	RAISE NOTICE 'inside error handler 1';
 	
-	IF l_data_source_code IN ('A','D','E','L','O','RC','RY','RS','BC') THEN
+	IF l_data_source_code IN ('A','D','E','L','O','RC','RY','RS','BC','FC') THEN
 		-- Updating the processed flag to C for all non processed data files for the job
 
 		UPDATE  etl.etl_data_load_file a

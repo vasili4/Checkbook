@@ -1318,6 +1318,7 @@ DROP TABLE IF EXISTS trends_government_funds_temp;
 CREATE TABLE trends_government_funds_temp
 (
 category varchar,	
+fy_2011 numeric(20,2),
 fy_2010 numeric(20,2),
 fy_2009 numeric(20,2),
 fy_2008 numeric(20,2),

@@ -897,7 +897,7 @@ CREATE TABLE etl.invalid_funding_class (LIKE etl.archive_funding_class) DISTRIBU
 CREATE TABLE etl.ref_funding_class_id_seq
 (
   uniq_id bigint,
-  funding_class_id integer DEFAULT nextval('seq_ref_funding_class_funding_class_id'::regclass)
+  funding_class_id integer DEFAULT nextval('public.seq_ref_funding_class_funding_class_id'::regclass)
 )
 DISTRIBUTED BY (uniq_id);
 
