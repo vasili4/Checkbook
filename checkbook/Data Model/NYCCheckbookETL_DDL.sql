@@ -274,7 +274,8 @@ alw_bud_fl character varying,
 rscat_dscr character varying,
 cntac_cd character varying,
 rscat_nm_up character varying,
-tbl_last_dt  character varying
+tbl_last_dt  character varying,
+col13 character varying
 )
  location 
 
