@@ -1443,18 +1443,34 @@ BEGIN
 				     and c.agency_id = b.agency_id 
 				     and d.fund_class_id = b.fund_class_id;
 
+
+
 	--New agency in budget_code
-	INSERT INTO ref_agency (agency_code,agency_name,created_date,created_load_id)
-	SELECT b.dept_cd,dept_nm,now()::timestamp,p_load_id_in 
-	FROM tmp_ref_budget_code b 
-	WHERE b.agency_exists_flag ='N';
 
-	-- TO DO - Agency history
+	TRUNCATE etl.ref_agency_id_seq;
+	  	
+	  	INSERT INTO etl.ref_agency_id_seq(uniq_id)
+	  	SELECT uniq_id
+	  	FROM   tmp_ref_budget_code;
+	  	
+	  	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
+	  	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
+	  	FROM   etl.ref_agency_id_seq a JOIN tmp_ref_budget_code b ON a.uniq_id = b.uniq_id;
+  
 
-	INSERT INTO ref_agency_history (agency_name,created_date,load_id)
-	SELECT dept_nm,now()::timestamp,p_load_id_in 
-	FROM tmp_ref_budget_code b 
-	WHERE b.agency_exists_flag ='N';
+	--  Agency history
+ 	
+  	TRUNCATE etl.ref_agency_history_id_seq;
+		
+		INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
+		SELECT uniq_id
+		FROM   tmp_fk_values_new_agencies;
+	
+		INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
+		SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
+	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
+
+
 
 	--For Populating temp with agency _id
 	
