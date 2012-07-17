@@ -1194,6 +1194,7 @@ CREATE TABLE revenue_budget
   agency_id smallint,
   revenue_source_id int,
   agency_name character varying,
+  agency_short_name character varying,
   revenue_source_name character varying,
   created_load_id integer,
   updated_load_id integer,
