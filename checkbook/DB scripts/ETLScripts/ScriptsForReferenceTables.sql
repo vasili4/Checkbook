@@ -10,7 +10,7 @@ COPY etl.aggregate_tables FROM '/home/gpadmin/prerelease/NYC/widget_aggregate_ta
 
 ---------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.initializedate(p_start_date_in date, p_end_date_in date) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION initializedate(p_start_date_in date, p_end_date_in date) RETURNS INT AS $$
 DECLARE
 	l_no_of_days int;
 	l_no_of_years int;
