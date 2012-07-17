@@ -556,7 +556,7 @@ COPY  trends_employment_status_of_resident_population_temp FROM '/home/gpadmin/T
 INSERT INTO trends_employment_status_of_resident_population  select * from trends_employment_status_of_resident_population_temp;
 
 update  trends_employment_status_of_resident_population set display_yn ='N' where fiscal_year <1996;
-update  trends_employment_status_of_resident_population set display_yn ='Y' where fiscal_year >=1997;
+update  trends_employment_status_of_resident_population set display_yn ='Y' where fiscal_year >=1996;
 
 -- 8) trends_non_agricultural_wage_salary_employement
 
@@ -815,6 +815,7 @@ INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, disp
 
 update  trends_changes_in_fund_balances set display_yn ='N' where fiscal_year <1996;
 update  trends_changes_in_fund_balances set display_yn ='Y' where fiscal_year >=1996;
+update trends_changes_in_fund_balances set display_yn ='N' where fiscal_year = 2011;
 
 -- 12) trends_capital_assets_statistics_function_program
 
@@ -1359,6 +1360,7 @@ DISTRIBUTED BY (category);
 
 COPY  trends_government_funds_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_government_funds.csv' CSV HEADER QUOTE as '"';
 
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2008, fy_2008, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
