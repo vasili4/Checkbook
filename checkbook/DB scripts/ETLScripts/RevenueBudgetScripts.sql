@@ -1,5 +1,4 @@
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 -- Function: etl.updateforeignkeysforrevenuebudget(bigint)
 
 -- DROP FUNCTION etl.updateforeignkeysforrevenuebudget(bigint);
@@ -125,7 +124,7 @@ $BODY$
   	GROUP BY 1,2,3,5,6;
   	
   
-  	TRUNCATE etl.ref_budget_code_id_seq;
+  	TRUNCATE etl.ref_revenue_budget_code_id_seq;
   	
   	INSERT INTO etl.ref_budget_code_id_seq
   	SELECT uniq_id
@@ -205,7 +204,8 @@ $BODY$
   		agency_name = ct_table.agency_name,
   		revenue_source_name = ct_table.revenue_source_name,
   		revenue_source_id = ct_table.revenue_source_id,
-  		agency_short_name = ct_table.agency_short_name
+  		agency_short_name = ct_table.agency_short_name,
+  		budget_code_name =ct_table.budget_code_name
   	FROM	(SELECT uniq_id, max(fund_class_id) as fund_class_id, 
   				 max(agency_history_id) as agency_history_id,
   				 max(agency_id) as agency_id,
@@ -216,6 +216,7 @@ $BODY$
   				 max(budget_code_name) as budget_code_name,
   				 max(revenue_source_id) as revenue_source_id,
   				 max(agency_short_name) as agency_short_name
+				 	
   				 FROM	tmp_fk_revenue_budget_values
   		 GROUP BY 1) ct_table
   	WHERE	a.uniq_id = ct_table.uniq_id;	
@@ -233,6 +234,7 @@ $BODY$
   LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION etl.updateforeignkeysforrevenuebudget(bigint)
   OWNER TO gpadmin;
+
   
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -259,7 +261,7 @@ BEGIN
 	SET action_flag = 'I';
 
 
-	CREATE TEMPORARY TABLE tmp_revenue_budget_unique_keys(uniq_id bigint, budget_fiscal_year smallint, fund_class_id smallint, agency_history_id smallint, budget_code_id integer,revenue_source_id smallint, action_flag character(1), budget_id integer) 
+	CREATE TEMPORARY TABLE tmp_revenue_budget_unique_keys(uniq_id bigint, budget_fiscal_year smallint, fund_class_id smallint, agency_history_id smallint, budget_code_id integer,revenue_source_id integer, action_flag character(1), budget_id integer) 
 	DISTRIBUTED BY (uniq_id);
 
 	INSERT INTO tmp_revenue_budget_unique_keys(uniq_id, budget_fiscal_year, fund_class_id, agency_history_id,  
@@ -368,4 +370,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION etl.processrevenuebudget(integer, bigint)
   OWNER TO gpadmin;
-
