@@ -1464,7 +1464,7 @@ BEGIN
 		
 		INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
 		SELECT uniq_id
-		FROM   tmp_fk_values_new_agencies;
+		FROM   tmp_ref_budget_code;
 	
 		INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
 		SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
