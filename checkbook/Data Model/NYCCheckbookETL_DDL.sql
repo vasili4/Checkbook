@@ -3714,7 +3714,9 @@ CREATE EXTERNAL TABLE etl.ext_stg_revenue_budget
   func_cd varchar,
   revenue_source varchar,
   adpt_am varchar,
-  curr_bud_am varchar
+  curr_bud_am varchar,
+  col8 varchar,
+  col9 varchar
 )
  LOCATION (
     'gpfdist://mdw1:8081/datafiles/revenue_budget.txt'
