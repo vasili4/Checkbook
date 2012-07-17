@@ -1,9 +1,9 @@
 TODAY=$(date)
-SCRIPT_DIR=/home/gpadmin/athiagarajan/NYC
+SCRIPT_DIR=/home/gpadmin/prerelease/NYC
 export SCRIPT_DIR
 EXEC_TIME=`date +%m%d%Y:%T`
 export EXEC_TIME
-DB_NAME=checkbook
+DB_NAME=checkbook_prerelease
 export DB_NAME
 echo "--------------------CREATE TABLES STRUCTURES---------------------"
 
@@ -27,6 +27,7 @@ psql -d $DB_NAME -f $SCRIPT_DIR/BudgetScripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/Scripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/PMSScripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/RevenueScripts.sql
-
-
-
+psql -d $DB_NAME -f $SCRIPT_DIR/Trends.sql
+psql -d $DB_NAME -f $SCRIPT_DIR/RevenueBudgetScripts.sql
+psql -d $DB_NAME -f $SCRIPT_DIR/PendingContracts.sql
+psql -d $DB_NAME -f$SCRIPT_DIR/VendorScripts.sql
