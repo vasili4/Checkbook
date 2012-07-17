@@ -3751,7 +3751,8 @@ CREATE TABLE etl.stg_revenue_budget
   invalid_flag character(1),
   invalid_reason character varying,
   revenue_source_id int,
-  agency_short_name int
+  agency_short_name character varying,
+  budget_code_name character varying
 )
 WITH (
   OIDS=FALSE
