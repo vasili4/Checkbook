@@ -1548,12 +1548,12 @@ BEGIN
 		RAISE NOTICE 'RS - 4';
 
 		-- change of budget_code
-		CREATE TEMPORARY TABLE tmp_ref_budget_code_1(func_nm varchar, budget_code_id smallint)
+		CREATE TEMPORARY TABLE tmp_ref_budget_code_1(func_nm varchar, func_attr_nm varchar, func_attr_sh_nm varchar, budget_code_id smallint)
 		DISTRIBUTED BY (budget_code_id);
 
 
 		INSERT INTO tmp_ref_budget_code_1
-		SELECT a.func_nm,b.budget_code_id FROM tmp_ref_budget_code a JOIN ref_budget_code b ON a.func_cd = b.budget_code AND a.fy = b.fiscal_year
+		SELECT a.func_nm,a.func_attr_nm,a.func_attr_sh_nm, b.budget_code_id FROM tmp_ref_budget_code a JOIN ref_budget_code b ON a.func_cd = b.budget_code AND a.fy = b.fiscal_year
 		WHERE exists_flag ='Y' and budget_code_modified_flag ='Y';
 
 
@@ -1561,6 +1561,8 @@ BEGIN
 
 		UPDATE ref_budget_code a
 		SET budget_code_name = b.func_nm,
+			attribute_name = b.func_attr_nm,
+			attribute_short_name = b.func_attr_sh_nm,
 			updated_date = now()::timestamp,
 			updated_load_id = p_load_id_in 
 		FROM	tmp_ref_budget_code_1 b		
