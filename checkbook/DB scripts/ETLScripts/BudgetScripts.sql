@@ -294,7 +294,7 @@ BEGIN
 		department_short_name = ct_table.department_short_name,
 		agency_id =ct_table.agency_id, 
 		department_id=ct_table.department_id,
-		object_class_id = ct_table.object_id 
+		object_class_id = ct_table.object_class_id 
 	FROM	(SELECT uniq_id, max(fund_class_id) as fund_class_id, 
 				 max(agency_history_id) as agency_history_id,
 				 max(department_history_id) as department_history_id,
