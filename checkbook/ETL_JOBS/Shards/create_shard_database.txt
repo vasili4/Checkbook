@@ -1,0 +1,32 @@
+1) Creating staging and public schema dumps
+
+a) pg_dump  "mmnyccheckbook_athu" -s -n public -T "*all_*"  -f mmnyccheckbook_athu_public_schema.sql 1>1.out 2>2.err
+
+Removed Primary Keys and Foreign Keys.
+Removed RULES
+Removed some testing tables
+
+
+b) ./gptransfer -s staging mmnyccheckbook_athu  > mmnyccheckbook_athu_staging_schema.sql
+
+Removed public_ from the view/external table names
+Removed the sequences & all the procedure definitions
+Removed the tables which are not required by the application
+Removed PGOPTIONS="-c gp_session_role=utility.
+Updated  FORMAT 'csv'; to  FORMAT 'csv' (delimiter ',' null '' escape '"' quote '"') ENCODING 'UTF8';
+
+2) Creating database and running the above dumps  (192.168.3.24://home/gpadmin/TREDDY)
+
+CREATE DATABASE mmnyccheckbook_athu WITH TEMPLATE = template0 ENCODING = 'UTF8';
+ALTER DATABASE mmnyccheckbook_athu OWNER TO gpadmin;
+
+psql "mmnyccheckbook_athu" -f mmnyccheckbook_athu_public_schema_mod.sql 1>1.out 2>2.err
+psql "mmnyccheckbook_athu" -f mmnyccheckbook_athu_staging_schema_mod.sql 1>1.out 2>2.err
+
+3) VERFICATION:
+
+\dt
+
+select  a.relname,b.nspname
+FROM pg_class a JOIN pg_namespace b ON a.relnamespace = b.oid
+WHERE   b.nspname in ('staging','public') AND a.relkind <> 'S' ;
