@@ -1436,8 +1436,8 @@ BEGIN
 		a.tbl_last_dt,	
 		a.func_attr_nm_up,
 		a.fin_plan_sav_fl 
-	FROM   etl.stg_budget_code a LEFT Join ref_agency c on  a.dept_cd = c.agency_code 
-				     LEFT join ref_fund_class d on a.fcls_cd =  d.fund_class_code 
+	FROM   etl.stg_budget_code a LEFT JOIN ref_agency c on  a.dept_cd = c.agency_code 
+				     LEFT JOIN ref_fund_class d on a.fcls_cd =  d.fund_class_code 
 				     LEFT JOIN ref_budget_code b ON a.func_cd = b.budget_code 
 				     and a.fy= b.fiscal_year 
 				     and c.agency_id = b.agency_id 
@@ -1447,11 +1447,19 @@ BEGIN
 
 	--New agency in budget_code
 
+	CREATE TEMPORARY TABLE tmp_fk_budget_code_new_agencies(dept_cd varchar,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_budget_code_new_agencies
+	SELECT dept_cd,MIN(a.uniq_id) as uniq_id
+	FROM tmp_ref_budget_code a WHERE a.agency_exists_flag = 'N'
+	GROUP BY 1;
+						 
 	TRUNCATE etl.ref_agency_id_seq;
 	  	
 	  	INSERT INTO etl.ref_agency_id_seq(uniq_id)
 	  	SELECT uniq_id
-	  	FROM   tmp_ref_budget_code;
+	  	FROM   tmp_fk_budget_code_new_agencies;
 	  	
 	  	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
 	  	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
@@ -1464,7 +1472,7 @@ BEGIN
 		
 		INSERT INTO etl.ref_agency_history_id_seq(uniq_id)
 		SELECT uniq_id
-		FROM   tmp_ref_budget_code;
+		FROM   tmp_fk_budget_code_new_agencies;
 	
 		INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id)
 		SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in
@@ -1489,10 +1497,24 @@ BEGIN
 
 	--New fund_class
 
-	INSERT INTO ref_fund_class(fund_class_code,fund_class_name,created_date,created_load_id) 
-	SELECT b.fcls_cd, fcls_nm,now()::timestamp,p_load_id_in
-	FROM tmp_ref_budget_code b 
-	WHERE b.fund_class_exists_flag='N';
+	CREATE TEMPORARY TABLE tmp_fk_budget_code_new_fund_class(fcls_cd varchar,uniq_id bigint)
+	DISTRIBUTED BY (uniq_id);
+	
+	INSERT INTO tmp_fk_budget_code_new_fund_class
+	SELECT fcls_cd,MIN(a.uniq_id) as uniq_id
+	FROM tmp_ref_budget_code a WHERE a.fund_class_exists_flag = 'N'
+	GROUP BY 1;
+	
+	TRUNCATE etl.ref_fund_class_id_seq;
+	
+  	INSERT INTO etl.ref_fund_class_id_seq(uniq_id)
+  	SELECT uniq_id
+  	FROM   tmp_fk_budget_code_new_fund_class;
+	
+  	
+	INSERT INTO ref_fund_class(fund_class_id, fund_class_code,fund_class_name,created_date,created_load_id) 
+	SELECT a.fund_class_id, b.fcls_cd, b.fcls_nm,now()::timestamp,p_load_id_in
+	FROM etl.ref_fund_class_id_seq a JOIN tmp_ref_budget_code b ON a.uniq_id = b.uniq_id;
 
 
 	--For populating temp with fund_class_id
@@ -1513,6 +1535,7 @@ BEGIN
 	-- Generate the budget code id for new records
 
 	TRUNCATE etl.ref_budget_code_id_seq;
+	
 	INSERT INTO etl.ref_budget_code_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   tmp_ref_budget_code
