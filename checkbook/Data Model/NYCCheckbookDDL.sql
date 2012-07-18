@@ -1751,6 +1751,7 @@ CREATE TABLE aggregateon_total_contracts(
 	total_commited_contracts bigint,
 	total_master_agreements bigint,
 	total_standalone_contracts bigint,
+	total_revenue_contracts bigint,
 	total_commited_contracts_amount numeric(16,2),
 	total_contracts_amount numeric(16,2),
 	total_spending_amount numeric(16,2), 

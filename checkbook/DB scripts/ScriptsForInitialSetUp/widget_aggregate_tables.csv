@@ -597,8 +597,7 @@ FROM
  master_agreement_yn,
  'A' as status_flag
 FROM agreement_snapshot_cy ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
-AND fiscal_year >= 2010 AND ( (fiscal_year <= extract(year from now()::date) AND extract(month from now()::date) <= 6) OR
-       (fiscal_year <= (extract(year from now()::date)::smallint)+1 AND extract(month from now()::date) > 6) )","SELECT original_agreement_id,
+AND fiscal_year >= 2010 AND (fiscal_year <= extract(year from now()::date) ) ","SELECT original_agreement_id,
  agreement_id,
  registered_year,
  description,
@@ -858,6 +857,7 @@ ContractsForSumAndTotals,aggregateon_total_contracts,"CREATE TABLE aggregateon_t
 	total_commited_contracts bigint,
 	total_master_agreements bigint,
 	total_standalone_contracts bigint,
+	total_revenue_contracts bigint,
 	total_commited_contracts_amount numeric(16,2),
 	total_contracts_amount numeric(16,2),
 	total_spending_amount numeric(16,2), 
@@ -872,13 +872,14 @@ ContractsForSumAndTotals,aggregateon_total_contracts,"CREATE TABLE aggregateon_t
   SUM(CASE WHEN b.document_code IN ('MA1','MMA1','CT1') THEN 1 ELSE 0 END) AS total_commited_contracts,
   SUM(CASE WHEN b.document_code IN ('MA1','MMA1') THEN 1 ELSE 0 END) AS total_master_agreements,
   SUM(CASE WHEN b.document_code IN ('CT1','CTA1') THEN  1 ELSE 0 END) AS total_standalone_contracts,
+  SUM(CASE WHEN b.document_code IN ('RCT1') THEN  1 ELSE 0 END) AS total_revenue_contracts,
   SUM(CASE WHEN b.document_code IN ('MA1','MMA1','CT1') THEN maximum_contract_amount ELSE 0 END) AS total_commited_contracts_amount,
   SUM(CASE WHEN b.document_code IN ('MA1','MMA1','CT1','CTA1') THEN maximum_contract_amount ELSE 0 END) AS total_contracts_amount,
   SUM(CASE WHEN b.document_code IN ('CT1','CTA1','DO1') THEN spending_amount ELSE 0 END) as total_spending_amount,
   status_flag,
   type_of_year
 FROM aggregateon_contracts_cumulative_spending a LEFT JOIN ref_document_code b ON a.document_code_id = b.document_code_id
-GROUP BY 1,2,3,4,5,13,14;",,18
+GROUP BY 1,2,3,4,5,14,15",,18
 ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggregateon_contracts_department(
 	document_code_id smallint,
 	document_agency_id smallint,

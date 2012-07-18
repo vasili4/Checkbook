@@ -2338,6 +2338,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 	total_commited_contracts bigint,
 	total_master_agreements bigint,
 	total_standalone_contracts bigint,
+	total_revenue_contracts bigint,
 	total_commited_contracts_amount numeric(16,2),
 	total_contracts_amount numeric(16,2),
 	total_spending_amount numeric(16,2), 
@@ -2351,7 +2352,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total
   CREATE VIEW aggregateon_total_contracts AS
   	SELECT aggregateon_total_contracts__0.fiscal_year,aggregateon_total_contracts__0.fiscal_year_id,aggregateon_total_contracts__0.vendor_id,aggregateon_total_contracts__0.award_method_id,
   	aggregateon_total_contracts__0.agency_id, aggregateon_total_contracts__0.total_contracts,aggregateon_total_contracts__0.total_commited_contracts,
-  	aggregateon_total_contracts__0.total_master_agreements,aggregateon_total_contracts__0.total_standalone_contracts,
+  	aggregateon_total_contracts__0.total_master_agreements,aggregateon_total_contracts__0.total_standalone_contracts,aggregateon_total_contracts__0.total_revenue_contracts,
   	aggregateon_total_contracts__0.total_commited_contracts_amount,aggregateon_total_contracts__0.total_contracts_amount,aggregateon_total_contracts__0.total_spending_amount,
   	aggregateon_total_contracts__0.status_flag,aggregateon_total_contracts__0.type_of_year
   	FROM   aggregateon_total_contracts__0;
