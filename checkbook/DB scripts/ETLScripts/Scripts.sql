@@ -6,6 +6,7 @@
 	errorhandler
 	refreshaggregates
 	grant access
+	processfacts
 */
 
 CREATE FUNCTION concat(text, text) RETURNS text
@@ -1098,3 +1099,55 @@ EXCEPTION
 END;
 
 $$  LANGUAGE plpgsql ;
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION etl.processfacts(p_job_id_in bigint)
+  RETURNS integer AS 
+$BODY$
+DECLARE
+	l_status int;
+BEGIN
+	
+	
+	
+	
+		l_status := etl.processrevenuedetails(p_job_id_in);
+	
+
+	IF l_status = 1 THEN 
+			l_status := etl.postprocessmag(p_job_id_in);
+		ELSE 
+			RETURN 0;
+	END IF;	
+	
+	IF l_status = 1 THEN 
+			l_status :=etl.postprocesscontracts(p_job_id_in);
+		ELSE 
+			RETURN 0;
+	END IF;	
+
+	IF l_status = 1 THEN 
+		l_status :=etl.refreshfactsforfms(p_job_id_in);
+	ELSE 
+			RETURN 0;
+
+	END IF;	
+	
+	IF l_status = 1 THEN 
+		l_status :=etl.refreshaggregates(p_job_id_in);
+	ELSE 
+			RETURN 0;
+
+	END IF;	
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in processfacts';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE;
