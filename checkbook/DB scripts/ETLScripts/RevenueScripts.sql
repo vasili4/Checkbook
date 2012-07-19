@@ -862,7 +862,7 @@ BEGIN
 	
 EXCEPTION
 	WHEN OTHERS THEN
-	RAISE NOTICE 'Exception Occurred in refreshrevenuedetails';
+	RAISE NOTICE 'Exception Occurred in processrevenuedetails';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 	RETURN 0;
