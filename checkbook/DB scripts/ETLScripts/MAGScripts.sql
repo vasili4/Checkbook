@@ -811,8 +811,13 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.postProcessMAG(p_job_id_in bigint) RETURNS INT AS $$
 DECLARE
+
+	l_start_time  timestamp;
+	l_end_time  timestamp;
+	
 BEGIN
 
+	l_start_time := timeofday()::timestamp;
 	
 	-- Get the master agreements (key elements only without version) which have been created or updated
 	
@@ -1204,7 +1209,7 @@ BEGIN
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
 		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
 	
-		RETURN 1;
+		
 		
 	-- update has_children column
 	
@@ -1225,14 +1230,14 @@ BEGIN
 	
 	*/
 		
-	CREATE TEMPORARY TABLE tmp_master_has_children (original_master_agreement_id bigint, total_children smallint)
+	CREATE TEMPORARY TABLE tmp_master_has_children (original_master_agreement_id bigint, total_children int)
 	DISTRIBUTED BY (original_master_agreement_id);
 	
 	INSERT INTO tmp_master_has_children
 	SELECT distinct original_master_agreement_id, 0 as total_children
 	FROM history_master_agreement ;
 	
-	CREATE TEMPORARY TABLE tmp_master_has_children_1 (original_master_agreement_id bigint, total_children smallint)
+	CREATE TEMPORARY TABLE tmp_master_has_children_1 (original_master_agreement_id bigint, total_children int)
 	DISTRIBUTED BY (original_master_agreement_id);
 	
 	INSERT INTO tmp_master_has_children_1
@@ -1242,7 +1247,7 @@ BEGIN
 	GROUP BY 1;
 	
 	UPDATE tmp_master_has_children a
-	SET has_children = (CASE WHEN b.total_children > 0 THEN 'Y' ELSE 'N' END)
+	SET total_children =  b.total_children 
 	FROM tmp_master_has_children_1 b
 	WHERE a.original_master_agreement_id = b.original_master_agreement_id ;
 	
@@ -1257,6 +1262,14 @@ BEGIN
 	FROM tmp_master_has_children b
 	WHERE a.master_agreement_yn = 'Y' AND a.master_agreement_id = b.original_master_agreement_id;
 	
+		
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_job_id_in,'etl.postProcessMAG',1,l_start_time,l_end_time);
+	
+	RETURN 1;
+	
 	/* End of one time changes */
 
 EXCEPTION
@@ -1264,6 +1277,11 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in postProcessMAG';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.postProcessMAG',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
 	RETURN 0;
 	
 END;

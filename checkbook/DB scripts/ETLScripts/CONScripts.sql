@@ -1407,12 +1407,16 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.postProcessContracts(p_job_id_in bigint) RETURNS INT AS $$
 DECLARE
+	l_start_time  timestamp;
+	l_end_time  timestamp;
 BEGIN
 	/* Common for all types 
 	Can be done once per etl
 	*/
 	
 	-- Get the contracts (key elements only without version) which have been created or updated
+	
+	l_start_time := timeofday()::timestamp;
 	
 	CREATE TEMPORARY TABLE tmp_loaded_agreements(document_id varchar,document_version integer,document_code_id smallint, agency_id smallint,
 		latest_version_no smallint,first_version smallint ) DISTRIBUTED BY (document_id);
@@ -1821,6 +1825,11 @@ BEGIN
 	
 	-- End of associating Disbursement line item to the original version of an agreement
 	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_job_id_in,'etl.postProcessContracts',1,l_start_time,l_end_time);
+	
 			RETURN 1;
 						
 	/* End of one time changes */
@@ -1831,6 +1840,11 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in postProcessContracts';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.postProcessContracts',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
 	RETURN 0;
 	
 END;

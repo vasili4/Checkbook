@@ -9,7 +9,7 @@
 	refreshfactandaggregatetables
 */
 
-CREATE FUNCTION concat(text, text) RETURNS text
+CREATE OR REPLACE FUNCTION concat(text, text) RETURNS text
     AS $$
   DECLARE
     t text;
@@ -23,6 +23,8 @@ CREATE FUNCTION concat(text, text) RETURNS text
   END;
   $$ language plpgsql;
 
+  DROP AGGREGATE group_concat(text);
+  
 CREATE AGGREGATE group_concat(text) (
     SFUNC = concat,
     STYPE = text,
@@ -760,8 +762,8 @@ BEGIN
 			SET	processed_flag ='E' 
 			WHERE	load_file_id = p_load_file_id_in;
 
-			INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
-			VALUES(p_load_file_id_in,'etl.processdata',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+			INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time)
+			VALUES(p_load_file_id_in,'etl.processdata',0,l_start_time,l_end_time);
 
 			RETURN -1;	
 		END IF;		
@@ -908,11 +910,11 @@ ORDER BY a.data_source_order, 4,file_timestamp;
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Function: etl.refreshaggregates(integer)
+-- Function: etl.refreshaggregates(bigint)
 
--- DROP FUNCTION etl.refreshaggregates(integer);
+-- DROP FUNCTION etl.refreshaggregates(bigint);
 
-CREATE OR REPLACE FUNCTION etl.refreshaggregates(p_job_id_in integer)
+CREATE OR REPLACE FUNCTION etl.refreshaggregates(p_job_id_in bigint)
   RETURNS integer AS
 $BODY$
 DECLARE
@@ -995,8 +997,7 @@ EXCEPTION
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 
-	-- l_exception :=  etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
-	
+
 	l_end_time := timeofday()::timestamp;
 	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
 	VALUES(p_job_id_in,'etl.refreshaggregates',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
@@ -1107,8 +1108,11 @@ CREATE OR REPLACE FUNCTION etl.refreshfactandaggregatetables(p_job_id_in bigint)
 $BODY$
 DECLARE
 	l_status int;
+	l_start_time  timestamp;
+	l_end_time  timestamp;
 BEGIN
 	
+	l_start_time := timeofday()::timestamp;
 	
 		l_status := etl.processrevenuedetails(p_job_id_in);
 	
@@ -1137,6 +1141,11 @@ BEGIN
 			RETURN 0;
 	END IF;	
 	
+		l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_job_id_in,'etl.refreshfactandaggregatetables',1,l_start_time,l_end_time);
+	
 	RETURN 1;
 	
 EXCEPTION
@@ -1144,6 +1153,11 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in refreshfactandaggregatetables';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.refreshfactandaggregatetables',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
 	RETURN 0;
 END;
 $BODY$

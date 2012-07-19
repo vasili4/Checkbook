@@ -824,9 +824,11 @@ CREATE OR REPLACE FUNCTION etl.processrevenuedetails(p_job_id_in bigint)
   RETURNS integer AS
 $BODY$
 DECLARE
+	l_start_time  timestamp;
+	l_end_time  timestamp;
 BEGIN
 	-- Inserting into the revenue_details
-
+	l_start_time := timeofday()::timestamp;
 	RAISE NOTICE 'FMS RF 1';
 	
 
@@ -858,6 +860,12 @@ BEGIN
 			join ref_agency l on b.agency_id = l.agency_id
 			JOIN etl.etl_data_load m ON a.load_id = m.load_id
 		WHERE m.job_id = p_job_id_in AND m.data_source_code ='R' ;
+		
+		l_end_time := timeofday()::timestamp;
+		
+		INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+		VALUES(p_job_id_in,'etl.processrevenuedetails',1,l_start_time,l_end_time);
+	
 	RETURN 1;
 	
 EXCEPTION
@@ -865,6 +873,11 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in processrevenuedetails';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.processrevenuedetails',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
 	RETURN 0;
 	
 END;

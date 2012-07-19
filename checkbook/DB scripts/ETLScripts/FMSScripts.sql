@@ -785,9 +785,13 @@ $$ language plpgsql;
 CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_job_id_in bigint) RETURNS INT AS
 $$
 DECLARE
+	l_start_time  timestamp;
+	l_end_time  timestamp;
 BEGIN
 	-- Inserting into the disbursement_line_item_details
-
+	
+	l_start_time := timeofday()::timestamp;
+	
 	RAISE NOTICE 'FMS RF 1';
 	
 	
@@ -1099,13 +1103,23 @@ BEGIN
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_job_id_in,'etl.refreshFactsForFMS',1,l_start_time,l_end_time);
+	
 	RETURN 1;
 	
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in refreshFactsForFMS';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
-
+	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.refreshFactsForFMS',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
 	RETURN 0;
 	
 END;

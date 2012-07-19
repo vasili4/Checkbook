@@ -249,9 +249,11 @@ $BODY$
 DECLARE
 	l_fk_update int;
 	l_count bigint;
-
+	l_start_time  timestamp;
+	l_end_time  timestamp;
 BEGIN	      
 
+	l_start_time := timeofday()::timestamp;
 	l_fk_update := etl.updateForeignKeysForRevenueBudget(p_load_id_in);
 
 	
@@ -363,6 +365,11 @@ EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in processrevenuebudget';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_load_file_id_in,'etl.processrevenuebudget',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
 
 	RETURN 0;
 END;
