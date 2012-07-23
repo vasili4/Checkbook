@@ -1008,3 +1008,25 @@ JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_i
 AND a.fiscal_year >= b.calendar_fiscal_year
 WHERE a.status_flag='R' AND a.type_of_year = 'C' ;
 */
+
+
+CREATE TABLE aggregateon_contracts_expense(
+	original_agreement_id bigint,
+	expenditure_object_id integer,
+	expenditure_object_name character varying(40),
+	encumbered_amount numeric(16,2),
+	spending_amount numeric(16,2)	
+) DISTRIBUTED BY (original_agreement_id);	
+ 
+ 
+ INSERT INTO aggregateon_contracts_expense
+ SELECT a.original_agreement_id, e.expenditure_object_id, e.expenditure_object_name, sum(b.line_amount) as encumbered_amount, sum(c.check_amount) as spending_amount
+ FROM history_agreement a
+ JOIN history_agreement_accounting_line b ON a.agreement_id = b.agreement_id
+ LEFT JOIN disbursement_line_item_details c ON a.original_agreement_id = c.agreement_id 
+ AND b.line_number =  c.agreement_accounting_line_number  AND b.commodity_line_number = c.agreement_commodity_line_number
+ JOIN ref_expenditure_object_history d ON d.expenditure_object_history_id = b.expenditure_object_history_id
+ JOIN ref_expenditure_object e ON e.expenditure_object_id = d.expenditure_object_id 
+ GROUP BY 1,2,3 ;
+ 
+ 

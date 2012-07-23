@@ -2409,6 +2409,23 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.contracts_spendin
   	contracts_spending_transactions__0.status_flag,contracts_spending_transactions__0.type_of_year
   	FROM   contracts_spending_transactions__0;	
   	
+CREATE EXTERNAL WEB TABLE aggregateon_contracts_expense__0(
+	original_agreement_id bigint,
+	expenditure_object_id integer,
+	expenditure_object_name character varying(40),
+	encumbered_amount numeric(16,2),
+	spending_amount numeric(16,2)	
+) 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_expense to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';	
+
+
+   CREATE VIEW aggregateon_contracts_expense AS
+     	SELECT aggregateon_contracts_expense__0.original_agreement_id,aggregateon_contracts_expense__0.expenditure_object_id,aggregateon_contracts_expense__0.expenditure_object_name,
+  	aggregateon_contracts_expense__0.encumbered_amount,aggregateon_contracts_expense__0.spending_amount
+  	  	FROM   aggregateon_contracts_expense__0;	
+ 
   	
 CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
  	 original_agreement_id bigint,

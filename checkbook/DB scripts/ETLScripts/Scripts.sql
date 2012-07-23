@@ -5,7 +5,7 @@
 	isEligibleForConsumption
 	errorhandler
 	refreshaggregates
-	grant access
+	grantaccess
 	refreshfactandaggregatetables
 */
 

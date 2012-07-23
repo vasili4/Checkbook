@@ -1626,6 +1626,15 @@ CREATE TABLE contracts_spending_transactions(
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);	
 
+
+CREATE TABLE aggregateon_contracts_expense(
+	original_agreement_id bigint,
+	expenditure_object_id integer,
+	expenditure_object_name character varying(40),
+	encumbered_amount numeric(16,2),
+	spending_amount numeric(16,2)	
+) DISTRIBUTED BY (original_agreement_id);	
+
 -- End Contract Aggregate Tables
 
 
@@ -1741,4 +1750,17 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4)
  );
+ 
+ 
+ 
+ 
+ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ -- creating indexes
+ 
+ CREATE INDEX idx_original_agreement_id_history_agreement ON history_agreement(original_agreement_id);
+ CREATE INDEX idx_master_agreement_id_history_agreement ON history_agreement(master_agreement_id);
+ 
+ CREATE INDEX idx_original_master_agreement_id_history_master_agreement ON history_master_agreement(original_master_agreement_id);
+ 
+ 
  

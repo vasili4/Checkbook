@@ -589,3 +589,30 @@ DATA_SOURCE_CODE  		LOAD_ID			LOAD_FILE_ID           DOC_TYPE
  gpfdist -d /home/gpadmin/athiagarajan/NYC/ -p 8081 -l /home/gpadmin/athiagarajan/log
  psql -c " copy (select * from etl.stg_con_po_award_detail) to stdout " checkbook_new | psql -c "copy etl.stg_con_po_award_detail from stdin "  checkbook
  
+ 
+ CREATE USER webuser1 WITH PASSWORD 'webuser1';
+CREATE USER qa_user WITH PASSWORD 'qa_user';
+CREATE USER datafeeduser WITH PASSWORD 'datafeeduser';
+
+
+GRANT ALL ON database checkbook_uat TO webuser1;
+GRANT ALL ON database checkbook_uat TO qa_user;
+GRANT ALL ON database checkbook_uat TO datafeeduser;
+
+
+GRANT ALL ON SCHEMA etl TO webuser1;
+GRANT ALL ON SCHEMA public TO webuser1;
+
+
+GRANT ALL ON ALL TABLES IN SCHEMA etl TO webuser1;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO webuser1;
+
+
+GRANT ALL ON ALL SEQUENCES IN SCHEMA etl TO webuser1;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO webuser1;
+
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA etl TO webuser1;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO webuser1;
+
+
+ 
