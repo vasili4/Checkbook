@@ -997,6 +997,7 @@ etl.ext_stg_coa_department_feed,fund_class_code,varchar,etl.stg_department,fund_
 etl.ext_stg_coa_department_feed,fiscal_year,varchar,etl.stg_department,fiscal_year,smallint,3
 etl.ext_stg_coa_department_feed,department_code,varchar,etl.stg_department,department_code,varchar,4
 etl.ext_stg_coa_department_feed,department_name,varchar,etl.stg_department,department_name,varchar,5
+etl.ext_stg_coa_department_feed,department_short_name,varchar,etl.stg_department,department_short_name,varchar,6
 etl.ext_stg_fmsv_data_feed,vend_cust_cd,varchar,etl.stg_fmsv_business_type,vend_cust_cd,varchar,1
 etl.ext_stg_fmsv_data_feed,bus_typ,varchar,etl.stg_fmsv_business_type,bus_typ,varchar,2
 etl.ext_stg_fmsv_data_feed,bus_typ_sta,varchar,etl.stg_fmsv_business_type,bus_typ_sta,int,3
