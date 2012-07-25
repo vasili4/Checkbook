@@ -265,8 +265,8 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM   tmp_ref_department
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO ref_department(department_id,department_code,department_name,agency_id,fund_class_id,fiscal_year,created_date,created_load_id,original_department_name,department_short_name)
-	SELECT a.department_id,b.department_code,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_name,b.department_short_name
+	INSERT INTO ref_department(department_id,department_code,department_name,department_short_name,agency_id,fund_class_id,fiscal_year,created_date,created_load_id,original_department_name)
+	SELECT a.department_id,b.department_code,b.department_name,b.department_short_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id;
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
@@ -318,8 +318,8 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	
 	RAISE NOTICE '5';
 	
-	INSERT INTO ref_department_history(department_history_id,department_id,department_name,agency_id,fund_class_id,fiscal_year,created_date,load_id,department_short_name)
-	SELECT a.department_history_id,c.department_id,b.department_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in,b.department_short_name
+	INSERT INTO ref_department_history(department_history_id,department_id,department_name,department_short_name,agency_id,fund_class_id,fiscal_year,created_date,load_id)
+	SELECT a.department_history_id,c.department_id,b.department_name,b.department_short_name,b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_ref_department b ON a.uniq_id = b.uniq_id
 		JOIN ref_department c ON b.department_code = c.department_code AND b.agency_id = c.agency_id 
 			AND b.fund_class_id = c.fund_class_id AND b.fiscal_year=c.fiscal_year
