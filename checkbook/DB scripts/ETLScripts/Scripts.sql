@@ -23,7 +23,7 @@ CREATE OR REPLACE FUNCTION concat(text, text) RETURNS text
   END;
   $$ language plpgsql;
 
-  DROP AGGREGATE group_concat(text);
+ DROP AGGREGATE IF EXISTS group_concat(text);
   
 CREATE AGGREGATE group_concat(text) (
     SFUNC = concat,
@@ -1008,7 +1008,7 @@ END;
 
 $BODY$
   LANGUAGE 'plpgsql' VOLATILE;
-ALTER FUNCTION etl.refreshaggregates(integer) OWNER TO gpadmin;
+ALTER FUNCTION etl.refreshaggregates(bigint) OWNER TO gpadmin;
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------

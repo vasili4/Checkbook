@@ -461,25 +461,27 @@ DISTRIBUTED BY (fiscal_year_id)","SELECT fiscal_year_id,'B' as type_of_year,
 	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 	GROUP BY 1,2",12
 PopulateAgreementSnapshot,agreement_snapshot_expanded,"CREATE TABLE agreement_snapshot_expanded(
-	original_agreement_id bigint,
-	agreement_id bigint,
-	fiscal_year smallint,
-	description varchar,
-	contract_number varchar,
-	vendor_id int,
-	agency_id smallint,
-	original_contract_amount numeric(16,2) ,
-	maximum_contract_amount numeric(16,2),
-	starting_year smallint,	
-	ending_year smallint,
-	dollar_difference numeric(16,2), 
-	percent_difference numeric(17,4),
-	award_method_id smallint,
-	document_code_id smallint,
-	master_agreement_id bigint,
-	master_agreement_yn character(1),
-	status_flag char(1)
-	)
+ original_agreement_id bigint,
+ agreement_id bigint,
+ fiscal_year smallint,
+ description varchar,
+ contract_number varchar,
+ vendor_id int,
+ agency_id smallint,
+ industry_type_id smallint,
+    award_size_id smallint,
+ original_contract_amount numeric(16,2) ,
+ maximum_contract_amount numeric(16,2),
+ starting_year smallint, 
+ ending_year smallint,
+ dollar_difference numeric(16,2), 
+ percent_difference numeric(17,4),
+ award_method_id smallint,
+ document_code_id smallint,
+ master_agreement_id bigint,
+ master_agreement_yn character(1),
+ status_flag char(1)
+ )
 DISTRIBUTED BY (original_agreement_id)","SELECT  original_agreement_id ,
  agreement_id,
  fiscal_year ,
@@ -487,6 +489,8 @@ DISTRIBUTED BY (original_agreement_id)","SELECT  original_agreement_id ,
  contract_number ,
  vendor_id ,
  agency_id,
+ industry_type_id,
+ award_size_id,
  original_contract_amount ,
  maximum_contract_amount ,
  starting_year, 
@@ -506,6 +510,8 @@ FROM
  contract_number,
  vendor_id,
  agency_id,
+ industry_type_id,
+ award_size_id,
  original_contract_amount,
  maximum_contract_amount,
  starting_year, 
@@ -517,7 +523,7 @@ FROM
  master_agreement_id,
  master_agreement_yn,
  'A' as status_flag
-FROM agreement_snapshot ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
+FROM agreement_snapshot ) expanded_tbl  WHERE fiscal_year between starting_year AND ending_year
 AND fiscal_year >= 2010 AND ( (fiscal_year <= extract(year from now()::date) AND extract(month from now()::date) <= 6) OR
        (fiscal_year <= (extract(year from now()::date)::smallint)+1 AND extract(month from now()::date) > 6) )","SELECT original_agreement_id,
  agreement_id,
@@ -526,6 +532,8 @@ AND fiscal_year >= 2010 AND ( (fiscal_year <= extract(year from now()::date) AND
  contract_number,
  vendor_id,
  agency_id,
+ industry_type_id,
+ award_size_id,
  original_contract_amount,
  maximum_contract_amount,
  starting_year, 
@@ -539,27 +547,29 @@ AND fiscal_year >= 2010 AND ( (fiscal_year <= extract(year from now()::date) AND
  'R' as status_flag
 FROM agreement_snapshot
 WHERE registered_year between starting_year AND ending_year
-AND registered_year >= 2010",13
+AND registered_year >= 2010 ;",13
 PopulateAgreementSnapshotCY,agreement_snapshot_expanded_cy,"CREATE TABLE agreement_snapshot_expanded_cy(
-	original_agreement_id bigint,
-	agreement_id bigint,
-	fiscal_year smallint,
-	description varchar,
-	contract_number varchar,
-	vendor_id int,
-	agency_id smallint,
-	original_contract_amount numeric(16,2) ,
-	maximum_contract_amount numeric(16,2),
-	starting_year smallint,	
-	ending_year smallint,
-	dollar_difference numeric(16,2), 
-	percent_difference numeric(17,4),
-	award_method_id smallint,
-	document_code_id smallint,
-	master_agreement_id bigint,
-	master_agreement_yn character(1),
-	status_flag char(1)
-	)
+ original_agreement_id bigint,
+ agreement_id bigint,
+ fiscal_year smallint,
+ description varchar,
+ contract_number varchar,
+ vendor_id int,
+ agency_id smallint,
+ industry_type_id smallint,
+ award_size_id smallint,
+ original_contract_amount numeric(16,2) ,
+ maximum_contract_amount numeric(16,2),
+ starting_year smallint, 
+ ending_year smallint,
+ dollar_difference numeric(16,2), 
+ percent_difference numeric(17,4),
+ award_method_id smallint,
+ document_code_id smallint,
+ master_agreement_id bigint,
+ master_agreement_yn character(1),
+ status_flag char(1)
+ )
 DISTRIBUTED BY (original_agreement_id)","SELECT  original_agreement_id ,
  agreement_id,
  fiscal_year ,
@@ -567,6 +577,8 @@ DISTRIBUTED BY (original_agreement_id)","SELECT  original_agreement_id ,
  contract_number ,
  vendor_id ,
  agency_id,
+ industry_type_id,
+ award_size_id,
  original_contract_amount ,
  maximum_contract_amount ,
  starting_year, 
@@ -586,6 +598,8 @@ FROM
  contract_number,
  vendor_id,
  agency_id,
+ industry_type_id,
+ award_size_id,
  original_contract_amount,
  maximum_contract_amount,
  starting_year, 
@@ -598,13 +612,15 @@ FROM
  master_agreement_yn,
  'A' as status_flag
 FROM agreement_snapshot_cy ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
-AND fiscal_year >= 2010 AND (fiscal_year <= extract(year from now()::date) ) ","SELECT original_agreement_id,
+AND fiscal_year >= 2010 AND (fiscal_year <= extract(year from now()::date) )","SELECT original_agreement_id,
  agreement_id,
  registered_year,
  description,
  contract_number,
  vendor_id,
  agency_id,
+ industry_type_id,
+ award_size_id,
  original_contract_amount,
  maximum_contract_amount,
  starting_year, 
@@ -660,24 +676,26 @@ SELECT master_agreement_id,
 FROM disbursement_line_item_details a JOIN ref_year b ON a.calendar_fiscal_year = b.year_value AND master_agreement_id IS NOT NULL
 GROUP  BY 1,2,3,5,6",15
 ContractLandingWidgets,aggregateon_contracts_cumulative_spending,"CREATE TABLE aggregateon_contracts_cumulative_spending(
-	original_agreement_id bigint,
-	fiscal_year smallint,
-	fiscal_year_id smallint,
-	document_code_id smallint,
-	master_agreement_yn character(1),
-	description varchar,
-	contract_number varchar,
-	vendor_id int,
-	award_method_id smallint,
-	agency_id smallint,
-	original_contract_amount numeric(16,2),
-	maximum_contract_amount numeric(16,2),
-	spending_amount numeric(16,2),
-	current_year_spending_amount numeric(16,2),
-	dollar_difference numeric(16,2),
-	percent_difference numeric(16,2),
-	status_flag char(1),
-	type_of_year char(1)	
+ original_agreement_id bigint,
+ fiscal_year smallint,
+ fiscal_year_id smallint,
+ document_code_id smallint,
+ master_agreement_yn character(1),
+ description varchar,
+ contract_number varchar,
+ vendor_id int,
+ award_method_id smallint,
+ agency_id smallint,
+ industry_type_id smallint,
+ award_size_id smallint,
+ original_contract_amount numeric(16,2),
+ maximum_contract_amount numeric(16,2),
+ spending_amount numeric(16,2),
+ current_year_spending_amount numeric(16,2),
+ dollar_difference numeric(16,2),
+ percent_difference numeric(16,2),
+ status_flag char(1),
+ type_of_year char(1) 
 ) DISTRIBUTED BY (vendor_id)","SELECT  a.original_agreement_id,
   a.fiscal_year,
   ry.year_id,
@@ -688,6 +706,8 @@ ContractLandingWidgets,aggregateon_contracts_cumulative_spending,"CREATE TABLE a
   MIN(vendor_id),
   MIN(award_method_id),
   MIN(a.agency_id) ,
+  MIN(industry_type_id),
+  MIN(award_size_id),
   MIN(original_contract_amount),
   MIN(maximum_contract_amount),
   SUM(b.check_amount),
@@ -712,6 +732,8 @@ SELECT a.original_agreement_id,
  MIN(vendor_id),
  MIN(award_method_id),
  MIN(a.agency_id) ,
+ MIN(industry_type_id),
+ MIN(award_size_id),
  MIN(original_contract_amount),
  MIN(maximum_contract_amount),
  SUM(b.check_amount) ,
@@ -734,6 +756,8 @@ SELECT a.original_agreement_id,
   MIN(vendor_id),
   MIN(award_method_id),
   MIN(a.agency_id) ,
+  MIN(industry_type_id),
+  MIN(award_size_id),
   MIN(original_contract_amount),
   MIN(maximum_contract_amount),
   SUM(b.check_amount),
@@ -758,6 +782,8 @@ SELECT a.original_agreement_id,
  MIN(vendor_id),
  MIN(award_method_id),
  MIN(a.agency_id),
+ MIN(industry_type_id),
+ MIN(award_size_id),
  MIN(original_contract_amount),
  MIN(maximum_contract_amount),
  SUM(b.check_amount) ,
@@ -772,17 +798,19 @@ SELECT a.original_agreement_id,
  WHERE   a.status_flag='R'
  GROUP BY 1,2,3,4,5",16
 ContractLandingTopGraph,aggregateon_contracts_spending_by_month,"CREATE TABLE aggregateon_contracts_spending_by_month(
-	original_agreement_id bigint,
-	fiscal_year smallint,
-	fiscal_year_id smallint,
-	document_code_id smallint,
-	month_id integer,
-	vendor_id int,
-	award_method_id smallint,
-	agency_id smallint,
-	spending_amount numeric(16,2),
-	status_flag char(1),
-	type_of_year char(1)	
+ original_agreement_id bigint,
+ fiscal_year smallint,
+ fiscal_year_id smallint,
+ document_code_id smallint,
+ month_id integer,
+ vendor_id int,
+ award_method_id smallint,
+ agency_id smallint,
+ industry_type_id smallint,
+ award_size_id smallint,
+ spending_amount numeric(16,2),
+ status_flag char(1),
+ type_of_year char(1) 
 ) DISTRIBUTED BY (vendor_id)","SELECT  a.original_agreement_id,
   a.fiscal_year,
   ry.year_id,
@@ -790,7 +818,9 @@ ContractLandingTopGraph,aggregateon_contracts_spending_by_month,"CREATE TABLE ag
   b.check_eft_issued_cal_month_id as month_id,  
   a.vendor_id,
   a.award_method_id,
-  a.agency_id , 
+  a.agency_id ,
+  a.industry_type_id,
+  a.award_size_id,
   SUM(b.check_amount),  
   'A' as status_flag,
   'B' as type_of_year
@@ -798,7 +828,7 @@ ContractLandingTopGraph,aggregateon_contracts_spending_by_month,"CREATE TABLE ag
  LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
  LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
  WHERE  a.status_flag='A'
- GROUP BY 1,2,3,4,5,6,7,8
+ GROUP BY 1,2,3,4,5,6,7,8,9,10
 UNION ALL
 SELECT a.original_agreement_id,
   a.fiscal_year,
@@ -808,6 +838,8 @@ SELECT a.original_agreement_id,
   a.vendor_id,
   a.award_method_id,
   a.agency_id , 
+  a.industry_type_id,
+  a.award_size_id,
   SUM(b.check_amount),
   'R' as status_flag, 
   'B' as type_of_year 
@@ -815,7 +847,7 @@ SELECT a.original_agreement_id,
  LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
  LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
  WHERE   a.status_flag='R'
- GROUP BY 1,2,3,4,5,6,7,8","SELECT  a.original_agreement_id,
+ GROUP BY 1,2,3,4,5,6,7,8,9,10","SELECT  a.original_agreement_id,
   a.fiscal_year,
   ry.year_id,
   document_code_id,
@@ -823,6 +855,8 @@ SELECT a.original_agreement_id,
   a.vendor_id,
   a.award_method_id,
   a.agency_id , 
+  a.industry_type_id,
+  a.award_size_id,
   SUM(b.check_amount),
   'A' as status_flag,
   'C' as type_of_year
@@ -830,7 +864,7 @@ SELECT a.original_agreement_id,
  LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
  LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
  WHERE  a.status_flag='A'
- GROUP BY 1,2,3,4,5,6,7,8
+ GROUP BY 1,2,3,4,5,6,7,8,9,10
 UNION ALL
 SELECT  a.original_agreement_id,
   a.fiscal_year,
@@ -840,6 +874,8 @@ SELECT  a.original_agreement_id,
   a.vendor_id,
   a.award_method_id,
   a.agency_id , 
+  a.industry_type_id,
+  a.award_size_id,
   SUM(b.check_amount),
  'R' as status_flag, 
  'C' as type_of_year 
@@ -847,28 +883,33 @@ SELECT  a.original_agreement_id,
  LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
  LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
  WHERE   a.status_flag='R'
- GROUP BY 1,2,3,4,5,6,7,8",17
-ContractsForSumAndTotals,aggregateon_total_contracts,"CREATE TABLE aggregateon_total_contracts(
-	fiscal_year smallint,
-	fiscal_year_id smallint,
-	vendor_id int,
-	award_method_id smallint,
-	agency_id smallint,
-	total_contracts bigint,
-	total_commited_contracts bigint,
-	total_master_agreements bigint,
-	total_standalone_contracts bigint,
-	total_revenue_contracts bigint,
-	total_commited_contracts_amount numeric(16,2),
-	total_contracts_amount numeric(16,2),
-	total_spending_amount numeric(16,2), 
-	status_flag char(1),
-	type_of_year char(1)
+ GROUP BY 1,2,3,4,5,6,7,8,9,10",17
+ContractsForSumAndTotals,aggregateon_total_contracts,"CREATE TABLE aggregateon_total_contracts
+(
+fiscal_year smallint,
+fiscal_year_id smallint,
+vendor_id int,
+award_method_id smallint,
+agency_id smallint,
+industry_type_id smallint,
+award_size_id smallint,
+total_contracts bigint,
+total_commited_contracts bigint,
+total_master_agreements bigint,
+total_standalone_contracts bigint,
+total_revenue_contracts bigint,
+total_commited_contracts_amount numeric(16,2),
+total_contracts_amount numeric(16,2),
+total_spending_amount numeric(16,2), 
+status_flag char(1),
+type_of_year char(1)
 ) DISTRIBUTED BY (fiscal_year)","SELECT  fiscal_year, 
   fiscal_year_id,
   vendor_id,
   award_method_id,
   agency_id,
+  industry_type_id,
+  award_size_id,
   SUM(CASE WHEN b.document_code IN ('MA1','MMA1','CT1','CTA1') THEN 1 ELSE 0 END) AS    total_contracts,
   SUM(CASE WHEN b.document_code IN ('MA1','MMA1','CT1') THEN 1 ELSE 0 END) AS total_commited_contracts,
   SUM(CASE WHEN b.document_code IN ('MA1','MMA1') THEN 1 ELSE 0 END) AS total_master_agreements,
@@ -880,20 +921,22 @@ ContractsForSumAndTotals,aggregateon_total_contracts,"CREATE TABLE aggregateon_t
   status_flag,
   type_of_year
 FROM aggregateon_contracts_cumulative_spending a LEFT JOIN ref_document_code b ON a.document_code_id = b.document_code_id
-GROUP BY 1,2,3,4,5,14,15",,18
+GROUP BY 1,2,3,4,5,6,7,16,17",,18
 ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggregateon_contracts_department(
-	document_code_id smallint,
-	document_agency_id smallint,
-	agency_id smallint,
-	department_id integer,
-	fiscal_year smallint,
-	fiscal_year_id smallint,
-	award_method_id smallint,
-	vendor_id int,
-	spending_amount numeric(16,2),
-	total_contracts integer,
-	status_flag char(1),
-	type_of_year char(1)
+ document_code_id smallint,
+ document_agency_id smallint,
+ agency_id smallint,
+ department_id integer,
+ fiscal_year smallint,
+ fiscal_year_id smallint,
+ award_method_id smallint,
+ vendor_id int,
+ industry_type_id smallint,
+ award_size_id smallint,
+ spending_amount numeric(16,2),
+ total_contracts integer,
+ status_flag char(1),
+ type_of_year char(1)
 ) DISTRIBUTED BY (department_id)","SELECT a.document_code_id,
    a.agency_id as document_agency_id,
    e.agency_id as agency_id,
@@ -902,6 +945,8 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
   b.year_id,
   a.award_method_id,
   a.vendor_id,
+  a.industry_type_id,
+  a.award_size_id,
   sum(d.check_amount) as spending_amount,
   count(distinct a.original_agreement_id) as total_contracts,
   'A' as status_flag,
@@ -912,7 +957,7 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8 
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8,9,10 
  UNION ALL 
  SELECT a.document_code_id,
    a.agency_id as document_agency_id,
@@ -922,6 +967,8 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
   b.year_id,
   a.award_method_id,
   a.vendor_id,
+  a.industry_type_id,
+  a.award_size_id,
   sum(d.check_amount) as spending_amount,
   count(distinct a.original_agreement_id) as total_contracts,
   'R' as status_flag,
@@ -932,7 +979,7 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8","SELECT a.document_code_id,
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8,9,10","SELECT a.document_code_id,
    a.agency_id as document_agency_id,
    e.agency_id as agency_id,
   f.department_id as department_id,
@@ -940,6 +987,8 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
   b.year_id,
   a.award_method_id,
   a.vendor_id,
+  a.industry_type_id,
+  a.award_size_id,
   sum(d.check_amount) as spending_amount,
   count(distinct a.original_agreement_id) as total_contracts,
   'A' as status_flag,
@@ -950,7 +999,7 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8 
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8,9,10 
  UNION ALL 
  SELECT a.document_code_id,
    a.agency_id as document_agency_id,
@@ -960,6 +1009,8 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
   b.year_id,
   a.award_method_id,
   a.vendor_id,
+  a.industry_type_id,
+  a.award_size_id,
   sum(d.check_amount) as spending_amount,
   count(distinct a.original_agreement_id) as total_contracts,
   'R' as status_flag,
@@ -970,7 +1021,7 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8",19
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8,9,10",19
 ContractsSpendingTransactions,contracts_spending_transactions,"CREATE TABLE contracts_spending_transactions
 (
 disbursement_line_item_id bigint,
@@ -981,22 +1032,26 @@ document_code_id smallint,
 vendor_id int,
 award_method_id smallint,
 document_agency_id smallint,
+industry_type_id smallint,
+award_size_id smallint,
 agency_id smallint,
 department_id integer,
 status_flag char(1),
 type_of_year char(1)
-) DISTRIBUTED BY (disbursement_line_item_id)","SELECT 	d.disbursement_line_item_id, 
-		a.original_agreement_id,
-		a.fiscal_year,
-		b.year_id,
-		a.document_code_id,
-		a.vendor_id,
-		a.award_method_id,
-		a.agency_id as document_agency_id,
-		e.agency_id,
-		f.department_id,
-		'A' as status_flag,
-		'B' as type_of_year
+) DISTRIBUTED BY (disbursement_line_item_id)","SELECT  d.disbursement_line_item_id, 
+  a.original_agreement_id,
+  a.fiscal_year,
+  b.year_id,
+  a.document_code_id,
+  a.vendor_id,
+  a.award_method_id,
+  a.agency_id as document_agency_id,
+  a.industry_type_id,
+  a.award_size_id,
+  e.agency_id,
+  f.department_id,
+  'A' as status_flag,
+  'B' as type_of_year
 FROM   agreement_snapshot_expanded a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
 WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
 AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
@@ -1006,17 +1061,19 @@ AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.de
 AND a.status_flag='A' 
 UNION ALL
  SELECT d.disbursement_line_item_id, 
-		a.original_agreement_id,
-		a.fiscal_year,
-		b.year_id,
-		a.document_code_id,
-		a.vendor_id,
-		a.award_method_id,
-		a.agency_id as document_agency_id,
-		e.agency_id,
-		f.department_id,
-		'R' as status_flag,
-		'B' as type_of_year
+  a.original_agreement_id,
+  a.fiscal_year,
+  b.year_id,
+  a.document_code_id,
+  a.vendor_id,
+  a.award_method_id,
+  a.agency_id as document_agency_id,
+  a.industry_type_id,
+  a.award_size_id,
+  e.agency_id,
+  f.department_id,
+  'R' as status_flag,
+  'B' as type_of_year
 FROM   agreement_snapshot_expanded a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
 WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
 AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
@@ -1024,17 +1081,19 @@ AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_yea
 AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
 AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
 AND a.status_flag='R'","SELECT d.disbursement_line_item_id, 
-		a.original_agreement_id,
-		a.fiscal_year,
-		b.year_id,
-		a.document_code_id,
-		a.vendor_id,
-		a.award_method_id,
-		a.agency_id as document_agency_id,
-		e.agency_id,
-		f.department_id,
-		'A' as status_flag,
-		'C' as type_of_year
+  a.original_agreement_id,
+  a.fiscal_year,
+  b.year_id,
+  a.document_code_id,
+  a.vendor_id,
+  a.award_method_id,
+  a.agency_id as document_agency_id,
+  a.industry_type_id,
+  a.award_size_id,
+  e.agency_id,
+  f.department_id,
+  'A' as status_flag,
+  'C' as type_of_year
 FROM   agreement_snapshot_expanded_cy a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
 WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
 AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
@@ -1043,18 +1102,20 @@ AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_lin
 AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
 AND a.status_flag='A' 
 UNION ALL
-SELECT 	d.disbursement_line_item_id, 
-		a.original_agreement_id,
-		a.fiscal_year,
-		b.year_id,
-		a.document_code_id,
-		a.vendor_id,
-		a.award_method_id,
-		a.agency_id as document_agency_id,
-		e.agency_id,
-		f.department_id,
-		'R' as status_flag,
-		'C' as type_of_year
+SELECT  d.disbursement_line_item_id, 
+  a.original_agreement_id,
+  a.fiscal_year,
+  b.year_id,
+  a.document_code_id,
+  a.vendor_id,
+  a.award_method_id,
+  a.agency_id as document_agency_id,
+  a.industry_type_id,
+  a.award_size_id,
+  e.agency_id,
+  f.department_id,
+  'R' as status_flag,
+  'C' as type_of_year
 FROM   agreement_snapshot_expanded_cy a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
 WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
 AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
@@ -1068,11 +1129,13 @@ ContractsByExpenseCategory,aggregateon_contracts_expense,"CREATE TABLE aggregate
  expenditure_object_name character varying(40),
  encumbered_amount numeric(16,2),
  spending_amount numeric(16,2) 
-) DISTRIBUTED BY (original_agreement_id)"," SELECT a.original_agreement_id, e.expenditure_object_id, e.expenditure_object_name, sum(b.line_amount) as encumbered_amount, sum(c.check_amount) as spending_amount
- FROM history_agreement a
- JOIN history_agreement_accounting_line b ON a.agreement_id = b.agreement_id
- LEFT JOIN disbursement_line_item_details c ON a.original_agreement_id = c.agreement_id 
- AND b.line_number =  c.agreement_accounting_line_number  AND b.commodity_line_number = c.agreement_commodity_line_number
- JOIN ref_expenditure_object_history d ON d.expenditure_object_history_id = b.expenditure_object_history_id
- JOIN ref_expenditure_object e ON e.expenditure_object_id = d.expenditure_object_id 
- GROUP BY 1,2,3",,21
+) DISTRIBUTED BY (original_agreement_id)","SELECT m.original_agreement_id, p.expenditure_object_id, p.expenditure_object_name, m.encumbered_amount, n.spending_amount
+FROM
+ (SELECT a.original_agreement_id, c.expenditure_object_id,  sum(b.line_amount) as encumbered_amount
+ FROM history_agreement a, history_agreement_accounting_line b , ref_expenditure_object_history c
+ WHERE a.agreement_id = b.agreement_id AND a.latest_flag = 'Y' AND b.expenditure_object_history_id = c.expenditure_object_history_id
+ GROUP BY 1,2) m LEFT JOIN
+ (SELECT agreement_id as original_agreement_id, expenditure_object_id, sum(check_amount) as spending_amount
+ FROM disbursement_line_item_details
+ GROUP BY 1,2) n ON m.original_agreement_id = n.original_agreement_id AND m.expenditure_object_id = n.expenditure_object_id 
+ JOIN ref_expenditure_object p ON p.expenditure_object_id = m.expenditure_object_id ",,21

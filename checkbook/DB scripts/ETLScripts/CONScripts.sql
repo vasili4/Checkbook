@@ -1409,6 +1409,7 @@ CREATE OR REPLACE FUNCTION etl.postProcessContracts(p_job_id_in bigint) RETURNS 
 DECLARE
 	l_start_time  timestamp;
 	l_end_time  timestamp;
+	l_load_id bigint;
 BEGIN
 	/* Common for all types 
 	Can be done once per etl
@@ -1417,6 +1418,11 @@ BEGIN
 	-- Get the contracts (key elements only without version) which have been created or updated
 	
 	l_start_time := timeofday()::timestamp;
+	
+	SELECT load_id
+	FROM etl.etl_data_load
+	WHERE job_id = p_job_id_in	AND data_source_code = 'C' 
+	INTO l_load_id;
 	
 	CREATE TEMPORARY TABLE tmp_loaded_agreements(document_id varchar,document_version integer,document_code_id smallint, agency_id smallint,
 		latest_version_no smallint,first_version smallint ) DISTRIBUTED BY (document_id);
@@ -1574,6 +1580,13 @@ BEGIN
 		AND ending_year is not null;
 	
 	RAISE NOTICE 'PCON5';
+	
+	INSERT INTO agreement_snapshot_deleted(original_agreement_id, starting_year, load_id, deleted_date)
+	SELECT a.original_agreement_id, a.starting_year, l_load_id, now()::timestamp
+	FROM agreement_snapshot a , tmp_agreement_snapshot b
+	WHERE a.original_agreement_id = b.original_agreement_id;
+	
+	
 	DELETE FROM ONLY agreement_snapshot a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 	
 	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
@@ -1583,13 +1596,13 @@ BEGIN
 					dollar_difference,
 					percent_difference,
 					master_agreement_id, master_contract_number,agreement_type_id,
-					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,
-					expenditure_object_names,effective_begin_date,effective_begin_date_id,
+					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
+					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn)
+					master_agreement_yn,load_id,last_modified_date)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year
@@ -1604,12 +1617,14 @@ BEGIN
 		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
 		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
-		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
+		g.expenditure_object_names, k.industry_type_id, (CASE WHEN b.maximum_contract_amount IS NULL THEN 5 WHEN b.maximum_contract_amount <= 5000 THEN 4 WHEN b.maximum_contract_amount > 5000 
+		AND b.maximum_contract_amount <= 100000 THEN 3 		WHEN  b.maximum_contract_amount > 100000 AND b.maximum_contract_amount <= 1000000 THEN 2 WHEN b.maximum_contract_amount > 1000000 THEN 1 
+		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn
+		'N' as master_agreement_yn, coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id
@@ -1626,7 +1641,8 @@ BEGIN
 			   GROUP BY 1) g ON a.agreement_id = g.agreement_id
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
-		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
+		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
+		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code ;
 
 		
 	RAISE NOTICE 'PCON6';				
@@ -1698,6 +1714,11 @@ BEGIN
 
 	RAISE NOTICE 'PCON8';
 	
+	INSERT INTO agreement_snapshot_cy_deleted(original_agreement_id, starting_year, load_id, deleted_date)
+	SELECT a.original_agreement_id, a.starting_year, l_load_id, now()::timestamp
+	FROM agreement_snapshot_cy a , tmp_agreement_snapshot b
+	WHERE a.original_agreement_id = b.original_agreement_id;
+	
 	DELETE FROM ONLY agreement_snapshot_cy a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 
 	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
@@ -1708,12 +1729,12 @@ BEGIN
 					percent_difference,
 					master_agreement_id, master_contract_number,agreement_type_id,
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,
-					expenditure_object_names,effective_begin_date,effective_begin_date_id,
+					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn)
+					master_agreement_yn,load_id,last_modified_date)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 				      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
@@ -1728,12 +1749,14 @@ BEGIN
 		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		b.master_agreement_id,d.contract_number,e.agreement_type_id,
 		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
-		g.expenditure_object_names,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
+		g.expenditure_object_names,	k.industry_type_id, (CASE WHEN b.maximum_contract_amount IS NULL THEN 5 WHEN b.maximum_contract_amount <= 5000 THEN 4 WHEN b.maximum_contract_amount > 5000 
+		AND b.maximum_contract_amount <= 100000 THEN 3 	WHEN  b.maximum_contract_amount > 100000 AND b.maximum_contract_amount <= 1000000 THEN 2 WHEN b.maximum_contract_amount > 1000000 THEN 1 
+		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn
+		'N' as master_agreement_yn,coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id
@@ -1750,7 +1773,8 @@ BEGIN
 			   GROUP BY 1) g ON a.agreement_id = g.agreement_id
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
-		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id;
+		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id		
+		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code ;
 
 	RAISE NOTICE 'PCON9';
 			-- Associate Disbursement line item to the original version of the agreement

@@ -2,10 +2,10 @@ set search_path=public;
 /* Functions defined
 	updateForeignKeysForFMSInHeader
 	updateForeignKeysForFMSVendors
-	updateForeignKeysForFMSInAccLine	
-	refreshFactsForFMS
+	updateForeignKeysForFMSInAccLine		
 	associateCONToFMS
 	processFMS
+	refreshFactsForFMS
 */
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
@@ -780,350 +780,7 @@ EXCEPTION
 END;
 $$ language plpgsql;
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_job_id_in bigint) RETURNS INT AS
-$$
-DECLARE
-	l_start_time  timestamp;
-	l_end_time  timestamp;
-BEGIN
-	-- Inserting into the disbursement_line_item_details
-	
-	l_start_time := timeofday()::timestamp;
-	
-	RAISE NOTICE 'FMS RF 1';
-	
-	
-	DELETE FROM ONLY disbursement_line_item_details a 
-	USING disbursement b, etl.etl_data_load c
-	WHERE   a.disbursement_id = b.disbursement_id 
-	AND updated_load_id = c.load_id
-	AND c.job_id = p_job_id_in AND c.data_source_code IN ('C','M','F'); 
-	
-
-		
-		
-	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
-						check_eft_issued_nyc_year_id,fiscal_year, check_eft_issued_cal_month_id,
-						agreement_id,master_agreement_id,fund_class_id,
-						check_amount,agency_id,agency_history_id,agency_code,expenditure_object_id,
-						vendor_id,maximum_contract_amount,maximum_spending_limit,department_id,						
-						document_id,vendor_name,vendor_customer_code,check_eft_issued_date,agency_name,agency_short_name,location_name,
-						department_name,department_short_name,department_code,expenditure_object_name,expenditure_object_code,
-						budget_code_id,budget_code,budget_name,reporting_code,location_id,location_code,fund_class_name,fund_class_code,
-						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,
-						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number,load_id)
-	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
-		f.nyc_year_id,l.year_value,f.calendar_month_id,
-		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
-		b.check_amount,c.agency_id,b.agency_history_id,m.agency_code,d.expenditure_object_id,
-		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit, g.department_id,
-		a.document_id,COALESCE(e.legal_name,e.alias_name) as vendor_name,q.vendor_customer_code,f.date,c.agency_name,c.agency_short_name, COALESCE(i.location_short_name,i.location_name),
-		g.department_name,g.department_short_name,o.department_code,d.expenditure_object_name,p.expenditure_object_code,
-		j.budget_code_id,j.budget_code,j.attribute_name,b.reporting_code,i.location_id,n.location_code,k.fund_class_name,k.fund_class_code,
-		(CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 3
-		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 1
-		      ELSE 4
-		 END) as spending_category_id,
-		 (CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 'Capital Contracts'
-		 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 'Contracts'
-		 		      ELSE 'Others'
-		 END) as spending_category_name,x.year_id,x.year_value,
-		 b.agreement_accounting_line_number, b.agreement_commodity_line_number, b.agreement_vendor_line_number, b.reference_document_number,coalesce(a.updated_load_id, a.created_load_id)
-		FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
-			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
-			JOIN ref_agency m on c.agency_id = m.agency_id
-			JOIN ref_expenditure_object_history d ON b.expenditure_object_history_id = d.expenditure_object_history_id
-			JOIN ref_expenditure_object p on d.expenditure_object_id = p.expenditure_object_id
-			JOIN vendor_history e ON a.vendor_history_id = e.vendor_history_id
-			JOIN vendor q ON q.vendor_id = e.vendor_id
-			JOIN ref_date f ON a.check_eft_issued_date_id = f.date_id
-			JOIN ref_year l on f.nyc_year_id = l.year_id
-			JOIN ref_department_history g ON b.department_history_id = g.department_history_id
-			JOIN ref_department o on g.department_id = o.department_id
-			JOIN ref_location_history i ON b.location_history_id = i.location_history_id
-			JOIN ref_location  n ON i.location_id = n.location_id
-			LEFT JOIN ref_budget_code j ON j.budget_code_id = b.budget_code_id
-			JOIN ref_fund_class k ON k.fund_class_id = b.fund_class_id			
-			JOIN ref_month y on f.calendar_month_id = y.month_id
-			JOIN ref_year x on y.year_id = x.year_id
-			JOIN etl.etl_data_load z ON coalesce(a.updated_load_id, a.created_load_id) = z.load_id
-		WHERE z.job_id = p_job_id_in AND z.data_source_code IN ('C','M','F');
-		
-	
-	RAISE NOTICE 'FMS RF 2';
-	
-	CREATE TEMPORARY TABLE tmp_agreement_con(disbursement_line_item_id bigint,agreement_id bigint,fiscal_year smallint,calendar_fiscal_year smallint,master_agreement_id bigint,  maximum_contract_amount numeric(16,2),
-												maximum_contract_amount_cy numeric(16,2), maximum_spending_limit numeric(16,2), maximum_spending_limit_cy numeric(16,2),
-												purpose varchar, purpose_cy varchar, contract_number varchar, master_contract_number varchar, contract_vendor_id integer, contract_vendor_id_cy integer,
-												master_contract_vendor_id integer, master_contract_vendor_id_cy integer, contract_agency_id smallint, contract_agency_id_cy smallint, master_contract_agency_id smallint,
-												master_contract_agency_id_cy smallint, master_purpose varchar, master_purpose_cy varchar)
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	INSERT INTO tmp_agreement_con(disbursement_line_item_id,agreement_id,fiscal_year,calendar_fiscal_year)
-	SELECT DISTINCT a.disbursement_line_item_id, a.agreement_id, a.fiscal_year, a.calendar_fiscal_year 
-	FROM disbursement_line_item_details a JOIN disbursement_line_item b ON a.disbursement_line_item_id = b.disbursement_line_item_id
-		 JOIN disbursement c ON b.disbursement_id = c.disbursement_id
-		 JOIN etl.etl_data_load d ON coalesce(c.updated_load_id, c.created_load_id) = d.load_id
-		WHERE d.job_id = p_job_id_in AND d.data_source_code IN ('C','M','F');
-	
-		
-	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.
-	
-	CREATE TEMPORARY TABLE tmp_agreement_con_fy(disbursement_line_item_id bigint,agreement_id bigint,master_agreement_id bigint, contract_number varchar,
-						maximum_contract_amount_fy numeric(16,2), purpose_fy varchar, contract_vendor_id_fy integer, contract_agency_id_fy smallint )
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	INSERT INTO tmp_agreement_con_fy
-	SELECT a.disbursement_line_item_id, b.original_agreement_id,b.master_agreement_id,b.contract_number,
-	b.maximum_contract_amount as maximum_contract_amount_fy ,
-	b.description as purpose_fy ,
-	b.vendor_id as contract_vendor_id_fy,
-	b.agency_id as contract_agency_id_fy
-		FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
-		
-	
-	INSERT INTO tmp_agreement_con_fy
-    SELECT a.disbursement_line_item_id, b.original_agreement_id,b.master_agreement_id,b.contract_number,
-	b.maximum_contract_amount as maximum_contract_amount_fy ,
-	b.description as purpose_fy ,
-	b.vendor_id as contract_vendor_id_fy,
-	b.agency_id as contract_agency_id_fy
-		FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND b.latest_flag='Y'
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
-		LEFT JOIN tmp_agreement_con_fy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
-		WHERE f.disbursement_line_item_id IS NULL ;
-   	
-	UPDATE tmp_agreement_con a
-	SET master_agreement_id = b.master_agreement_id,
-		maximum_contract_amount = b.maximum_contract_amount_fy,
-		purpose = b.purpose_fy,
-		contract_number = b.contract_number,
-		contract_vendor_id = b.contract_vendor_id_fy,
-		contract_agency_id = b.contract_agency_id_fy
-	FROM tmp_agreement_con_fy b
-	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	-- Getting maximum_spending_limit, master_contract_number, master_contract_vendor_id, master_contract_agency_id for FY for master agreements
-	
-	CREATE TEMPORARY TABLE tmp_agreement_con_master_fy(disbursement_line_item_id bigint, master_agreement_id bigint, master_contract_number varchar, maximum_spending_limit_fy numeric(16,2), 
-	master_contract_vendor_id_fy integer, master_contract_agency_id_fy smallint, master_purpose_fy varchar)
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	INSERT INTO tmp_agreement_con_master_fy
-	SELECT a.disbursement_line_item_id, a.master_agreement_id,
-	b.contract_number as master_contract_number,
-	b.maximum_contract_amount as maximum_spending_limit_fy ,
-	b.vendor_id as master_contract_vendor_id_fy,
-	b.agency_id as master_contract_agency_id_fy,
-	b.description as master_purpose_fy 
-	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.fiscal_year between b.starting_year and b.ending_year
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
-		
-	INSERT INTO tmp_agreement_con_master_fy
-	SELECT a.disbursement_line_item_id, a.master_agreement_id,
-	b.contract_number as master_contract_number,
-	b.maximum_contract_amount as maximum_spending_limit_fy ,
-	b.vendor_id as master_contract_vendor_id_fy,
-	b.agency_id as master_contract_agency_id_fy,
-	b.description as master_purpose_fy 
-	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND b.latest_flag='Y'
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id 
-		LEFT JOIN tmp_agreement_con_master_fy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
-		WHERE f.disbursement_line_item_id IS NULL ;
-		
-		
-
-		
-	UPDATE tmp_agreement_con a
-	SET maximum_spending_limit = b.maximum_spending_limit_fy,
-		master_contract_number = b.master_contract_number,
-		master_contract_vendor_id = b.master_contract_vendor_id_fy,
-		master_contract_agency_id = b.master_contract_agency_id_fy,
-		master_purpose = b.master_purpose_fy
-	FROM tmp_agreement_con_master_fy b
-	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	
-	
-	RAISE NOTICE 'FMS RF 3';
-	
-	-- Getting maximum_contract_amount and purpose for CY 
-	
-	/* CREATE TEMPORARY TABLE tmp_agreement_con_cy(disbursement_line_item_id bigint,agreement_id bigint, 
-						maximum_contract_amount_cy numeric(16,2),maximum_contract_amount_latest numeric(16,2), description_cy varchar,
-						description_latest varchar)
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	INSERT INTO tmp_agreement_con_cy
-    SELECT a.disbursement_line_item_id, b.original_agreement_id,
-	SUM(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_cy ,
-	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_latest ,
-	MIN(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.description ELSE NULL END) as description_cy ,
-	MIN(CASE WHEN b.latest_flag='Y' THEN b.description ELSE NULL END) as description_latest 
-	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id 
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
-		GROUP BY 1,2;
-		
-	UPDATE tmp_agreement_con a
-	SET maximum_contract_amount_cy = COALESCE(b.maximum_contract_amount_cy, b.maximum_contract_amount_latest),
-		purpose_cy = COALESCE(b.description_cy,b.description_latest)	
-	FROM tmp_agreement_con_cy b
-	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	-- Getting maximum_spending_limit for CY
-	
-	CREATE TEMPORARY TABLE tmp_agreement_con_master_cy(disbursement_line_item_id bigint, master_agreement_id_cy bigint, maximum_spending_limit_cy numeric(16,2),  maximum_spending_limit_latest numeric(16,2))
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	INSERT INTO tmp_agreement_con_master_cy
-	SELECT a.disbursement_line_item_id, a.master_agreement_id,
-	SUM(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_cy ,
-	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_latest
-	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y'
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
-		GROUP BY 1,2;
-		
-	UPDATE tmp_agreement_con a
-	SET maximum_spending_limit_cy = COALESCE(b.maximum_spending_limit_cy, b.maximum_spending_limit_latest)
-	FROM tmp_agreement_con_master_cy b
-	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id; */
-	
-	
-	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.
-	
-	CREATE TEMPORARY TABLE tmp_agreement_con_cy(disbursement_line_item_id bigint,agreement_id bigint,
-						maximum_contract_amount_cy numeric(16,2), purpose_cy varchar, contract_vendor_id_cy integer, contract_agency_id_cy smallint )
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	INSERT INTO tmp_agreement_con_cy
-    SELECT a.disbursement_line_item_id, b.original_agreement_id,
-	b.maximum_contract_amount as maximum_contract_amount_cy ,
-	b.description as purpose_cy ,
-	b.vendor_id as contract_vendor_id_cy,
-	b.agency_id as contract_agency_id_cy
-		FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
-		
-	
-	INSERT INTO tmp_agreement_con_cy
-    SELECT a.disbursement_line_item_id, b.original_agreement_id,
-	b.maximum_contract_amount as maximum_contract_amount_cy ,
-	b.description as purpose_cy ,
-	b.vendor_id as contract_vendor_id_cy,
-	b.agency_id as contract_agency_id_cy
-		FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id AND b.latest_flag='Y'
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
-		LEFT JOIN tmp_agreement_con_cy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
-		WHERE f.disbursement_line_item_id IS NULL ;
-   
-		
-	UPDATE tmp_agreement_con a
-	SET maximum_contract_amount_cy = b.maximum_contract_amount_cy,
-		purpose_cy = b.purpose_cy,
-		contract_vendor_id_cy = b.contract_vendor_id_cy,
-		contract_agency_id_cy = b.contract_agency_id_cy
-	FROM tmp_agreement_con_cy b
-	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	-- Getting maximum_spending_limit, master_contract_number, master_contract_vendor_id, master_contract_agency_id for FY for master agreements
-	
-	CREATE TEMPORARY TABLE tmp_agreement_con_master_cy(disbursement_line_item_id bigint, master_agreement_id bigint,  maximum_spending_limit_cy numeric(16,2), 
-	master_contract_vendor_id_cy integer, master_contract_agency_id_cy smallint, master_purpose_cy varchar)
-	DISTRIBUTED  BY (disbursement_line_item_id);
-	
-	
-	INSERT INTO tmp_agreement_con_master_cy
-	SELECT a.disbursement_line_item_id, a.master_agreement_id,
-	b.maximum_contract_amount as maximum_spending_limit_cy ,
-	b.vendor_id as master_contract_vendor_id_cy,
-	b.agency_id as master_contract_agency_id_cy,
-	b.description as master_purpose_cy 
-	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.fiscal_year between b.starting_year and b.ending_year
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
-		
-		
-	INSERT INTO tmp_agreement_con_master_cy
-	SELECT a.disbursement_line_item_id, a.master_agreement_id,
-	b.maximum_contract_amount as maximum_spending_limit_cy ,
-	b.vendor_id as master_contract_vendor_id_cy,
-	b.agency_id as master_contract_agency_id_cy,
-	b.description as master_purpose_cy 
-	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND b.latest_flag='Y'
-		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id 
-		LEFT JOIN tmp_agreement_con_master_cy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
-		WHERE f.disbursement_line_item_id IS NULL ;
-		
-		
-
-		
-	UPDATE tmp_agreement_con a
-	SET maximum_spending_limit_cy = b.maximum_spending_limit_cy,
-		master_contract_vendor_id_cy = b.master_contract_vendor_id_cy,
-		master_contract_agency_id_cy = b.master_contract_agency_id_cy,
-		master_purpose_cy = b.master_purpose_cy
-	FROM tmp_agreement_con_master_cy b
-	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	RAISE NOTICE 'FMS RF 4';
-	
-	UPDATE disbursement_line_item_details a
-	SET	agreement_id = a.agreement_id,
-		master_agreement_id = b.master_agreement_id,		
-		contract_number = b.contract_number,
-		master_contract_number = b.master_contract_number,
-		maximum_contract_amount =b.maximum_contract_amount,
-		maximum_spending_limit = b.maximum_spending_limit,
-		purpose = b.purpose,
-		master_purpose = b.master_purpose,		
-		contract_agency_id  = b.contract_agency_id ,
-		master_contract_agency_id  = b.master_contract_agency_id,
-		contract_vendor_id  = b.contract_vendor_id ,
-		master_contract_vendor_id  = b.master_contract_vendor_id ,		
-		maximum_contract_amount_cy =b.maximum_contract_amount_cy,
-		maximum_spending_limit_cy = b.maximum_spending_limit_cy,
-		purpose_cy = b.purpose_cy,
-		master_purpose_cy = b.master_purpose_cy,		
-		contract_agency_id_cy  = b.contract_agency_id_cy ,
-		master_contract_agency_id_cy  = b.master_contract_agency_id_cy,
-		contract_vendor_id_cy  = b.contract_vendor_id_cy ,
-		master_contract_vendor_id_cy  = b.master_contract_vendor_id_cy 
-	FROM	tmp_agreement_con  b
-	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	l_end_time := timeofday()::timestamp;
-	
-	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
-	VALUES(p_job_id_in,'etl.refreshFactsForFMS',1,l_start_time,l_end_time);
-	
-	RETURN 1;
-	
-EXCEPTION
-	WHEN OTHERS THEN
-	RAISE NOTICE 'Exception Occurred in refreshFactsForFMS';
-	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
-	
-	l_end_time := timeofday()::timestamp;
-	
-	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
-	VALUES(p_job_id_in,'etl.refreshFactsForFMS',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
-	
-	RETURN 0;
-	
-END;
-$$ language plpgsql;	
 ------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION etl.processFMS(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
@@ -1387,8 +1044,8 @@ BEGIN
 	WHERE   d.action_flag = 'U' AND e.action_flag='I';
 	
 	
-	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id)
-	SELECT a.disbursement_line_item_id, p_load_id_in
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
+	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
 	FROM disbursement_line_item a, tmp_disbs_lines_actions b , tmp_all_disbs c
 	WHERE   a.disbursement_id = b.disbursement_id 		
 		AND a.line_number = b.line_number		
@@ -1468,4 +1125,348 @@ EXCEPTION
 END;
 $$ language plpgsql;
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+CREATE OR REPLACE FUNCTION etl.refreshFactsForFMS(p_job_id_in bigint) RETURNS INT AS
+$$
+DECLARE
+	l_start_time  timestamp;
+	l_end_time  timestamp;
+BEGIN
+	-- Inserting into the disbursement_line_item_details
+	
+	l_start_time := timeofday()::timestamp;
+	
+	RAISE NOTICE 'FMS RF 1';
+	
+	
+	DELETE FROM ONLY disbursement_line_item_details a 
+	USING disbursement b, etl.etl_data_load c
+	WHERE   a.disbursement_id = b.disbursement_id 
+	AND updated_load_id = c.load_id
+	AND c.job_id = p_job_id_in AND c.data_source_code IN ('C','M','F'); 
+	
+
+		
+		
+	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,disbursement_id,line_number,check_eft_issued_date_id,	
+						check_eft_issued_nyc_year_id,fiscal_year, check_eft_issued_cal_month_id,
+						agreement_id,master_agreement_id,fund_class_id,
+						check_amount,agency_id,agency_history_id,agency_code,expenditure_object_id,
+						vendor_id,maximum_contract_amount,maximum_spending_limit,department_id,						
+						document_id,vendor_name,vendor_customer_code,check_eft_issued_date,agency_name,agency_short_name,location_name,
+						department_name,department_short_name,department_code,expenditure_object_name,expenditure_object_code,
+						budget_code_id,budget_code,budget_name,reporting_code,location_id,location_code,fund_class_name,fund_class_code,
+						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,
+						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number,load_id,
+						last_modified_date)
+	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
+		f.nyc_year_id,l.year_value,f.calendar_month_id,
+		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
+		b.check_amount,c.agency_id,b.agency_history_id,m.agency_code,d.expenditure_object_id,
+		e.vendor_id,NULL as maximum_contract_amount, NULL as maximum_spending_limit, g.department_id,
+		a.document_id,COALESCE(e.legal_name,e.alias_name) as vendor_name,q.vendor_customer_code,f.date,c.agency_name,c.agency_short_name, COALESCE(i.location_short_name,i.location_name),
+		g.department_name,g.department_short_name,o.department_code,d.expenditure_object_name,p.expenditure_object_code,
+		j.budget_code_id,j.budget_code,j.attribute_name,b.reporting_code,i.location_id,n.location_code,k.fund_class_name,k.fund_class_code,
+		(CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 3
+		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 1
+		      ELSE 4
+		 END) as spending_category_id,
+		 (CASE WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code in ('400', '402') THEN 'Capital Contracts'
+		 		      WHEN COALESCE(b.agreement_id,0) > 0 AND k.fund_class_code not in ('400', '402') THEN 'Contracts'
+		 		      ELSE 'Others'
+		 END) as spending_category_name,x.year_id,x.year_value,
+		 b.agreement_accounting_line_number, b.agreement_commodity_line_number, b.agreement_vendor_line_number, b.reference_document_number,coalesce(a.updated_load_id, a.created_load_id),
+		 coalesce(a.updated_date, a.created_date)
+		FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
+			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
+			JOIN ref_agency m on c.agency_id = m.agency_id
+			JOIN ref_expenditure_object_history d ON b.expenditure_object_history_id = d.expenditure_object_history_id
+			JOIN ref_expenditure_object p on d.expenditure_object_id = p.expenditure_object_id
+			JOIN vendor_history e ON a.vendor_history_id = e.vendor_history_id
+			JOIN vendor q ON q.vendor_id = e.vendor_id
+			JOIN ref_date f ON a.check_eft_issued_date_id = f.date_id
+			JOIN ref_year l on f.nyc_year_id = l.year_id
+			JOIN ref_department_history g ON b.department_history_id = g.department_history_id
+			JOIN ref_department o on g.department_id = o.department_id
+			JOIN ref_location_history i ON b.location_history_id = i.location_history_id
+			JOIN ref_location  n ON i.location_id = n.location_id
+			LEFT JOIN ref_budget_code j ON j.budget_code_id = b.budget_code_id
+			JOIN ref_fund_class k ON k.fund_class_id = b.fund_class_id			
+			JOIN ref_month y on f.calendar_month_id = y.month_id
+			JOIN ref_year x on y.year_id = x.year_id
+			JOIN etl.etl_data_load z ON coalesce(a.updated_load_id, a.created_load_id) = z.load_id
+		WHERE z.job_id = p_job_id_in AND z.data_source_code IN ('C','M','F');
+		
+	
+	RAISE NOTICE 'FMS RF 2';
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con(disbursement_line_item_id bigint,agreement_id bigint,fiscal_year smallint,calendar_fiscal_year smallint,master_agreement_id bigint,  maximum_contract_amount numeric(16,2),
+												maximum_contract_amount_cy numeric(16,2), maximum_spending_limit numeric(16,2), maximum_spending_limit_cy numeric(16,2),
+												purpose varchar, purpose_cy varchar, contract_number varchar, master_contract_number varchar, contract_vendor_id integer, contract_vendor_id_cy integer,
+												master_contract_vendor_id integer, master_contract_vendor_id_cy integer, contract_agency_id smallint, contract_agency_id_cy smallint, master_contract_agency_id smallint,
+												master_contract_agency_id_cy smallint, master_purpose varchar, master_purpose_cy varchar)
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con(disbursement_line_item_id,agreement_id,fiscal_year,calendar_fiscal_year)
+	SELECT DISTINCT a.disbursement_line_item_id, a.agreement_id, a.fiscal_year, a.calendar_fiscal_year 
+	FROM disbursement_line_item_details a JOIN disbursement_line_item b ON a.disbursement_line_item_id = b.disbursement_line_item_id
+		 JOIN disbursement c ON b.disbursement_id = c.disbursement_id
+		 JOIN etl.etl_data_load d ON coalesce(c.updated_load_id, c.created_load_id) = d.load_id
+		WHERE d.job_id = p_job_id_in AND d.data_source_code IN ('C','M','F');
+	
+		
+	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_fy(disbursement_line_item_id bigint,agreement_id bigint,master_agreement_id bigint, contract_number varchar,
+						maximum_contract_amount_fy numeric(16,2), purpose_fy varchar, contract_vendor_id_fy integer, contract_agency_id_fy smallint )
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_fy
+	SELECT a.disbursement_line_item_id, b.original_agreement_id,b.master_agreement_id,b.contract_number,
+	b.maximum_contract_amount as maximum_contract_amount_fy ,
+	b.description as purpose_fy ,
+	b.vendor_id as contract_vendor_id_fy,
+	b.agency_id as contract_agency_id_fy
+		FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		
+	
+	INSERT INTO tmp_agreement_con_fy
+    SELECT a.disbursement_line_item_id, b.original_agreement_id,b.master_agreement_id,b.contract_number,
+	b.maximum_contract_amount as maximum_contract_amount_fy ,
+	b.description as purpose_fy ,
+	b.vendor_id as contract_vendor_id_fy,
+	b.agency_id as contract_agency_id_fy
+		FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND b.latest_flag='Y'
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		LEFT JOIN tmp_agreement_con_fy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
+		WHERE f.disbursement_line_item_id IS NULL ;
+   	
+	UPDATE tmp_agreement_con a
+	SET master_agreement_id = b.master_agreement_id,
+		maximum_contract_amount = b.maximum_contract_amount_fy,
+		purpose = b.purpose_fy,
+		contract_number = b.contract_number,
+		contract_vendor_id = b.contract_vendor_id_fy,
+		contract_agency_id = b.contract_agency_id_fy
+	FROM tmp_agreement_con_fy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	-- Getting maximum_spending_limit, master_contract_number, master_contract_vendor_id, master_contract_agency_id for FY for master agreements
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_master_fy(disbursement_line_item_id bigint, master_agreement_id bigint, master_contract_number varchar, maximum_spending_limit_fy numeric(16,2), 
+	master_contract_vendor_id_fy integer, master_contract_agency_id_fy smallint, master_purpose_fy varchar)
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_master_fy
+	SELECT a.disbursement_line_item_id, a.master_agreement_id,
+	b.contract_number as master_contract_number,
+	b.maximum_contract_amount as maximum_spending_limit_fy ,
+	b.vendor_id as master_contract_vendor_id_fy,
+	b.agency_id as master_contract_agency_id_fy,
+	b.description as master_purpose_fy 
+	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.fiscal_year between b.starting_year and b.ending_year
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		
+	INSERT INTO tmp_agreement_con_master_fy
+	SELECT a.disbursement_line_item_id, a.master_agreement_id,
+	b.contract_number as master_contract_number,
+	b.maximum_contract_amount as maximum_spending_limit_fy ,
+	b.vendor_id as master_contract_vendor_id_fy,
+	b.agency_id as master_contract_agency_id_fy,
+	b.description as master_purpose_fy 
+	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND b.latest_flag='Y'
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id 
+		LEFT JOIN tmp_agreement_con_master_fy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
+		WHERE f.disbursement_line_item_id IS NULL ;
+		
+		
+	
+	UPDATE tmp_agreement_con a
+	SET maximum_spending_limit = b.maximum_spending_limit_fy,
+		master_contract_number = b.master_contract_number,
+		master_contract_vendor_id = b.master_contract_vendor_id_fy,
+		master_contract_agency_id = b.master_contract_agency_id_fy,
+		master_purpose = b.master_purpose_fy
+	FROM tmp_agreement_con_master_fy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	
+	
+	RAISE NOTICE 'FMS RF 3';
+	
+	-- Getting maximum_contract_amount and purpose for CY 
+	
+	/* CREATE TEMPORARY TABLE tmp_agreement_con_cy(disbursement_line_item_id bigint,agreement_id bigint, 
+						maximum_contract_amount_cy numeric(16,2),maximum_contract_amount_latest numeric(16,2), description_cy varchar,
+						description_latest varchar)
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_cy
+    SELECT a.disbursement_line_item_id, b.original_agreement_id,
+	SUM(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_cy ,
+	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_contract_amount_latest ,
+	MIN(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.description ELSE NULL END) as description_cy ,
+	MIN(CASE WHEN b.latest_flag='Y' THEN b.description ELSE NULL END) as description_latest 
+	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id 
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		GROUP BY 1,2;
+		
+	UPDATE tmp_agreement_con a
+	SET maximum_contract_amount_cy = COALESCE(b.maximum_contract_amount_cy, b.maximum_contract_amount_latest),
+		purpose_cy = COALESCE(b.description_cy,b.description_latest)	
+	FROM tmp_agreement_con_cy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	-- Getting maximum_spending_limit for CY
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_master_cy(disbursement_line_item_id bigint, master_agreement_id_cy bigint, maximum_spending_limit_cy numeric(16,2),  maximum_spending_limit_latest numeric(16,2))
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_master_cy
+	SELECT a.disbursement_line_item_id, a.master_agreement_id,
+	SUM(CASE WHEN a.calendar_fiscal_year between b.starting_year and b.ending_year THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_cy ,
+	SUM(CASE WHEN b.latest_flag='Y' THEN b.maximum_contract_amount ELSE 0 END) as maximum_spending_limit_latest
+	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y'
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		GROUP BY 1,2;
+		
+	UPDATE tmp_agreement_con a
+	SET maximum_spending_limit_cy = COALESCE(b.maximum_spending_limit_cy, b.maximum_spending_limit_latest)
+	FROM tmp_agreement_con_master_cy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id; */
+	
+	
+	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_cy(disbursement_line_item_id bigint,agreement_id bigint,
+						maximum_contract_amount_cy numeric(16,2), purpose_cy varchar, contract_vendor_id_cy integer, contract_agency_id_cy smallint )
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	INSERT INTO tmp_agreement_con_cy
+    SELECT a.disbursement_line_item_id, b.original_agreement_id,
+	b.maximum_contract_amount as maximum_contract_amount_cy ,
+	b.description as purpose_cy ,
+	b.vendor_id as contract_vendor_id_cy,
+	b.agency_id as contract_agency_id_cy
+		FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		
+	
+	INSERT INTO tmp_agreement_con_cy
+    SELECT a.disbursement_line_item_id, b.original_agreement_id,
+	b.maximum_contract_amount as maximum_contract_amount_cy ,
+	b.description as purpose_cy ,
+	b.vendor_id as contract_vendor_id_cy,
+	b.agency_id as contract_agency_id_cy
+		FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id AND b.latest_flag='Y'
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		LEFT JOIN tmp_agreement_con_cy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
+		WHERE f.disbursement_line_item_id IS NULL ;
+   
+		
+	UPDATE tmp_agreement_con a
+	SET maximum_contract_amount_cy = b.maximum_contract_amount_cy,
+		purpose_cy = b.purpose_cy,
+		contract_vendor_id_cy = b.contract_vendor_id_cy,
+		contract_agency_id_cy = b.contract_agency_id_cy
+	FROM tmp_agreement_con_cy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	-- Getting maximum_spending_limit, master_contract_number, master_contract_vendor_id, master_contract_agency_id for FY for master agreements
+	
+	CREATE TEMPORARY TABLE tmp_agreement_con_master_cy(disbursement_line_item_id bigint, master_agreement_id bigint,  maximum_spending_limit_cy numeric(16,2), 
+	master_contract_vendor_id_cy integer, master_contract_agency_id_cy smallint, master_purpose_cy varchar)
+	DISTRIBUTED  BY (disbursement_line_item_id);
+	
+	
+	INSERT INTO tmp_agreement_con_master_cy
+	SELECT a.disbursement_line_item_id, a.master_agreement_id,
+	b.maximum_contract_amount as maximum_spending_limit_cy ,
+	b.vendor_id as master_contract_vendor_id_cy,
+	b.agency_id as master_contract_agency_id_cy,
+	b.description as master_purpose_cy 
+	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.fiscal_year between b.starting_year and b.ending_year
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		
+		
+	INSERT INTO tmp_agreement_con_master_cy
+	SELECT a.disbursement_line_item_id, a.master_agreement_id,
+	b.maximum_contract_amount as maximum_spending_limit_cy ,
+	b.vendor_id as master_contract_vendor_id_cy,
+	b.agency_id as master_contract_agency_id_cy,
+	b.description as master_purpose_cy 
+	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND b.latest_flag='Y'
+		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id 
+		LEFT JOIN tmp_agreement_con_master_cy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
+		WHERE f.disbursement_line_item_id IS NULL ;
+		
+		
+
+		
+	UPDATE tmp_agreement_con a
+	SET maximum_spending_limit_cy = b.maximum_spending_limit_cy,
+		master_contract_vendor_id_cy = b.master_contract_vendor_id_cy,
+		master_contract_agency_id_cy = b.master_contract_agency_id_cy,
+		master_purpose_cy = b.master_purpose_cy
+	FROM tmp_agreement_con_master_cy b
+	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	RAISE NOTICE 'FMS RF 4';
+	
+	UPDATE disbursement_line_item_details a
+	SET	agreement_id = a.agreement_id,
+		master_agreement_id = b.master_agreement_id,		
+		contract_number = b.contract_number,
+		master_contract_number = b.master_contract_number,
+		maximum_contract_amount =b.maximum_contract_amount,
+		maximum_spending_limit = b.maximum_spending_limit,
+		purpose = b.purpose,
+		master_purpose = b.master_purpose,		
+		contract_agency_id  = b.contract_agency_id ,
+		master_contract_agency_id  = b.master_contract_agency_id,
+		contract_vendor_id  = b.contract_vendor_id ,
+		master_contract_vendor_id  = b.master_contract_vendor_id ,		
+		maximum_contract_amount_cy =b.maximum_contract_amount_cy,
+		maximum_spending_limit_cy = b.maximum_spending_limit_cy,
+		purpose_cy = b.purpose_cy,
+		master_purpose_cy = b.master_purpose_cy,		
+		contract_agency_id_cy  = b.contract_agency_id_cy ,
+		master_contract_agency_id_cy  = b.master_contract_agency_id_cy,
+		contract_vendor_id_cy  = b.contract_vendor_id_cy ,
+		master_contract_vendor_id_cy  = b.master_contract_vendor_id_cy 
+	FROM	tmp_agreement_con  b
+	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_job_id_in,'etl.refreshFactsForFMS',1,l_start_time,l_end_time);
+	
+	RETURN 1;
+	
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in refreshFactsForFMS';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.refreshFactsForFMS',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
+	RETURN 0;
+	
+END;
+$$ language plpgsql;	

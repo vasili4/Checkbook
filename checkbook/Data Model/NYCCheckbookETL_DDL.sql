@@ -4280,4 +4280,10 @@ CREATE TABLE tmp_all_vendors(
 	address_type_code varchar(2)
 	)	DISTRIBUTED BY (uniq_id);
 	
+
+	-- for contracts by indutry and size
 	
+ CREATE TABLE stg_award_category_industry (
+  award_category_code varchar(10) ,
+  industry_type_id smallint 
+);

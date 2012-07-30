@@ -102,6 +102,9 @@ INSERT INTO ref_minority_type values (1,'Unspecified MWBE',now()::timestamp),
 INSERT INTO ref_business_type_status values (1,'Requested',now()::timestamp),
 					(2,'Accepted',now()::timestamp),
 					(3,'Rejected',now()::timestamp);
+					
+
+
 			
 /* CREATE TABLE etl.stg_funding_class(
 	fy int,
@@ -186,6 +189,25 @@ INSERT INTO ref_fiscal_period VALUES (1,'July'),
 				      (12, 'June'),
 				      (13,'Post Adjustment Closing')
 				      ;
+
+				      
+-- Contract by ondustry and contract by size
+
+INSERT INTO ref_industry_type(industry_type_id, industry_type_name,created_date) VALUES(1,'Construction Services',now()::timestamp),
+																						(2,'Goods',now()::timestamp),
+																						(3,'Professional Services',now()::timestamp),
+																						(4,'Standardized Services',now()::timestamp),
+																						(5,'Not Classified',now()::timestamp);
+
+INSERT INTO ref_award_size(award_size_id, award_size_name,created_date) VALUES(1,'Greater than $1 Million',now()::timestamp),
+																						(2,'Between $100,000 and $1 Million',now()::timestamp),
+																						(3,'Between $5,000 and $100,000',now()::timestamp),
+																						(4,'Less than $5,000',now()::timestamp),
+																						(5,'Unclassified',now()::timestamp);
+
+COPY etl.stg_award_category_industry FROM '/home/gpadmin/prerelease/NYC/AgreementIndustryCategory.csv' CSV QUOTE as '"' ;
+
+INSERT INTO ref_award_category_industry(award_category_code,industry_type_id,created_date) SELECT award_category_code, industry_type_id,now()::timestamp  from etl.stg_award_category_industry;  
 
 -- Dummy values
 insert into vendor(vendor_id,vendor_customer_code,legal_name) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)');

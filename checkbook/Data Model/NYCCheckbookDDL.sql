@@ -46,6 +46,7 @@ CREATE SEQUENCE seq_payroll_payroll_id;
 CREATE SEQUENCE seq_employee_employee_id;
 CREATE SEQUENCE seq_employee_history_employee_history_id;
 CREATE SEQUENCE seq_revenue_budget_revenue_budget_id;
+CREATE SEQUENCE seq_ref_award_category_industry_award_category_industry_id;
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /*Sequences for FMSV data feed*/
@@ -624,6 +625,34 @@ CREATE TABLE fmsv_business_type (
 )
 DISTRIBUTED BY (vendor_customer_code);
 
+
+CREATE TABLE vendor_details (
+	vendor_history_id integer,
+	vendor_id		integer,
+	vendor_customer_code	character varying(20),
+	legal_name		character varying(60),
+	alias_name		character varying(60),
+	miscellaneous_vendor_flag	bit(1),
+	vendor_sub_code		integer,
+	address_type_code	character varying(2),
+	address_type_name	character varying(50),
+	address_id		integer,
+	address_line_1		character varying(75),
+	address_line_2		character varying(75),
+	city			character varying(60),
+	state			character(2),
+	zip			character varying(10),
+	country			character(3),
+	status			smallint,
+	business_type_id	smallint,
+	business_type_code	character varying(4),
+	business_type_name	character varying(50),
+	minority_type_id	smallint,
+	minority_type_name	character varying(50)
+)
+DISTRIBUTED BY (vendor_history_id);
+
+
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 /*
@@ -895,6 +924,8 @@ CREATE TABLE history_agreement (
    award_method_name character varying,
    expenditure_object_codes character varying,
    expenditure_object_names character varying,
+   industry_type_id smallint,
+   award_size_id smallint,
    effective_begin_date date,
    effective_begin_date_id integer,
    effective_begin_year smallint,
@@ -907,10 +938,12 @@ CREATE TABLE history_agreement (
    registered_date_id integer,
    brd_awd_no character varying,
    tracking_number character varying,
-   master_agreement_yn character(1),
+   master_agreement_yn character(1),  
    has_children character(1),
    original_version_flag character(1),
-   latest_flag character(1)
+   latest_flag character(1),
+   load_id integer,
+   last_modified_date timestamp without time zone
  ) DISTRIBUTED BY (original_agreement_id);
  
 
@@ -1000,7 +1033,8 @@ CREATE TABLE disbursement_line_item (
 
 CREATE TABLE disbursement_line_item_deleted (
   disbursement_line_item_id bigint NOT NULL,
-  load_id integer
+  load_id integer,
+  deleted_date timestamp without time zone
 ) DISTRIBUTED BY (disbursement_line_item_id);
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1250,7 +1284,9 @@ CREATE TABLE revenue_details
 	revenue_source_code varchar,
 	agency_short_name varchar(15),
 	department_short_name varchar(15),
-	agency_history_id smallint
+	agency_history_id smallint,
+	load_id integer,
+    last_modified_date timestamp without time zone	
 ) DISTRIBUTED BY (revenue_id);
 
 ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_details_ref_revenue_category FOREIGN KEY (revenue_category_id) REFERENCES ref_revenue_category(revenue_category_id);
@@ -1346,7 +1382,8 @@ CREATE TABLE disbursement_line_item_details(
     agreement_commodity_line_number integer,
     agreement_vendor_line_number integer, 
     reference_document_number character varying,  	
-	load_id integer
+	load_id integer,
+	last_modified_date timestamp without time zone
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -1588,8 +1625,23 @@ DISTRIBUTED BY (fiscal_year_id);
 	
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
 
+CREATE TABLE agreement_snapshot_deleted (
+  original_agreement_id bigint NOT NULL,
+  starting_year smallint,
+  load_id integer,
+  deleted_date timestamp without time zone
+) DISTRIBUTED BY (original_agreement_id);
+
+CREATE TABLE agreement_snapshot_cy_deleted (
+  original_agreement_id bigint NOT NULL,
+  starting_year smallint,
+  load_id integer,
+  deleted_date timestamp without time zone
+) DISTRIBUTED BY (original_agreement_id);
+
+
 CREATE TABLE deleted_agreement_accounting_line (LIKE history_agreement_accounting_line) DISTRIBUTED BY (agreement_id);
-ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp, ADD COLUMN deleted_load_id bigint;
+ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp, ADD COLUMN deleted_load_id int;
 
  CREATE TABLE pending_contracts(
  	document_code_id smallint,
@@ -1656,6 +1708,8 @@ CREATE TABLE agreement_snapshot_expanded(
 	contract_number varchar,
 	vendor_id int,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	original_contract_amount numeric(16,2) ,
 	maximum_contract_amount numeric(16,2),
 	starting_year smallint,	
@@ -1679,6 +1733,8 @@ CREATE TABLE agreement_snapshot_expanded_cy(
 	contract_number varchar,
 	vendor_id int,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	original_contract_amount numeric(16,2) ,
 	maximum_contract_amount numeric(16,2),
 	starting_year smallint,	
@@ -1714,6 +1770,8 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
 	vendor_id int,
 	award_method_id smallint,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	original_contract_amount numeric(16,2),
 	maximum_contract_amount numeric(16,2),
 	spending_amount numeric(16,2),
@@ -1734,6 +1792,8 @@ CREATE TABLE aggregateon_contracts_spending_by_month(
 	vendor_id int,
 	award_method_id smallint,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	spending_amount numeric(16,2),
 	status_flag char(1),
 	type_of_year char(1)	
@@ -1747,6 +1807,8 @@ CREATE TABLE aggregateon_total_contracts(
 	vendor_id int,
 	award_method_id smallint,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	total_contracts bigint,
 	total_commited_contracts bigint,
 	total_master_agreements bigint,
@@ -1769,6 +1831,8 @@ CREATE TABLE aggregateon_contracts_department(
 	fiscal_year_id smallint,
 	award_method_id smallint,
 	vendor_id int,
+	industry_type_id smallint,
+    award_size_id smallint,
 	spending_amount numeric(16,2),
 	total_contracts integer,
 	status_flag char(1),
@@ -1784,9 +1848,42 @@ CREATE TABLE contracts_spending_transactions(
 	vendor_id int,
 	award_method_id smallint,
 	document_agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	agency_id smallint,
 	department_id integer,
 	status_flag char(1),
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);	
+
+CREATE TABLE aggregateon_contracts_expense(
+	original_agreement_id bigint,
+	expenditure_object_id integer,
+	expenditure_object_name character varying(40),
+	encumbered_amount numeric(16,2),
+	spending_amount numeric(16,2)	
+) DISTRIBUTED BY (original_agreement_id);	
+
+-- tables for contracts by industry and contracts by size
+
+CREATE TABLE ref_industry_type (
+  industry_type_id smallint primary key,
+  industry_type_name VARCHAR(50),
+  created_date timestamp
+);
+
+
+CREATE TABLE ref_award_size (
+  award_size_id smallint primary key,
+  award_size_name VARCHAR(50),
+  created_date timestamp
+);
+
+
+ CREATE TABLE ref_award_category_industry (
+  award_category_industry_id smallint PRIMARY KEY default nextval('seq_ref_award_category_industry_award_category_industry_id'),
+  award_category_code varchar(10) default null,
+  industry_type_id smallint default null,
+  created_date timestamp
+) DISTRIBUTED BY (award_category_industry_id);
 

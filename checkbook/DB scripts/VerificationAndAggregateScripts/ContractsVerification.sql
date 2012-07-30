@@ -614,5 +614,11 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO webuser1;
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA etl TO webuser1;
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO webuser1;
 
+INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(13,'OASIS_feed.txt','20120523195328','D','Y','Y','N');
 
+/*
+ nohup pg_dump "checkbook_new" -vFc -f checkbook_07_27.dump 1>1.out 2>2.err &
+ nohup pg_restore -d "checkbook_mtr" -v checkbook_07_27.dump 1>1.out 2>2.err &
+ 
+ */
  

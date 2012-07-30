@@ -83,9 +83,9 @@ CREATE TABLE address (
     address_line_1 character varying(75),
     address_line_2 character varying(75),
     city character varying(60),
-    state character(2),
-    zip character varying(10),
-    country character(3)
+ 	state character varying(25),
+  	zip character varying(25),
+  	country character varying(25)
 ) DISTRIBUTED BY (address_id);
 
 
@@ -269,7 +269,7 @@ CREATE TABLE disbursement_line_item_details(
 	vendor_name varchar,
 	vendor_customer_code varchar(20), 
 	check_eft_issued_date date,
-	agency_name varchar(50),	
+	agency_name varchar(100),	
 	agency_short_name character varying(15),  	
 	location_name varchar,
 	location_code varchar(4),
@@ -307,7 +307,8 @@ CREATE TABLE disbursement_line_item_details(
     agreement_commodity_line_number integer,
     agreement_vendor_line_number integer, 
     reference_document_number character varying,
-	load_id integer
+	load_id integer,
+    last_modified_date timestamp without time zone
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -347,7 +348,9 @@ CREATE TABLE revenue_details
 	revenue_source_code varchar,
 	agency_short_name varchar,
 	department_short_name varchar,
-	agency_history_id smallint
+	agency_history_id smallint,
+	load_id integer,
+    last_modified_date timestamp without time zone
 ) DISTRIBUTED BY (revenue_id);
 
 --
@@ -608,9 +611,9 @@ CREATE TABLE ref_address_type (
 CREATE TABLE ref_agency (
     agency_id smallint NOT NULL,
     agency_code character varying(20),
-    agency_name character varying(50),
+    agency_name character varying(100),
     agency_short_name character varying(15),
-    original_agency_name character varying(50),
+    original_agency_name character varying(100),
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
@@ -624,7 +627,7 @@ CREATE TABLE ref_agency (
 CREATE TABLE ref_agency_history (
     agency_history_id smallint NOT NULL,
     agency_id smallint,
-    agency_name character varying(50),
+    agency_name character varying(100),
     agency_short_name character varying(15),
     created_date timestamp without time zone,
     load_id integer
@@ -1277,6 +1280,34 @@ CREATE TABLE vendor_history (
     updated_date timestamp without time zone
 ) DISTRIBUTED BY (vendor_history_id);
 
+
+CREATE TABLE vendor_details (
+	vendor_history_id integer,
+	vendor_id		integer,
+	vendor_customer_code	character varying(20),
+	legal_name		character varying(60),
+	alias_name		character varying(60),
+	miscellaneous_vendor_flag	bit(1),
+	vendor_sub_code		integer,
+	address_type_code	character varying(2),
+	address_type_name	character varying(50),
+	address_id		integer,
+	address_line_1		character varying(75),
+	address_line_2		character varying(75),
+	city			character varying(60),
+	state			character(2),
+	zip			character varying(10),
+	country			character(3),
+	status			smallint,
+	business_type_id	smallint,
+	business_type_code	character varying(4),
+	business_type_name	character varying(50),
+	minority_type_id	smallint,
+	minority_type_name	character varying(50)
+)
+DISTRIBUTED BY (vendor_history_id);
+
+
 CREATE TABLE ref_amount_basis (
   amount_basis_id smallint,
   amount_basis_name varchar(50) ,
@@ -1450,13 +1481,13 @@ CREATE TABLE revenue_budget
   agency_id smallint,
   revenue_source_id int,
   agency_name character varying,
+  agency_short_name character varying,
   revenue_source_name character varying,
   created_load_id integer,
   updated_load_id integer,
   created_date timestamp without time zone,
   updated_date timestamp without time zone,
   budget_fiscal_year_id smallint,
-  agency_short_name varchar(15),
   revenue_category_id smallint,
   revenue_category_code character varying,
   revenue_category_name character varying,
@@ -1501,6 +1532,8 @@ DISTRIBUTED BY (fiscal_year_id);
 	contract_number varchar,
 	vendor_id int,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	original_contract_amount numeric(16,2) ,
 	maximum_contract_amount numeric(16,2),
 	starting_year smallint,	
@@ -1524,6 +1557,8 @@ CREATE TABLE agreement_snapshot_expanded_cy(
 	contract_number varchar,
 	vendor_id int,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	original_contract_amount numeric(16,2) ,
 	maximum_contract_amount numeric(16,2),
 	starting_year smallint,	
@@ -1550,6 +1585,8 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
 	vendor_id int,
 	award_method_id smallint,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	original_contract_amount numeric(16,2),
 	maximum_contract_amount numeric(16,2),
 	spending_amount numeric(16,2),
@@ -1570,6 +1607,8 @@ CREATE TABLE aggregateon_contracts_spending_by_month(
 	vendor_id int,
 	award_method_id smallint,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	spending_amount numeric(16,2),
 	status_flag char(1),
 	type_of_year char(1)	
@@ -1583,6 +1622,8 @@ CREATE TABLE aggregateon_total_contracts(
 	vendor_id int,
 	award_method_id smallint,
 	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	total_contracts bigint,
 	total_commited_contracts bigint,
 	total_master_agreements bigint,
@@ -1605,6 +1646,8 @@ CREATE TABLE aggregateon_contracts_department(
 	fiscal_year_id smallint,
 	award_method_id smallint,
 	vendor_id int,
+	industry_type_id smallint,
+    award_size_id smallint,
 	spending_amount numeric(16,2),
 	total_contracts integer,
 	status_flag char(1),
@@ -1620,6 +1663,8 @@ CREATE TABLE contracts_spending_transactions(
 	vendor_id int,
 	award_method_id smallint,
 	document_agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
 	agency_id smallint,
 	department_id integer,
 	status_flag char(1),
@@ -1639,13 +1684,13 @@ CREATE TABLE aggregateon_contracts_expense(
 
 
 CREATE TABLE agreement_snapshot(
-          original_agreement_id bigint,
+      original_agreement_id bigint,
 	  document_version smallint,
 	  document_code_id smallint,
 	  agency_history_id smallint,
 	  agency_id smallint,
 	  agency_code character varying(20),
-	  agency_name character varying(50),
+	  agency_name character varying(100),
 	  agreement_id bigint,
 	  starting_year smallint,
 	  starting_year_id smallint,
@@ -1676,6 +1721,8 @@ CREATE TABLE agreement_snapshot(
 	  award_method_name character varying,
 	  expenditure_object_codes character varying,
 	  expenditure_object_names character varying,
+	  industry_type_id smallint,
+   	  award_size_id smallint,
 	  effective_begin_date date,
 	  effective_begin_date_id integer,
 	  effective_begin_year smallint,
@@ -1691,7 +1738,9 @@ CREATE TABLE agreement_snapshot(
 	  master_agreement_yn character(1),
 	  has_children character(1),
 	  original_version_flag character(1),
-  	  latest_flag character(1)
+  	  latest_flag character(1),
+  	  load_id integer,
+      last_modified_date timestamp without time zone
 ) DISTRIBUTED BY (original_agreement_id);
 
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
@@ -1751,16 +1800,42 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
   	percent_difference numeric(17,4)
  );
  
+ -- tables for contracts by industry and contracts by size
  
+ CREATE TABLE ref_industry_type (
+    industry_type_id smallint NOT NULL,
+    industry_type_name character varying(50),
+    created_date timestamp without time zone
+) DISTRIBUTED BY (industry_type_id);
  
- 
+ CREATE TABLE ref_award_size (
+    award_size_id smallint NOT NULL,
+    award_size_name character varying(50),
+    created_date timestamp without time zone
+) DISTRIBUTED BY (award_size_id);
+
+CREATE TABLE ref_award_category_industry (
+    award_category_industry_id smallint NOT NULL,
+    award_category_code character varying(10),
+    industry_type_id smallint,
+    created_date timestamp without time zone
+) DISTRIBUTED BY (award_category_industry_id);
+
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  -- creating indexes
  
  CREATE INDEX idx_original_agreement_id_history_agreement ON history_agreement(original_agreement_id);
  CREATE INDEX idx_master_agreement_id_history_agreement ON history_agreement(master_agreement_id);
+ CREATE INDEX idx_latest_flag_history_agreement ON history_agreement(latest_flag);
+ 
  
  CREATE INDEX idx_original_master_agreement_id_history_master_agreement ON history_master_agreement(original_master_agreement_id);
+ CREATE INDEX idx_latest_flag_history_master_agreement ON history_master_agreement(latest_flag);
+ 
+ CREATE INDEX idx_agreement_id_disbursement_line_item_details ON disbursement_line_item_details(agreement_id);
+ 
+ CREATE INDEX idx_agreement_id_disbursement_line_item ON disbursement_line_item(agreement_id);
+ 
  
  
  

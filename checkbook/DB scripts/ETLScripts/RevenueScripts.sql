@@ -840,14 +840,14 @@ BEGIN
 					budget_code_id,budget_fiscal_year_id,agency_name,revenue_category_name,
 					revenue_source_name,budget_fiscal_year,department_name,revenue_class_name,
 					fund_class_name,funding_class_name,agency_code,revenue_class_code,fund_class_code,funding_class_code,
-					revenue_category_code,revenue_source_code,agency_short_name,department_short_name,agency_history_id)
+					revenue_category_code,revenue_source_code,agency_short_name,department_short_name,agency_history_id, load_id, last_modified_date)
 	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,
 			a.revenue_category_id,a.revenue_source_id,d.year_id,b.agency_id,
 			c.department_id,a.revenue_class_id,a.fund_class_id,e.funding_class_id,
 			a.budget_code_id,f.year_id,b.agency_name,g.revenue_category_name,
 			e.revenue_source_name,a.budget_fiscal_year,c.department_name,i.revenue_class_name,
 			j.fund_class_name,k.funding_class_name,l.agency_code,i.revenue_class_code,j.fund_class_code,k.funding_class_code,
-			g.revenue_category_code,e.revenue_source_code,b.agency_short_name,c.department_short_name,b.agency_history_id
+			g.revenue_category_code,e.revenue_source_code,b.agency_short_name,c.department_short_name,b.agency_history_id, a.load_id, a.created_date
 	FROM    revenue a join ref_agency_history b on a.agency_history_id = b.agency_history_id
 			join ref_department_history c on a.department_history_id = c.department_history_id
 			join ref_year d on a.fiscal_year = d.year_value

@@ -124,7 +124,7 @@ $BODY$
   	GROUP BY 1,2,3,5,6;
   	
   
-  	TRUNCATE etl.ref_revenue_budget_code_id_seq;
+  	TRUNCATE etl.ref_budget_code_id_seq;
   	
   	INSERT INTO etl.ref_budget_code_id_seq
   	SELECT uniq_id
