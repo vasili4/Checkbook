@@ -403,7 +403,13 @@ END;
 $$ language plpgsql;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.processPayroll(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
+-- Function: etl.processpayroll(integer, bigint)
+
+-- DROP FUNCTION etl.processpayroll(integer, bigint);
+
+CREATE OR REPLACE FUNCTION etl.processpayroll(p_load_file_id_in integer, p_load_id_in bigint)
+  RETURNS integer AS
+$BODY$
 DECLARE
 	l_count bigint;
 	l_fk_update smallint;
@@ -412,7 +418,7 @@ BEGIN
 	l_fk_update := etl.updateEmployees(p_load_id_in);
 	
 	IF l_fk_update = 1 THEN		
-		l_fk_update := etl.updateForeignKeysForPMS(p_load_id_in);
+		l_fk_update := etl.updateForeignKeysForPMS(p_load_file_id_in,p_load_id_in);
 	ELSE
 		RETURN -1;
 	END IF;	
@@ -422,7 +428,7 @@ BEGIN
 	END IF;
 		
 	INSERT INTO payroll(payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
-						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,
+						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_dt,
 						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 						  amount_basis_id,base_pay,overtime_pay,other_payments,
 						  gross_pay,agency_id,agency_code,agency_name,
@@ -432,7 +438,7 @@ BEGIN
 						  agency_short_name,department_short_name,
 						  created_date,created_load_id)
 	SELECT payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
-	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,
+	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_dt,
 	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 	       amount_basis_id,base_pay,overtime_pay,other_payments,
 	       gross_pay,agency_id,agency_code,agency_name,
@@ -521,7 +527,10 @@ EXCEPTION
 	RETURN 0;
 	
 END;
-$$ language plpgsql;
+$BODY$
+  LANGUAGE plpgsql VOLATILE;
+ALTER FUNCTION etl.processpayroll(integer, bigint)
+  OWNER TO gpadmin;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
