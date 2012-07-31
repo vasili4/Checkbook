@@ -221,7 +221,7 @@ PayrollByEmployeeAgency,aggregateon_payroll_employee_agency,"CREATE TABLE aggreg
 DISTRIBUTED BY (employee_id)","SELECT e.employee_id,e.agency_id,e.fiscal_year_id,'B' as type_of_year,
 	pay_frequency,
 	type_of_employment,
-	start_date,
+	annual_sal_table.agency_start_dt,
 	annual_sal_table.annual_salary,		
 	base_pay,
 	overtime_pay,
@@ -237,7 +237,7 @@ FROM
 	SUM(gross_pay) as gross_pay_ytd	
 FROM payroll p
 JOIN ref_amount_basis z ON p.amount_basis_id = z.amount_basis_id		 
-GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.fiscal_year,d.annual_salary
+GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.fiscal_year,d.agency_start_dt,d.annual_salary
 		     FROM (SELECT employee_id,payroll_number,job_sequence_number,fiscal_year,max(pay_date) as pay_date
 		     	   FROM payroll a 
 		     	   JOIN ref_amount_basis f ON a.amount_basis_id = f.amount_basis_id		     	  
@@ -249,14 +249,11 @@ GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_se
 		     			AND e.payroll_number = annual_sal_table.payroll_number 
 		     			AND e.fiscal_year = annual_sal_table.fiscal_year
 		     			AND e.job_sequence_number = annual_sal_table.job_sequence_number	     			
-	JOIN (SELECT employee_id, agency_id,min(pay_date) as start_date
-	      FROM   payroll
-	      GROUP BY 1,2) as start_date_table ON e.employee_id = start_date_table.employee_id
-		     			AND e.agency_id = start_date_table.agency_id
+	
 ORDER BY 1,2,3;","SELECT e.employee_id,e.agency_id,e.calendar_fiscal_year_id,'C' as type_of_year,
 	pay_frequency,
 	type_of_employment,
-	start_date,
+	annual_sal_table.agency_start_dt,
 	annual_sal_table.annual_salary,		
 	base_pay,
 	overtime_pay,
@@ -272,7 +269,7 @@ FROM
 	SUM(gross_pay) as gross_pay_ytd	
 FROM payroll p
 JOIN ref_amount_basis z ON p.amount_basis_id = z.amount_basis_id		 
-GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.calendar_fiscal_year,d.annual_salary
+GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.calendar_fiscal_year,d.agency_start_dt,d.annual_salary
 		     FROM (SELECT employee_id,payroll_number,job_sequence_number,calendar_fiscal_year,max(pay_date) as pay_date
 		     	   FROM payroll a 
 		     	   JOIN ref_amount_basis f ON a.amount_basis_id = f.amount_basis_id		     	   
@@ -283,11 +280,7 @@ GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_se
 					     AND d.pay_date = c.pay_date) annual_sal_table ON e.employee_id = annual_sal_table.employee_id
 		     			AND e.payroll_number = annual_sal_table.payroll_number 
 		     			AND e.calendar_fiscal_year = annual_sal_table.calendar_fiscal_year
-		     			AND e.job_sequence_number = annual_sal_table.job_sequence_number	     			
-	JOIN (SELECT employee_id, agency_id,min(pay_date) as start_date
-	      FROM   payroll
-	      GROUP BY 1,2) as start_date_table ON e.employee_id = start_date_table.employee_id
-		     			AND e.agency_id = start_date_table.agency_id",6
+		     			AND e.job_sequence_number = annual_sal_table.job_sequence_number",6
 PayrollByAgency,aggregateon_payroll_agency,"CREATE TABLE aggregateon_payroll_agency(	
 	agency_id smallint,	
 	fiscal_year_id smallint,
