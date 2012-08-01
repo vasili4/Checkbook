@@ -4164,7 +4164,8 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
 	con_pin	 varchar,
 	con_internal_pin varchar,
 	con_batch_suffix varchar,
-	con_version varchar)
+	con_version varchar,
+	con_original_modified_flag varchar)
  LOCATION (
   	    'gpfdist://mdw1:8081/datafiles/OAISIS_feed.txt')
   	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
@@ -4226,6 +4227,7 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4),
   	contract_number varchar,
+  	con_original_modified_flag varchar,
  	uniq_id bigint default nextval('seq_stg_pending_contracts_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar	
