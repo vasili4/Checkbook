@@ -300,7 +300,7 @@ BEGIN
 				      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,
 				      cif_received_date_id,document_agency_code,document_agency_name,document_agency_short_name,  
 				      original_agreement_id, funding_agency_id, funding_agency_code, funding_agency_name, funding_agency_short_name,
-				      dollar_difference, percent_difference)
+				      dollar_difference, percent_difference,original_or_modified,award_size_id )
 	SELECT document_code_id,document_agency_id,con_no,parent_document_code_id,
 	      parent_document_agency_id,con_par_reg_num,con_cur_encumbrance,con_original_max,
 	      con_rev_max,vc_legal_name,con_vc_code,con_purpose,
@@ -315,7 +315,12 @@ BEGIN
 	      original_agreement_id, funding_agency_id, funding_agency_code, funding_agency_name, funding_agency_short_name,
 	      coalesce(con_rev_max,0) - coalesce(con_original_max,0) as dollar_difference,
 		(CASE WHEN coalesce(con_original_max,0) = 0 THEN 0 ELSE 
-		ROUND((( coalesce(con_rev_max,0) - coalesce(con_original_max,0)) * 100 )::decimal / coalesce(con_original_max,0),2) END) as percent_difference
+		ROUND((( coalesce(con_rev_max,0) - coalesce(con_original_max,0)) * 100 )::decimal / coalesce(con_original_max,0),2) END) as percent_difference,
+		con_original_modified_flag ,
+		(CASE WHEN con_rev_max IS NULL THEN 5 WHEN con_rev_max <= 5000 THEN 4 WHEN con_rev_max  > 5000 
+		            AND con_rev_max  <= 100000 THEN 3 WHEN  con_rev_max > 100000 AND con_rev_max <= 1000000 THEN 2 WHEN con_rev_max > 1000000 THEN 1 
+            ELSE 5 END) as award_size_id
+
 	FROM  etl.stg_pending_contracts;
 	
 	RETURN 1;
