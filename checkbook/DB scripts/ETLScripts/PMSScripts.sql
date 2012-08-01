@@ -534,10 +534,14 @@ ALTER FUNCTION etl.processpayroll(integer, bigint)
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.updateForeignKeysForPMSSummary(p_load_id_in bigint) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.updateforeignkeysforpmssummary(p_load_file_id_in bigint,p_load_id_in bigint)
+  RETURNS integer AS
+$BODY$
 DECLARE
 	l_count bigint;
 BEGIN
+
+
 
 	CREATE TEMPORARY TABLE tmp_fk_pms_summay_values(uniq_id bigint,pay_date_id int,agency_history_id smallint,agency_id smallint,
 				        agency_name varchar,department_history_id integer,department_id integer,
@@ -950,17 +954,24 @@ EXCEPTION
 	RETURN 0;
 	
 END;
-$$ language plpgsql;
+$BODY$
+  LANGUAGE plpgsql VOLATILE;
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.processPayrollSummary(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
+-- Function: etl.processpayrollsummary(integer, bigint)
+
+-- DROP FUNCTION etl.processpayrollsummary(integer, bigint);
+
+CREATE OR REPLACE FUNCTION etl.processpayrollsummary(p_load_file_id_in integer, p_load_id_in bigint)
+  RETURNS integer AS
+$BODY$
 DECLARE
 	l_count bigint;
 	l_fk_update smallint;
 	
 BEGIN
-	l_fk_update := etl.updateForeignKeysForPMSSummary(p_load_id_in);
+	l_fk_update := etl.updateForeignKeysForPMSSummary(p_load_file_id_in,p_load_id_in);
 
 	IF l_fk_update <> 1 THEN
 		RETURN -1;
@@ -1041,4 +1052,9 @@ EXCEPTION
 	RETURN 0;
 	
 END;
-$$ language plpgsql;
+$BODY$
+  LANGUAGE plpgsql VOLATILE;
+
+
+
+
