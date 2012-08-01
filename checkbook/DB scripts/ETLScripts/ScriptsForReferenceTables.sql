@@ -134,6 +134,20 @@ from etl.stg_funding_class;
 */
 select etl.initializedate('1900-01-01'::date,'2200-12-31'::date);
 
+	UPDATE ref_month
+	SET display_order = (CASE WHEN month_value = 7 THEN 1
+				  WHEN month_value = 8 THEN 2
+				  WHEN month_value = 9 THEN 3
+				  WHEN month_value = 10 THEN 4
+				  WHEN month_value = 11 THEN 5
+				  WHEN month_value = 12 THEN 6
+				  WHEN month_value = 1 THEN 7
+				  WHEN month_value = 2 THEN 8
+				  WHEN month_value = 3 THEN 9
+				  WHEN month_value = 4 THEN 10
+				  WHEN month_value = 5 THEN 11
+				  WHEN month_value = 6 THEN 12
+				  END);
 --------------------------------------------------------------------------------------------------------------------------------------------
 
 COPY etl.stg_award_method FROM '/home/gpadmin/prerelease/NYC/AwardMethod.csv' CSV QUOTE as '"' ;

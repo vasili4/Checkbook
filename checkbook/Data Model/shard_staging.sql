@@ -2393,6 +2393,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 	total_master_agreements bigint,
 	total_standalone_contracts bigint,
 	total_revenue_contracts bigint,
+	total_revenue_contracts_amount numeric(16,2),
 	total_commited_contracts_amount numeric(16,2),
 	total_contracts_amount numeric(16,2),
 	total_spending_amount numeric(16,2), 
@@ -2406,8 +2407,8 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total
   CREATE VIEW aggregateon_total_contracts AS
   	SELECT aggregateon_total_contracts__0.fiscal_year,aggregateon_total_contracts__0.fiscal_year_id,aggregateon_total_contracts__0.vendor_id,aggregateon_total_contracts__0.award_method_id,
   	aggregateon_total_contracts__0.agency_id, aggregateon_total_contracts__0.industry_type_id, aggregateon_total_contracts__0.award_size_id,
-  	aggregateon_total_contracts__0.total_contracts,aggregateon_total_contracts__0.total_commited_contracts,
-  	aggregateon_total_contracts__0.total_master_agreements,aggregateon_total_contracts__0.total_standalone_contracts,aggregateon_total_contracts__0.total_revenue_contracts,
+  	aggregateon_total_contracts__0.total_contracts,aggregateon_total_contracts__0.total_commited_contracts,	aggregateon_total_contracts__0.total_master_agreements,
+  	aggregateon_total_contracts__0.total_standalone_contracts,aggregateon_total_contracts__0.total_revenue_contracts,aggregateon_total_contracts__0.total_revenue_contracts_amount,
   	aggregateon_total_contracts__0.total_commited_contracts_amount,aggregateon_total_contracts__0.total_contracts_amount,aggregateon_total_contracts__0.total_spending_amount,
   	aggregateon_total_contracts__0.status_flag,aggregateon_total_contracts__0.type_of_year
   	FROM   aggregateon_total_contracts__0;
@@ -2703,7 +2704,9 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
 	funding_agency_short_name varchar ,
 	original_agreement_id bigint,
 	dollar_difference numeric(16,2),
-  	percent_difference numeric(17,4)
+  	percent_difference numeric(17,4),
+  	original_or_modified varchar,
+  	award_size_id smallint
 	
  )
  EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.pending_contracts to stdout csv"' ON SEGMENT 0 
@@ -2729,7 +2732,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  		pending_contracts__0.document_agency_code,pending_contracts__0.document_agency_name,pending_contracts__0.document_agency_short_name, 		
  		pending_contracts__0.funding_agency_id,pending_contracts__0.funding_agency_code,pending_contracts__0.funding_agency_name,
  		pending_contracts__0.funding_agency_short_name,pending_contracts__0.original_agreement_id,pending_contracts__0.dollar_difference,
- 		pending_contracts__0.percent_difference 		
+ 		pending_contracts__0.percent_difference, pending_contracts__0.original_or_modified, pending_contracts__0.award_size_id  		
  	FROM pending_contracts__0;
  	
 
@@ -2744,7 +2747,7 @@ ENCODING 'UTF8';
 
 
 CREATE VIEW ref_industry_type AS
-    SELECT ref_industry_type__0.minority_type_id, ref_industry_type__0.minority_type_name, ref_industry_type__0.created_date FROM ONLY ref_industry_type__0;
+    SELECT ref_industry_type__0.industry_type_id, ref_industry_type__0.industry_type_name, ref_industry_type__0.created_date FROM ONLY ref_industry_type__0;
     
     
   CREATE EXTERNAL WEB TABLE ref_award_size__0 (
@@ -2771,4 +2774,4 @@ ENCODING 'UTF8';
 
 
 CREATE VIEW ref_award_category_industry AS
-    SELECT ref_award_category_industry__0.award_category_industry_id, ref_award_category_industry__0.award_category_code, ref_award_category_industry__0.industry_type_id, ref_award_category__0.created_date FROM ONLY ref_award_category_industry__0;  
+    SELECT ref_award_category_industry__0.award_category_industry_id, ref_award_category_industry__0.award_category_code, ref_award_category_industry__0.industry_type_id, ref_award_category_industry__0.created_date FROM ONLY ref_award_category_industry__0;  

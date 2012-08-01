@@ -1629,6 +1629,7 @@ CREATE TABLE aggregateon_total_contracts(
 	total_master_agreements bigint,
 	total_standalone_contracts bigint,
 	total_revenue_contracts bigint,
+	total_revenue_contracts_amount numeric(16,2),
 	total_commited_contracts_amount numeric(16,2),
 	total_contracts_amount numeric(16,2),
 	total_spending_amount numeric(16,2), 
@@ -1797,7 +1798,9 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
 	funding_agency_short_name varchar ,
 	original_agreement_id bigint,
 	dollar_difference numeric(16,2),
-  	percent_difference numeric(17,4)
+  	percent_difference numeric(17,4),
+  	original_or_modified varchar,
+  	award_size_id smallint
  );
  
  -- tables for contracts by industry and contracts by size

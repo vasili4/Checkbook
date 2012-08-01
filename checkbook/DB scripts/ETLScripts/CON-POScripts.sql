@@ -107,6 +107,7 @@ BEGIN
 	-- below two statements are slow. So should be modified.
 	--FK:effective_begin_date_id
 	
+	RAISE NOTICE '1.4';
 	CREATE TEMPORARY TABLE tmp_stg_con_po_header_ebd AS SELECT * FROM etl.stg_con_po_header WHERE cntrct_strt_dt IS NOT NULL DISTRIBUTED BY (cntrct_strt_dt) ;
 	
 	
@@ -119,6 +120,7 @@ BEGIN
 	
 	--FK:effective_end_date_id
 	
+	RAISE NOTICE '1.5';
 	CREATE TEMPORARY TABLE tmp_stg_con_po_header_eed AS SELECT * FROM etl.stg_con_po_header WHERE cntrct_end_dt IS NOT NULL DISTRIBUTED BY (cntrct_end_dt) ;
 	
 	INSERT INTO tmp_po_fk_values(uniq_id,effective_end_date_id,effective_end_fiscal_year,effective_end_fiscal_year_id, effective_end_calendar_year,effective_end_calendar_year_id)
@@ -129,7 +131,7 @@ BEGIN
 		JOIN ref_year e ON d.year_id = e.year_id;
 	
 	--FK:source_created_date_id
-	
+	RAISE NOTICE '1.6' ;
 	INSERT INTO tmp_po_fk_values(uniq_id,source_created_date_id)
 	SELECT	a.uniq_id, b.date_id
 	FROM etl.stg_con_po_header a JOIN ref_date b ON a.doc_appl_crea_dt = b.date;
@@ -145,7 +147,7 @@ BEGIN
 	
 		
 	--Updating con_po_header with all the FK values
-	
+	RAISE NOTICE '1.7' ;
 	UPDATE etl.stg_con_po_header a
 	SET	document_code_id = ct_table.document_code_id ,
 		agency_history_id = ct_table.agency_history_id,

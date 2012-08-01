@@ -1817,6 +1817,7 @@ CREATE TABLE aggregateon_total_contracts(
 	total_master_agreements bigint,
 	total_standalone_contracts bigint,
 	total_revenue_contracts bigint,
+	total_revenue_contracts_amount numeric(16,2),
 	total_commited_contracts_amount numeric(16,2),
 	total_contracts_amount numeric(16,2),
 	total_spending_amount numeric(16,2), 
@@ -1890,3 +1891,10 @@ CREATE TABLE ref_award_size (
   created_date timestamp
 ) DISTRIBUTED BY (award_category_industry_id);
 
+
+
+ ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ -- creating indexes
+ 
+ CREATE INDEX idx_date_ref_date ON ref_date(date);
+ 

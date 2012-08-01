@@ -252,6 +252,37 @@ GROUP BY 1
 ORDER BY 4 desc LIMIT 5
 
 
+Spending Graph validation queries:
+-----------------------------------
+
+a) From Source tables
+
+
+select sum(c.check_amount), ref_month.month_value
+from
+history_agreement b join (
+                select a.original_agreement_id, max(document_version) as document_version
+                from
+                history_agreement a join 
+                                (select original_agreement_id,max(source_updated_fiscal_year) as source_updated_fiscal_year 
+                                from history_agreement  
+                                where registered_fiscal_year  = 2011
+                                and source_updated_fiscal_year <= 2011
+                                GROUP BY 1 ) tbl1 on a.original_agreement_id = tbl1.original_agreement_id AND a.source_updated_fiscal_year = tbl1.source_updated_fiscal_year and  document_code_id in (2,1)
+                GROUP BY 1 order by 1) tbl2 on  b.original_agreement_id = tbl2.original_agreement_id AND b.document_version = tbl2.document_version 
+                LEFT JOIN disbursement_line_item_details c ON b.original_agreement_id = c.agreement_id AND c.fiscal_year=2011
+                JOIN ref_month on c.check_eft_issued_cal_month_id=ref_month.month_id 
+                group by 2
+
+                
+ b) From aggregate tables
+ 
+ select sum(a.spending_amount), b.month_value FROM aggregateon_contracts_spending_by_month a, ref_month b WHERE a.month_id = b.month_id and status_flag = 'R' and type_of_year = 'B' 
+ AND fiscal_year_id = 112 and document_code_id in (1,2)  group by 2
+ 
+ 
+ 
+
 
 b) From aggregate table
 

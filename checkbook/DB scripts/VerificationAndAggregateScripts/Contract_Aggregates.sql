@@ -606,6 +606,7 @@ total_commited_contracts bigint,
 total_master_agreements bigint,
 total_standalone_contracts bigint,
 total_revenue_contracts bigint,
+total_revenue_contracts_amount numeric(16,2),
 total_commited_contracts_amount numeric(16,2),
 total_contracts_amount numeric(16,2),
 total_spending_amount numeric(16,2), 
@@ -626,13 +627,14 @@ SELECT 	fiscal_year,
 		SUM(CASE WHEN b.document_code IN ('MA1','MMA1') THEN 1 ELSE 0 END) AS total_master_agreements,
 		SUM(CASE WHEN b.document_code IN ('CT1','CTA1') THEN  1 ELSE 0 END) AS total_standalone_contracts,
 		SUM(CASE WHEN b.document_code IN ('RCT1') THEN  1 ELSE 0 END) AS total_revenue_contracts,
+		SUM(CASE WHEN b.document_code IN ('RCT1') THEN  maximum_contract_amount ELSE 0 END) AS total_revenue_contracts_amount,
 		SUM(CASE WHEN b.document_code IN ('MA1','MMA1','CT1') THEN maximum_contract_amount ELSE 0 END) AS total_commited_contracts_amount,
 		SUM(CASE WHEN b.document_code IN ('MA1','MMA1','CT1','CTA1') THEN maximum_contract_amount ELSE 0 END) AS total_contracts_amount,
 		SUM(CASE WHEN b.document_code IN ('CT1','CTA1','DO1') THEN spending_amount ELSE 0 END) as total_spending_amount,
 		status_flag,
 		type_of_year
 FROM aggregateon_contracts_cumulative_spending a LEFT JOIN ref_document_code b ON a.document_code_id = b.document_code_id
-GROUP BY 1,2,3,4,5,6,7,16,17;	
+GROUP BY 1,2,3,4,5,6,7,17,18;	
 
 -- Contract Aggregate table for the filter All years 
 /*
