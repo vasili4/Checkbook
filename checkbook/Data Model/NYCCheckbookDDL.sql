@@ -1697,7 +1697,7 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
 	original_agreement_id bigint,
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4),
-	 con_original_modified_flag varchar,
+	original_or_modified varchar,
 	 award_size_id smallint
  );
  
