@@ -316,7 +316,7 @@ BEGIN
 	      coalesce(con_rev_max,0) - coalesce(con_original_max,0) as dollar_difference,
 		(CASE WHEN coalesce(con_original_max,0) = 0 THEN 0 ELSE 
 		ROUND((( coalesce(con_rev_max,0) - coalesce(con_original_max,0)) * 100 )::decimal / coalesce(con_original_max,0),2) END) as percent_difference,
-		con_original_modified_flag ,
+		original_or_modified,
 		(CASE WHEN con_rev_max IS NULL THEN 5 WHEN con_rev_max <= 5000 THEN 4 WHEN con_rev_max  > 5000 
 		            AND con_rev_max  <= 100000 THEN 3 WHEN  con_rev_max > 100000 AND con_rev_max <= 1000000 THEN 2 WHEN con_rev_max > 1000000 THEN 1 
             ELSE 5 END) as award_size_id
