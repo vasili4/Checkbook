@@ -729,7 +729,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id),b.expenditure_object_id,b.expenditure_object_name 
-	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON COALESCE(a.object,'PS') = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON COALESCE(a.object,'') = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 	GROUP BY 1,3,4	;
 
@@ -740,12 +740,15 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_pm_summary_new_exp_object
-	SELECT COALESCE(object,'PS') as obj_cd,pms_fy,MIN(a.uniq_id) as uniq_id
+	SELECT (case when object ='' then 'PS' else object end) as obj_cd,pms_fy,MIN(a.uniq_id) as uniq_id
 	FROM etl.stg_payroll_summary a join (SELECT uniq_id
 						 FROM tmp_fk_pms_summay_values
 						 GROUP BY 1
 						 HAVING max(expenditure_object_history_id) is null) b on a.uniq_id=b.uniq_id
 	GROUP BY 1,2;
+
+
+
 
 	-- Generate the expenditure_object id for new records
 		
@@ -760,9 +763,9 @@ BEGIN
 	INSERT INTO ref_expenditure_object(expenditure_object_id,expenditure_object_code,
 		expenditure_object_name,fiscal_year,created_date,created_load_id,original_expenditure_object_name)
 	SELECT a.expenditure_object_id,b.obj_cd,
-	(CASE WHEN COALESCE(object,'PS')='PS' THEN 'Payroll Summary' ELSE <unknown expenditure object> END) as expenditure_object_name,
+	(CASE WHEN COALESCE(obj_cd,'PS')='PS' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as expenditure_object_name,
 	b.fiscal_year,now()::timestamp,p_load_id_in,
-	(CASE WHEN COALESCE(object,'PS')='PS' THEN 'Payroll Summary' ELSE <unknown expenditure object> END) as original_expenditure_object_name
+	(CASE WHEN COALESCE(obj_cd,'PS')='PS' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as original_expenditure_object_name
 	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id;
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
@@ -781,10 +784,10 @@ BEGIN
 	FROM   tmp_fk_values_pm_summary_new_exp_object;
 
 	RAISE NOTICE '1.10';
-	
+
 	INSERT INTO ref_expenditure_object_history(expenditure_object_history_id,expenditure_object_id,fiscal_year,expenditure_object_name,created_date,load_id)
 	SELECT a.expenditure_object_history_id,c.expenditure_object_id,b.fiscal_year,
-		(CASE WHEN COALESCE(object,'PS')='PS' THEN 'Payroll Summary' ELSE <unknown expenditure object> END) as expenditure_object_name,now()::timestamp,p_load_id_in
+		(CASE WHEN COALESCE(obj_cd,'PS')='PS' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as expenditure_object_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_expenditure_object_history_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id
 		JOIN etl.ref_expenditure_object_id_seq c ON a.uniq_id = c.uniq_id;
 
@@ -797,10 +800,19 @@ BEGIN
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id),b.expenditure_object_id,b.expenditure_object_name 
-	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON COALESCE(a.object,'PS') = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON a.object = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
 	GROUP BY 1,3,4	;
+
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
+	SELECT	a.uniq_id, max(c.expenditure_object_history_id),b.expenditure_object_id,b.expenditure_object_name 
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON 'PS' = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
+		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
+		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
+	GROUP BY 1,3,4	;
+
+
 		
 	-- FK:budget_code_id
 
