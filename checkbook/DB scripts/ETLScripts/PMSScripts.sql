@@ -729,7 +729,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id),b.expenditure_object_id,b.expenditure_object_name 
-	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON a.object = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON COALESCE(a.object,'PS') = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 	GROUP BY 1,3,4	;
 
@@ -740,7 +740,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_pm_summary_new_exp_object
-	SELECT (CASE WHEN COALESCE(object,'PS')='PS' THEN 'PS' ELSE object END) as obj_cd,pms_fy,MIN(a.uniq_id) as uniq_id
+	SELECT COALESCE(object,'PS') as obj_cd,pms_fy,MIN(a.uniq_id) as uniq_id
 	FROM etl.stg_payroll_summary a join (SELECT uniq_id
 						 FROM tmp_fk_pms_summay_values
 						 GROUP BY 1
