@@ -759,9 +759,10 @@ BEGIN
 	
 	INSERT INTO ref_expenditure_object(expenditure_object_id,expenditure_object_code,
 		expenditure_object_name,fiscal_year,created_date,created_load_id,original_expenditure_object_name)
-	SELECT a.expenditure_object_id,b.obj_cd,'Payroll Summary',
-		b.fiscal_year,now()::timestamp,p_load_id_in,
-		'Payroll Summary'
+	SELECT a.expenditure_object_id,b.obj_cd,
+	(CASE WHEN COALESCE(object,'PS')='PS' THEN 'Payroll Summary' ELSE <unknown expenditure object> END) as expenditure_object_name,
+	b.fiscal_year,now()::timestamp,p_load_id_in,
+	(CASE WHEN COALESCE(object,'PS')='PS' THEN 'Payroll Summary' ELSE <unknown expenditure object> END) as original_expenditure_object_name
 	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id;
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
@@ -783,7 +784,7 @@ BEGIN
 	
 	INSERT INTO ref_expenditure_object_history(expenditure_object_history_id,expenditure_object_id,fiscal_year,expenditure_object_name,created_date,load_id)
 	SELECT a.expenditure_object_history_id,c.expenditure_object_id,b.fiscal_year,
-		'Payroll Summary',now()::timestamp,p_load_id_in
+		(CASE WHEN COALESCE(object,'PS')='PS' THEN 'Payroll Summary' ELSE <unknown expenditure object> END) as expenditure_object_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_expenditure_object_history_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id
 		JOIN etl.ref_expenditure_object_id_seq c ON a.uniq_id = c.uniq_id;
 
