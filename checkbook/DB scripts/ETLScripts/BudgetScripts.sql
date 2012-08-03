@@ -84,7 +84,7 @@ BEGIN
 	FROM   tmp_fk_bdgt_values_new_agencies;
 
 	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id,agency_short_name)
-	SELECT a.agency_history_id,b.agency_id,(CASE WHEN COALESCE(c.dept_cd,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END),
+	SELECT a.agency_history_id,b.agency_id, '<Unknown Agency>',
 	now()::timestamp,p_load_id_in,'N/A'
 	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
 
