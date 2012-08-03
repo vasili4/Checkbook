@@ -20,11 +20,26 @@ $BODY$
   						     agency_code varchar,revenue_source_code varchar,agency_short_name varchar)
   	DISTRIBUTED BY (uniq_id);
   	
+  	
+  	
+  		UPDATE etl.stg_revenue_budget 
+		SET fund_class_code = NULL
+		WHERE fund_class_code = '';
+		
+		UPDATE etl.stg_revenue_budget 
+		SET agency_code = NULL
+		WHERE agency_code = '';
+		
+			
+  	
+  	
+  	
+  	
   	-- FK:fund_class_id
   
   	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,fund_class_id)
   	SELECT	a.uniq_id, b.fund_class_id as fund_class_id
-  	FROM etl.stg_revenue_budget a JOIN ref_fund_class b ON a.fund_class_code = b.fund_class_code;
+  	FROM etl.stg_revenue_budget a JOIN ref_fund_class b ON COALESCE(a.fund_class_code,'---') = b.fund_class_code;
   		
 
   	-- FK:Agency_history_id
@@ -40,7 +55,7 @@ $BODY$
   	DISTRIBUTED BY (uniq_id);
   	
   	INSERT INTO tmp_fk_bdgt_values_new_agencies
-  	SELECT agency_code,MIN(b.uniq_id) as uniq_id
+  	SELECT COALESCE(b.agency_code,'---'),MIN(b.uniq_id) as uniq_id
   	FROM etl.stg_revenue_budget a join (SELECT uniq_id
   				    FROM tmp_fk_revenue_budget_values
   				    GROUP BY 1
@@ -56,7 +71,8 @@ $BODY$
   	FROM   tmp_fk_bdgt_values_new_agencies;
   	
   	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
-  	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
+  	SELECT a.agency_id,COALESCE(b.agency_code,'---'),(CASE WHEN COALESCE(b.agency_code,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END) as agency_name,
+  	now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
   	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_bdgt_values_new_agencies b ON a.uniq_id = b.uniq_id;
   
   	
@@ -77,7 +93,8 @@ $BODY$
   	FROM   tmp_fk_bdgt_values_new_agencies;
   
   	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id,agency_short_name)
-  	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'N/A'
+  	SELECT a.agency_history_id,b.agency_id,(CASE WHEN COALESCE(b.agency_code,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END) as agency_name,
+  	now()::timestamp,p_load_id_in,'N/A'
   	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
   
   
@@ -91,7 +108,7 @@ $BODY$
   	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code)
   	SELECT	a.uniq_id, max(c.agency_history_id) , max(b.agency_id), b.agency_name,
   		b.agency_code
-  	FROM etl.stg_revenue_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
+  	FROM etl.stg_revenue_budget a JOIN ref_agency b ON  COALESCE(a.agency_code,'---') = b.agency_code
   		JOIN ref_agency_history c ON b.agency_id = c.agency_id
   		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
   	GROUP BY 1,4,5;	
