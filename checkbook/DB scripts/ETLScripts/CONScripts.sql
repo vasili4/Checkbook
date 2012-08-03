@@ -442,6 +442,29 @@ BEGIN
 	SELECT DISTINCT  uniq_id
 	FROM etl.stg_con_ct_accounting_line;
 	
+	UPDATE etl.stg_con_ct_accounting_line 
+	SET fund_cd = NULL
+	WHERE fund_cd = '';
+	
+	UPDATE etl.stg_con_ct_accounting_line 
+	SET dept_cd = NULL
+	WHERE dept_cd = '';
+	
+	UPDATE etl.stg_con_ct_accounting_line 
+	SET appr_cd = NULL
+	WHERE appr_cd = '';
+	
+		
+	UPDATE etl.stg_con_ct_accounting_line 
+	SET obj_cd = NULL
+	WHERE obj_cd = '';
+	
+	
+	INSERT INTO tmp_fk_values_acc_line(uniq_id)
+	SELECT DISTINCT  uniq_id
+	FROM etl.stg_con_ct_accounting_line;
+	
+	
 	-- FK:fund_class_id
 
 	
@@ -467,7 +490,7 @@ BEGIN
 	FROM   tmp_fk_values_acc_line_new_fund_class;
 	
 	INSERT INTO ref_fund_class(fund_class_id,fund_class_code,fund_class_name,created_date,created_load_id)
-	SELECT a.fund_class_id,COALESCE(b.fund_class_code,'---'),(CASE WHEN COALESCE(b.fund_class_code,'') <> ''  THEN '<Unknown Fund Class>' 
+	SELECT a.fund_class_id,COALESCE(b.fund_class_code,'---'),(CASE WHEN COALESCE(b.fund_class_code,'---') <> '---'  THEN '<Unknown Fund Class>' 
 							ELSE '<Non-Applicable Fund Class>' END) as fund_class_name,
 				now()::timestamp,p_load_id_in
 	FROM   etl.ref_fund_class_id_seq a JOIN tmp_fk_values_acc_line_new_fund_class b ON a.uniq_id = b.uniq_id;
@@ -559,7 +582,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_values_acc_line(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_con_ct_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_con_ct_accounting_line a JOIN ref_department b ON COALESCE(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fund_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -572,7 +595,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_acc_line_new_dept
-	SELECT c.agency_id,appr_cd,e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
+	SELECT c.agency_id,COALESCE(appr_cd,'---------'),e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_con_ct_accounting_line a join (SELECT uniq_id
 						 FROM tmp_fk_values_acc_line
 						 GROUP BY 1
@@ -595,11 +618,11 @@ BEGIN
 				   agency_id,fund_class_id,
 				   fiscal_year,created_date,created_load_id,original_department_name)
 	SELECT a.department_id,COALESCE(b.appr_cd,'---------') as department_code,
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE 'Non-Applicable Department' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,
 		now()::timestamp,p_load_id_in,
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE 'Non-Applicable Department' END) as original_department_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_fk_values_acc_line_new_dept b ON a.uniq_id = b.uniq_id;
 
@@ -623,7 +646,7 @@ BEGIN
 					   department_name,agency_id,fund_class_id,
 					   fiscal_year,created_date,load_id)
 	SELECT a.department_history_id,c.department_id,	
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 		      ELSE 'Non-Applicable Department' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_fk_values_acc_line_new_dept b ON a.uniq_id = b.uniq_id
@@ -640,7 +663,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_values_acc_line(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_department b  ON COALESCE(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_con_ct_accounting_line a JOIN ref_department b  ON COALESCE(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON COALESCE(a.dept_cd,'---') = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON COALESCE(a.fund_cd,'---') = e.fund_class_code AND e.fund_class_id = b.fund_class_id

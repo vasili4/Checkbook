@@ -552,6 +552,24 @@ BEGIN
 				        calendar_month_id int, fund_class_id smallint,agency_short_name varchar, department_short_name varchar)
 	DISTRIBUTED BY (uniq_id);
 	
+	UPDATE etl.stg_payroll_summary
+	SET object = NULL
+	WHERE object = '';
+	
+	UPDATE etl.stg_payroll_summary
+	SET agency = NULL
+	WHERE agency = '';
+	
+	UPDATE etl.stg_payroll_summary
+	SET uoa = NULL
+	WHERE uoa = '';
+	
+	
+	INSERT INTO tmp_fk_pms_summay_values(uniq_id)
+	SELECT DISTINCT  uniq_id
+	FROM etl.stg_payroll_summary;
+	
+	
 	-- FK:pay_date_id
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,pay_date_id,fiscal_year, fiscal_year_id, calendar_fiscal_year, calendar_fiscal_year_id,calendar_month_id)
@@ -570,7 +588,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,agency_history_id,agency_id,agency_name,agency_short_name)
 	SELECT	a.uniq_id, max(c.agency_history_id) as agency_history_id,b.agency_id,b.agency_name,b.agency_short_name
-	FROM etl.stg_payroll_summary a JOIN ref_agency b ON a.agency = b.agency_code
+	FROM etl.stg_payroll_summary a JOIN ref_agency b ON coalesce(a.agency,'---') = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1,3,4,5;
 	
@@ -578,7 +596,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_pms_summary_values_new_agencies
-	SELECT agency,MIN(b.uniq_id) as uniq_id
+	SELECT coalesce(agency,'---'),MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_payroll_summary a join (SELECT uniq_id
 						 FROM tmp_fk_pms_summay_values
 						 GROUP BY 1
@@ -594,9 +612,12 @@ BEGIN
 	FROM   tmp_fk_pms_summary_values_new_agencies;
 	
 	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name)
-	SELECT a.agency_id,b.agency_code,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
+	SELECT a.agency_id,coalesce(b.agency_code,'---'),(CASE WHEN COALESCE(b.agency_code,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END) as agency_name,
+	now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name
 	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_pms_summary_values_new_agencies b ON a.uniq_id = b.uniq_id;
 
+
+	
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
 
 	IF l_count > 0 THEN
@@ -638,7 +659,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,department_history_id,department_id,department_name,department_short_name)
 	SELECT	a.uniq_id, max(c.department_history_id),b.department_id,b.department_name,b.department_short_name
-	FROM etl.stg_payroll_summary a JOIN ref_department b ON a.uoa = b.department_code AND a.pms_fy = b.fiscal_year
+	FROM etl.stg_payroll_summary a JOIN ref_department b ON coalesce(a.uoa,'---------') = b.department_code AND a.pms_fy = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.agency = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON '001' = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -649,7 +670,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_pms_summary_new_dept
-	SELECT c.agency_id,a.uoa,e.fund_class_id,a.pms_fy,MIN(b.uniq_id) as uniq_id
+	SELECT c.agency_id,coalesce(a.uoa,'---------'),e.fund_class_id,a.pms_fy,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_payroll_summary a join (SELECT uniq_id
 						 FROM tmp_fk_pms_summay_values
 						 GROUP BY 1
@@ -673,11 +694,11 @@ BEGIN
 				   agency_id,fund_class_id,
 				   fiscal_year,created_date,created_load_id,original_department_name)
 	SELECT a.department_id,COALESCE(b.department_code,'---------') as department_code,
-		(CASE WHEN COALESCE(b.department_code,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.department_code,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE 'Non-Applicable Department' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,
 		now()::timestamp,p_load_id_in,
-		(CASE WHEN COALESCE(b.department_code,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.department_code,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE 'Non-Applicable Department' END) as original_department_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_fk_values_pms_summary_new_dept b ON a.uniq_id = b.uniq_id;
 
@@ -701,7 +722,7 @@ BEGIN
 					   department_name,agency_id,fund_class_id,
 					   fiscal_year,created_date,load_id)
 	SELECT a.department_history_id,c.department_id,	
-		(CASE WHEN COALESCE(b.department_code,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.department_code,'---------') <> '---------' THEN '<Unknown Department>'
 		      ELSE 'Non-Applicable Department' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_fk_values_pms_summary_new_dept b ON a.uniq_id = b.uniq_id
@@ -718,7 +739,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,department_history_id,department_id,department_name,department_short_name)
 	SELECT	a.uniq_id, max(c.department_history_id),b.department_id,b.department_name,b.department_short_name 
-	FROM etl.stg_payroll_summary a JOIN ref_department b  ON a.uoa = b.department_code AND a.pms_fy = b.fiscal_year
+	FROM etl.stg_payroll_summary a JOIN ref_department b  ON coalesce(a.uoa,'---------') = b.department_code AND a.pms_fy = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.agency = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON '001' = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -729,7 +750,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id),b.expenditure_object_id,b.expenditure_object_name 
-	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON COALESCE(a.object,'') = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON COALESCE(a.object,'!PS!') = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 	GROUP BY 1,3,4	;
 
@@ -740,7 +761,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_pm_summary_new_exp_object
-	SELECT (case when object ='' then 'PS' else object end) as obj_cd,pms_fy,MIN(a.uniq_id) as uniq_id
+	SELECT coalesce(object,'!PS!') as obj_cd,pms_fy,MIN(a.uniq_id) as uniq_id
 	FROM etl.stg_payroll_summary a join (SELECT uniq_id
 						 FROM tmp_fk_pms_summay_values
 						 GROUP BY 1
@@ -763,9 +784,9 @@ BEGIN
 	INSERT INTO ref_expenditure_object(expenditure_object_id,expenditure_object_code,
 		expenditure_object_name,fiscal_year,created_date,created_load_id,original_expenditure_object_name)
 	SELECT a.expenditure_object_id,b.obj_cd,
-	(CASE WHEN COALESCE(obj_cd,'PS')='PS' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as expenditure_object_name,
+	(CASE WHEN COALESCE(obj_cd,'!PS!')='!PS!' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as expenditure_object_name,
 	b.fiscal_year,now()::timestamp,p_load_id_in,
-	(CASE WHEN COALESCE(obj_cd,'PS')='PS' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as original_expenditure_object_name
+	(CASE WHEN COALESCE(obj_cd,'!PS!')='!PS!' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as original_expenditure_object_name
 	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id;
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
@@ -787,7 +808,7 @@ BEGIN
 
 	INSERT INTO ref_expenditure_object_history(expenditure_object_history_id,expenditure_object_id,fiscal_year,expenditure_object_name,created_date,load_id)
 	SELECT a.expenditure_object_history_id,c.expenditure_object_id,b.fiscal_year,
-		(CASE WHEN COALESCE(obj_cd,'PS')='PS' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as expenditure_object_name,now()::timestamp,p_load_id_in
+		(CASE WHEN COALESCE(obj_cd,'!PS!')='!PS!' THEN 'Payroll Summary' ELSE '<unknown expenditure object>' END) as expenditure_object_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_expenditure_object_history_id_seq a JOIN tmp_fk_values_pm_summary_new_exp_object b ON a.uniq_id = b.uniq_id
 		JOIN etl.ref_expenditure_object_id_seq c ON a.uniq_id = c.uniq_id;
 
@@ -800,17 +821,11 @@ BEGIN
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id),b.expenditure_object_id,b.expenditure_object_name 
-	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON a.object = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
+	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON coalesce(a.object,'!PS!') = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
 	GROUP BY 1,3,4	;
 
-	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
-	SELECT	a.uniq_id, max(c.expenditure_object_history_id),b.expenditure_object_id,b.expenditure_object_name 
-	FROM etl.stg_payroll_summary a JOIN ref_expenditure_object b ON 'PS' = b.expenditure_object_code AND a.pms_fy = b.fiscal_year
-		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
-		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
-	GROUP BY 1,3,4	;
 
 
 		

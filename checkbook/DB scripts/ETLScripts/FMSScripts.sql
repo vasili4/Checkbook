@@ -157,6 +157,22 @@ BEGIN
 	SET loc_cd = NULL
 	WHERE loc_cd = '';
 	
+	UPDATE etl.stg_fms_accounting_line 
+	SET fcls_cd = NULL
+	WHERE fcls_cd = '';
+	
+	UPDATE etl.stg_fms_accounting_line 
+	SET dept_cd = NULL
+	WHERE dept_cd = '';
+	
+	UPDATE etl.stg_fms_accounting_line 
+	SET appr_cd = NULL
+	WHERE appr_cd = '';
+	
+	UPDATE etl.stg_fms_accounting_line 
+	SET obj_cd = NULL
+	WHERE obj_cd = '';
+	
 	
 	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line(uniq_id bigint,fund_class_id smallint,agency_history_id smallint,
 							department_history_id int, expenditure_object_history_id integer,budget_code_id integer,
@@ -177,7 +193,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_fms_acc_line_new_fund_class
-	SELECT COALESCE(a.fund_cd,'---'),MIN(b.uniq_id) as uniq_id
+	SELECT COALESCE(a.fcls_cd,'---'),MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
 				    FROM tmp_fk_values_fms_acc_line
 				    GROUP BY 1
@@ -191,7 +207,7 @@ BEGIN
 	FROM   tmp_fk_values_fms_acc_line_new_fund_class;
 	
 	INSERT INTO ref_fund_class(fund_class_id,fund_class_code,fund_class_name,created_date,created_load_id)
-	SELECT a.fund_class_id,COALESCE(b.fund_class_code,'---'),(CASE WHEN COALESCE(b.fund_class_code,'') <> ''  THEN '<Unknown Fund Class>' 
+	SELECT a.fund_class_id,COALESCE(b.fund_class_code,'---'),(CASE WHEN COALESCE(b.fund_class_code,'---') <> '---'  THEN '<Unknown Fund Class>' 
 							ELSE '<Non-Applicable Fund Class>' END) as fund_class_name,
 				now()::timestamp,p_load_id_in
 	FROM   etl.ref_fund_class_id_seq a JOIN tmp_fk_values_fms_acc_line_new_fund_class b ON a.uniq_id = b.uniq_id;
@@ -203,11 +219,18 @@ BEGIN
 		VALUES(p_load_file_id_in,'F',l_count, 'New fund class records inserted from disbursements accounting lines');	
 	END IF;	
 	
+	
+		INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,fund_class_id)
+	SELECT	a.uniq_id, b.fund_class_id 
+	FROM etl.stg_fms_accounting_line a JOIN ref_fund_class b ON COALESCE(a.fcls_cd,'---') = b.fund_class_code
+		JOIN etl.ref_fund_class_id_seq c ON c.fund_class_id = b.fund_class_id ;	
+		
+		
 	-- FK:agency_history_id
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,agency_history_id)
 	SELECT	a.uniq_id, max(c.agency_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_agency b ON a.dept_cd = b.agency_code
+	FROM etl.stg_fms_accounting_line a JOIN ref_agency b ON coalesce(a.dept_cd,'---') = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1	;	
 
@@ -217,7 +240,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_fms_acc_line_new_agencies
-	SELECT dept_cd,MIN(b.uniq_id) as uniq_id
+	SELECT coalesce(dept_cd,'---'),MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
 						 FROM tmp_fk_values_fms_acc_line
 						 GROUP BY 1
@@ -266,7 +289,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,agency_history_id)
 	SELECT	a.uniq_id, max(c.agency_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_agency b ON a.dept_cd = b.agency_code
+	FROM etl.stg_fms_accounting_line a JOIN ref_agency b ON coalesce(a.dept_cd,'---') = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
 	GROUP BY 1	;	
@@ -277,7 +300,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON coalesce(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -288,7 +311,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_fms_acc_line_new_dept
-	SELECT d.agency_history_id,c.agency_id,appr_cd,e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
+	SELECT d.agency_history_id,c.agency_id,coalesce(appr_cd,'---------'),e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
 						 FROM tmp_fk_values_fms_acc_line
 						 GROUP BY 1
@@ -313,11 +336,11 @@ BEGIN
 				   agency_id,fund_class_id,
 				   fiscal_year,created_date,created_load_id,original_department_name)
 	SELECT a.department_id,COALESCE(b.appr_cd,'---------') as department_code,
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE 'Non-Applicable Department' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,
 		now()::timestamp,p_load_id_in,
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE 'Non-Applicable Department' END) as original_department_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_fk_values_fms_acc_line_new_dept b ON a.uniq_id = b.uniq_id;
 
@@ -341,7 +364,7 @@ BEGIN
 					   department_name,agency_id,fund_class_id,
 					   fiscal_year,created_date,load_id)
 	SELECT a.department_history_id,c.department_id,	
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 		      ELSE 'Non-Applicable Department' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_fk_values_fms_acc_line_new_dept b ON a.uniq_id = b.uniq_id
@@ -359,7 +382,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_department b  ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_department b  ON coalesce(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -372,7 +395,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,expenditure_object_history_id)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_expenditure_object b ON a.obj_cd = b.expenditure_object_code AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_expenditure_object b ON coalesce(a.obj_cd,'----') = b.expenditure_object_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 	GROUP BY 1	;
 
@@ -383,7 +406,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_fms_acc_line_new_exp_object
-	SELECT (CASE WHEN COALESCE(obj_cd,'')='' THEN '----' ELSE obj_cd END) as obj_cd,fy_dc,MIN(a.uniq_id) as uniq_id
+	SELECT COALESCE(a.obj_cd,'----') as obj_cd,fy_dc,MIN(a.uniq_id) as uniq_id
 	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
 						 FROM tmp_fk_values_fms_acc_line
 						 GROUP BY 1
@@ -443,10 +466,7 @@ BEGIN
 	
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,expenditure_object_history_id)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
-	FROM etl.stg_fms_accounting_line a JOIN ref_expenditure_object b ON (COALESCE(a.obj_cd,'----') = b.expenditure_object_code 
-										OR (a.obj_cd='' AND b.expenditure_object_code='----')
-									     ) 
-									     AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_fms_accounting_line a JOIN ref_expenditure_object b ON COALESCE(a.obj_cd,'----') = b.expenditure_object_code   AND a.fy_dc = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
 	GROUP BY 1	;
@@ -472,7 +492,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 
 	INSERT INTO tmp_fk_values_fms_acc_line_new_loc
-	SELECT (CASE WHEN COALESCE(loc_cd,'') ='' THEN '----' ELSE loc_cd END) as loc_cd,
+	SELECT COALESCE(loc_cd,'----') as loc_cd,
 		d.agency_history_id,c.agency_id,a.fy_dc,min(b.uniq_id)
 	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
 						 FROM tmp_fk_values_fms_acc_line
@@ -491,9 +511,9 @@ BEGIN
 	FROM   tmp_fk_values_fms_acc_line_new_loc;
 
 	INSERT INTO ref_location(location_id,location_code,location_name,agency_id,created_date,created_load_id,original_location_name)
-	SELECT a.location_id,b.loc_cd,(CASE WHEN COALESCE(b.loc_cd,'') <> '' THEN '<Unknown Location>'
+	SELECT a.location_id,b.loc_cd,(CASE WHEN COALESCE(b.loc_cd,'----') <> '----' THEN '<Unknown Location>'
 			ELSE 'Non-Applicable Location' END) as location_name,b.agency_id,now()::timestamp,p_load_id_in,
-			(CASE WHEN COALESCE(b.loc_cd,'') <> '' THEN '<Unknown Location>'
+			(CASE WHEN COALESCE(b.loc_cd,'----') <> '----' THEN '<Unknown Location>'
 			ELSE 'Non-Applicable Location' END) as original_location_name
 	FROM   etl.ref_location_id_seq a JOIN tmp_fk_values_fms_acc_line_new_loc b ON a.uniq_id = b.uniq_id;
 	
@@ -517,7 +537,7 @@ BEGIN
 	INSERT INTO ref_location_history(location_history_id,location_id,location_name,
 					 created_date,load_id)
 	SELECT a.location_history_id,c.location_id,	
-		(CASE WHEN COALESCE(b.loc_cd,'') <> '' THEN '<Unknown Location>'
+		(CASE WHEN COALESCE(b.loc_cd,'----') <> '----' THEN '<Unknown Location>'
 			ELSE 'Non-Applicable Location' END) as location_name,
 		now()::timestamp,p_load_id_in
 	FROM   etl.ref_location_history_id_seq a JOIN tmp_fk_values_fms_acc_line_new_loc b ON a.uniq_id = b.uniq_id
