@@ -45,7 +45,7 @@ BEGIN
 	INSERT INTO tmp_fk_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code,agency_short_name)
 	SELECT	a.uniq_id, max(c.agency_history_id)as agency_history_id,max(b.agency_id) as agency_id,
 		max(c.agency_name) as agency_name,b.agency_code,b.agency_short_name
-	FROM etl.stg_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
+	FROM etl.stg_budget a JOIN ref_agency b ON COALESCE(a.agency_code,'---') = b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 	GROUP BY 1,5,6;
 	
@@ -84,7 +84,7 @@ BEGIN
 	FROM   tmp_fk_bdgt_values_new_agencies;
 
 	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id,agency_short_name)
-	SELECT a.agency_history_id,b.agency_id, '<Unknown Agency>',
+	SELECT a.agency_history_id,b.agency_id, '<Unknown Agency>' as agency_name,
 	now()::timestamp,p_load_id_in,'N/A'
 	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
 
@@ -171,10 +171,10 @@ BEGIN
 	INSERT INTO tmp_fk_budget_values(uniq_id,department_history_id,department_id,department_name,department_code)
 	SELECT	a.uniq_id, max(c.department_history_id) ,max(b.department_id) as department_id,
 		max(c.department_name) as department_name,b.department_code
-	FROM etl.stg_budget a JOIN ref_department b  ON a.department_code = b.department_code AND a.budget_fiscal_year = b.fiscal_year
+	FROM etl.stg_budget a JOIN ref_department b  ON COALESCE(a.department_code,'---------') = b.department_code AND a.budget_fiscal_year = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
-		JOIN ref_agency d ON a.agency_code = d.agency_code AND b.agency_id = d.agency_id
-		JOIN ref_fund_class e ON a.fund_class_code = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN ref_agency d ON COALESCE(a.agency_code,'---')= d.agency_code AND b.agency_id = d.agency_id
+		JOIN ref_fund_class e ON COALESCE(a.fund_class_code,'---')  = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 		JOIN etl.ref_department_history_id_seq f ON c.department_history_id = f.department_history_id
 	GROUP BY 1,5	;	
 
