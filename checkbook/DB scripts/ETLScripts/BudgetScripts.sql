@@ -16,6 +16,24 @@ BEGIN
 						     agency_code varchar,department_code varchar,object_class_code varchar,agency_short_name varchar,department_short_name varchar,budget_code_name varchar)
 	DISTRIBUTED BY (uniq_id);
 	
+	
+	
+	
+	UPDATE etl.stg_budget 
+	SET agency_code = NULL
+	WHERE agency_code = '';
+	
+	
+	UPDATE etl.stg_budget 
+	SET department_code = NULL
+	WHERE department_code = '';
+	
+	
+	
+	
+	
+	
+	
 	-- FK:fund_class_id
 
 	INSERT INTO tmp_fk_budget_values(uniq_id,fund_class_id)
@@ -35,7 +53,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_bdgt_values_new_agencies
-	SELECT agency_code,MIN(b.uniq_id) as uniq_id
+	SELECT COALESCE(agency_code,'---'),MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_budget a join (SELECT uniq_id
 				    FROM tmp_fk_budget_values
 				    GROUP BY 1
@@ -51,7 +69,8 @@ BEGIN
 	FROM   tmp_fk_bdgt_values_new_agencies;
 	
 	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
-	SELECT a.agency_id,b.dept_cd,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
+	SELECT a.agency_id,COALESCE(b.dept_cd,'---'),(CASE WHEN COALESCE(b.dept_cd,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END)as agency_name,
+	now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
 	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_bdgt_values_new_agencies b ON a.uniq_id = b.uniq_id;
 
 	RAISE NOTICE '1.1';
@@ -65,13 +84,14 @@ BEGIN
 	FROM   tmp_fk_bdgt_values_new_agencies;
 
 	INSERT INTO ref_agency_history(agency_history_id,agency_id,agency_name,created_date,load_id,agency_short_name)
-	SELECT a.agency_history_id,b.agency_id,'<Unknown Agency>' as agency_name,now()::timestamp,p_load_id_in,'N/A'
+	SELECT a.agency_history_id,b.agency_id,(CASE WHEN COALESCE(c.dept_cd,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END),
+	now()::timestamp,p_load_id_in,'N/A'
 	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
 
 	RAISE NOTICE '1.3';
 	INSERT INTO tmp_fk_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code,agency_short_name)
 	SELECT	a.uniq_id, max(c.agency_history_id) , max(b.agency_id), max(c.agency_name) as agency_name,b.agency_code,'N/A'
-	FROM etl.stg_budget a JOIN ref_agency b ON a.agency_code = b.agency_code
+	FROM etl.stg_budget a JOIN ref_agency b ON COALESCE(a.agency_code,'---')= b.agency_code
 		JOIN ref_agency_history c ON b.agency_id = c.agency_id
 		JOIN etl.ref_agency_history_id_seq d ON c.agency_history_id = d.agency_history_id
 	GROUP BY 1,5	;	
@@ -94,14 +114,14 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_bdgt_new_dept
-	SELECT d.agency_history_id,c.agency_id,department_code,e.fund_class_id,budget_fiscal_year,MIN(b.uniq_id) as uniq_id
+	SELECT d.agency_history_id,c.agency_id, COALESCE(department_code,'---------'),e.fund_class_id,budget_fiscal_year,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_budget a join (SELECT uniq_id
 						 FROM tmp_fk_budget_values
 						 GROUP BY 1
 						 HAVING max(department_history_id) IS NULL) b on a.uniq_id=b.uniq_id
-		JOIN ref_agency c ON a.agency_code = c.agency_code
+		JOIN ref_agency c ON COALESCE(a.agency_code,'---') = c.agency_code
 		JOIN ref_agency_history d ON c.agency_id = d.agency_id
-		JOIN ref_fund_class e ON a.fund_class_code = e.fund_class_code
+		JOIN ref_fund_class e ON COALESCE(a.fund_class_code,'---') = e.fund_class_code
 	GROUP BY 1,2,3,4,5;
 
 	RAISE NOTICE '1.4';
@@ -118,11 +138,13 @@ BEGIN
 				   department_name,
 				   agency_id,fund_class_id,
 				   fiscal_year,created_date,created_load_id,original_department_name,department_short_name)
-	SELECT a.department_id,b.appr_cd as department_code,
-		'<Unknown Department>'as department_name,
+	SELECT a.department_id,COALESCE(b.appr_cd,'---------') as department_code,
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
+			ELSE 'Non-Applicable Department' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,
 		now()::timestamp,p_load_id_in,
-		'<Unknown Department>' as original_department_name,
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
+			ELSE 'Non-Applicable Department' END) as original_department_name,
 		'N/A'
 	FROM   etl.ref_department_id_seq a JOIN tmp_fk_values_bdgt_new_dept b ON a.uniq_id = b.uniq_id;
 
