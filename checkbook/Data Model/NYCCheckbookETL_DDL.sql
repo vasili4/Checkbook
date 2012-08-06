@@ -3976,7 +3976,7 @@ CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
 	payroll_number varchar,
 	job_sequence_number varchar,
 	agency_code varchar,
-	agency_start_date date,
+	agency_start_date varchar,
 	fiscal_year varchar,
 	orig_pay_cycle_code bpchar,	
 	orig_pay_date varchar,
