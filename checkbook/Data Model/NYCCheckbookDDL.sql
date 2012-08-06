@@ -1502,7 +1502,7 @@ CREATE TABLE payroll(
 	job_sequence_number varchar,
 	agency_history_id smallint,
 	fiscal_year smallint,
-	agency_start_dt varchar,
+	agency_start_dt date,
 	orig_pay_date_id int,
 	pay_frequency varchar,
 	department_history_id int,
