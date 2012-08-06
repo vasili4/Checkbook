@@ -1011,7 +1011,7 @@ etl.ext_stg_pms_data_feed,employee_number,varchar,etl.stg_payroll,employee_numbe
 etl.ext_stg_pms_data_feed,payroll_number,varchar,etl.stg_payroll,payroll_number,varchar,4
 etl.ext_stg_pms_data_feed,job_sequence_number,varchar,etl.stg_payroll,job_sequence_number,varchar,5
 etl.ext_stg_pms_data_feed,agency_code,varchar,etl.stg_payroll,agency_code,varchar,6
-etl.ext_stg_pms_data_feed,agency_start_dt,varchar,etl.stg_payroll,agency_start_dt,varchar,7
+etl.ext_stg_pms_data_feed,agency_start_date,varchar,etl.stg_payroll,agency_start_date,date,7
 etl.ext_stg_pms_data_feed,fiscal_year,varchar,etl.stg_payroll,fiscal_year,smallint,8
 etl.ext_stg_pms_data_feed,orig_pay_cycle_code,bpchar,etl.stg_payroll,orig_pay_cycle_code,char,9
 etl.ext_stg_pms_data_feed,orig_pay_date,varchar,etl.stg_payroll,orig_pay_date,date,10
