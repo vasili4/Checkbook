@@ -221,7 +221,7 @@ PayrollByEmployeeAgency,aggregateon_payroll_employee_agency,"CREATE TABLE aggreg
 DISTRIBUTED BY (employee_id)","SELECT e.employee_id,e.agency_id,e.fiscal_year_id,'B' as type_of_year,
 	pay_frequency,
 	type_of_employment,
-	annual_sal_table.agency_start_dt,
+	annual_sal_table.agency_start_date,
 	annual_sal_table.annual_salary,		
 	base_pay,
 	overtime_pay,
@@ -237,7 +237,7 @@ FROM
 	SUM(gross_pay) as gross_pay_ytd	
 FROM payroll p
 JOIN ref_amount_basis z ON p.amount_basis_id = z.amount_basis_id		 
-GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.fiscal_year,d.agency_start_dt,d.annual_salary
+GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.fiscal_year,d.agency_start_date,d.annual_salary
 		     FROM (SELECT employee_id,payroll_number,job_sequence_number,fiscal_year,max(pay_date) as pay_date
 		     	   FROM payroll a 
 		     	   JOIN ref_amount_basis f ON a.amount_basis_id = f.amount_basis_id		     	  
@@ -253,7 +253,7 @@ GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_se
 ORDER BY 1,2,3;","SELECT e.employee_id,e.agency_id,e.calendar_fiscal_year_id,'C' as type_of_year,
 	pay_frequency,
 	type_of_employment,
-	annual_sal_table.agency_start_dt,
+	annual_sal_table.agency_start_date,
 	annual_sal_table.annual_salary,		
 	base_pay,
 	overtime_pay,
@@ -269,7 +269,7 @@ FROM
 	SUM(gross_pay) as gross_pay_ytd	
 FROM payroll p
 JOIN ref_amount_basis z ON p.amount_basis_id = z.amount_basis_id		 
-GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.calendar_fiscal_year,d.agency_start_dt,d.annual_salary
+GROUP BY 1,2,3,4,5,6,7,8) e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number,d.calendar_fiscal_year,d.agency_start_date,d.annual_salary
 		     FROM (SELECT employee_id,payroll_number,job_sequence_number,calendar_fiscal_year,max(pay_date) as pay_date
 		     	   FROM payroll a 
 		     	   JOIN ref_amount_basis f ON a.amount_basis_id = f.amount_basis_id		     	   
