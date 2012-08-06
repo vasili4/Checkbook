@@ -23,7 +23,7 @@ BEGIN
 	WHERE  load_id = p_load_id_in
 	INTO   l_data_source_code;
 
-	
+	UPDATE etl.stg_fms_vendor SET vend_cust_cd = 'N/A' WHERE vend_cust_cd ='N/A (PRIVACY/SECURITY)';
 	
 	TRUNCATE etl.tmp_stg_vendor;
 	
