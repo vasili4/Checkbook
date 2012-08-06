@@ -1965,6 +1965,7 @@ CREATE EXTERNAL WEB TABLE payroll__0(
 	job_sequence_number varchar,
 	agency_history_id smallint,
 	fiscal_year smallint,	
+	agency_start_date date,
 	orig_pay_date_id int,
 	pay_frequency varchar,
 	department_history_id int,
@@ -2002,7 +2003,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.payroll to stdout
  CREATE VIEW  payroll AS
  	SELECT payroll__0.payroll_id,payroll__0.pay_cycle_code,payroll__0.pay_date_id,payroll__0.employee_history_id,
 		payroll__0.payroll_number,payroll__0.job_sequence_number,payroll__0.agency_history_id,payroll__0.fiscal_year,
-		payroll__0.orig_pay_date_id,payroll__0.pay_frequency,payroll__0.department_history_id,payroll__0.annual_salary,
+		payroll__0.agency_start_date,payroll__0.orig_pay_date_id,payroll__0.pay_frequency,payroll__0.department_history_id,payroll__0.annual_salary,
 		payroll__0.amount_basis_id,payroll__0.base_pay,payroll__0.overtime_pay,payroll__0.other_payments,payroll__0.gross_pay,
 		payroll__0.orig_pay_cycle_code,payroll__0.agency_id,payroll__0.agency_code,payroll__0.agency_name,payroll__0.department_id,
 		payroll__0.department_code,payroll__0.department_name,payroll__0.employee_id,payroll__0.employee_name,payroll__0.fiscal_year_id,
