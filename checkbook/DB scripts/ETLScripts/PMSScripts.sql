@@ -428,7 +428,7 @@ BEGIN
 	END IF;
 		
 	INSERT INTO payroll(payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
-						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_dt,
+						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
 						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 						  amount_basis_id,base_pay,overtime_pay,other_payments,
 						  gross_pay,agency_id,agency_code,agency_name,
@@ -438,7 +438,7 @@ BEGIN
 						  agency_short_name,department_short_name,
 						  created_date,created_load_id)
 	SELECT payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
-	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_dt,
+	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
 	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 	       amount_basis_id,base_pay,overtime_pay,other_payments,
 	       gross_pay,agency_id,agency_code,agency_name,
