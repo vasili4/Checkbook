@@ -426,7 +426,8 @@ BEGIN
 	IF l_fk_update <> 1 THEN
 		RETURN -1;
 	END IF;
-		
+	
+	RAISE NOTICE 'PAYROLL 1.1';
 	INSERT INTO payroll(payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
 						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
@@ -456,6 +457,9 @@ BEGIN
 	
 	-- Updating the gross pay YTD based on budget fiscal year
 	
+	RAISE NOTICE 'PAYROLL 1.2';
+	
+	
 	CREATE TEMPORARY TABLE tmp_employee_rec_gross_pay(payroll_id bigint,employee_id bigint, payroll_number varchar,job_sequence_number varchar,fiscal_year smallint, pay_date date)
 	DISTRIBUTED BY (payroll_id);
 	
@@ -467,7 +471,9 @@ BEGIN
 			AND a.fiscal_year = b.fiscal_year
 			AND a.pay_date >= b.pay_date;
 			
-			
+	
+	RAISE NOTICE 'PAYROLL 1.3';
+	
 	CREATE TEMPORARY TABLE tmp_employee_rec_gross_pay_1(payroll_id bigint, gross_pay_ytd numeric(16,2),created_load_id integer)
 	DISTRIBUTED BY (payroll_id);
 	
@@ -479,6 +485,8 @@ BEGIN
 			AND a.fiscal_year = b.fiscal_year
 	GROUP BY 1;
 	
+	RAISE NOTICE 'PAYROLL 1.4';
+	
 	UPDATE payroll a
 	SET    gross_pay_ytd = b.gross_pay_ytd,
 	       updated_load_id = (CASE WHEN b.created_load_id <> a.created_load_id THEN p_load_id_in END),
@@ -486,7 +494,8 @@ BEGIN
 	FROM   tmp_employee_rec_gross_pay_1 b
 	WHERE	a.payroll_id = b.payroll_id;	
 	
-
+	
+	RAISE NOTICE 'PAYROLL 1.5';
 	-- Updating the gross pay YTD based on calendar fiscal year
 	
 	TRUNCATE tmp_employee_rec_gross_pay;
@@ -499,7 +508,9 @@ BEGIN
 			AND a.calendar_fiscal_year = b.calendar_fiscal_year
 			AND a.pay_date >= b.pay_date;
 			
-			
+	RAISE NOTICE 'PAYROLL 1.6';		
+	
+	
 	TRUNCATE tmp_employee_rec_gross_pay_1;
 	
 	INSERT INTO tmp_employee_rec_gross_pay_1
@@ -510,12 +521,19 @@ BEGIN
 			AND a.calendar_fiscal_year = b.fiscal_year
 	GROUP BY 1;
 	
+	
+	RAISE NOTICE 'PAYROLL 1.7';
+	
+	
 	UPDATE payroll a
 	SET    gross_pay_cytd = b.gross_pay_ytd,
 	       updated_load_id = (CASE WHEN b.created_load_id <> a.created_load_id THEN p_load_id_in END),
 	       updated_date =  (CASE WHEN b.created_load_id <> a.created_load_id THEN now()::timestamp END)	
 	FROM   tmp_employee_rec_gross_pay_1 b
 	WHERE	a.payroll_id = b.payroll_id;		
+	
+	
+	RAISE NOTICE 'PAYROLL 1.8';
 	
 	RETURN 1;
 	

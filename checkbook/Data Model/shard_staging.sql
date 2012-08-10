@@ -2048,7 +2048,8 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_agency__0(
 	total_employees int,
 	total_salaried_employees int,
 	total_hourly_employees int,
-	total_overtime_employees int)
+	total_overtime_employees int,
+	annual_salary numeric(16,2))
 EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_agency to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
@@ -2057,7 +2058,8 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
  	SELECT aggregateon_payroll_agency__0.agency_id, aggregateon_payroll_agency__0.fiscal_year_id, aggregateon_payroll_agency__0.type_of_year,
  		aggregateon_payroll_agency__0.base_pay, aggregateon_payroll_agency__0.other_payments, 
  		aggregateon_payroll_agency__0.gross_pay, aggregateon_payroll_agency__0.overtime_pay, aggregateon_payroll_agency__0.total_employees, 
- 		aggregateon_payroll_agency__0.total_salaried_employees, aggregateon_payroll_agency__0.total_hourly_employees, aggregateon_payroll_agency__0.total_overtime_employees
+ 		aggregateon_payroll_agency__0.total_salaried_employees, aggregateon_payroll_agency__0.total_hourly_employees, 
+ 		aggregateon_payroll_agency__0.total_overtime_employees, aggregateon_payroll_agency__0.annual_salary
  	FROM 	aggregateon_payroll_agency__0;	
 
 CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_dept__0(
@@ -2681,6 +2683,8 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  	revised_start_date date,
  	revised_end_date date,
  	cif_received_date date,
+ 	cif_fiscal_year smallint,
+ 	cif_fiscal_year_id smallint,
  	tracking_number varchar(30),
  	board_award_number varchar(15),
  	oca_number varchar(10),
@@ -2725,7 +2729,8 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  		pending_contracts__0.awarding_agency_id,pending_contracts__0.oaisis_awarding_agency_desc,pending_contracts__0.awarding_agency_code,
  		pending_contracts__0.contract_type_name,pending_contracts__0.cont_type_code,pending_contracts__0.award_method_name,pending_contracts__0.award_method_code,
  		pending_contracts__0.start_date,pending_contracts__0.end_date,pending_contracts__0.revised_start_date,pending_contracts__0.revised_end_date,
- 		pending_contracts__0.cif_received_date,pending_contracts__0.tracking_number,pending_contracts__0.board_award_number,pending_contracts__0.oca_number,
+ 		pending_contracts__0.cif_received_date,pending_contracts__0.cif_fiscal_year,pending_contracts__0.cif_fiscal_year_id,
+ 		pending_contracts__0.tracking_number,pending_contracts__0.board_award_number,pending_contracts__0.oca_number,
  		pending_contracts__0.version_number,pending_contracts__0.contract_number,pending_contracts__0.fms_parent_contract_number,
  		pending_contracts__0.submitting_agency_name,pending_contracts__0.submitting_agency_short_name,pending_contracts__0.awarding_agency_name,
  		pending_contracts__0.awarding_agency_short_name,pending_contracts__0.start_date_id,pending_contracts__0.end_date_id,

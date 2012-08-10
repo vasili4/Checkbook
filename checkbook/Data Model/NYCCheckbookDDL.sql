@@ -1568,7 +1568,8 @@ CREATE TABLE aggregateon_payroll_agency(
 	total_employees int,
 	total_salaried_employees int,
 	total_hourly_employees int,
-	total_overtime_employees int)
+	total_overtime_employees int,
+	annual_salary numeric(16,2))
 DISTRIBUTED BY (agency_id);
 
 CREATE TABLE aggregateon_payroll_employee_dept(
@@ -1672,6 +1673,8 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
  	revised_start_date date,
  	revised_end_date date,
  	cif_received_date date,
+ 	cif_fiscal_year smallint,
+ 	cif_fiscal_year_id smallint,
  	tracking_number varchar(30),
  	board_award_number varchar(15),
  	oca_number varchar(10),
@@ -1699,7 +1702,7 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
   	percent_difference numeric(17,4),
 	original_or_modified varchar,
 	 award_size_id smallint
- );
+ ) DISTRIBUTED BY (document_code_id);
  
 -- Contract Aggregate Tables
 

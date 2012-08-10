@@ -8,7 +8,7 @@ V,_VEND_,AIE6_DLY_VEND_BTYP_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9]
 M,_MA_,AIE((2_DLY_PCO)|(F_DLY_PCOP))_MA_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,MAG_feed.txt
 C,_PO_,AIE((2_DLY_PCO)|(F_DLY_PCOP))_PO_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,CON_feed.txt
 F,_MMDSB,AIE((0_DLY_MMDSB)|(1_DLY_MMDSBP))_((AD)|(MD))_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,FMS_feed.txt
-P,PAYROLL,PAYROLL_A015_%_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9]_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,PMS_feed.txt
+P,PAYROLL_A,PAYROLL_A015_%_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,PMS_feed.txt
 B,_BUD_92L3_,AIE3_DLY_BUD_92L3_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,BUDGET_feed.txt
 RY,_COA_RSCAT_,AIEC_DLY_COA_RSCAT_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,COA_revenue_category_feed.txt
 RC,_COA_RSCLS_,AIEC_DLY_COA_RSCLS_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,COA_revenue_class_feed.txt
@@ -16,5 +16,6 @@ RS,_COA_RSRC_,AIEB_DLY_COA_RSRC_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][
 BC,_COA_FUNCATTR_,AIED_DLY_COA_FUNCATTR_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,COA_budget_code_feed.txt
 R,_JL_REV_,AIE5_DLY_JL_REV_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,Revenue_feed.txt
 FC,_COA_RSFCLS_,AIEC_DLY_COA_RSFCLS_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,COA_funding_class_feed.txt
-PC,checkbookpendingcontracts,checkbookpendingcontracts.pdl,OAISIS_feed.txt
+PC,checkbookpendingcontracts,checkbookpendingcontracts.txt,OAISIS_feed.txt
 RB,_BUD_93L1_,AIE4_DLY_BUD_93L1_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,revenue_budget.txt
+PS,PAYROLL_SUMMARY_A,PAYROLL_SUMMARY_A015_%_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].txt,PMS_summary_feed.txt

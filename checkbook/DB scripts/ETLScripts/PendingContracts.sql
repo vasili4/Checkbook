@@ -7,7 +7,7 @@ BEGIN
 						awarding_agency_id smallint,submitting_agency_name varchar,submitting_agency_short_name varchar,
 						awarding_agency_name varchar,awarding_agency_short_name varchar,start_date_id int,
 						end_date_id int,revised_start_date_id int,revised_end_date_id int,	
-						cif_received_date_id int, document_agency_name varchar, document_agency_short_name varchar )
+						cif_received_date_id int, cif_fiscal_year smallint, cif_fiscal_year_id smallint, document_agency_name varchar, document_agency_short_name varchar )
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_pc (uniq_id,document_code_id)
@@ -195,9 +195,11 @@ BEGIN
 	SELECT a.uniq_id,b.date_id
 	FROM etl.stg_pending_contracts a JOIN ref_date b ON a.con_rev_end_dt = b.date;
 	
-	INSERT INTO tmp_fk_values_pc(uniq_id,cif_received_date_id)
-	SELECT a.uniq_id,b.date_id
-	FROM etl.stg_pending_contracts a JOIN ref_date b ON a.con_cif_received_date = b.date;	
+	INSERT INTO tmp_fk_values_pc(uniq_id,cif_received_date_id, cif_fiscal_year, cif_fiscal_year_id)
+	SELECT a.uniq_id,b.date_id, c.year_value, c.year_id
+	FROM etl.stg_pending_contracts a 
+	JOIN ref_date b ON a.con_cif_received_date = b.date
+	JOIN ref_year c ON b.nyc_year_id = c.year_id;	
 	
 	RAISE NOTICE '8';
 	--Updating con_ct_header with all the FK values
@@ -219,7 +221,9 @@ BEGIN
 		end_date_id = ct_table.end_date_id,
 		revised_start_date_id = ct_table.revised_start_date_id,
 		revised_end_date_id = ct_table.revised_end_date_id,
-		cif_received_date_id = ct_table.cif_received_date_id	
+		cif_received_date_id = ct_table.cif_received_date_id,
+		cif_fiscal_year = ct_table.cif_fiscal_year,
+		cif_fiscal_year_id = ct_table.cif_fiscal_year_id
 	FROM	(SELECT uniq_id, max(document_code_id) as document_code_id ,
 				 max(document_agency_id) as document_agency_id,
 				 max(document_agency_name) as document_agency_name,
@@ -236,7 +240,9 @@ BEGIN
 				 max(end_date_id) as end_date_id,
 				 max(revised_start_date_id) as revised_start_date_id, 
 				 max(revised_end_date_id) as revised_end_date_id,
-				 max(cif_received_date_id) as cif_received_date_id
+				 max(cif_received_date_id) as cif_received_date_id,
+				 max(cif_fiscal_year) as cif_fiscal_year,
+				 max(cif_fiscal_year_id) as cif_fiscal_year_id
 		 FROM	tmp_fk_values_pc
 		 GROUP BY 1) ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
@@ -294,7 +300,7 @@ BEGIN
 				      submitting_agency_id,oaisis_submitting_agency_desc,submitting_agency_code	,awarding_agency_id,
 				      oaisis_awarding_agency_desc,awarding_agency_code,contract_type_name,cont_type_code,
 				      award_method_name,award_method_code,start_date,end_date,revised_start_date,
-				      revised_end_date,cif_received_date,tracking_number,board_award_number,
+				      revised_end_date,cif_received_date,cif_fiscal_year, cif_fiscal_year_id, tracking_number,board_award_number,
 				      oca_number,version_number,contract_number,fms_parent_contract_number,
 				      submitting_agency_name,submitting_agency_short_name,awarding_agency_name,awarding_agency_short_name,
 				      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,
@@ -307,7 +313,7 @@ BEGIN
 	      submitting_agency_id,submitting_agency_desc,submitting_agency_code,awarding_agency_id,
 	      awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,
 	      am_desc,am_code,con_term_from,con_term_to,con_rev_start_dt,
-	      con_rev_end_dt,con_cif_received_date,con_pin,con_internal_pin,
+	      con_rev_end_dt,con_cif_received_date,cif_fiscal_year, cif_fiscal_year_id, con_pin,con_internal_pin,
 	      con_batch_suffix,con_version,contract_number,con_par_trans_code || con_par_ad_code || con_par_reg_num as fms_parent_contract_number,
 	      submitting_agency_name,submitting_agency_short_name,awarding_agency_name,awarding_agency_short_name,
 	      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,

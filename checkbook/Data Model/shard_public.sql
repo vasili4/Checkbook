@@ -1420,7 +1420,7 @@ CREATE TABLE aggregateon_payroll_employee_agency(
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
-	gross_pay numeric(16,2) )
+	gross_pay numeric(16,2))
 DISTRIBUTED BY (employee_id);
 
 CREATE TABLE aggregateon_payroll_agency(	
@@ -1434,7 +1434,8 @@ CREATE TABLE aggregateon_payroll_agency(
 	total_employees int,
 	total_salaried_employees int,
 	total_hourly_employees int,
-	total_overtime_employees int)
+	total_overtime_employees int,
+	annual_salary numeric(16,2))
 DISTRIBUTED BY (agency_id);
 
 CREATE TABLE aggregateon_payroll_employee_dept(
@@ -1775,6 +1776,8 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
  	revised_start_date date,
  	revised_end_date date,
  	cif_received_date date,
+ 	cif_fiscal_year smallint,
+ 	cif_fiscal_year_id smallint,
  	tracking_number varchar(30),
  	board_award_number varchar(15),
  	oca_number varchar(10),
@@ -1802,7 +1805,7 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
   	percent_difference numeric(17,4),
   	original_or_modified varchar,
   	award_size_id smallint
- );
+ ) DISTRIBUTED BY (document_code_id);
  
  -- tables for contracts by industry and contracts by size
  
