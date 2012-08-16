@@ -30,3 +30,40 @@ join ref_agency on ref_agency.agency_id = payroll.agency_id
 where fiscal_year=2012
 group by payroll.employee_id,employee.first_name, employee.last_name, ref_agency.agency_name
 order by 4 desc limit 10
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- other Verification Queries
+
+
+select count(*) from employee ;
+select count(*) from employee_history ;
+select count(*) from payroll ;
+select * from payroll limit 100;
+
+
+
+select count(*) from aggregateon_payroll_agency ;
+select * from aggregateon_payroll_agency limit 100;
+
+select count(*) from aggregateon_payroll_employee_agency ;
+select * from aggregateon_payroll_employee_agency  limit 100;
+
+select count(*) from aggregateon_payroll_dept ;
+select * from aggregateon_payroll_dept limit 100;
+
+select count(*) from aggregateon_payroll_employee_dept ;
+select * from aggregateon_payroll_employee_dept limit 100 ;
+
+select count(*) from aggregateon_payroll_coa_month ;
+select * from aggregateon_payroll_coa_month limit 100;
+
+select count(*) from aggregateon_payroll_year ;
+select * from aggregateon_payroll_year limit 100;
+
+
+

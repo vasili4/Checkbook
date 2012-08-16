@@ -7,7 +7,8 @@ BEGIN
 						awarding_agency_id smallint,submitting_agency_name varchar,submitting_agency_short_name varchar,
 						awarding_agency_name varchar,awarding_agency_short_name varchar,start_date_id int,
 						end_date_id int,revised_start_date_id int,revised_end_date_id int,	
-						cif_received_date_id int, cif_fiscal_year smallint, cif_fiscal_year_id smallint, document_agency_name varchar, document_agency_short_name varchar )
+						cif_received_date_id int, cif_fiscal_year smallint, cif_fiscal_year_id smallint, 
+						document_agency_name varchar, document_agency_short_name varchar, award_category_id smallint )
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_pc (uniq_id,document_code_id)
@@ -195,11 +196,19 @@ BEGIN
 	SELECT a.uniq_id,b.date_id
 	FROM etl.stg_pending_contracts a JOIN ref_date b ON a.con_rev_end_dt = b.date;
 	
+	-- FK cif_fiscal_year
+	
 	INSERT INTO tmp_fk_values_pc(uniq_id,cif_received_date_id, cif_fiscal_year, cif_fiscal_year_id)
 	SELECT a.uniq_id,b.date_id, c.year_value, c.year_id
 	FROM etl.stg_pending_contracts a 
 	JOIN ref_date b ON a.con_cif_received_date = b.date
 	JOIN ref_year c ON b.nyc_year_id = c.year_id;	
+	
+	-- FK award_category_id
+	
+	INSERT INTO tmp_fk_values_pc(uniq_id,award_category_id)
+	SELECT a.uniq_id , b.award_category_id
+	FROM	etl.stg_pending_contracts a JOIN ref_award_category b ON a.award_category_code = b.award_category_code;
 	
 	RAISE NOTICE '8';
 	--Updating con_ct_header with all the FK values
@@ -223,7 +232,8 @@ BEGIN
 		revised_end_date_id = ct_table.revised_end_date_id,
 		cif_received_date_id = ct_table.cif_received_date_id,
 		cif_fiscal_year = ct_table.cif_fiscal_year,
-		cif_fiscal_year_id = ct_table.cif_fiscal_year_id
+		cif_fiscal_year_id = ct_table.cif_fiscal_year_id,
+		award_category_id = ct_table.award_category_id
 	FROM	(SELECT uniq_id, max(document_code_id) as document_code_id ,
 				 max(document_agency_id) as document_agency_id,
 				 max(document_agency_name) as document_agency_name,
@@ -242,7 +252,8 @@ BEGIN
 				 max(revised_end_date_id) as revised_end_date_id,
 				 max(cif_received_date_id) as cif_received_date_id,
 				 max(cif_fiscal_year) as cif_fiscal_year,
-				 max(cif_fiscal_year_id) as cif_fiscal_year_id
+				 max(cif_fiscal_year_id) as cif_fiscal_year_id,
+				 max(award_category_id) as award_category_id
 		 FROM	tmp_fk_values_pc
 		 GROUP BY 1) ct_table
 	WHERE	a.uniq_id = ct_table.uniq_id;	
@@ -296,7 +307,7 @@ BEGIN
 	
 	INSERT INTO pending_contracts(document_code_id,document_agency_id,document_id,parent_document_code_id,
 				      parent_document_agency_id,parent_document_id,encumbrance_mount,original_maximum_amount,
-				      revised_maximum_amount,vendor_legal_name,vendor_customer_code,description,
+				      revised_maximum_amount,revised_maximum_amount_mod, vendor_legal_name,vendor_customer_code,description,
 				      submitting_agency_id,oaisis_submitting_agency_desc,submitting_agency_code	,awarding_agency_id,
 				      oaisis_awarding_agency_desc,awarding_agency_code,contract_type_name,cont_type_code,
 				      award_method_name,award_method_code,start_date,end_date,revised_start_date,
@@ -306,10 +317,10 @@ BEGIN
 				      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,
 				      cif_received_date_id,document_agency_code,document_agency_name,document_agency_short_name,  
 				      original_agreement_id, funding_agency_id, funding_agency_code, funding_agency_name, funding_agency_short_name,
-				      dollar_difference, percent_difference,original_or_modified,award_size_id )
+				      dollar_difference, percent_difference,original_or_modified,award_size_id, award_category_id )
 	SELECT document_code_id,document_agency_id,con_no,parent_document_code_id,
 	      parent_document_agency_id,con_par_reg_num,con_cur_encumbrance,con_original_max,
-	      con_rev_max,vc_legal_name,con_vc_code,con_purpose,
+	      con_rev_max,(CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount_mod,vc_legal_name,con_vc_code,con_purpose,
 	      submitting_agency_id,submitting_agency_desc,submitting_agency_code,awarding_agency_id,
 	      awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,
 	      am_desc,am_code,con_term_from,con_term_to,con_rev_start_dt,
@@ -325,8 +336,7 @@ BEGIN
 		original_or_modified,
 		(CASE WHEN con_rev_max IS NULL THEN 5 WHEN con_rev_max <= 5000 THEN 4 WHEN con_rev_max  > 5000 
 		            AND con_rev_max  <= 100000 THEN 3 WHEN  con_rev_max > 100000 AND con_rev_max <= 1000000 THEN 2 WHEN con_rev_max > 1000000 THEN 1 
-            ELSE 5 END) as award_size_id
-
+            ELSE 5 END) as award_size_id, award_category_id
 	FROM  etl.stg_pending_contracts;
 	
 	RETURN 1;

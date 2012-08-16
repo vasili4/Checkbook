@@ -2665,6 +2665,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  	encumbrance_mount numeric(15,2),
  	original_maximum_amount numeric(15,2),
  	revised_maximum_amount numeric(15,2),
+ 	revised_maximum_amount_mod numeric(15,2),
  	vendor_legal_name varchar(80),
  	vendor_customer_code varchar(20),
  	description varchar(78),
@@ -2711,7 +2712,8 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4),
   	original_or_modified varchar,
-  	award_size_id smallint
+  	award_size_id smallint,
+  	award_category_id smallint
 	
  )
  EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.pending_contracts to stdout csv"' ON SEGMENT 0 
@@ -2723,7 +2725,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  CREATE VIEW pending_contracts AS 
  	SELECT pending_contracts__0.document_code_id,pending_contracts__0.document_agency_id,pending_contracts__0.document_id,
  		pending_contracts__0.parent_document_code_id,pending_contracts__0.parent_document_agency_id,pending_contracts__0.parent_document_id,
- 		pending_contracts__0.encumbrance_mount,pending_contracts__0.original_maximum_amount,pending_contracts__0.revised_maximum_amount,
+ 		pending_contracts__0.encumbrance_mount,pending_contracts__0.original_maximum_amount,pending_contracts__0.revised_maximum_amount,pending_contracts__0.revised_maximum_amount_mod,
  		pending_contracts__0.vendor_legal_name,pending_contracts__0.vendor_customer_code,pending_contracts__0.description,
  		pending_contracts__0.submitting_agency_id,pending_contracts__0.oaisis_submitting_agency_desc,pending_contracts__0.submitting_agency_code,
  		pending_contracts__0.awarding_agency_id,pending_contracts__0.oaisis_awarding_agency_desc,pending_contracts__0.awarding_agency_code,
@@ -2738,7 +2740,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  		pending_contracts__0.document_agency_code,pending_contracts__0.document_agency_name,pending_contracts__0.document_agency_short_name, 		
  		pending_contracts__0.funding_agency_id,pending_contracts__0.funding_agency_code,pending_contracts__0.funding_agency_name,
  		pending_contracts__0.funding_agency_short_name,pending_contracts__0.original_agreement_id,pending_contracts__0.dollar_difference,
- 		pending_contracts__0.percent_difference, pending_contracts__0.original_or_modified, pending_contracts__0.award_size_id  		
+ 		pending_contracts__0.percent_difference, pending_contracts__0.original_or_modified, pending_contracts__0.award_size_id, pending_contracts__0.award_category_id  		
  	FROM pending_contracts__0;
  	
 

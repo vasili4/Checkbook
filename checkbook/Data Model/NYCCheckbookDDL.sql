@@ -1655,6 +1655,7 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
  	encumbrance_mount numeric(15,2),
  	original_maximum_amount numeric(15,2),
  	revised_maximum_amount numeric(15,2),
+ 	revised_maximum_amount_mod numeric(15,2),
  	vendor_legal_name varchar(80),
  	vendor_customer_code varchar(20),
  	description varchar(78),
@@ -1701,7 +1702,8 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4),
 	original_or_modified varchar,
-	 award_size_id smallint
+	award_size_id smallint,
+	award_category_id smallint 
  ) DISTRIBUTED BY (document_code_id);
  
 -- Contract Aggregate Tables

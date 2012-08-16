@@ -4165,7 +4165,8 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
 	con_internal_pin varchar,
 	con_batch_suffix varchar,
 	con_version varchar,
-	original_or_modified varchar)
+	original_or_modified varchar,
+	award_category_code character varying)
  LOCATION (
   	    'gpfdist://mdw1:8081/datafiles/OAISIS_feed.txt')
   	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
@@ -4212,6 +4213,8 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
 	revised_start_date_id int,
 	revised_end_date_id int,	
 	cif_received_date_id int,
+	cif_fiscal_year smallint, 
+	cif_fiscal_year_id smallint,
  	document_code_id smallint,
  	document_agency_id  smallint,
   	parent_document_code_id smallint,
@@ -4228,6 +4231,8 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
   	percent_difference numeric(17,4),
   	contract_number varchar,
   	original_or_modified varchar,
+  	award_category_code varchar(3),
+  	award_category_id smallint,
  	uniq_id bigint default nextval('seq_stg_pending_contracts_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar	

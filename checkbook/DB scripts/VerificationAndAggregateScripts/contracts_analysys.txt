@@ -1,0 +1,440 @@
+Total lines in Con feed 		: 8111294
+
+Total lines after preprocessing : 5496653
+
+Data in the external table
+
+1443209;"CT1";"A"
+189580;"CT1";"H"
+189580;"CT1";"V"
+189578;"CT1";"W"
+25293;"CTA1";"A"
+5638;"CTA1";"H"
+5638;"CTA1";"V"
+5638;"CTA1";"W"
+3301;"CTA2";"A"
+480;"CTA2";"H"
+480;"CTA2";"V"
+480;"CTA2";"W"
+851529;"DO1";"A"
+724869;"DO1";"H"
+724869;"DO1";"V"
+43922;"PCC1";"A"
+43915;"PCC1";"H"
+43915;"PCC1";"V"
+43915;"PCC1";"W"
+167773;"POC";"A"
+156505;"POC";"H"
+156505;"POC";"V"
+156504;"POC";"W"
+103872;"POD";"A"
+78110;"POD";"H"
+78110;"POD";"V"
+63445;"POD";"W"
+
+
+
+189580;"CT1";"H"
+5638;"CTA1";"H"
+480;"CTA2";"H"
+724869;"DO1";"H"
+43915;"PCC1";"H"
+156505;"POC";"H"
+78110;"POD";"H"
+
+
+After stageandarchive
+
+select 43915 + 156505 + 78110  -- 278530
+select count(*) from etl.stg_con_po_header   -- 278530
+
+After validate
+
+select doc_cd, count(*) from etl.invalid_con_po_header group by 1
+
+POC   -  1
+
+select count(*) from etl.stg_con_po_header  -- 278529
+
+select doc_cd, count(*) from etl.stg_con_po_header group by 1
+
+"POC";156504
+"POD";78110
+"PCC1";43915
+
+
+After updateForeignKeysForPOInHeader and updateForeignKeysForPOInAwardDetail
+
+select count(*) from etl.stg_con_po_header  -- 278529
+
+select count(*) from etl.stg_con_po_header where source_updated_date_id IS NULL AND agency_history_id IS NULL  -- 0
+
+select count(*) from etl.stg_con_po_award_detail -- 263864
+
+select count(*) from tmp_po_fk_values_award_detail where award_method_id IS NOT NULL;  -- 263864
+
+
+After associateMAGToPO and associateMAGToPO
+
+select max(master_agreement_id) from history_master_agreement -- 30686
+select count(*) from etl.stg_con_po_header   -- 278529
+select count(*) from etl.stg_con_po_accounting_line   -- 315566
+select count(*) from etl.stg_con_po_award_detail -- 263864
+select count(*) from etl.stg_con_po_vendor -- 278530
+
+select * from etl.stg_con_po_vendor limit 10
+
+select count(*) from vendor where vendor_customer_code in ('0000539314','0002339304','0001767434','0001115789','0001833352','0001099802','0001129417','VC00124911','0001481782','0001215565')
+
+select count(distinct vend_cust_cd) from etl.stg_con_po_vendor  -- 15827
+
+select count(*) from vendor where coalesce(updated_load_id, created_load_id) = 4;  -- 14115
+
+select count(*) from etl.tmp_stg_vendor;  -- 278530
+
+select count(*) from etl.tmp_all_vendors  -- 18373;
+
+select count(*) from vendor where vendor_customer_code in (select distinct vend_cust_cd from etl.stg_con_po_vendor)
+
+select count(*), is_new_vendor, is_name_changed, is_vendor_address_changed, is_bus_type_changed, misc_acct_fl from etl.tmp_all_vendors group by 2,3,4,5,6
+
+
+
+
+
+
+
+-- extra queries
+
+
+-- original queries
+
+SELECT j.industry_industry,
+       j.yeartype_yeartype,
+       j.spending_amount_sum,
+       j1.industry_type_name AS industry_industry_industry_type_name
+  FROM (SELECT s0.type_of_year AS yeartype_yeartype,
+               s0.industry_type_id AS industry_industry,
+               SUM(COALESCE(original_contract_amount,0)) AS original_amount_sum,
+               SUM(COALESCE(maximum_contract_amount,0)) AS current_amount_sum,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum,
+               COUNT(contract_number) AS total_contracts
+          FROM aggregateon_contracts_cumulative_spending AS s0
+               LEFT OUTER JOIN ref_document_code AS s14 ON s14.document_code_id = s0.document_code_id
+         WHERE s0.status_flag = 'A'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s14.document_code IN ('CTA1', 'CT1')
+         GROUP BY yeartype_yeartype, industry_industry) AS j
+       LEFT OUTER JOIN ref_industry_type AS j1 ON j1.industry_type_id = j.industry_industry
+ORDER BY current_amount_sum DESC
+
+
+16644157432.08
+
+SELECT SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+      JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s0.check_eft_issued_nyc_year_id <= 113
+   AND s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'A'
+   AND s6.document_code_id IN (1,2)
+   AND s6.type_of_year = 'B'
+   
+
+-- debugging queries for registered
+   
+SELECT agency_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'R'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+         GROUP BY 1
+		 order by 1
+       
+
+SELECT document_agency_id, SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'R'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B'  
+   GROUP BY 1 
+   order by 1
+   
+ SELECT award_method_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'R'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND agency_id = 5
+         GROUP BY 1
+		 order by 1
+		 
+		 
+SELECT award_method_id, SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'R'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B' 
+   AND document_agency_id = 5 
+   GROUP BY 1 
+   order by 1
+   
+   
+   
+SELECT vendor_id, spending_amount_sum
+FROM
+ (SELECT vendor_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'R'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND agency_id = 5
+           AND award_method_id = 71
+         GROUP BY 1) X WHERE spending_amount_sum > 0 
+		 order by 1
+		 
+		 
+SELECT s6.vendor_id, SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'R'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B' 
+   AND document_agency_id = 5 
+   AND award_method_id = 71
+   GROUP BY 1 
+   order by 1
+   
+   
+   
+   SELECT award_size_id, spending_amount_sum
+FROM
+ (SELECT vendor_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'R'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND agency_id = 5
+           AND award_method_id = 71
+		   AND vendor_id = 2721
+         GROUP BY 1) X WHERE spending_amount_sum > 0 
+		 order by 1
+		 
+		 
+SELECT vendor_id, COALESCE(SUM(check_amount),0) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'R'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B' 
+   AND document_agency_id = 5 
+   AND award_method_id = 71
+    AND vendor_id = 2721
+   GROUP BY 1 
+   order by 1
+   
+   
+   
+   
+ SELECT vendor_id, spending_amount_sum
+FROM
+ (SELECT vendor_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'R'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND agency_id = 5
+           AND award_method_id = 71
+         GROUP BY 1) X WHERE spending_amount_sum > 0 
+		 order by 1
+
+
+SELECT s6.vendor_id, SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'R'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B' 
+   AND document_agency_id = 5 
+   AND award_method_id = 71
+   GROUP BY 1 
+   order by 1
+
+
+   select * from aggregateon_contracts_cumulative_spending s0 
+   WHERE s0.status_flag = 'R'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND agency_id = 5
+           AND award_method_id = 71
+           AND vendor_id = 2721
+
+399825.00
+
+
+      select * from contracts_spending_transactions s0 
+   WHERE s0.status_flag = 'R'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND document_agency_id = 5
+           AND award_method_id = 71
+           AND vendor_id = 2721
+
+
+-- debugging queries for Active
+
+-- Agencyid
+
+SELECT agency_id, spending_amount_sum
+FROM
+(SELECT agency_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'A'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+         GROUP BY 1) X where spending_amount_sum > 0
+		 order by 1
+		 
+SELECT document_agency_id, SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'A'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B'  
+   GROUP BY 1 
+   order by 1
+   
+
+-- award_method_id
+
+SELECT award_method_id, spending_amount_sum
+FROM
+(SELECT award_method_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'A'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND s0.agency_id = 155
+         GROUP BY 1) X where spending_amount_sum > 0
+		 order by 1
+
+
+SELECT award_method_id, SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'A'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B'  
+   AND document_agency_id = 155
+   GROUP BY 1 
+   order by 1
+
+-- vendor_id
+
+SELECT vendor_id, spending_amount_sum
+FROM
+(SELECT vendor_id,
+               SUM(COALESCE(spending_amount,0)) AS spending_amount_sum
+          FROM aggregateon_contracts_cumulative_spending AS s0
+         WHERE s0.status_flag = 'A'
+           AND s0.type_of_year = 'B'
+           AND s0.industry_type_id = 4
+           AND s0.fiscal_year_id = 113
+           AND s0.document_code_id IN (1)
+           AND s0.agency_id = 155
+           AND award_method_id = 4
+         GROUP BY 1) X where spending_amount_sum > 0
+		 order by 1
+
+
+SELECT s6.vendor_id, SUM(COALESCE(check_amount,0)) AS check_amount_sum
+  FROM disbursement_line_item_details AS s0
+       LEFT OUTER JOIN contracts_spending_transactions AS s6 ON s6.disbursement_line_item_id = s0.disbursement_line_item_id
+WHERE s6.industry_type_id = 4
+   AND s6.fiscal_year_id = 113
+   AND s6.status_flag = 'A'
+   AND s6.document_code_id IN (1)
+   AND s6.type_of_year = 'B'  
+   AND document_agency_id = 155
+   AND award_method_id = 4
+   GROUP BY 1 
+   order by 1   
+		   
+select * from disbursement_line_item_details where agreement_id = 32238
+
+select sum(check_amount) from disbursement_line_item_details where agreement_accounting_line_number = 0 AND agreement_vendor_line_number = 0 and agreement_id IS NOT NULL
+
+select count(*) from  disbursement_line_item_details where agreement_accounting_line_number IS NOT NULL AND agreement_commodity_line_number IS NOT NULL
+
+select count(*), disbursement_id from disbursement_line_item_details group by 2 having count(*) > 1 limit 100
+
+select count(*), document_version from disbursement group by 2 having count(*) > 1 limit 100
+
+select count(*) from disbursement_line_item_details a , disbursement b where a.disbursement_id = b.disbursement_id and b.document_version > 1  -- 18663
+
+select agreement_id, agreement_accounting_line_number, agreement_vendor_line_number from disbursement_line_item_details a , disbursement b where a.disbursement_id = b.disbursement_id and a.check_amount < 0 and document_version = 1 and agreement_id IS NOT NULL  limit 100
+
+select count(*), b.document_version from disbursement_line_item_details a , disbursement b where a.disbursement_id = b.disbursement_id and  agreement_id IS NOT NULL   AND (agreement_accounting_line_number = 0 OR agreement_vendor_line_number = 0) group by 2
+
+select count(*) from disbursement_line_item_details a , disbursement b where a.disbursement_id = b.disbursement_id and  agreement_id IS NOT NULL   AND  (agreement_accounting_line_number = 0 OR agreement_vendor_line_number = 0)
+
+select * from disbursement_line_item_details a , disbursement b where a.disbursement_id = b.disbursement_id and agreement_id IS NOT NULL  AND  check_amount >= 0 AND (agreement_accounting_line_number = 0 OR agreement_commodity_line_number = 0)
+
+select  c.document_code as DOC_CD, e.agency_code  as DOC_DEPT_CD, b.document_code_id as DOC_ID, b.document_version as DOC_VERS_NO, a.line_number as DOC_ACTG_LN_NO, a.check_amount as CHK_AM from disbursement_line_item_details a , disbursement b, ref_document_code c, ref_agency_history d, ref_agency e where a.disbursement_id = b.disbursement_id  AND b.document_code_id = c.document_code_id AND b.agency_history_id = d.agency_history_id AND d.agency_id = e.agency_id AND  check_amount < 0 and b.document_version = 1 and agreement_id IS NOT NULL  LIMIT 100
+
+select  count(*) from disbursement_line_item_details a , disbursement b, ref_document_code c, ref_agency_history d, ref_agency e where a.disbursement_id = b.disbursement_id  AND b.document_code_id = c.document_code_id AND b.agency_history_id = d.agency_history_id AND d.agency_id = e.agency_id AND  check_amount < 0 and b.document_version = 1  
+
+
+select  c.document_code as DOC_CD, e.agency_code  as DOC_DEPT_CD, b.document_code_id as DOC_ID, b.document_version as DOC_VERS_NO, a.line_number as DOC_ACTG_LN_NO, a.check_amount as CHK_AM, a.agreement_accounting_line_number as RQPORF_ACTG_LN_NO, a.agreement_commodity_line_number as RQPORF_COMM_LN_NO, a.agreement_vendor_line_number as RQPORF_VEND_LN_NO from disbursement_line_item_details a , disbursement b, ref_document_code c, ref_agency_history d, ref_agency e where a.disbursement_id = b.disbursement_id  AND b.document_code_id = c.document_code_id AND b.agency_history_id = d.agency_history_id AND d.agency_id = e.agency_id AND  check_amount < 0 and b.document_version = 2 and agreement_id IS NOT NULL   LIMIT 100
+
+
+select  c.document_code as DOC_CD, e.agency_code  as DOC_DEPT_CD, b.document_code_id as DOC_ID, b.document_version as DOC_VERS_NO, a.line_number as DOC_ACTG_LN_NO, a.check_amount as CHK_AM, a.agreement_accounting_line_number as RQPORF_ACTG_LN_NO, a.agreement_commodity_line_number as RQPORF_COMM_LN_NO, a.agreement_vendor_line_number as RQPORF_VEND_LN_NO from disbursement_line_item_details a , disbursement b, ref_document_code c, ref_agency_history d, ref_agency e where a.disbursement_id = b.disbursement_id  AND b.document_code_id = c.document_code_id AND b.agency_history_id = d.agency_history_id AND d.agency_id = e.agency_id AND  check_amount < 0 and b.document_version = 1 and agreement_id IS NOT NULL  AND (agreement_accounting_line_number = 0 OR agreement_commodity_line_number = 0) 
+
+
+
+		   
+		   

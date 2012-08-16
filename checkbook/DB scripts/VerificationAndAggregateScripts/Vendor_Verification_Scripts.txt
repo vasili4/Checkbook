@@ -1,0 +1,12 @@
+select * from etl.stg_fms_vendor
+
+update etl.stg_fms_vendor set vendor_history_id = null
+
+select * from vendor where vendor_customer_code = '12345A'
+
+select * from vendor_history a, vendor b where a.vendor_id = b.vendor_id and b.vendor_customer_code = '12345A'
+
+delete from vendor where vendor_customer_code = '12345A'
+delete from vendor_history where vendor_history_id > 140800
+delete from vendor_business_type where vendor_history_id > 140800
+delete from vendor_address where vendor_history_id > 140800
