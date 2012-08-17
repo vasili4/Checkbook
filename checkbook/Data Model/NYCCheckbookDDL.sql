@@ -1028,7 +1028,8 @@ CREATE TABLE disbursement_line_item (
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
-    updated_date timestamp without time zone
+    updated_date timestamp without time zone,
+    file_type char(1)
 ) distributed by (disbursement_line_item_id);
 
 
@@ -1388,7 +1389,8 @@ CREATE TABLE disbursement_line_item_details(
     agreement_vendor_line_number integer, 
     reference_document_number character varying,  	
 	load_id integer,
-	last_modified_date timestamp without time zone
+	last_modified_date timestamp without time zone,
+	file_type char(1)
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
