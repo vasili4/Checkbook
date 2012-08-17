@@ -1001,7 +1001,7 @@ BEGIN
 		-- Disbursement line item changes
 		
 		
-		TRUNCATE etl.seq_disbursement_line_item_id;
+		TRUNCATE etl.seq_,_id;
 		
 		INSERT INTO etl.seq_disbursement_line_item_id(uniq_id)
 		SELECT b.uniq_id
@@ -1018,7 +1018,7 @@ BEGIN
 							reporting_code,check_amount,agreement_id,
 							agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number, 
 							location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
-							created_load_id,created_date)
+							created_load_id,created_date,file_type)
 		SELECT  c.disbursement_line_item_id,d.disbursement_id,a.doc_actg_ln_no,
 			a.bfy,a.fy_dc,a.per_dc,
 			a.fund_class_id,a.agency_history_id,a.department_history_id,
@@ -1031,7 +1031,7 @@ BEGIN
 			 else 
 			  a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id end),
 			a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
-			p_load_id_in, now()::timestamp
+			p_load_id_in, now()::timestamp,a.file_type
 		FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 						AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 			JOIN etl.seq_disbursement_line_item_id c ON a.uniq_id = c.uniq_id
@@ -1075,7 +1075,7 @@ BEGIN
 							reporting_code,check_amount,agreement_id,
 							agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number, 
 							location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
-							created_load_id,created_date)
+							created_load_id,created_date,file_type)
 		SELECT  d.disbursement_id,a.doc_actg_ln_no,
 			a.bfy,a.fy_dc,a.per_dc,
 			a.fund_class_id,a.agency_history_id,a.department_history_id,
@@ -1088,7 +1088,7 @@ BEGIN
 			 else 
 			  a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id end),
 			a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
-			p_load_id_in, now()::timestamp
+			p_load_id_in, now()::timestamp,a.file_type
 		FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 						AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no 
 						JOIN tmp_all_disbs d ON b.uniq_id = d.uniq_id
@@ -1118,7 +1118,8 @@ BEGIN
 	        CREATE TEMPORARY TABLE tmp_disbs_line_items_update AS
 	                SELECT e.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, b.agency_history_id, b.department_history_id, b.expenditure_object_history_id, b.budget_code_id,             
 	                                  b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no,b.rqporf_comm_ln_no, b.rqporf_vend_ln_no, 
-	                                  b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id as reference_document_number, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id
+	                                  b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id as reference_document_number, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id,
+	                                  b.file_type
 	                FROM etl.stg_fms_header a, etl.stg_fms_accounting_line b,
 	                                tmp_all_disbs d,tmp_disbs_lines_actions e
 	                WHERE  d.action_flag = 'U' AND e.action_flag='U'
@@ -1150,7 +1151,8 @@ BEGIN
 			retainage_amount = b.rtg_ln_am,
 			check_eft_issued_nyc_year_id = b.check_eft_issued_nyc_year_id,
 			updated_load_id = p_load_id_in,
-			updated_date = now()::timestamp
+			updated_date = now()::timestamp,
+			file_type = b.file_type
 		FROM   tmp_disbs_line_items_update b			      	      
 		WHERE   f.disbursement_line_item_id = b.disbursement_line_item_id ;	
 		
