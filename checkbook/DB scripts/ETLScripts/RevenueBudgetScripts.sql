@@ -32,9 +32,6 @@ $BODY$
 		
 			
   	
-  	
-  	
-  	
   	-- FK:fund_class_id
   
   	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,fund_class_id)
@@ -71,7 +68,7 @@ $BODY$
   	FROM   tmp_fk_bdgt_values_new_agencies;
   	
   	INSERT INTO ref_agency(agency_id,agency_code,agency_name,created_date,created_load_id,original_agency_name,agency_short_name)
-  	SELECT a.agency_id,COALESCE(b.dept_cd,'---') as agency_code,(CASE WHEN COALESCE(b.dept_code,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END) as agency_name,
+  	SELECT a.agency_id,COALESCE(b.dept_cd,'---') as agency_code,(CASE WHEN COALESCE(b.dept_cd,'---')='---' THEN '<Non-Applicable Agency>' ELSE '<Unknown Agency>' END) as agency_name,
   	now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
   	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_bdgt_values_new_agencies b ON a.uniq_id = b.uniq_id;
   
@@ -226,7 +223,7 @@ $BODY$
   	FROM	(SELECT uniq_id, max(fund_class_id) as fund_class_id, 
   				 max(agency_history_id) as agency_history_id,
   				 max(agency_id) as agency_id,
-        			 max(budget_code_id) as budget_code_id,
+        		 max(budget_code_id) as budget_code_id,
   				 max(budget_fiscal_year_id) as budget_fiscal_year_id,
   				 max(agency_name) as agency_name,
 				 max(revenue_source_name) as revenue_source_name,
@@ -273,6 +270,9 @@ BEGIN
 	l_start_time := timeofday()::timestamp;
 	l_fk_update := etl.updateForeignKeysForRevenueBudget(p_load_id_in);
 
+	IF l_fk_update <> 1 THEN
+		RETURN -1;
+	END IF;
 	
 	RAISE NOTICE 'REVENUE BUDGET 1';
 
@@ -318,6 +318,7 @@ Raise NOTICE 'Revenue Budget 1.1';
 	UPDATE revenue_budget a
 	SET 	adopted_amount = b.adopted_amount,
 		current_modified_budget_amount = b.current_budget_amount,
+		current_modified_budget_amount_mod = (CASE WHEN b.current_budget_amount IS NULL THEN 0 ELSE b.current_budget_amount END),
 		updated_load_id = b.load_id,
 		updated_date = now()::timestamp
 	FROM 	tmp_revenue_budget_data_to_update b
@@ -352,14 +353,14 @@ Raise NOTICE 'Revenue Budget 1.1';
 	
 	
 	INSERT INTO revenue_budget(budget_fiscal_year, fund_class_id, agency_history_id,  budget_code_id, 
-			    adopted_amount, current_modified_budget_amount,   
+			    adopted_amount, current_modified_budget_amount,   current_modified_budget_amount_mod, 
 			 created_load_id,created_date,
 			 budget_fiscal_year_id,agency_id,
 			   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
 			   agency_short_name,revenue_category_id,revenue_category_code,revenue_category_name,
 			   funding_class_id,funding_class_code,funding_class_name,budget_code_name)				      
 	   SELECT a.budget_fiscal_year, a.fund_class_id, a.agency_history_id, a.budget_code_id, 
-					 a.adopted_amount, a.current_budget_amount, 
+					 a.adopted_amount, a.current_budget_amount, (CASE WHEN a.current_budget_amount IS NULL THEN 0 ELSE a.current_budget_amount END) as current_modified_budget_amount_mod,
 					 p_load_id_in,now()::timestamp,
 					 a.budget_fiscal_year_id,a.agency_id,
 					a.agency_name,a.budget_code,a.agency_code,a.revenue_source_code,a.revenue_source_name,a.revenue_source_id,

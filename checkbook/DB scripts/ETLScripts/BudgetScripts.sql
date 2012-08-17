@@ -31,9 +31,6 @@ BEGIN
 	
 	
 	
-	
-	
-	
 	-- FK:fund_class_id
 
 	INSERT INTO tmp_fk_budget_values(uniq_id,fund_class_id)
@@ -369,6 +366,10 @@ BEGIN
 
 	l_fk_update := etl.updateForeignKeysForBudget(p_load_id_in);
 
+	IF l_fk_update <> 1 THEN
+		RETURN -1;
+	END IF;
+	
 	RAISE NOTICE 'BUDGET 1';
 
 	UPDATE etl.stg_budget 
@@ -422,6 +423,7 @@ BEGIN
 	UPDATE budget a
 	SET 	adopted_amount = b.adopted_amount,
 		current_budget_amount = b.current_budget_amount,
+		current_budget_amount_mod = (CASE WHEN b.current_budget_amount IS NULL THEN 0 ELSE b.current_budget_amount END),
 		pre_encumbered_amount = b.pre_encumbered_amount,
 		encumbered_amount = b.encumbered_amount,
 		accrued_expense_amount = b.accrued_expense_amount,
@@ -444,13 +446,15 @@ BEGIN
 	VALUES(p_load_file_id_in,'B',l_count,'# of records updated in budget ');
 	
 	INSERT INTO budget(budget_fiscal_year, fund_class_id, agency_history_id, department_history_id, budget_code_id, 
-			   object_class_history_id, adopted_amount, current_budget_amount, pre_encumbered_amount, encumbered_amount, 
+			   object_class_history_id, adopted_amount, current_budget_amount, current_budget_amount_mod, 
+			   pre_encumbered_amount, encumbered_amount, 
 			   accrued_expense_amount, cash_expense_amount, post_closing_adjustment_amount, total_expenditure_amount, 
 			   created_load_id, created_date,budget_fiscal_year_id,agency_id,object_class_id ,department_id ,
 			   agency_name,object_class_name,department_name,budget_code,budget_code_name,
 			   agency_code,department_code,object_class_code,agency_short_name,department_short_name)
 	SELECT budget_fiscal_year, fund_class_id, agency_history_id, department_history_id, budget_code_id, 
-		object_class_history_id, adopted_amount, current_budget_amount, pre_encumbered_amount, encumbered_amount, 
+		object_class_history_id, adopted_amount, current_budget_amount, (CASE WHEN current_budget_amount IS NULL THEN 0 ELSE current_budget_amount END) as current_budget_amount_mod,
+		pre_encumbered_amount, encumbered_amount, 
 		accrued_expense_amount, cash_expense_amount, post_closing_adjustment_amount, total_expenditure_amount, 
 		p_load_id_in, now()::timestamp,budget_fiscal_year_id,agency_id,object_class_id ,department_id ,
 		agency_name,object_class_name,department_name,budget_code,budget_code_name,

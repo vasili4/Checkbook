@@ -863,6 +863,7 @@ BEGIN
 		RETURN -1;
 	END IF;
 
+	
 	RAISE NOTICE 'CON 5';
 
 	
@@ -1614,7 +1615,7 @@ BEGIN
 	
 	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
-				       original_contract_amount,maximum_contract_amount,description,
+				       original_contract_amount,maximum_contract_amount,maximum_contract_amount_mod,description,
 					vendor_history_id,vendor_id,vendor_code,vendor_name,
 					dollar_difference,
 					percent_difference,
@@ -1633,7 +1634,7 @@ BEGIN
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
 	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
-	        b.original_contract_amount,b.maximum_contract_amount,b.description,
+	        b.original_contract_amount,b.maximum_contract_amount,(CASE WHEN b.maximum_contract_amount IS NULL THEN 0 ELSE b.maximum_contract_amount END) as maximum_contract_amount_mod,b.description,
 		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),		
 		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
@@ -1746,7 +1747,7 @@ BEGIN
 
 	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
-				       original_contract_amount,maximum_contract_amount,description,
+				       original_contract_amount,maximum_contract_amount,maximum_contract_amount_mod,description,
 					vendor_history_id,vendor_id,vendor_code,vendor_name,
 					dollar_difference,
 					percent_difference,
@@ -1765,7 +1766,7 @@ BEGIN
 				(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
 				      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year_id
 				      ELSE b.effective_end_calendar_year_id END),b.contract_number,
-		b.original_contract_amount,b.maximum_contract_amount,b.description,
+		b.original_contract_amount,b.maximum_contract_amount,(CASE WHEN b.maximum_contract_amount IS NULL THEN 0 ELSE b.maximum_contract_amount END) as maximum_contract_amount_mod,b.description,
 		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),		
 		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as  dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 

@@ -432,7 +432,7 @@ BEGIN
 						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
 						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 						  amount_basis_id,base_pay,overtime_pay,other_payments,
-						  gross_pay,agency_id,agency_code,agency_name,
+						  gross_pay, gross_pay_mod, agency_id,agency_code,agency_name,
 						  department_id,department_code,department_name,
 						  employee_id,employee_name,fiscal_year_id,pay_date,
 						  calendar_fiscal_year_id,calendar_fiscal_year,
@@ -442,7 +442,7 @@ BEGIN
 	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
 	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
 	       amount_basis_id,base_pay,overtime_pay,other_payments,
-	       gross_pay,agency_id,agency_code,agency_name,
+	       gross_pay,(CASE WHEN gross_pay IS NULL THEN 0 ELSE gross_pay END) as gross_pay_mod, agency_id,agency_code,agency_name,
 	       department_id,department_code,department_name,
 	       employee_id,employee_name,fiscal_year_id,pay_date,
 	       calendar_fiscal_year_id,calendar_fiscal_year,
@@ -460,13 +460,15 @@ BEGIN
 	RAISE NOTICE 'PAYROLL 1.2';
 	
 	
-	CREATE TEMPORARY TABLE tmp_employee_rec_gross_pay(payroll_id bigint,employee_id bigint, payroll_number varchar,job_sequence_number varchar,fiscal_year smallint, pay_date date)
+	CREATE TEMPORARY TABLE tmp_employee_rec_gross_pay(payroll_id bigint, employee_id bigint, agency_id smallint, payroll_number varchar,job_sequence_number varchar,fiscal_year smallint, pay_date date)
 	DISTRIBUTED BY (payroll_id);
 	
 	INSERT INTO tmp_employee_rec_gross_pay
-	SELECT  DISTINCT a.payroll_id,a.employee_id, a.payroll_number, a.job_sequence_number, 
+	SELECT  DISTINCT a.payroll_id,a.employee_id, a.agency_id, a.payroll_number, a.job_sequence_number, 
 		a.fiscal_year,a.pay_date
-	FROM   payroll a JOIN etl.stg_payroll b ON a.employee_id = b.employee_id AND a.payroll_number = b.payroll_number
+	FROM   payroll a JOIN etl.stg_payroll b ON a.employee_id = b.employee_id 
+			AND a.agency_id = b.agency_id
+			AND a.payroll_number = b.payroll_number
 			AND a.job_sequence_number = b.job_sequence_number
 			AND a.fiscal_year = b.fiscal_year
 			AND a.pay_date >= b.pay_date;
@@ -479,7 +481,9 @@ BEGIN
 	
 	INSERT INTO tmp_employee_rec_gross_pay_1
 	SELECT b.payroll_id, sum(a.gross_pay) as gross_pay_ytd, MIN(created_load_id) as created_load_id
-	FROM	payroll a JOIN tmp_employee_rec_gross_pay b ON a.employee_id = b.employee_id AND a.payroll_number = b.payroll_number
+	FROM	payroll a JOIN tmp_employee_rec_gross_pay b ON a.employee_id = b.employee_id 
+			AND a.agency_id = b.agency_id
+			AND a.payroll_number = b.payroll_number
 			AND a.job_sequence_number = b.job_sequence_number
 			AND b.pay_date >= a.pay_date
 			AND a.fiscal_year = b.fiscal_year
@@ -501,9 +505,11 @@ BEGIN
 	TRUNCATE tmp_employee_rec_gross_pay;
 	
 	INSERT INTO tmp_employee_rec_gross_pay
-	SELECT  DISTINCT a.payroll_id,a.employee_id, a.payroll_number, a.job_sequence_number, 
+	SELECT  DISTINCT a.payroll_id,a.employee_id, a.agency_id, a.payroll_number, a.job_sequence_number, 
 		a.calendar_fiscal_year,a.pay_date
-	FROM   payroll a JOIN etl.stg_payroll b ON a.employee_id = b.employee_id AND a.payroll_number = b.payroll_number
+	FROM   payroll a JOIN etl.stg_payroll b ON a.employee_id = b.employee_id 
+			AND a.agency_id = b.agency_id
+		    AND a.payroll_number = b.payroll_number
 			AND a.job_sequence_number = b.job_sequence_number
 			AND a.calendar_fiscal_year = b.calendar_fiscal_year
 			AND a.pay_date >= b.pay_date;
@@ -515,7 +521,9 @@ BEGIN
 	
 	INSERT INTO tmp_employee_rec_gross_pay_1
 	SELECT b.payroll_id, sum(a.gross_pay) as gross_pay_ytd, MIN(created_load_id) as created_load_id
-	FROM	payroll a JOIN tmp_employee_rec_gross_pay b ON a.employee_id = b.employee_id AND a.payroll_number = b.payroll_number
+	FROM	payroll a JOIN tmp_employee_rec_gross_pay b ON a.employee_id = b.employee_id 
+			AND a.agency_id = b.agency_id
+			AND a.payroll_number = b.payroll_number
 			AND a.job_sequence_number = b.job_sequence_number
 			AND b.pay_date >= a.pay_date
 			AND a.calendar_fiscal_year = b.fiscal_year

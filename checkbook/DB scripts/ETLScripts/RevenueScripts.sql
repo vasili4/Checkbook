@@ -834,14 +834,14 @@ BEGIN
 
 	
 				
-	INSERT INTO revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,
+	INSERT INTO revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,posting_amount_mod,
 					revenue_category_id,revenue_source_id,fiscal_year_id,agency_id,
 					department_id,revenue_class_id,fund_class_id,funding_class_id,
 					budget_code_id,budget_fiscal_year_id,agency_name,revenue_category_name,
 					revenue_source_name,budget_fiscal_year,department_name,revenue_class_name,
 					fund_class_name,funding_class_name,agency_code,revenue_class_code,fund_class_code,funding_class_code,
 					revenue_category_code,revenue_source_code,agency_short_name,department_short_name,agency_history_id, load_id, last_modified_date)
-	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,
+	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,(CASE WHEN a.posting_amount IS NULL THEN 0 ELSE a.posting_amount END) as posting_amount_mod,
 			a.revenue_category_id,a.revenue_source_id,d.year_id,b.agency_id,
 			c.department_id,a.revenue_class_id,a.fund_class_id,e.funding_class_id,
 			a.budget_code_id,f.year_id,b.agency_name,g.revenue_category_name,
