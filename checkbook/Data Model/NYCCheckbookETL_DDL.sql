@@ -3124,7 +3124,6 @@ CREATE TABLE stg_fms_vendor(
 	st varchar(25),
 	zip varchar(25),
 	city varchar(60),
-	file_type char(1) default 'F',
 	vendor_history_id integer,
 	uniq_id bigint default nextval('seq_stg_fms_vendor_uniq_id'),
 	invalid_flag char(1),
@@ -3189,6 +3188,7 @@ CREATE TABLE stg_fms_accounting_line(
 	agreement_id bigint,
 	masked_agency_history_id smallint,
 	masked_department_history_id int,
+	file_type char(1),
 	uniq_id bigint default nextval('seq_stg_fms_accounting_line_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar		)
