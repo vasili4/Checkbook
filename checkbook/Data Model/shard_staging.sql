@@ -256,6 +256,7 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item__0 (
     location_history_id integer,
     retainage_amount numeric,
     check_eft_issued_nyc_year_id smallint,
+    file_type,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -276,7 +277,7 @@ CREATE VIEW disbursement_line_item AS
     disbursement_line_item__0.reporting_code, disbursement_line_item__0.check_amount, disbursement_line_item__0.agreement_id, 
     disbursement_line_item__0.agreement_accounting_line_number, disbursement_line_item__0.agreement_commodity_line_number, disbursement_line_item__0.agreement_vendor_line_number, disbursement_line_item__0.reference_document_number, 
     disbursement_line_item__0.location_history_id, disbursement_line_item__0.retainage_amount,
-    disbursement_line_item__0.check_eft_issued_nyc_year_id, disbursement_line_item__0.created_load_id,disbursement_line_item__0.updated_load_id,
+    disbursement_line_item__0.check_eft_issued_nyc_year_id, disbursement_line_item__0.file_type, disbursement_line_item__0.created_load_id,disbursement_line_item__0.updated_load_id,
     disbursement_line_item__0.created_date, disbursement_line_item__0.updated_date  FROM ONLY disbursement_line_item__0;
 
 --
@@ -345,9 +346,10 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-    agreement_commodity_line_number integer,
-    agreement_vendor_line_number integer, 
-    reference_document_number character varying,
+        agreement_commodity_line_number integer,
+        agreement_vendor_line_number integer, 
+        reference_document_number character varying,
+	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.disbursement_line_item_details to stdout csv"' ON SEGMENT 0 
@@ -378,7 +380,7 @@ CREATE VIEW disbursement_line_item_details AS
     disbursement_line_item_details__0.reporting_code,disbursement_line_item_details__0.location_id,disbursement_line_item_details__0.fund_class_name,disbursement_line_item_details__0.fund_class_code,
     disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year,
     disbursement_line_item_details__0.agreement_accounting_line_number, disbursement_line_item_details__0.agreement_commodity_line_number, disbursement_line_item_details__0.agreement_vendor_line_number, 
-    disbursement_line_item_details__0.reference_document_number,disbursement_line_item_details__0.load_id, disbursement_line_item_details__0.last_modified_date 
+    disbursement_line_item_details__0.reference_document_number,disbursement_line_item_details__0.file_type,disbursement_line_item_details__0.load_id, disbursement_line_item_details__0.last_modified_date 
 FROM ONLY disbursement_line_item_details__0;
 
 --
