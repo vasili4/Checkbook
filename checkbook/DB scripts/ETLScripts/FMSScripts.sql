@@ -1001,7 +1001,7 @@ BEGIN
 		-- Disbursement line item changes
 		
 		
-		TRUNCATE etl.seq_,_id;
+		TRUNCATE etl.seq_disbursement_line_item_id;
 		
 		INSERT INTO etl.seq_disbursement_line_item_id(uniq_id)
 		SELECT b.uniq_id
@@ -1212,7 +1212,7 @@ BEGIN
 						budget_code_id,budget_code,budget_name,reporting_code,location_id,location_code,fund_class_name,fund_class_code,
 						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,
 						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number,load_id,
-						last_modified_date)
+						last_modified_date,file_type)
 	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.check_eft_issued_date_id,
 		f.nyc_year_id,l.year_value,f.calendar_month_id,
 		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
@@ -1230,7 +1230,7 @@ BEGIN
 		 		      ELSE 'Others'
 		 END) as spending_category_name,x.year_id,x.year_value,
 		 b.agreement_accounting_line_number, b.agreement_commodity_line_number, b.agreement_vendor_line_number, b.reference_document_number,coalesce(a.updated_load_id, a.created_load_id),
-		 coalesce(a.updated_date, a.created_date)
+		 coalesce(a.updated_date, a.created_date),b.file_type
 		FROM disbursement a JOIN disbursement_line_item b ON a.disbursement_id = b.disbursement_id
 			JOIN ref_agency_history c ON b.agency_history_id = c.agency_history_id
 			JOIN ref_agency m on c.agency_id = m.agency_id
