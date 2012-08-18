@@ -1388,11 +1388,10 @@ CREATE TABLE disbursement_line_item_details(
     	agreement_commodity_line_number integer,
     	agreement_vendor_line_number integer, 
     	reference_document_number character varying,  	
-    	file_type char(1) defualt 'F',
+    	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone,
-	file_type char(1)
-	)
+)
 DISTRIBUTED BY (disbursement_line_item_id);
 
  ----------------------------------------------------------------------------------------------------------------------------------------
