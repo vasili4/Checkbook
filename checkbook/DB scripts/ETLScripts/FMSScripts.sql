@@ -690,7 +690,7 @@ BEGIN
 	UPDATE etl.invalid_fms_accounting_line 
 	SET file_type ='P' 
 	WHERE  rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' 
-	AND load_file_id =p_load_file_id_in;;
+	AND load_file_id =p_load_file_id_in;
 	
 	UPDATE etl.archive_fms_accounting_line 
 	SET file_type ='P' 
