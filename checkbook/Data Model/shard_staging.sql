@@ -256,7 +256,7 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item__0 (
     location_history_id integer,
     retainage_amount numeric,
     check_eft_issued_nyc_year_id smallint,
-    file_type,
+    file_type char(1),
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
