@@ -1084,7 +1084,7 @@ BEGIN
 			(case when a.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else a.rqporf_actg_ln_no end)::integer as rqporf_actg_ln_no,
 			(case when a.rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else a.rqporf_comm_ln_no end)::integer as rqporf_comm_ln_no,
 			(case when a.rqporf_vend_ln_no='N/A (PRIVACY/SECURITY)' then NULL else a.rqporf_vend_ln_no end)::integer as rqporf_vend_ln_no,
-			 (case when a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id ='N/A' then 'NULL' 
+			 (case when a.rqporf_doc_cd ='N/A' then NULL
 			 else 
 			  a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id end),
 			a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
