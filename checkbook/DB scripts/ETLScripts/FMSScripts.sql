@@ -1062,9 +1062,9 @@ BEGIN
 	
 
 		
-<<<<<<< .mine
+
 	RAISE NOTICE 'FMS 18';
-=======
+
 		INSERT INTO disbursement_line_item(disbursement_id,line_number,
 							budget_fiscal_year,fiscal_year,fiscal_period,
 							fund_class_id,agency_history_id,department_history_id,
@@ -1125,7 +1125,7 @@ BEGIN
 	                       AND a.uniq_id = d.uniq_id
 	                       AND d.disbursement_id = e.disbursement_id AND b.uniq_id = e.uniq_id                       
 	     DISTRIBUTED BY (disbursement_line_item_id); 
->>>>>>> .r2798
+
 	
 	INSERT INTO disbursement_line_item(disbursement_id,line_number,
 						budget_fiscal_year,fiscal_year,fiscal_period,
