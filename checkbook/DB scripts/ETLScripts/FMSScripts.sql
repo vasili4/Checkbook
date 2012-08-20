@@ -683,27 +683,18 @@ BEGIN
 	UPDATE etl.stg_fms_accounting_line
 	SET rqporf_doc_id = 'N/A',
 		rqporf_doc_dept_cd = 'N/A',
-		rqporf_doc_cd = 'N/A'
+		rqporf_doc_cd = 'N/A',
+		file_type ='P'
 	WHERE rqporf_doc_id = 'N/A (PRIVACY/SECURITY)';
 	
-	UPDATE etl.stg_fms_accounting_line 
+	UPDATE etl.invalid_fms_accounting_line 
 	SET file_type ='P' 
 	WHERE  rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' 
-	AND rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' 
-	AND rqporf_vend_ln_no ='N/A (PRIVACY/SECURITY)' ;
-	
-	
-	UPDATE etl.invalid_fms_accounting_line 
-		SET file_type ='P' 
-		WHERE  rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' 
-		AND rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' 
-	AND rqporf_vend_ln_no ='N/A (PRIVACY/SECURITY)' ;
+	AND load_file_id =p_load_file_id_in;;
 	
 	UPDATE etl.archive_fms_accounting_line 
-		SET file_type ='P' 
-		WHERE  rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' 
-		AND rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' 
-	AND rqporf_vend_ln_no ='N/A (PRIVACY/SECURITY)'
+	SET file_type ='P' 
+	WHERE  rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' 
 	AND load_file_id =p_load_file_id_in;
 	
 	-- Fetch all the contracts associated with Disbursements
@@ -1062,10 +1053,8 @@ BEGIN
 	
 
 		
-
 	RAISE NOTICE 'FMS 18';
-
-		
+	
 	INSERT INTO disbursement_line_item(disbursement_id,line_number,
 						budget_fiscal_year,fiscal_year,fiscal_period,
 						fund_class_id,agency_history_id,department_history_id,
@@ -1101,6 +1090,7 @@ BEGIN
 		AND a.disbursement_id = c.disbursement_id
 		AND b.action_flag = 'D' AND c.action_flag='U';
 	
+	
 	RAISE NOTICE 'FMS 18.2';
 	
 	DELETE FROM ONLY disbursement_line_item a 
@@ -1118,8 +1108,7 @@ BEGIN
         CREATE TEMPORARY TABLE tmp_disbs_line_items_update AS
                 SELECT e.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, b.agency_history_id, b.department_history_id, b.expenditure_object_history_id, b.budget_code_id,             
                                   b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no,b.rqporf_comm_ln_no, b.rqporf_vend_ln_no, 
-                                  (CASE WHEN b.rqporf_doc_cd = 'N/A' THEN NULL ELSE b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id END) as reference_document_number, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id,
-                                  b.file_type
+                                  (CASE WHEN b.rqporf_doc_cd = 'N/A' THEN NULL ELSE b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id END) as reference_document_number, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id,b.file_type
                 FROM etl.stg_fms_header a, etl.stg_fms_accounting_line b,
                                 tmp_all_disbs d,tmp_disbs_lines_actions e
                 WHERE  d.action_flag = 'U' AND e.action_flag='U'
@@ -1129,8 +1118,8 @@ BEGIN
                        AND d.disbursement_id = e.disbursement_id AND b.uniq_id = e.uniq_id                       
      DISTRIBUTED BY (disbursement_line_item_id); 
 
-	 RAISE NOTICE 'FMS 19.1';
-	 
+	RAISE NOTICE 'FMS 19.1';
+	
 	UPDATE  disbursement_line_item f
 	SET budget_fiscal_year = b.bfy,
 		fiscal_year = b.fy_dc,
