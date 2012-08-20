@@ -97,11 +97,13 @@ BEGIN
 	TRUNCATE etl.tmp_all_vendors;
 	
 	INSERT INTO etl.tmp_all_vendors
-	SELECT MAX(uniq_id), a.vend_cust_cd as vendor_customer_code, COALESCE(MAX(c.vendor_history_id),0) as vendor_history_id, COALESCE(MAX(b.vendor_id),0) as vendor_id, COALESCE(misc_acct_fl,0) as misc_acct_fl,
+	SELECT MAX(uniq_id), a.vend_cust_cd as vendor_customer_code, COALESCE(MAX(b.vendor_history_id),0) as vendor_history_id, COALESCE(MAX(b.vendor_id),0) as vendor_id, COALESCE(misc_acct_fl,0) as misc_acct_fl,
 				'N' as is_new_vendor, 'N' as is_name_changed, 'N' as is_vendor_address_changed, 'N' as  is_address_new,'N' as is_bus_type_changed, lgl_nm, alias_nm,
 				ad_ln_1, ad_ln_2, ctry, st, zip, city, address_type_code		
-	FROM etl.tmp_stg_vendor a LEFT JOIN vendor b ON a.vend_cust_cd = b.vendor_customer_code	
-			LEFT JOIN vendor_history c ON b.vendor_id=c.vendor_id	
+	FROM etl.tmp_stg_vendor a LEFT JOIN 
+	(SELECT b.vendor_id, c.vendor_history_id, b.vendor_customer_code FROM vendor b, vendor_history c
+	WHERE coalesce(b.miscellaneous_vendor_flag,0::bit) = 0::bit AND b.vendor_id = c.vendor_id) b
+	ON a.vend_cust_cd = b.vendor_customer_code	
 	WHERE COALESCE(misc_acct_fl,0) = 0 
 	GROUP BY 2,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19;
 
