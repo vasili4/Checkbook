@@ -686,7 +686,6 @@ BEGIN
 		rqporf_doc_cd = 'N/A'
 	WHERE rqporf_doc_id = 'N/A (PRIVACY/SECURITY)';
 	
-	
 	UPDATE etl.stg_fms_accounting_line 
 	SET file_type ='P' 
 	WHERE  rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' 
@@ -706,7 +705,6 @@ BEGIN
 		AND rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' 
 	AND rqporf_vend_ln_no ='N/A (PRIVACY/SECURITY)'
 	AND load_file_id =p_load_file_id_in;
-	
 	
 	-- Fetch all the contracts associated with Disbursements
 	
@@ -997,77 +995,76 @@ BEGIN
 	WHERE	a.disbursement_id = b.disbursement_id;
 	
 	RAISE NOTICE 'FMS 16';
-		
-		-- Disbursement line item changes
-		
-		
-		TRUNCATE etl.seq_disbursement_line_item_id;
-		
-		INSERT INTO etl.seq_disbursement_line_item_id(uniq_id)
-		SELECT b.uniq_id
-		FROM	etl.stg_fms_header a JOIN etl.stg_fms_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
-				AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no	
-				JOIN tmp_all_disbs c ON a.uniq_id = c.uniq_id
-		WHERE	action_flag ='I' ;
-		
-		
-		INSERT INTO disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,
-							budget_fiscal_year,fiscal_year,fiscal_period,
-							fund_class_id,agency_history_id,department_history_id,
-							expenditure_object_history_id,budget_code_id,fund_code,
-							reporting_code,check_amount,agreement_id,
-							agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number, 
-							location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
-							created_load_id,created_date,file_type)
-		SELECT  c.disbursement_line_item_id,d.disbursement_id,a.doc_actg_ln_no,
-			a.bfy,a.fy_dc,a.per_dc,
-			a.fund_class_id,a.agency_history_id,a.department_history_id,
-			a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
-			a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as check_amount,a.agreement_id,
-			(case when a.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_actg_ln_no end)::integer as rqporf_actg_ln_no,
-			(case when a.rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_comm_ln_no end)::integer as rqporf_comm_ln_no,
-			(case when a.rqporf_vend_ln_no='N/A (PRIVACY/SECURITY)' then NULL else a.rqporf_vend_ln_no end)::integer as rqporf_vend_ln_no,
-			 (case when a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id ='N/A' then 'NULL' 
-			 else 
-			  a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id end),
-			a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
-			p_load_id_in, now()::timestamp,a.file_type
-		FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
-						AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
-			JOIN etl.seq_disbursement_line_item_id c ON a.uniq_id = c.uniq_id
-			JOIN etl.seq_expenditure_expenditure_id d ON b.uniq_id = d.uniq_id;
 	
-		RAISE NOTICE 'FMS 17';
-		
-		-- Identify the disbursement accounting lines which need to be deleted/updated
-		
-		CREATE TEMPORARY TABLE tmp_disbs_lines_actions(disbursement_id bigint, line_number integer,action_flag char(1),disbursement_line_item_id bigint, uniq_id bigint)
-		DISTRIBUTED BY (disbursement_id);
-		
-		INSERT INTO tmp_disbs_lines_actions
-		SELECT  COALESCE(latest_tbl.disbursement_id,old_tbl.disbursement_id) as disbursement_id,
-			COALESCE(latest_tbl.doc_actg_ln_no, old_tbl.line_number) as line_number,
-			(CASE WHEN latest_tbl.disbursement_id = old_tbl.disbursement_id AND latest_tbl.doc_actg_ln_no = old_tbl.line_number THEN 'U'
-			      WHEN latest_tbl.disbursement_id IS NOT NULL AND old_tbl.disbursement_id IS NULL THEN 'I'
-			      WHEN latest_tbl.disbursement_id IS NULL AND old_tbl.line_number IS NOT NULL THEN 'D' END) as action_flag,
-			      old_tbl.disbursement_line_item_id, latest_tbl.uniq_id  
-		FROM	      
-			(SELECT a.disbursement_id,c.doc_actg_ln_no, c.uniq_id
-			FROM   tmp_all_disbs a JOIN etl.stg_fms_header b ON a.uniq_id = b.uniq_id
-				JOIN etl.stg_fms_accounting_line c ON c.doc_cd = b.doc_cd AND c.doc_dept_cd = b.doc_dept_cd 
-							     AND c.doc_id = b.doc_id AND c.doc_vers_no = b.doc_vers_no
-			WHERE   a.action_flag ='U'
-			order by 1,2 ) latest_tbl				     
-			FULL OUTER JOIN (SELECT e.disbursement_id,e.line_number , disbursement_line_item_id
-				    FROM   disbursement_line_item e JOIN tmp_all_disbs f ON e.disbursement_id = f.disbursement_id ) old_tbl ON latest_tbl.disbursement_id = old_tbl.disbursement_id 
-				    AND latest_tbl.doc_actg_ln_no = old_tbl.line_number;
-		
-		
-		
+	-- Disbursement line item changes
 	
-			
-		RAISE NOTICE 'FMS 18';
+	
+	TRUNCATE etl.seq_disbursement_line_item_id;
+	
+	INSERT INTO etl.seq_disbursement_line_item_id(uniq_id)
+	SELECT b.uniq_id
+	FROM	etl.stg_fms_header a JOIN etl.stg_fms_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
+			AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no	
+			JOIN tmp_all_disbs c ON a.uniq_id = c.uniq_id
+	WHERE	action_flag ='I' ;
+	
+	
+	INSERT INTO disbursement_line_item(disbursement_line_item_id,disbursement_id,line_number,
+						budget_fiscal_year,fiscal_year,fiscal_period,
+						fund_class_id,agency_history_id,department_history_id,
+						expenditure_object_history_id,budget_code_id,fund_code,
+						reporting_code,check_amount,agreement_id,
+						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number, 
+						location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
+						created_load_id,created_date,file_type)
+	SELECT  c.disbursement_line_item_id,d.disbursement_id,a.doc_actg_ln_no,
+		a.bfy,a.fy_dc,a.per_dc,
+		a.fund_class_id,a.agency_history_id,a.department_history_id,
+		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
+		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as check_amount,a.agreement_id,
+		(case when a.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_actg_ln_no end)::integer as rqporf_actg_ln_no,
+		(case when a.rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_comm_ln_no end)::integer as rqporf_comm_ln_no,
+		(case when a.rqporf_vend_ln_no='N/A (PRIVACY/SECURITY)' then NULL else a.rqporf_vend_ln_no end)::integer as rqporf_vend_ln_no,
+		(case when a.rqporf_doc_cd ='N/A' then NULL	else a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id end),
+		a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
+		p_load_id_in, now()::timestamp,a.file_type
+	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
+					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
+		JOIN etl.seq_disbursement_line_item_id c ON a.uniq_id = c.uniq_id
+		JOIN etl.seq_expenditure_expenditure_id d ON b.uniq_id = d.uniq_id;
+
+	RAISE NOTICE 'FMS 17';
+	
+	-- Identify the disbursement accounting lines which need to be deleted/updated
+	
+	CREATE TEMPORARY TABLE tmp_disbs_lines_actions(disbursement_id bigint, line_number integer,action_flag char(1),disbursement_line_item_id bigint, uniq_id bigint)
+	DISTRIBUTED BY (disbursement_id);
+	
+	INSERT INTO tmp_disbs_lines_actions
+	SELECT  COALESCE(latest_tbl.disbursement_id,old_tbl.disbursement_id) as disbursement_id,
+		COALESCE(latest_tbl.doc_actg_ln_no, old_tbl.line_number) as line_number,
+		(CASE WHEN latest_tbl.disbursement_id = old_tbl.disbursement_id AND latest_tbl.doc_actg_ln_no = old_tbl.line_number THEN 'U'
+		      WHEN latest_tbl.disbursement_id IS NOT NULL AND old_tbl.disbursement_id IS NULL THEN 'I'
+		      WHEN latest_tbl.disbursement_id IS NULL AND old_tbl.line_number IS NOT NULL THEN 'D' END) as action_flag,
+		      old_tbl.disbursement_line_item_id, latest_tbl.uniq_id  
+	FROM	      
+		(SELECT a.disbursement_id,c.doc_actg_ln_no, c.uniq_id
+		FROM   tmp_all_disbs a JOIN etl.stg_fms_header b ON a.uniq_id = b.uniq_id
+			JOIN etl.stg_fms_accounting_line c ON c.doc_cd = b.doc_cd AND c.doc_dept_cd = b.doc_dept_cd 
+						     AND c.doc_id = b.doc_id AND c.doc_vers_no = b.doc_vers_no
+		WHERE   a.action_flag ='U'
+		order by 1,2 ) latest_tbl				     
+		FULL OUTER JOIN (SELECT e.disbursement_id,e.line_number , disbursement_line_item_id
+			    FROM   disbursement_line_item e JOIN tmp_all_disbs f ON e.disbursement_id = f.disbursement_id ) old_tbl ON latest_tbl.disbursement_id = old_tbl.disbursement_id 
+			    AND latest_tbl.doc_actg_ln_no = old_tbl.line_number;
+	
+	
+	
+
 		
+<<<<<<< .mine
+	RAISE NOTICE 'FMS 18';
+=======
 		INSERT INTO disbursement_line_item(disbursement_id,line_number,
 							budget_fiscal_year,fiscal_year,fiscal_period,
 							fund_class_id,agency_history_id,department_history_id,
@@ -1128,35 +1125,96 @@ BEGIN
 	                       AND a.uniq_id = d.uniq_id
 	                       AND d.disbursement_id = e.disbursement_id AND b.uniq_id = e.uniq_id                       
 	     DISTRIBUTED BY (disbursement_line_item_id); 
+>>>>>>> .r2798
 	
+	INSERT INTO disbursement_line_item(disbursement_id,line_number,
+						budget_fiscal_year,fiscal_year,fiscal_period,
+						fund_class_id,agency_history_id,department_history_id,
+						expenditure_object_history_id,budget_code_id,fund_code,
+						reporting_code,check_amount,agreement_id,
+						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number, 
+						location_history_id,retainage_amount,check_eft_issued_nyc_year_id,
+						created_load_id,created_date,file_type)
+	SELECT  d.disbursement_id,a.doc_actg_ln_no,
+		a.bfy,a.fy_dc,a.per_dc,
+		a.fund_class_id,a.agency_history_id,a.department_history_id,
+		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
+		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as chk_amt,a.agreement_id,
+		(case when a.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_actg_ln_no end)::integer as rqporf_actg_ln_no,
+		(case when a.rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_comm_ln_no end)::integer as rqporf_comm_ln_no,
+		(case when a.rqporf_vend_ln_no='N/A (PRIVACY/SECURITY)' then NULL else a.rqporf_vend_ln_no end)::integer as rqporf_vend_ln_no,
+		(case when a.rqporf_doc_cd ='N/A' then NULL	else a.rqporf_doc_cd || a.rqporf_doc_dept_cd || a.rqporf_doc_id end),
+		a.location_history_id,a.rtg_ln_am,b.check_eft_issued_nyc_year_id,
+		p_load_id_in, now()::timestamp, a.file_type
+	FROM	etl.stg_fms_accounting_line a JOIN etl.stg_fms_header b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
+					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no 
+					JOIN tmp_all_disbs d ON b.uniq_id = d.uniq_id
+					JOIN tmp_disbs_lines_actions e ON d.disbursement_id = e.disbursement_id AND a.doc_actg_ln_no = e.line_number 
+	WHERE   d.action_flag = 'U' AND e.action_flag='I';
+	
+	
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
+	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
+	FROM disbursement_line_item a, tmp_disbs_lines_actions b , tmp_all_disbs c
+	WHERE   a.disbursement_id = b.disbursement_id 		
+		AND a.line_number = b.line_number		
+		AND a.disbursement_id = c.disbursement_id
+		AND b.action_flag = 'D' AND c.action_flag='U';
+	
+	DELETE FROM ONLY disbursement_line_item a 
+	USING tmp_disbs_lines_actions b , tmp_all_disbs c
+	WHERE   a.disbursement_id = b.disbursement_id 		
+		AND a.line_number = b.line_number		
+		AND a.disbursement_id = c.disbursement_id
+		AND b.action_flag = 'D' AND c.action_flag='U';
 		
-		UPDATE  disbursement_line_item f
-		SET budget_fiscal_year = b.bfy,
-			fiscal_year = b.fy_dc,
-			fiscal_period = b.per_dc,
-			fund_class_id = b.fund_class_id,
-			agency_history_id = b.agency_history_id,
-			department_history_id =b.department_history_id,
-			expenditure_object_history_id = b.expenditure_object_history_id,
-			budget_code_id = b.budget_code_id,		
-			fund_code = b.fund_cd,
-			reporting_code = b.rpt_cd,
-			check_amount = b.chk_amt,
-			agreement_id = b.agreement_id,
-			agreement_accounting_line_number = (case when b.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else b.rqporf_actg_ln_no end)::integer,
-			agreement_commodity_line_number = (case when b.rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else b.rqporf_comm_ln_no end)::integer, 
-			agreement_vendor_line_number = (case when b.rqporf_vend_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else b.rqporf_vend_ln_no end)::integer, 
-			reference_document_number = b.reference_document_number, 
-			location_history_id = b.location_history_id,
-			retainage_amount = b.rtg_ln_am,
-			check_eft_issued_nyc_year_id = b.check_eft_issued_nyc_year_id,
-			updated_load_id = p_load_id_in,
-			updated_date = now()::timestamp,
-			file_type = b.file_type
-		FROM   tmp_disbs_line_items_update b			      	      
-		WHERE   f.disbursement_line_item_id = b.disbursement_line_item_id ;	
 		
-		RAISE NOTICE 'FMS 20';	
+	 RAISE NOTICE 'FMS 19';
+	
+	 
+	
+        CREATE TEMPORARY TABLE tmp_disbs_line_items_update AS
+                SELECT e.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, b.agency_history_id, b.department_history_id, b.expenditure_object_history_id, b.budget_code_id,             
+                                  b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no,b.rqporf_comm_ln_no, b.rqporf_vend_ln_no, 
+                                  (CASE WHEN b.rqporf_doc_cd = 'N/A' THEN NULL ELSE b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id END) as reference_document_number, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id,
+                                  b.file_type
+                FROM etl.stg_fms_header a, etl.stg_fms_accounting_line b,
+                                tmp_all_disbs d,tmp_disbs_lines_actions e
+                WHERE  d.action_flag = 'U' AND e.action_flag='U'
+                       AND a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
+                       AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
+                       AND a.uniq_id = d.uniq_id
+                       AND d.disbursement_id = e.disbursement_id AND b.uniq_id = e.uniq_id                       
+     DISTRIBUTED BY (disbursement_line_item_id); 
+
+	
+	UPDATE  disbursement_line_item f
+	SET budget_fiscal_year = b.bfy,
+		fiscal_year = b.fy_dc,
+		fiscal_period = b.per_dc,
+		fund_class_id = b.fund_class_id,
+		agency_history_id = b.agency_history_id,
+		department_history_id =b.department_history_id,
+		expenditure_object_history_id = b.expenditure_object_history_id,
+		budget_code_id = b.budget_code_id,		
+		fund_code = b.fund_cd,
+		reporting_code = b.rpt_cd,
+		check_amount = b.chk_amt,
+		agreement_id = b.agreement_id,
+		agreement_accounting_line_number = (case when b.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else b.rqporf_actg_ln_no end)::integer,
+		agreement_commodity_line_number = (case when b.rqporf_comm_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else b.rqporf_comm_ln_no end)::integer, 
+		agreement_vendor_line_number = (case when b.rqporf_vend_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else b.rqporf_vend_ln_no end)::integer, 
+		reference_document_number = b.reference_document_number, 
+		location_history_id = b.location_history_id,
+		retainage_amount = b.rtg_ln_am,
+		check_eft_issued_nyc_year_id = b.check_eft_issued_nyc_year_id,
+		updated_load_id = p_load_id_in,
+		updated_date = now()::timestamp,
+		file_type = b.file_type
+	FROM   tmp_disbs_line_items_update b			      	      
+	WHERE   f.disbursement_line_item_id = b.disbursement_line_item_id ;	
+	
+	RAISE NOTICE 'FMS 20';	
 
 	/*
 	 IF l_fk_update = 1 THEN

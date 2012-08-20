@@ -1385,12 +1385,12 @@ CREATE TABLE disbursement_line_item_details(
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-    	agreement_commodity_line_number integer,
-    	agreement_vendor_line_number integer, 
-    	reference_document_number character varying,  	
-    	file_type char(1),
+	agreement_commodity_line_number integer,
+	agreement_vendor_line_number integer, 
+	reference_document_number character varying,  	
+	file_type char(1),
 	load_id integer,
-	last_modified_date timestamp without time zone,
+	last_modified_date timestamp without time zone
 )
 DISTRIBUTED BY (disbursement_line_item_id);
 

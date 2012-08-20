@@ -3188,11 +3188,11 @@ CREATE TABLE stg_fms_accounting_line(
 	agreement_id bigint,
 	masked_agency_history_id smallint,
 	masked_department_history_id int,
-	file_type char(1) defualt 'F',
+	file_type char(1) default 'F',
 	uniq_id bigint default nextval('seq_stg_fms_accounting_line_uniq_id'),
 	invalid_flag char(1),
-	invalid_reason varchar		)
-DISTRIBUTED BY (uniq_id)	;
+	invalid_reason varchar		
+	) DISTRIBUTED BY (uniq_id)	;
 	
 CREATE TABLE archive_fms_header (LIKE stg_fms_header) DISTRIBUTED BY (uniq_id);
 ALTER TABLE archive_fms_header ADD COLUMN load_file_id bigint;
