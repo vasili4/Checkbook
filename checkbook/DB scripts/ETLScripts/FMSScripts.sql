@@ -1092,6 +1092,8 @@ BEGIN
 						JOIN tmp_disbs_lines_actions e ON d.disbursement_id = e.disbursement_id AND a.doc_actg_ln_no = e.line_number 
 		WHERE   d.action_flag = 'U' AND e.action_flag='I';
 		
+		RAISE NOTICE 'FMS 18.1';
+		
 		INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
 		SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
 		FROM disbursement_line_item a, tmp_disbs_lines_actions b , tmp_all_disbs c
@@ -1099,6 +1101,8 @@ BEGIN
 			AND a.line_number = b.line_number		
 			AND a.disbursement_id = c.disbursement_id
 			AND b.action_flag = 'D' AND c.action_flag='U';
+		
+		RAISE NOTICE 'FMS 18.2';
 		
 		DELETE FROM ONLY disbursement_line_item a 
 		USING tmp_disbs_lines_actions b , tmp_all_disbs c
