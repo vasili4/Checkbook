@@ -225,8 +225,8 @@ INSERT INTO ref_award_category_industry(award_category_code,industry_type_id,cre
 
 -- Dummy values
 insert into vendor(vendor_id,vendor_customer_code,legal_name,miscellaneous_vendor_flag) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)',0::bit);
-insert into vendor_history(vendor_history_id,vendor_id,legal_name) 
-select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
+insert into vendor_history(vendor_history_id,vendor_id,legal_name,miscellaneous_vendor_flag) 
+select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name,miscellaneous_vendor_flag
 from vendor where vendor_customer_code='N/A'
 and legal_name='N/A (PRIVACY/SECURITY)';
 
