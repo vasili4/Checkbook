@@ -1805,7 +1805,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
 	DISTRIBUTED BY (disbursement_line_item_id);
-	
+		
 	CREATE TEMPORARY TABLE tmp_agreement(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
 	DISTRIBUTED BY (agreement_id);
 	
@@ -1815,10 +1815,25 @@ BEGIN
 		latest_maximum_contract_amount
 	FROM   tmp_agreement_flag_changes;
 	
-					     
+	CREATE TEMPORARY TABLE tmp_agreement_non_zero(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_agreement_non_zero
+	SELECT agreement_id, first_agreement_id, maximum_contract_amount FROM 
+	tmp_agreement WHERE agreement_id > 0;
+	
+	
+	CREATE TEMPORARY TABLE tmp_ct_fms_non_partial_disbs(disbursement_line_item_id bigint, agreement_id bigint)
+	DISTRIBUTED BY (agreement_id);
+	
+	INSERT INTO tmp_ct_fms_non_partial_disbs
+	SELECT disbursement_line_item_id, agreement_id
+	FROM disbursement_line_item
+	WHERE coalesce(file_type,'F') = 'F';
+	
 	INSERT INTO tmp_ct_fms_line_item
 	SELECT disbursement_line_item_id, b.first_agreement_id
-	FROM disbursement_line_item a JOIN  tmp_agreement b ON a.agreement_id = b.agreement_id;	
+	FROM tmp_ct_fms_non_partial_disbs a JOIN  tmp_agreement_non_zero b ON a.agreement_id = b.agreement_id;	
 	
 	
 	UPDATE disbursement_line_item a

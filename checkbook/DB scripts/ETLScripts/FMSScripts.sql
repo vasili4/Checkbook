@@ -1046,7 +1046,7 @@ BEGIN
 		WHERE   a.action_flag ='U'
 		order by 1,2 ) latest_tbl				     
 		FULL OUTER JOIN (SELECT e.disbursement_id,e.line_number , disbursement_line_item_id
-			    FROM   disbursement_line_item e JOIN tmp_all_disbs f ON e.disbursement_id = f.disbursement_id ) old_tbl ON latest_tbl.disbursement_id = old_tbl.disbursement_id 
+			    FROM   disbursement_line_item e JOIN tmp_all_disbs f ON e.disbursement_id = f.disbursement_id WHERE f.action_flag ='U') old_tbl ON latest_tbl.disbursement_id = old_tbl.disbursement_id 
 			    AND latest_tbl.doc_actg_ln_no = old_tbl.line_number;
 	
 	
@@ -1256,7 +1256,7 @@ BEGIN
 	FROM disbursement_line_item_details a JOIN disbursement_line_item b ON a.disbursement_line_item_id = b.disbursement_line_item_id
 		 JOIN disbursement c ON b.disbursement_id = c.disbursement_id
 		 JOIN etl.etl_data_load d ON coalesce(c.updated_load_id, c.created_load_id) = d.load_id
-		WHERE d.job_id = p_job_id_in AND d.data_source_code IN ('C','M','F');
+		WHERE d.job_id = p_job_id_in AND d.data_source_code IN ('C','M','F') AND b.agreement_id > 0;
 	
 		
 	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.

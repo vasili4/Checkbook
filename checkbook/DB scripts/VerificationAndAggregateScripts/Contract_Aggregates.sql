@@ -1072,6 +1072,8 @@ WHERE a.status_flag='R' AND a.type_of_year = 'C' ;
 */
 
 
+DROP TABLE IF EXISTS aggregateon_contracts_expense;
+
 CREATE TABLE aggregateon_contracts_expense(
 	original_agreement_id bigint,
 	expenditure_object_id integer,
