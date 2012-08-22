@@ -1045,13 +1045,13 @@ BEGIN
 				agency_name,department_name,department_code,expenditure_object_name,expenditure_object_code,budget_code_id,
 				budget_code,budget_name,fund_class_code,spending_category_id,
 				spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
-				agency_short_name,department_short_name)
+				agency_short_name,department_short_name,load_id)
 	SELECT 	payroll_summary_id,pay_date_id,fiscal_year_id,calendar_month_id,
 		fund_class_id,total_amt,agency_id,agency,expenditure_object_id,department_id,pay_date::date,
 		agency_name,department_name,uoa,expenditure_object_name,object,budget_code_id,
 		bud_code,budget_code_name,'001',2 as spending_category_id,
 		'Payroll',calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
-		agency_short_name,department_short_name
+		agency_short_name,department_short_name,p_load_id_in
 	FROM 	etl.stg_payroll_summary
 	WHERE  action_flag = 'I';
 	
@@ -1083,7 +1083,8 @@ BEGIN
 		expenditure_object_name = b.expenditure_object_name,
 		budget_name = b.budget_code_name,
 		agency_short_name = b.agency_short_name,
-		department_short_name = b.department_short_name
+		department_short_name = b.department_short_name,
+		load_id = p_load_id_in
 	FROM	tmp_payroll_summary_update b
 	WHERE	a.disbursement_line_item_id = b.payroll_summary_id
 		AND a.spending_category_id = 2;
