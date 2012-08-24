@@ -960,7 +960,8 @@ CREATE TABLE ref_month (
     month_value smallint,
     month_name character varying,
     year_id smallint,
-    display_order smallint
+    display_order smallint,
+    month_short_name varchar(3)
 ) DISTRIBUTED BY (month_id);
 
 --

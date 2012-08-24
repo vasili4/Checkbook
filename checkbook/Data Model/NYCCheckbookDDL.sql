@@ -137,7 +137,8 @@ CREATE TABLE ref_month(
 	month_value smallint,
 	month_name varchar,
 	year_id smallint,
-	display_order smallint
+	display_order smallint,
+	month_short_name varchar(3)
 	)
 DISTRIBUTED BY (month_id);
 ALTER TABLE  ref_month ADD constraint fk_ref_month_ref_year FOREIGN KEY(year_id) references ref_year(year_id);

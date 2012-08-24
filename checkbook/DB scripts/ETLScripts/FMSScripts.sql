@@ -801,6 +801,10 @@ BEGIN
 	 FROM	tmp_ct_fms b
 	 WHERE	a.uniq_id = b.uniq_id;
 	 
+	 UPDATE etl.stg_fms_accounting_line a
+	 SET	agreement_id = NULL
+	 WHERE agreement_id = 0;
+	 
 	RETURN 1;
 EXCEPTION
 	WHEN OTHERS THEN
@@ -1491,6 +1495,23 @@ BEGIN
 		master_contract_vendor_id_cy  = b.master_contract_vendor_id_cy 
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
+	
+	
+	-- needs to delete after first load
+	
+	DELETE FROM ONLY disbursement_line_item_details a
+	USING disbursement b
+	WHERE   a.disbursement_id = b.disbursement_id 
+	AND b.document_version > 1;
+	
+	DELETE FROM ONLY disbursement_line_item a
+	USING disbursement b
+	WHERE   a.disbursement_id = b.disbursement_id 
+	AND b.document_version > 1;
+	
+	DELETE FROM ONLY disbursement
+	WHERE   document_version > 1;
+	
 	
 	l_end_time := timeofday()::timestamp;
 	

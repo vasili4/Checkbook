@@ -1384,7 +1384,8 @@ CREATE EXTERNAL WEB TABLE ref_month__0 (
     month_value smallint,
     month_name character varying,
     year_id smallint,
-    display_order smallint
+    display_order smallint,
+    month_short_name varchar(3)
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_month to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -1395,7 +1396,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_month AS
-    SELECT ref_month__0.month_id, ref_month__0.month_value, ref_month__0.month_name, ref_month__0.year_id, ref_month__0.display_order FROM ONLY ref_month__0;
+    SELECT ref_month__0.month_id, ref_month__0.month_value, ref_month__0.month_name, ref_month__0.year_id, ref_month__0.display_order, ref_month__0.month_short_name FROM ONLY ref_month__0;
 
 --
 -- Name: ref_object_class__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 

@@ -65,6 +65,23 @@ BEGIN
 				  WHEN month_value = 5 THEN 11
 				  WHEN month_value = 6 THEN 12
 				  END);
+				  
+				  
+	UPDATE ref_month
+	SET month_short_name = (CASE WHEN month_value = 1 THEN 'JAN'
+				  WHEN month_value = 2 THEN 'FEB'
+				  WHEN month_value = 3 THEN 'MAR'
+				  WHEN month_value = 4 THEN 'APR'
+				  WHEN month_value = 5 THEN 'MAY'
+				  WHEN month_value = 6 THEN 'JUN'
+				  WHEN month_value = 7 THEN 'JUL'
+				  WHEN month_value = 8 THEN 'AUG'
+				  WHEN month_value = 9 THEN 'SEP'
+				  WHEN month_value = 10 THEN 'OCT'
+				  WHEN month_value = 11 THEN 'NOV'
+				  WHEN month_value = 12 THEN 'DEC'
+				  END);
+				  
 EXCEPTION
 	WHEN OTHERS THEN
 	RAISE NOTICE 'Exception Occurred in etl.initializedate';
@@ -224,15 +241,22 @@ COPY etl.stg_award_category_industry FROM '/home/gpadmin/prerelease/NYC/Agreemen
 INSERT INTO ref_award_category_industry(award_category_code,industry_type_id,created_date) SELECT award_category_code, industry_type_id,now()::timestamp  from etl.stg_award_category_industry;  
 
 -- Dummy values
-insert into vendor(vendor_id,vendor_customer_code,legal_name,miscellaneous_vendor_flag) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)',0::bit);
-insert into vendor_history(vendor_history_id,vendor_id,legal_name,miscellaneous_vendor_flag) 
-select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name,miscellaneous_vendor_flag
+insert into vendor(vendor_id,vendor_customer_code,legal_name,alias_name,miscellaneous_vendor_flag) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)','N/A (PRIVACY/SECURITY)',0::bit);
+insert into vendor_history(vendor_history_id,vendor_id,legal_name,alias_name,miscellaneous_vendor_flag) 
+select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name,alias_name,miscellaneous_vendor_flag
 from vendor where vendor_customer_code='N/A'
 and legal_name='N/A (PRIVACY/SECURITY)';
 
 INSERT INTO address(address_id,address_line_1 ,address_line_2,city,	state ,zip ,country) 
 VALUES(nextval('seq_address_address_id'), 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)', 'N/A (PRIVACY/SECURITY)');
 
+INSERT INTO vendor_address(vendor_address_id, address_id, address_type_id, created_date)
+SELECT nextval('seq_vendor_address_vendor_address_id'), address_id, 2, now()::timestamp 
+FROM address where address_line_1 = 'N/A (PRIVACY/SECURITY)';
+
+UPDATE vendor_address a
+SET vendor_history_id = b.vendor_history_id
+FROM vendor_history b WHERE b.legal_name = 'N/A (PRIVACY/SECURITY)';
 
 
 /*insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;

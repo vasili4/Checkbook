@@ -265,6 +265,38 @@ BEGIN
 	UPDATE etl.stg_pending_contracts
 	SET contract_number = con_trans_code||con_trans_ad_code||con_no ;
 	
+	CREATE TEMPORARY TABLE tmp_pc_ctr_mar_document_code(con_no varchar, con_trans_ad_code varchar, document_code varchar) DISTRIBUTED BY (con_no);
+	
+	INSERT INTO tmp_pc_ctr_mar_document_code
+	SELECT distinct con_no, con_trans_ad_code, e.document_code
+	FROM etl.stg_pending_contracts a, history_agreement b, ref_agency_history c, ref_agency d, ref_document_code e, ref_document_code f
+	WHERE a.con_no = b.document_id AND b.agency_history_id = c.agency_history_id AND c.agency_id = d.agency_id 
+	AND a.con_trans_ad_code = d.agency_code AND b.document_code_id = e.document_code_id AND a.document_code_id = f.document_code_id
+	AND e.document_code in ('CT1','CTA1') AND f.document_code = 'CTR' AND b.original_version_flag = 'Y' ;
+	
+	
+	UPDATE etl.stg_pending_contracts a
+	SET contract_number = b.document_code||b.con_trans_ad_code||b.con_no 
+	FROM tmp_pc_ctr_mar_document_code b 
+	WHERE a.con_no = b.con_no AND a.con_trans_ad_code = b.con_trans_ad_code
+	AND a.original_or_modified = 'M' AND a.con_trans_code = 'CTR' ;
+	
+	TRUNCATE tmp_pc_ctr_mar_document_code;
+	
+	INSERT INTO tmp_pc_ctr_mar_document_code
+	SELECT distinct con_no, con_trans_ad_code, e.document_code
+	FROM etl.stg_pending_contracts a, history_master_agreement b, ref_agency_history c, ref_agency d, ref_document_code e, ref_document_code f
+	WHERE a.con_no = b.document_id AND b.agency_history_id = c.agency_history_id AND c.agency_id = d.agency_id 
+	AND a.con_trans_ad_code = d.agency_code AND b.document_code_id = e.document_code_id AND a.document_code_id = f.document_code_id
+	AND e.document_code in ('MA1','MMA1') AND f.document_code = 'MAR' AND b.original_version_flag = 'Y' ;
+	
+	
+	UPDATE etl.stg_pending_contracts a
+	SET contract_number = b.document_code||b.con_trans_ad_code||b.con_no 
+	FROM tmp_pc_ctr_mar_document_code b 
+	WHERE a.con_no = b.con_no AND a.con_trans_ad_code = b.con_trans_ad_code
+	AND a.original_or_modified = 'M' AND a.con_trans_code = 'MAR' ;
+	
 		
 	UPDATE etl.stg_pending_contracts a
 	SET original_agreement_id = b.original_agreement_id
