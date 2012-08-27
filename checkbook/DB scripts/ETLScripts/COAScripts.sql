@@ -831,9 +831,11 @@ from etl.ref_funding_class_id_seq a JOIN tmp_ref_funding_class b ON a.uniq_id = 
 
 		GET DIAGNOSTICS fc_count = ROW_COUNT;
 				fc_ins_count := fc_count;
-				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-				VALUES(p_load_file_id_in,fc_data_source_code,fc_ins_count, 'insert');
-
+				
+		IF fc_ins_count> 0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,fc_data_source_code,fc_ins_count, 'insert');
+		END IF;
 
 
 CREATE TEMPORARY TABLE tmp_ref_funding_class_1(funding_class_code varchar(5),name varchar(52), exists_flag char(1), modified_flag char(1), funding_class_id smallint)
@@ -855,9 +857,11 @@ Raise notice '5';
 	EXECUTE fc_update_sql;
 		GET DIAGNOSTICS fc_count = ROW_COUNT;
 				fc_update_count := fc_count;
-				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-				VALUES(p_load_file_id_in,fc_data_source_code,fc_update_count, 'update');
-
+				
+		IF fc_update_count>0 THEN
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,fc_data_source_code,fc_update_count, 'update');
+		END IF;
 
 
 
@@ -1579,9 +1583,11 @@ BEGIN
 
 	GET DIAGNOSTICS bc_count = ROW_COUNT;
 	bc_ins_count := bc_count;
+	
+	IF bc_ins_count>0 THEN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,bc_data_source_code,bc_ins_count, '# of records inserted into budget_code');
-
+	END IF;
 
 
 		RAISE NOTICE 'RS - 4';
@@ -1610,8 +1616,11 @@ BEGIN
 
 		GET DIAGNOSTICS bc_count = ROW_COUNT;
 			bc_update_count := bc_count;
+			
+		IF bc_update_count > 0 THEN	
 			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 			VALUES(p_load_file_id_in,bc_data_source_code,bc_update_count, '# of records updated in ref_budget_code');
+		END IF;
 
 		RAISE NOTICE 'INSIDE';
 
