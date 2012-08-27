@@ -1,3 +1,9 @@
+/* Function defined
+updateforeignkeysforbudget
+processbudget
+*/
+
+
 -- Function: etl.updateforeignkeysforbudget(bigint)
 
 -- DROP FUNCTION etl.updateforeignkeysforbudget(bigint);
@@ -463,8 +469,11 @@ BEGIN
 	WHERE action_flag = 'I' AND budget_id IS NULL;		
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
+	
+	IF l_count>0 THEN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'B',l_count,'# of records inserted in budget ');
+	END IF;
 	
 	RAISE NOTICE 'BUDGET 2';
 	
