@@ -9,9 +9,11 @@ processbudget
 -- DROP FUNCTION etl.updateforeignkeysforbudget(bigint);
 
 CREATE OR REPLACE FUNCTION etl.updateforeignkeysforbudget(p_load_id_in bigint)
-  RETURNS integer AS
-$BODY$
+  RETURNS integer AS $$
+
 DECLARE
+l_count int;
+
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR BUDGET DATA*/		
 	
@@ -90,6 +92,16 @@ BEGIN
 	SELECT a.agency_history_id,b.agency_id, '<Unknown Agency>' as agency_name,
 	now()::timestamp,p_load_id_in,'N/A'
 	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+	
+		IF l_count > 0 THEN
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+			VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from expense budget');
+		END IF;
+	
+
+
 
 	RAISE NOTICE '1.3';
 	INSERT INTO tmp_fk_budget_values(uniq_id,agency_history_id,agency_id,agency_name,agency_code,agency_short_name)
@@ -351,10 +363,8 @@ EXCEPTION
 
 	RETURN 0;
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE;
-ALTER FUNCTION etl.updateforeignkeysforbudget(bigint)
-  OWNER TO gpadmin;
+ $$ LANGUAGE plpgsql VOLATILE;
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Function: etl.processbudget(integer, bigint)
