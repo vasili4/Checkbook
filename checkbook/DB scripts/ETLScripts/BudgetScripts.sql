@@ -181,6 +181,16 @@ BEGIN
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_fk_values_bdgt_new_dept b ON a.uniq_id = b.uniq_id
 		JOIN etl.ref_department_id_seq  c ON a.uniq_id = c.uniq_id ;
 
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+		
+			IF l_count > 0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'C',l_count, 'New department history records inserted from expense budget');
+		END IF;
+	
+
+
 	RAISE NOTICE '1.6';
 	
 	INSERT INTO tmp_fk_budget_values(uniq_id,department_history_id,department_id,department_name,department_code)
@@ -234,6 +244,16 @@ BEGIN
 		now()::timestamp,p_load_id_in
 	FROM	etl.ref_budget_code_id_seq a JOIN tmp_fk_values_bdgt_new_budget_code b ON a.uniq_id = b.uniq_id;
 	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+		
+			IF l_count > 0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'C',l_count, 'New budget code records inserted from expense budget');
+		END IF;
+		
+		
+	
 	INSERT INTO tmp_fk_budget_values(uniq_id,budget_code_id)
 	SELECT	a.uniq_id, f.budget_code_id 
 	FROM etl.stg_budget a JOIN ref_budget_code b ON a.budget_code = b.budget_code and a.budget_fiscal_year = b.fiscal_year
@@ -275,7 +295,7 @@ BEGIN
 
 	RAISE NOTICE '2.1';
 
-	-- Generate the agency history id for history records
+	-- Generate the object class id for history records
 	
 	TRUNCATE etl.ref_object_class_history_id_seq;
 	
