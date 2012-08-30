@@ -1252,7 +1252,7 @@ BEGIN
 												maximum_contract_amount_cy numeric(16,2), maximum_spending_limit numeric(16,2), maximum_spending_limit_cy numeric(16,2),
 												purpose varchar, purpose_cy varchar, contract_number varchar, master_contract_number varchar, contract_vendor_id integer, contract_vendor_id_cy integer,
 												master_contract_vendor_id integer, master_contract_vendor_id_cy integer, contract_agency_id smallint, contract_agency_id_cy smallint, master_contract_agency_id smallint,
-												master_contract_agency_id_cy smallint, master_purpose varchar, master_purpose_cy varchar)
+												master_contract_agency_id_cy smallint, master_purpose varchar, master_purpose_cy varchar, contract_document_code varchar, master_contract_document_code varchar)
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_agreement_con(disbursement_line_item_id,agreement_id,fiscal_year,calendar_fiscal_year)
@@ -1266,7 +1266,7 @@ BEGIN
 	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.
 	
 	CREATE TEMPORARY TABLE tmp_agreement_con_fy(disbursement_line_item_id bigint,agreement_id bigint,master_agreement_id bigint, contract_number varchar,
-						maximum_contract_amount_fy numeric(16,2), purpose_fy varchar, contract_vendor_id_fy integer, contract_agency_id_fy smallint )
+						maximum_contract_amount_fy numeric(16,2), purpose_fy varchar, contract_vendor_id_fy integer, contract_agency_id_fy smallint, contract_document_code_fy varchar )
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_agreement_con_fy
@@ -1274,10 +1274,12 @@ BEGIN
 	b.maximum_contract_amount as maximum_contract_amount_fy ,
 	b.description as purpose_fy ,
 	b.vendor_id as contract_vendor_id_fy,
-	b.agency_id as contract_agency_id_fy
+	b.agency_id as contract_agency_id_fy,
+	e.document_code as contract_document_code_fy
 		FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id 
+		JOIN ref_document_code e ON b.document_code_id = e.document_code_id ;
 		
 	
 	INSERT INTO tmp_agreement_con_fy
@@ -1285,10 +1287,12 @@ BEGIN
 	b.maximum_contract_amount as maximum_contract_amount_fy ,
 	b.description as purpose_fy ,
 	b.vendor_id as contract_vendor_id_fy,
-	b.agency_id as contract_agency_id_fy
+	b.agency_id as contract_agency_id_fy,
+	e.document_code as contract_document_code_fy
 		FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND b.latest_flag='Y'
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
 		JOIN disbursement d ON c.disbursement_id = d.disbursement_id
+		JOIN ref_document_code e ON b.document_code_id = e.document_code_id 
 		LEFT JOIN tmp_agreement_con_fy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
 		WHERE f.disbursement_line_item_id IS NULL ;
    	
@@ -1298,14 +1302,15 @@ BEGIN
 		purpose = b.purpose_fy,
 		contract_number = b.contract_number,
 		contract_vendor_id = b.contract_vendor_id_fy,
-		contract_agency_id = b.contract_agency_id_fy
+		contract_agency_id = b.contract_agency_id_fy,
+		contract_document_code = b.contract_document_code_fy
 	FROM tmp_agreement_con_fy b
 	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
 	-- Getting maximum_spending_limit, master_contract_number, master_contract_vendor_id, master_contract_agency_id for FY for master agreements
 	
 	CREATE TEMPORARY TABLE tmp_agreement_con_master_fy(disbursement_line_item_id bigint, master_agreement_id bigint, master_contract_number varchar, maximum_spending_limit_fy numeric(16,2), 
-	master_contract_vendor_id_fy integer, master_contract_agency_id_fy smallint, master_purpose_fy varchar)
+	master_contract_vendor_id_fy integer, master_contract_agency_id_fy smallint, master_purpose_fy varchar, master_contract_document_code_fy varchar)
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_agreement_con_master_fy
@@ -1314,10 +1319,12 @@ BEGIN
 	b.maximum_contract_amount as maximum_spending_limit_fy ,
 	b.vendor_id as master_contract_vendor_id_fy,
 	b.agency_id as master_contract_agency_id_fy,
-	b.description as master_purpose_fy 
+	b.description as master_purpose_fy,
+	e.document_code as master_contract_document_code_fy
 	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.fiscal_year between b.starting_year and b.ending_year
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		JOIN disbursement d ON c.disbursement_id = d.disbursement_id 
+		JOIN ref_document_code e ON b.document_code_id = e.document_code_id;
 		
 	INSERT INTO tmp_agreement_con_master_fy
 	SELECT a.disbursement_line_item_id, a.master_agreement_id,
@@ -1325,10 +1332,12 @@ BEGIN
 	b.maximum_contract_amount as maximum_spending_limit_fy ,
 	b.vendor_id as master_contract_vendor_id_fy,
 	b.agency_id as master_contract_agency_id_fy,
-	b.description as master_purpose_fy 
+	b.description as master_purpose_fy ,
+	e.document_code as master_contract_document_code_fy
 	FROM tmp_agreement_con a JOIN agreement_snapshot b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND b.latest_flag='Y'
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
 		JOIN disbursement d ON c.disbursement_id = d.disbursement_id 
+		JOIN ref_document_code e ON b.document_code_id = e.document_code_id
 		LEFT JOIN tmp_agreement_con_master_fy f ON a.disbursement_line_item_id = f.disbursement_line_item_id
 		WHERE f.disbursement_line_item_id IS NULL ;
 		
@@ -1339,7 +1348,8 @@ BEGIN
 		master_contract_number = b.master_contract_number,
 		master_contract_vendor_id = b.master_contract_vendor_id_fy,
 		master_contract_agency_id = b.master_contract_agency_id_fy,
-		master_purpose = b.master_purpose_fy
+		master_purpose = b.master_purpose_fy,
+		master_contract_document_code = b.master_contract_document_code_fy
 	FROM tmp_agreement_con_master_fy b
 	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
@@ -1394,7 +1404,7 @@ BEGIN
 	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.
 	
 	CREATE TEMPORARY TABLE tmp_agreement_con_cy(disbursement_line_item_id bigint,agreement_id bigint,
-						maximum_contract_amount_cy numeric(16,2), purpose_cy varchar, contract_vendor_id_cy integer, contract_agency_id_cy smallint )
+						maximum_contract_amount_cy numeric(16,2), purpose_cy varchar, contract_vendor_id_cy integer, contract_agency_id_cy smallint)
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_agreement_con_cy
@@ -1405,7 +1415,7 @@ BEGIN
 	b.agency_id as contract_agency_id_cy
 		FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		JOIN ref_document_code e ON b.document_code_id = e.document_code_id;
 		
 	
 	INSERT INTO tmp_agreement_con_cy
@@ -1441,10 +1451,10 @@ BEGIN
 	b.maximum_contract_amount as maximum_spending_limit_cy ,
 	b.vendor_id as master_contract_vendor_id_cy,
 	b.agency_id as master_contract_agency_id_cy,
-	b.description as master_purpose_cy 
+	b.description as master_purpose_cy
 	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.fiscal_year between b.starting_year and b.ending_year
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
-		JOIN disbursement d ON c.disbursement_id = d.disbursement_id ;
+		JOIN ref_document_code e ON b.document_code_id = e.document_code_id;
 		
 		
 	INSERT INTO tmp_agreement_con_master_cy
@@ -1492,7 +1502,9 @@ BEGIN
 		contract_agency_id_cy  = b.contract_agency_id_cy ,
 		master_contract_agency_id_cy  = b.master_contract_agency_id_cy,
 		contract_vendor_id_cy  = b.contract_vendor_id_cy ,
-		master_contract_vendor_id_cy  = b.master_contract_vendor_id_cy 
+		master_contract_vendor_id_cy  = b.master_contract_vendor_id_cy,
+		contract_document_code = b.contract_document_code,
+		master_contract_document_code = b.master_contract_document_code
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
 	

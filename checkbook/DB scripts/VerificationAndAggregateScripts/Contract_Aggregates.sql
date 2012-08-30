@@ -347,8 +347,8 @@ SELECT  a.original_agreement_id,
 		MIN(award_size_id),
 		MIN(original_contract_amount),
 		MIN(maximum_contract_amount),
-		SUM(b.check_amount),
-		SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN b.check_amount ELSE 0 END) as current_year_spending_amount,
+		SUM(coalesce(b.check_amount,0)),
+		SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
 		MIN(dollar_difference),
 		MIN(percent_difference),
 		'A' as status_flag,
@@ -373,8 +373,8 @@ SELECT a.original_agreement_id,
 	MIN(award_size_id),
 	MIN(original_contract_amount),
 	MIN(maximum_contract_amount),
-	SUM(b.check_amount) ,
-	SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN b.check_amount ELSE 0 END) as current_year_spending_amount,
+	SUM(coalesce(b.check_amount,0)) ,
+	SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
 	MIN(dollar_difference),
 	MIN(percent_difference),
 	'R' as status_flag, 
@@ -403,8 +403,8 @@ SELECT  a.original_agreement_id,
 		MIN(award_size_id),
 		MIN(original_contract_amount),
 		MIN(maximum_contract_amount),
-		SUM(b.check_amount),
-		SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN b.check_amount ELSE 0 END) as current_year_spending_amount,
+		SUM(coalesce(b.check_amount,0)),
+		SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
 		MIN(dollar_difference),
 		MIN(percent_difference),
 		'A' as status_flag,
@@ -429,8 +429,8 @@ SELECT a.original_agreement_id,
 	MIN(award_size_id),
 	MIN(original_contract_amount),
 	MIN(maximum_contract_amount),
-	SUM(b.check_amount) ,
-	SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN check_amount ELSE 0 END) as current_year_spending_amount,
+	SUM(coalesce(b.check_amount,0)) ,
+	SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
 	MIN(dollar_difference),
 	MIN(percent_difference),
 	'R' as status_flag, 
@@ -476,7 +476,7 @@ SELECT  a.original_agreement_id,
 		a.agency_id ,
 		a.industry_type_id,
 		a.award_size_id,
-		SUM(b.check_amount),		
+		SUM(coalesce(b.check_amount,0)),		
 		'A' as status_flag,
 		'B' as type_of_year
 	FROM 	agreement_snapshot_expanded a 
@@ -495,7 +495,7 @@ SELECT a.original_agreement_id,
 		a.agency_id ,	
 		a.industry_type_id,
 		a.award_size_id,
-		SUM(b.check_amount),
+		SUM(coalesce(b.check_amount,0)),
 		'R' as status_flag, 
 		'B' as type_of_year	
 	FROM 	agreement_snapshot_expanded a 
@@ -518,7 +518,7 @@ SELECT  a.original_agreement_id,
 		a.agency_id ,	
 		a.industry_type_id,
 		a.award_size_id,
-		SUM(b.check_amount),
+		SUM(coalesce(b.check_amount,0)),
 		'A' as status_flag,
 		'C' as type_of_year
 	FROM 	agreement_snapshot_expanded_cy a 
@@ -537,7 +537,7 @@ SELECT  a.original_agreement_id,
 		a.agency_id ,	
 		a.industry_type_id,
 		a.award_size_id,
-		SUM(b.check_amount),
+		SUM(coalesce(b.check_amount,0)),
 	'R' as status_flag, 
 	'C' as type_of_year	
 	FROM 	agreement_snapshot_expanded_cy a 
@@ -811,7 +811,7 @@ CREATE TABLE aggregateon_contracts_department(
 		a.vendor_id,
 		a.industry_type_id,
 		a.award_size_id,
-		sum(d.check_amount) as spending_amount,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'A' as status_flag,
 		'B' as type_of_year
@@ -833,7 +833,7 @@ CREATE TABLE aggregateon_contracts_department(
 		a.vendor_id,
 		a.industry_type_id,
 		a.award_size_id,
-		sum(d.check_amount) as spending_amount,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'R' as status_flag,
 		'B' as type_of_year
@@ -856,7 +856,7 @@ CREATE TABLE aggregateon_contracts_department(
 		a.vendor_id,
 		a.industry_type_id,
 		a.award_size_id,
-		sum(d.check_amount) as spending_amount,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'A' as status_flag,
 		'C' as type_of_year
@@ -878,7 +878,7 @@ CREATE TABLE aggregateon_contracts_department(
 		a.vendor_id,
 		a.industry_type_id,
 		a.award_size_id,
-		sum(d.check_amount) as spending_amount,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
 		count(distinct a.original_agreement_id) as total_contracts,
 		'R' as status_flag,
 		'C' as type_of_year
@@ -1097,7 +1097,7 @@ CREATE TABLE aggregateon_contracts_expense(
  */
 
  INSERT INTO aggregateon_contracts_expense 
-SELECT m.original_agreement_id, p.expenditure_object_id, p.expenditure_object_name, m.encumbered_amount, n.spending_amount
+SELECT m.original_agreement_id, p.expenditure_object_id, p.expenditure_object_name, m.encumbered_amount, coalesce(n.spending_amount,0) as spending_amount
 FROM
  (SELECT a.original_agreement_id, c.expenditure_object_id,  sum(b.line_amount) as encumbered_amount
  FROM history_agreement a, history_agreement_accounting_line b , ref_expenditure_object_history c

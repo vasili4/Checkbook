@@ -942,7 +942,7 @@ BEGIN
 				effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 				effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 		   		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		   		source_updated_calendar_year_id,contract_number,brd_awd_no)
+		   		source_updated_calendar_year_id,contract_number,brd_awd_no,rfed_amount)
 	SELECT	d.agreement_id,a.master_agreement_id,a.document_code_id,
 		a.agency_history_id,a.doc_id,a.doc_vers_no,
 		a.trkg_no,a.record_date_id,a.doc_bfy,
@@ -966,7 +966,7 @@ BEGIN
 		effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 		effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.brd_awd_no
+		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.brd_awd_no,a.rfed_am
 	FROM	etl.stg_con_ct_header a JOIN etl.stg_con_ct_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 					JOIN etl.stg_con_ct_award_detail c ON a.doc_cd = c.doc_cd AND a.doc_dept_cd = c.doc_dept_cd 
@@ -1001,7 +1001,7 @@ BEGIN
 			effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 			effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 			source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-			source_updated_calendar_year_id,a.brd_awd_no			
+			source_updated_calendar_year_id,a.brd_awd_no,a.rfed_am			
 		FROM	etl.stg_con_ct_header a JOIN etl.stg_con_ct_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 						JOIN etl.stg_con_ct_award_detail c ON a.doc_cd = c.doc_cd AND a.doc_dept_cd = c.doc_dept_cd 
@@ -1083,7 +1083,8 @@ BEGIN
 		source_updated_fiscal_year_id = b.source_updated_fiscal_year_id,
 		source_updated_calendar_year = b.source_updated_calendar_year,
 		source_updated_calendar_year_id = b.source_updated_calendar_year_id,
-		brd_awd_no = b.brd_awd_no
+		brd_awd_no = b.brd_awd_no,
+		rfed_amount = b.rfed_am
 	FROM	tmp_con_ct_update b
 	WHERE	a.agreement_id = b.agreement_id;
 
@@ -1103,14 +1104,14 @@ BEGIN
 			budget_fiscal_year,fiscal_year,fiscal_period,
 			fund_class_id,agency_history_id,department_history_id,
 			expenditure_object_history_id,revenue_source_id,location_code,
-			budget_code_id,reporting_code,created_load_id,
+			budget_code_id,reporting_code,rfed_line_amount,created_load_id,
 			created_date)	
 	SELECT  d.agreement_id,b.doc_comm_ln_no,b.doc_actg_ln_no,
 		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,
 		b.bfy,b.fy_dc,b.per_dc,
 		b.fund_class_id,b.agency_history_id,b.department_history_id,
 		b.expenditure_object_history_id,null as revenue_source_id,b.loc_cd,
-		b.budget_code_id,b.rpt_cd,p_load_id_in,
+		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,p_load_id_in,
 		now()::timestamp
 	FROM	etl.stg_con_ct_header a JOIN etl.stg_con_ct_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -1149,14 +1150,14 @@ BEGIN
 			budget_fiscal_year,fiscal_year,fiscal_period,
 			fund_class_id,agency_history_id,department_history_id,
 			expenditure_object_history_id,revenue_source_id,location_code,
-			budget_code_id,reporting_code,created_load_id,
+			budget_code_id,reporting_code,rfed_line_amount,created_load_id,
 			created_date)	
 	SELECT  d.agreement_id,b.doc_comm_ln_no,b.doc_actg_ln_no,
 		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,
 		b.bfy,b.fy_dc,b.per_dc,
 		b.fund_class_id,b.agency_history_id,b.department_history_id,
 		b.expenditure_object_history_id,null as revenue_source_id,b.loc_cd,
-		b.budget_code_id,b.rpt_cd,p_load_id_in,
+		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,p_load_id_in,
 		now()::timestamp
 	FROM	etl.stg_con_ct_header a JOIN etl.stg_con_ct_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -1198,6 +1199,7 @@ BEGIN
 		location_code = b.loc_cd,
 		budget_code_id = b.budget_code_id,
 		reporting_code = b.rpt_cd,
+		rfed_line_amount = b.rfed_ln_am,
 		updated_load_id = p_load_id_in,
 		updated_date = now()::timestamp
 	FROM   etl.stg_con_ct_header a, etl.stg_con_ct_accounting_line b,
@@ -1623,7 +1625,7 @@ BEGIN
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
 					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
-					registered_date_id,brd_awd_no,tracking_number,
+					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
 					master_agreement_yn,load_id,last_modified_date)
@@ -1645,7 +1647,7 @@ BEGIN
 		AND b.maximum_contract_amount <= 100000 THEN 3 		WHEN  b.maximum_contract_amount > 100000 AND b.maximum_contract_amount <= 1000000 THEN 2 WHEN b.maximum_contract_amount > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
-		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
+		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		'N' as master_agreement_yn, coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
@@ -1755,7 +1757,7 @@ BEGIN
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,
 					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
-					registered_date_id,brd_awd_no,tracking_number,
+					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
 					master_agreement_yn,load_id,last_modified_date)
@@ -1777,7 +1779,7 @@ BEGIN
 		AND b.maximum_contract_amount <= 100000 THEN 3 	WHEN  b.maximum_contract_amount > 100000 AND b.maximum_contract_amount <= 1000000 THEN 2 WHEN b.maximum_contract_amount > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
-		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,
+		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		'N' as master_agreement_yn,coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)

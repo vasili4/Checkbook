@@ -910,6 +910,38 @@ BEGIN
 	
 	RAISE NOTICE 'PMAG3'; 
 	
+	-- Populating the REFD_AMOUNT by calculating it from all the children.
+	
+	CREATE TEMPORARY TABLE tmp_rfed_loaded_master_agreements(master_agreement_id bigint,original_master_agreement_id bigint,doc_appl_last_dt date) DISTRIBUTED BY (original_master_agreement_id);
+	
+	INSERT INTO tmp_rfed_loaded_master_agreements
+	SELECT  master_agreement_id, original_master_agreement_id, b.date
+	FROM history_master_agreement a JOIN ref_date b ON a.source_updated_date_id = b.date_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('C','M','F');
+	
+	CREATE TEMPORARY TABLE tmp_rfed_matching_agreements(master_agreement_id bigint,document_id varchar, document_code_id smallint, agency_id smallint, document_version integer)  DISTRIBUTED BY (master_agreement_id);
+	
+	INSERT INTO tmp_rfed_matching_agreements
+	SELECT a.master_agreement_id, b.document_id, b.document_code_id, d.agency_id, max(b.document_version) as document_version
+	FROM tmp_rfed_loaded_master_agreements a, history_agreement b, ref_date c, ref_agency_history d
+	WHERE a.original_master_agreement_id = b.master_agreement_id AND b.source_updated_date_id = c.date_id AND b.agency_history_id = d.agency_history_id AND c.date <= a.doc_appl_last_dt 
+	GROUP BY 1,2,3,4;
+	
+	
+	CREATE TEMPORARY TABLE tmp_rfed_amounts_for_master(master_agreement_id bigint,rfed_amount numeric) DISTRIBUTED BY(master_agreement_id);
+	
+	INSERT INTO tmp_rfed_amounts_for_master
+	SELECT a.master_agreement_id, sum(b.rfed_amount) as rfed_amount
+	FROM tmp_rfed_matching_agreements a, history_agreement b, ref_agency_history c
+	WHERE a.document_id = b.document_id AND a.document_code_id = b.document_code_id AND a.document_version = b.document_version AND b.agency_history_id = c.agency_history_id AND a.agency_id = c.agency_id
+	GROUP BY 1;
+	
+	UPDATE history_master_agreement a 
+	SET    rfed_amount = b.rfed_amount
+	FROM tmp_rfed_amounts_for_master b
+	WHERE a.master_agreement_id = b.master_agreement_id ;
+	
 	-- Populating the agreement_snapshot tables
 
 	
@@ -990,7 +1022,7 @@ BEGIN
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
 					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
-					registered_date_id,brd_awd_no,tracking_number,
+					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,
 					load_id,last_modified_date)
@@ -1012,7 +1044,7 @@ BEGIN
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
-		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
+		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,b.rfed_amount,
 		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn, 
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
@@ -1111,7 +1143,7 @@ BEGIN
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
 					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
-					registered_date_id,brd_awd_no,tracking_number,
+					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,
 					load_id,last_modified_date)
@@ -1133,7 +1165,7 @@ BEGIN
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
-		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
+		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,b.rfed_amount,
 		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,b.original_version_flag,
 		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn,
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
@@ -1263,12 +1295,12 @@ BEGIN
 	UPDATE 	agreement_snapshot a
 	SET has_children = (CASE WHEN b.total_children > 0 THEN 'Y' ELSE 'N' END)
 	FROM tmp_master_has_children b
-	WHERE a.master_agreement_yn = 'Y' AND a.master_agreement_id = b.original_master_agreement_id;
+	WHERE a.master_agreement_yn = 'Y' AND a.original_agreement_id = b.original_master_agreement_id;
 	
 	UPDATE 	agreement_snapshot_cy a
 	SET has_children = (CASE WHEN b.total_children > 0 THEN 'Y' ELSE 'N' END)
 	FROM tmp_master_has_children b
-	WHERE a.master_agreement_yn = 'Y' AND a.master_agreement_id = b.original_master_agreement_id;
+	WHERE a.master_agreement_yn = 'Y' AND a.original_agreement_id = b.original_master_agreement_id;
 	
 		
 	l_end_time := timeofday()::timestamp;

@@ -713,106 +713,106 @@ ContractLandingWidgets,aggregateon_contracts_cumulative_spending,"CREATE TABLE a
  status_flag char(1),
  type_of_year char(1) 
 ) DISTRIBUTED BY (vendor_id)","SELECT  a.original_agreement_id,
-  a.fiscal_year,
-  ry.year_id,
-  document_code_id,
-  a.master_agreement_yn,
-  MIN(description),
-  MIN(contract_number),
-  MIN(vendor_id),
-  MIN(award_method_id),
-  MIN(a.agency_id) ,
-  MIN(industry_type_id),
-  MIN(award_size_id),
-  MIN(original_contract_amount),
-  MIN(maximum_contract_amount),
-  SUM(b.check_amount),
-  SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN b.check_amount ELSE 0 END) as current_year_spending_amount,
-  MIN(dollar_difference),
-  MIN(percent_difference),
-  'A' as status_flag,
-  'B' as type_of_year
- FROM  agreement_snapshot_expanded a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='B'
- WHERE  a.status_flag='A'
- GROUP BY 1,2,3,4,5
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		a.master_agreement_yn,
+		MIN(description),
+		MIN(contract_number),
+		MIN(vendor_id),
+		MIN(award_method_id),
+		MIN(a.agency_id) ,
+		MIN(industry_type_id),
+		MIN(award_size_id),
+		MIN(original_contract_amount),
+		MIN(maximum_contract_amount),
+		SUM(coalesce(b.check_amount,0)),
+		SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
+		MIN(dollar_difference),
+		MIN(percent_difference),
+		'A' as status_flag,
+		'B' as type_of_year
+	FROM 	agreement_snapshot_expanded a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='B'
+	WHERE  a.status_flag='A'
+	GROUP BY 1,2,3,4,5
 UNION ALL
 SELECT a.original_agreement_id,
- a.fiscal_year,
- ry.year_id,
- document_code_id,
- a.master_agreement_yn,
- MIN(description),
- MIN(contract_number),
- MIN(vendor_id),
- MIN(award_method_id),
- MIN(a.agency_id) ,
- MIN(industry_type_id),
- MIN(award_size_id),
- MIN(original_contract_amount),
- MIN(maximum_contract_amount),
- SUM(b.check_amount) ,
- SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN b.check_amount ELSE 0 END) as current_year_spending_amount,
- MIN(dollar_difference),
- MIN(percent_difference),
- 'R' as status_flag, 
- 'B' as type_of_year 
- FROM  agreement_snapshot_expanded a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='B' 
- WHERE   a.status_flag='R'
- GROUP BY 1,2,3,4,5","SELECT  a.original_agreement_id,
-  a.fiscal_year,
-  ry.year_id,
-  document_code_id,
-  a.master_agreement_yn,
-  MIN(description),
-  MIN(contract_number),
-  MIN(vendor_id),
-  MIN(award_method_id),
-  MIN(a.agency_id) ,
-  MIN(industry_type_id),
-  MIN(award_size_id),
-  MIN(original_contract_amount),
-  MIN(maximum_contract_amount),
-  SUM(b.check_amount),
-  SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN b.check_amount ELSE 0 END) as current_year_spending_amount,
-  MIN(dollar_difference),
-  MIN(percent_difference),
-  'A' as status_flag,
-  'C' as type_of_year
- FROM  agreement_snapshot_expanded_cy a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='C'
- WHERE  a.status_flag='A'
- GROUP BY 1,2,3,4,5
+	a.fiscal_year,
+	ry.year_id,
+	document_code_id,
+	a.master_agreement_yn,
+	MIN(description),
+	MIN(contract_number),
+	MIN(vendor_id),
+	MIN(award_method_id),
+	MIN(a.agency_id) ,
+	MIN(industry_type_id),
+	MIN(award_size_id),
+	MIN(original_contract_amount),
+	MIN(maximum_contract_amount),
+	SUM(coalesce(b.check_amount,0)) ,
+	SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
+	MIN(dollar_difference),
+	MIN(percent_difference),
+	'R' as status_flag, 
+	'B' as type_of_year	
+	FROM 	agreement_snapshot_expanded a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='B' 
+	WHERE   a.status_flag='R'
+	GROUP BY 1,2,3,4,5","SELECT  a.original_agreement_id,
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		a.master_agreement_yn,
+		MIN(description),
+		MIN(contract_number),
+		MIN(vendor_id),
+		MIN(award_method_id),
+		MIN(a.agency_id) ,
+		MIN(industry_type_id),
+		MIN(award_size_id),
+		MIN(original_contract_amount),
+		MIN(maximum_contract_amount),
+		SUM(coalesce(b.check_amount,0)),
+		SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
+		MIN(dollar_difference),
+		MIN(percent_difference),
+		'A' as status_flag,
+		'C' as type_of_year
+	FROM 	agreement_snapshot_expanded_cy a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='C'
+	WHERE  a.status_flag='A'
+	GROUP BY 1,2,3,4,5
 UNION ALL
 SELECT a.original_agreement_id,
- a.fiscal_year,
- ry.year_id,
- document_code_id,
- a.master_agreement_yn,
- MIN(description),
- MIN(contract_number),
- MIN(vendor_id),
- MIN(award_method_id),
- MIN(a.agency_id),
- MIN(industry_type_id),
- MIN(award_size_id),
- MIN(original_contract_amount),
- MIN(maximum_contract_amount),
- SUM(b.check_amount) ,
- SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN check_amount ELSE 0 END) as current_year_spending_amount,
- MIN(dollar_difference),
- MIN(percent_difference),
- 'R' as status_flag, 
- 'C' as type_of_year 
- FROM  agreement_snapshot_expanded_cy a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='C'
- WHERE   a.status_flag='R'
- GROUP BY 1,2,3,4,5",16
+	a.fiscal_year,
+	ry.year_id,
+	document_code_id,
+	a.master_agreement_yn,
+	MIN(description),
+	MIN(contract_number),
+	MIN(vendor_id),
+	MIN(award_method_id),
+	MIN(a.agency_id),
+	MIN(industry_type_id),
+	MIN(award_size_id),
+	MIN(original_contract_amount),
+	MIN(maximum_contract_amount),
+	SUM(coalesce(b.check_amount,0)) ,
+	SUM(CASE WHEN b.fiscal_year IS NOT NULL AND a.fiscal_year = b.fiscal_year THEN coalesce(b.check_amount,0) ELSE 0 END) as current_year_spending_amount,
+	MIN(dollar_difference),
+	MIN(percent_difference),
+	'R' as status_flag, 
+	'C' as type_of_year	
+	FROM 	agreement_snapshot_expanded_cy a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN mid_aggregateon_disbursement_spending_year b ON a.original_agreement_id = b.original_agreement_id AND a.fiscal_year >= b.fiscal_year AND b.type_of_year ='C'
+	WHERE   a.status_flag='R'
+	GROUP BY 1,2,3,4,5",16
 ContractLandingTopGraph,aggregateon_contracts_spending_by_month,"CREATE TABLE aggregateon_contracts_spending_by_month(
  original_agreement_id bigint,
  fiscal_year smallint,
@@ -828,78 +828,78 @@ ContractLandingTopGraph,aggregateon_contracts_spending_by_month,"CREATE TABLE ag
  status_flag char(1),
  type_of_year char(1) 
 ) DISTRIBUTED BY (vendor_id)","SELECT  a.original_agreement_id,
-  a.fiscal_year,
-  ry.year_id,
-  document_code_id,
-  b.check_eft_issued_cal_month_id as month_id,  
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id ,
-  a.industry_type_id,
-  a.award_size_id,
-  SUM(b.check_amount),  
-  'A' as status_flag,
-  'B' as type_of_year
- FROM  agreement_snapshot_expanded a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
- WHERE  a.status_flag='A'
- GROUP BY 1,2,3,4,5,6,7,8,9,10
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),		
+		'A' as status_flag,
+		'B' as type_of_year
+	FROM 	agreement_snapshot_expanded a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
+	WHERE  a.status_flag='A'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10
 UNION ALL
 SELECT a.original_agreement_id,
-  a.fiscal_year,
-  ry.year_id,
-  document_code_id,
-  b.check_eft_issued_cal_month_id as month_id,  
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id , 
-  a.industry_type_id,
-  a.award_size_id,
-  SUM(b.check_amount),
-  'R' as status_flag, 
-  'B' as type_of_year 
- FROM  agreement_snapshot_expanded a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
- WHERE   a.status_flag='R'
- GROUP BY 1,2,3,4,5,6,7,8,9,10","SELECT  a.original_agreement_id,
-  a.fiscal_year,
-  ry.year_id,
-  document_code_id,
-  b.check_eft_issued_cal_month_id as month_id,  
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id , 
-  a.industry_type_id,
-  a.award_size_id,
-  SUM(b.check_amount),
-  'A' as status_flag,
-  'C' as type_of_year
- FROM  agreement_snapshot_expanded_cy a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
- WHERE  a.status_flag='A'
- GROUP BY 1,2,3,4,5,6,7,8,9,10
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,	
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),
+		'R' as status_flag, 
+		'B' as type_of_year	
+	FROM 	agreement_snapshot_expanded a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
+	WHERE   a.status_flag='R'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10","SELECT  a.original_agreement_id,
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,	
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),
+		'A' as status_flag,
+		'C' as type_of_year
+	FROM 	agreement_snapshot_expanded_cy a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
+	WHERE  a.status_flag='A'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10
 UNION ALL
 SELECT  a.original_agreement_id,
-  a.fiscal_year,
-  ry.year_id,
-  document_code_id,
-  b.check_eft_issued_cal_month_id as month_id,  
-  a.vendor_id,
-  a.award_method_id,
-  a.agency_id , 
-  a.industry_type_id,
-  a.award_size_id,
-  SUM(b.check_amount),
- 'R' as status_flag, 
- 'C' as type_of_year 
- FROM  agreement_snapshot_expanded_cy a 
- LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
- LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
- WHERE   a.status_flag='R'
- GROUP BY 1,2,3,4,5,6,7,8,9,10",17
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,	
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),
+	'R' as status_flag, 
+	'C' as type_of_year	
+	FROM 	agreement_snapshot_expanded_cy a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
+	WHERE   a.status_flag='R'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10",17
 ContractsForSumAndTotals,aggregateon_total_contracts,"CREATE TABLE aggregateon_total_contracts
 (
 fiscal_year smallint,
@@ -956,41 +956,41 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
  status_flag char(1),
  type_of_year char(1)
 ) DISTRIBUTED BY (department_id)","SELECT a.document_code_id,
-   a.agency_id as document_agency_id,
-   e.agency_id as agency_id,
-  f.department_id as department_id,
-  a.fiscal_year,
-  b.year_id,
-  a.award_method_id,
-  a.vendor_id,
-  a.industry_type_id,
-  a.award_size_id,
-  sum(d.check_amount) as spending_amount,
-  count(distinct a.original_agreement_id) as total_contracts,
-  'A' as status_flag,
-  'B' as type_of_year
+ 		a.agency_id as document_agency_id,
+ 		e.agency_id as agency_id,
+		f.department_id as department_id,
+		a.fiscal_year,
+		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
+		a.industry_type_id,
+		a.award_size_id,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
+		count(distinct a.original_agreement_id) as total_contracts,
+		'A' as status_flag,
+		'B' as type_of_year
  FROM agreement_snapshot_expanded a JOIN ref_year b ON a.fiscal_year = b.year_value
  JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
  LEFT JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8,9,10 
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8,9,10	
  UNION ALL 
  SELECT a.document_code_id,
-   a.agency_id as document_agency_id,
-   e.agency_id as agency_id,
-  f.department_id as department_id,
-  a.fiscal_year,
-  b.year_id,
-  a.award_method_id,
-  a.vendor_id,
-  a.industry_type_id,
-  a.award_size_id,
-  sum(d.check_amount) as spending_amount,
-  count(distinct a.original_agreement_id) as total_contracts,
-  'R' as status_flag,
-  'B' as type_of_year
+ 		a.agency_id as document_agency_id,
+ 		e.agency_id as agency_id,
+		f.department_id as department_id,
+		a.fiscal_year,
+		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
+		a.industry_type_id,
+		a.award_size_id,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
+		count(distinct a.original_agreement_id) as total_contracts,
+		'R' as status_flag,
+		'B' as type_of_year
  FROM agreement_snapshot_expanded a JOIN ref_year b ON a.fiscal_year = b.year_value
  JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
  LEFT JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
@@ -998,41 +998,41 @@ ContractsByAppropriationUnit,aggregateon_contracts_department,"CREATE TABLE aggr
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
  WHERE  a.master_agreement_yn = 'N' AND a.status_flag='R' GROUP BY 1,2,3,4,5,6,7,8,9,10","SELECT a.document_code_id,
-   a.agency_id as document_agency_id,
-   e.agency_id as agency_id,
-  f.department_id as department_id,
-  a.fiscal_year,
-  b.year_id,
-  a.award_method_id,
-  a.vendor_id,
-  a.industry_type_id,
-  a.award_size_id,
-  sum(d.check_amount) as spending_amount,
-  count(distinct a.original_agreement_id) as total_contracts,
-  'A' as status_flag,
-  'C' as type_of_year
+ 		a.agency_id as document_agency_id,
+ 		e.agency_id as agency_id,
+		f.department_id as department_id,
+		a.fiscal_year,
+		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
+		a.industry_type_id,
+		a.award_size_id,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
+		count(distinct a.original_agreement_id) as total_contracts,
+		'A' as status_flag,
+		'C' as type_of_year
  FROM agreement_snapshot_expanded_cy a JOIN ref_year b ON a.fiscal_year = b.year_value
  JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
  LEFT JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
  AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
  JOIN ref_agency_history e ON e.agency_history_id = c.agency_history_id
  JOIN ref_department_history f ON f.department_history_id = c.department_history_id AND e.agency_id = f.agency_id
- WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8,9,10 
+ WHERE  a.master_agreement_yn = 'N' AND a.status_flag='A' GROUP BY 1,2,3,4,5,6,7,8,9,10	
  UNION ALL 
  SELECT a.document_code_id,
-   a.agency_id as document_agency_id,
-   e.agency_id as agency_id,
-  f.department_id as department_id,
-  a.fiscal_year,
-  b.year_id,
-  a.award_method_id,
-  a.vendor_id,
-  a.industry_type_id,
-  a.award_size_id,
-  sum(d.check_amount) as spending_amount,
-  count(distinct a.original_agreement_id) as total_contracts,
-  'R' as status_flag,
-  'C' as type_of_year
+ 		a.agency_id as document_agency_id,
+ 		e.agency_id as agency_id,
+		f.department_id as department_id,
+		a.fiscal_year,
+		b.year_id,
+		a.award_method_id,
+		a.vendor_id,
+		a.industry_type_id,
+		a.award_size_id,
+		sum(coalesce(d.check_amount,0)) as spending_amount,
+		count(distinct a.original_agreement_id) as total_contracts,
+		'R' as status_flag,
+		'C' as type_of_year
  FROM agreement_snapshot_expanded_cy a JOIN ref_year b ON a.fiscal_year = b.year_value
  JOIN history_agreement_accounting_line c ON a.agreement_id = c.agreement_id
  LEFT JOIN disbursement_line_item_details d ON a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number 
@@ -1147,7 +1147,7 @@ ContractsByExpenseCategory,aggregateon_contracts_expense,"CREATE TABLE aggregate
  expenditure_object_name character varying(40),
  encumbered_amount numeric(16,2),
  spending_amount numeric(16,2) 
-) DISTRIBUTED BY (original_agreement_id)","SELECT m.original_agreement_id, p.expenditure_object_id, p.expenditure_object_name, m.encumbered_amount, n.spending_amount
+) DISTRIBUTED BY (original_agreement_id)","SELECT m.original_agreement_id, p.expenditure_object_id, p.expenditure_object_name, m.encumbered_amount, coalesce(n.spending_amount,0) as spending_amount
 FROM
  (SELECT a.original_agreement_id, c.expenditure_object_id,  sum(b.line_amount) as encumbered_amount
  FROM history_agreement a, history_agreement_accounting_line b , ref_expenditure_object_history c

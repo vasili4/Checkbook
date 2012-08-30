@@ -720,7 +720,7 @@ BEGIN
 				document_name,original_term_begin_date_id,
 				original_term_end_date_id,privacy_flag,created_load_id,created_date,
 				source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		   		source_updated_calendar_year_id,contract_number,brd_awd_no)
+		   		source_updated_calendar_year_id,contract_number,brd_awd_no,rfed_amount)
 	SELECT	d.agreement_id,a.master_agreement_id,a.document_code_id,
 		a.agency_history_id,a.doc_id,a.doc_vers_no,
 		a.trkg_no,a.record_date_id,a.doc_bfy,
@@ -734,7 +734,7 @@ BEGIN
 		a.doc_nm,a.original_term_begin_date_id,
 		a.original_term_end_date_id,d.privacy_flag,p_load_id_in,now()::timestamp,
 		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.brd_awd_no
+		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.brd_awd_no,a.rfed_am
 	FROM	etl.stg_con_do1_header a JOIN etl.stg_con_do1_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 					 JOIN tmp_do1_con d ON a.uniq_id = d.uniq_id
@@ -761,7 +761,7 @@ BEGIN
 			a.doc_nm,a.original_term_begin_date_id,
 			a.original_term_end_date_id,d.privacy_flag,p_load_id_in as load_id,now()::timestamp as updated_date,
 			source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-			source_updated_calendar_year_id,a.brd_awd_no	
+			source_updated_calendar_year_id,a.brd_awd_no, a.rfed_am	
 		FROM	etl.stg_con_do1_header a JOIN etl.stg_con_do1_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 						     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 						 JOIN tmp_do1_con d ON a.uniq_id = d.uniq_id
@@ -802,7 +802,8 @@ BEGIN
 		source_updated_fiscal_year_id = b.source_updated_fiscal_year_id,
 		source_updated_calendar_year = b.source_updated_calendar_year,
 		source_updated_calendar_year_id = b.source_updated_calendar_year_id,
-		brd_awd_no = b.brd_awd_no
+		brd_awd_no = b.brd_awd_no,
+		rfed_amount = b.rfed_am
 	FROM	tmp_con_do1_update b
 	WHERE	a.agreement_id = b.agreement_id;
 	
@@ -821,14 +822,14 @@ BEGIN
 			budget_fiscal_year,fiscal_year,fiscal_period,
 			fund_class_id,agency_history_id,department_history_id,
 			expenditure_object_history_id,revenue_source_id,location_code,
-			budget_code_id,reporting_code,created_load_id,
+			budget_code_id,reporting_code,rfed_line_amount,created_load_id,
 			created_date)	
 	SELECT  d.agreement_id,b.doc_comm_ln_no,b.doc_actg_ln_no,
 		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,
 		b.bfy,b.fy_dc,b.per_dc,
 		b.fund_class_id,b.agency_history_id,b.department_history_id,
 		b.expenditure_object_history_id,null as revenue_source_id,b.loc_cd,
-		b.budget_code_id,b.rpt_cd,p_load_id_in,
+		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,p_load_id_in,
 		now()::timestamp
 	FROM	etl.stg_con_do1_header a JOIN etl.stg_con_do1_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -867,14 +868,14 @@ BEGIN
 			budget_fiscal_year,fiscal_year,fiscal_period,
 			fund_class_id,agency_history_id,department_history_id,
 			expenditure_object_history_id,revenue_source_id,location_code,
-			budget_code_id,reporting_code,created_load_id,
+			budget_code_id,reporting_code,rfed_line_amount,created_load_id,
 			created_date)	
 	SELECT  d.agreement_id,b.doc_comm_ln_no,b.doc_actg_ln_no,
 		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,
 		b.bfy,b.fy_dc,b.per_dc,
 		b.fund_class_id,b.agency_history_id,b.department_history_id,
 		b.expenditure_object_history_id,null as revenue_source_id,b.loc_cd,
-		b.budget_code_id,b.rpt_cd,p_load_id_in,
+		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,p_load_id_in,
 		now()::timestamp
 	FROM	etl.stg_con_do1_header a JOIN etl.stg_con_do1_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -916,6 +917,7 @@ BEGIN
 		location_code = b.loc_cd,
 		budget_code_id = b.budget_code_id,
 		reporting_code = b.rpt_cd,
+		rfed_line_amount = b.rfed_ln_am,
 		updated_load_id = p_load_id_in,
 		updated_date = now()::timestamp
 	FROM   etl.stg_con_do1_header a, etl.stg_con_do1_accounting_line b,

@@ -346,9 +346,11 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-        agreement_commodity_line_number integer,
-        agreement_vendor_line_number integer, 
-        reference_document_number character varying,
+    agreement_commodity_line_number integer,
+    agreement_vendor_line_number integer, 
+    reference_document_number character varying,    
+	contract_document_code varchar(8),
+	master_contract_document_code varchar(8),
 	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone
@@ -380,7 +382,8 @@ CREATE VIEW disbursement_line_item_details AS
     disbursement_line_item_details__0.reporting_code,disbursement_line_item_details__0.location_id,disbursement_line_item_details__0.fund_class_name,disbursement_line_item_details__0.fund_class_code,
     disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year,
     disbursement_line_item_details__0.agreement_accounting_line_number, disbursement_line_item_details__0.agreement_commodity_line_number, disbursement_line_item_details__0.agreement_vendor_line_number, 
-    disbursement_line_item_details__0.reference_document_number,disbursement_line_item_details__0.file_type,disbursement_line_item_details__0.load_id, disbursement_line_item_details__0.last_modified_date 
+    disbursement_line_item_details__0.reference_document_number,disbursement_line_item_details__0.contract_document_code,disbursement_line_item_details__0.master_contract_document_code,
+    disbursement_line_item_details__0.file_type,disbursement_line_item_details__0.load_id, disbursement_line_item_details__0.last_modified_date 
 FROM ONLY disbursement_line_item_details__0;
 
 --
@@ -499,6 +502,7 @@ CREATE EXTERNAL WEB TABLE history_agreement__0 (
     original_term_begin_date_id int,
     original_term_end_date_id int,
     brd_awd_no varchar,
+    rfed_amount numeric,
     registered_fiscal_year smallint,
     registered_fiscal_year_id smallint, 
     registered_calendar_year smallint,
@@ -546,7 +550,7 @@ CREATE VIEW history_agreement AS
     history_agreement__0.borough_code, history_agreement__0.block_code, history_agreement__0.lot_code, history_agreement__0.council_district_code, 
     history_agreement__0.vendor_history_id, history_agreement__0.vendor_preference_level, history_agreement__0.original_contract_amount, 
     history_agreement__0.registered_date_id, history_agreement__0.oca_number, history_agreement__0.number_solicitation, history_agreement__0.document_name, 
-    history_agreement__0.original_term_begin_date_id, history_agreement__0.original_term_end_date_id, history_agreement__0.brd_awd_no, 
+    history_agreement__0.original_term_begin_date_id, history_agreement__0.original_term_end_date_id, history_agreement__0.brd_awd_no, history_agreement__0.rfed_amount,
     history_agreement__0.registered_fiscal_year, history_agreement__0.registered_fiscal_year_id, history_agreement__0.registered_calendar_year, history_agreement__0.registered_calendar_year_id,
     history_agreement__0.effective_end_fiscal_year, history_agreement__0.effective_end_fiscal_year_id, history_agreement__0.effective_end_calendar_year, history_agreement__0.effective_end_calendar_year_id,
     history_agreement__0.effective_begin_fiscal_year, history_agreement__0.effective_begin_fiscal_year_id, history_agreement__0.effective_begin_calendar_year, history_agreement__0.effective_begin_calendar_year_id,
@@ -579,6 +583,7 @@ CREATE EXTERNAL WEB TABLE history_agreement_accounting_line__0 (
     location_code character varying,
     budget_code_id integer,
     reporting_code character varying,
+    rfed_line_amount numeric,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -598,7 +603,7 @@ CREATE VIEW history_agreement_accounting_line AS
     history_agreement_accounting_line__0.fiscal_period, history_agreement_accounting_line__0.fund_class_id, history_agreement_accounting_line__0.agency_history_id, 
     history_agreement_accounting_line__0.department_history_id, history_agreement_accounting_line__0.expenditure_object_history_id, 
     history_agreement_accounting_line__0.revenue_source_id, history_agreement_accounting_line__0.location_code, history_agreement_accounting_line__0.budget_code_id, 
-    history_agreement_accounting_line__0.reporting_code, history_agreement_accounting_line__0.created_load_id, history_agreement_accounting_line__0.updated_load_id,
+    history_agreement_accounting_line__0.reporting_code, history_agreement_accounting_line__0.rfed_line_amount, history_agreement_accounting_line__0.created_load_id, history_agreement_accounting_line__0.updated_load_id,
     history_agreement_accounting_line__0.created_date, history_agreement_accounting_line__0.updated_date FROM ONLY history_agreement_accounting_line__0;
 
 --
@@ -715,6 +720,7 @@ CREATE EXTERNAL WEB TABLE history_master_agreement__0 (
     contract_class_code character varying,
     number_solicitation integer,
     document_name character varying,
+    rfed_amount numeric,
   registered_fiscal_year smallint,
   registered_fiscal_year_id smallint,
   registered_calendar_year smallint,
@@ -765,7 +771,7 @@ CREATE VIEW history_master_agreement AS
     history_master_agreement__0.board_approved_award_date_id, history_master_agreement__0.original_contract_amount, history_master_agreement__0.oca_number, 
     history_master_agreement__0.original_term_begin_date_id, history_master_agreement__0.original_term_end_date_id, history_master_agreement__0.registered_date_id, 
     history_master_agreement__0.maximum_amount, history_master_agreement__0.maximum_spending_limit, history_master_agreement__0.award_level_code, 
-    history_master_agreement__0.contract_class_code, history_master_agreement__0.number_solicitation, history_master_agreement__0.document_name, 
+    history_master_agreement__0.contract_class_code, history_master_agreement__0.number_solicitation, history_master_agreement__0.document_name, history_master_agreement__0.rfed_amount,
     history_master_agreement__0.registered_fiscal_year, history_master_agreement__0.registered_fiscal_year_id, history_master_agreement__0.registered_calendar_year, history_master_agreement__0.registered_calendar_year_id,
     history_master_agreement__0.effective_end_fiscal_year, history_master_agreement__0.effective_end_fiscal_year_id, history_master_agreement__0.effective_end_calendar_year, history_master_agreement__0.effective_end_calendar_year_id,
     history_master_agreement__0.effective_begin_fiscal_year, history_master_agreement__0.effective_begin_fiscal_year_id, history_master_agreement__0.effective_begin_calendar_year, history_master_agreement__0.effective_begin_calendar_year_id,
@@ -2554,6 +2560,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
 	   registered_date_id integer,
 	   brd_awd_no character varying,
 	   tracking_number character varying,
+	   rfed_amount numeric(16,2),
 	   master_agreement_yn character(1),
 	   has_children character(1),
 	   original_version_flag character(1),
@@ -2579,7 +2586,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapsho
   		agreement_snapshot__0.effective_begin_date,agreement_snapshot__0.effective_begin_date_id,
   		agreement_snapshot__0.effective_begin_year,agreement_snapshot__0.effective_begin_year_id,agreement_snapshot__0.effective_end_date,
   		agreement_snapshot__0.effective_end_date_id,agreement_snapshot__0.effective_end_year,agreement_snapshot__0.effective_end_year_id,
-  		agreement_snapshot__0.registered_date,agreement_snapshot__0.registered_date_id,agreement_snapshot__0.brd_awd_no,agreement_snapshot__0.tracking_number,
+  		agreement_snapshot__0.registered_date,agreement_snapshot__0.registered_date_id,agreement_snapshot__0.brd_awd_no,agreement_snapshot__0.tracking_number,agreement_snapshot__0.rfed_amount,
   		agreement_snapshot__0.master_agreement_yn,agreement_snapshot__0.has_children,agreement_snapshot__0.original_version_flag,agreement_snapshot__0.latest_flag,
   		agreement_snapshot__0.load_id,agreement_snapshot__0.last_modified_date
   	FROM  agreement_snapshot__0;
@@ -2637,6 +2644,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot_cy__0(
 	  registered_date_id integer,
 	  brd_awd_no character varying,
 	  tracking_number character varying,
+	  rfed_amount numeric(16,2),
 	  master_agreement_yn character(1),
 	  has_children character(1),
 	  original_version_flag character(1),
@@ -2662,7 +2670,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapsho
    		agreement_snapshot_cy__0.effective_begin_date,agreement_snapshot_cy__0.effective_begin_date_id,
   		agreement_snapshot_cy__0.effective_begin_year,agreement_snapshot_cy__0.effective_begin_year_id,agreement_snapshot_cy__0.effective_end_date,
   		agreement_snapshot_cy__0.effective_end_date_id,agreement_snapshot_cy__0.effective_end_year,agreement_snapshot_cy__0.effective_end_year_id,
-  		agreement_snapshot_cy__0.registered_date,agreement_snapshot_cy__0.registered_date_id,agreement_snapshot_cy__0.brd_awd_no,agreement_snapshot_cy__0.tracking_number,
+  		agreement_snapshot_cy__0.registered_date,agreement_snapshot_cy__0.registered_date_id,agreement_snapshot_cy__0.brd_awd_no,agreement_snapshot_cy__0.tracking_number,agreement_snapshot_cy__0.rfed_amount,
   		agreement_snapshot_cy__0.master_agreement_yn,agreement_snapshot_cy__0.has_children,agreement_snapshot_cy__0.original_version_flag,agreement_snapshot_cy__0.latest_flag,
   		agreement_snapshot_cy__0.load_id,agreement_snapshot_cy__0.last_modified_date
   	FROM  agreement_snapshot_cy__0;  	

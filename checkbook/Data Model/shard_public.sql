@@ -307,12 +307,14 @@ CREATE TABLE disbursement_line_item_details(
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-        agreement_commodity_line_number integer,
-        agreement_vendor_line_number integer, 
-        reference_document_number character varying,
+    agreement_commodity_line_number integer,
+    agreement_vendor_line_number integer, 
+    reference_document_number character varying,    
+	contract_document_code varchar(8),
+	master_contract_document_code varchar(8),
 	file_type char(1),
 	load_id integer,
-        last_modified_date timestamp without time zone
+    last_modified_date timestamp without time zone
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -416,6 +418,7 @@ CREATE TABLE history_agreement (
     original_term_begin_date_id int,
     original_term_end_date_id int,    
     brd_awd_no varchar,
+    rfed_amount numeric(16,2),
     registered_fiscal_year smallint,
     registered_fiscal_year_id smallint, 
     registered_calendar_year smallint,
@@ -466,6 +469,7 @@ CREATE TABLE history_agreement_accounting_line (
     location_code character varying(4),
     budget_code_id integer,
     reporting_code character varying(15),
+    rfed_line_amount numeric(16,2),
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -571,6 +575,7 @@ CREATE TABLE history_master_agreement
   contract_class_code character varying(2),
   number_solicitation integer,
   document_name character varying(60),
+  rfed_amount numeric(16,2),
   registered_fiscal_year smallint,
   registered_fiscal_year_id smallint,
   registered_calendar_year smallint,
@@ -1747,6 +1752,7 @@ CREATE TABLE agreement_snapshot(
 	  registered_date_id integer,
 	  brd_awd_no character varying,
 	  tracking_number character varying,
+	  rfed_amount numeric(16,2),
 	  master_agreement_yn character(1),
 	  has_children character(1),
 	  original_version_flag character(1),
