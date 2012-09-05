@@ -1551,6 +1551,7 @@ DISTRIBUTED BY (fiscal_year_id);
     award_size_id smallint,
 	original_contract_amount numeric(16,2) ,
 	maximum_contract_amount numeric(16,2),
+	rfed_amount numeric(16,2),
 	starting_year smallint,	
 	ending_year smallint,
 	dollar_difference numeric(16,2), 
@@ -1576,6 +1577,7 @@ CREATE TABLE agreement_snapshot_expanded_cy(
     award_size_id smallint,
 	original_contract_amount numeric(16,2) ,
 	maximum_contract_amount numeric(16,2),
+	rfed_amount numeric(16,2),
 	starting_year smallint,	
 	ending_year smallint,
 	dollar_difference numeric(16,2), 
@@ -1604,6 +1606,7 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
     award_size_id smallint,
 	original_contract_amount numeric(16,2),
 	maximum_contract_amount numeric(16,2),
+	spending_amount_disb numeric(16,2),
 	spending_amount numeric(16,2),
 	current_year_spending_amount numeric(16,2),
 	dollar_difference numeric(16,2),
@@ -1647,7 +1650,8 @@ CREATE TABLE aggregateon_total_contracts(
 	total_revenue_contracts_amount numeric(16,2),
 	total_commited_contracts_amount numeric(16,2),
 	total_contracts_amount numeric(16,2),
-	total_spending_amount numeric(16,2), 
+	total_spending_amount_disb numeric(16,2), 
+	total_spending_amount numeric(16,2),
 	status_flag char(1),
 	type_of_year char(1)
 ) DISTRIBUTED BY (fiscal_year);	
@@ -1664,6 +1668,7 @@ CREATE TABLE aggregateon_contracts_department(
 	vendor_id int,
 	industry_type_id smallint,
     award_size_id smallint,
+	spending_amount_disb numeric(16,2),
 	spending_amount numeric(16,2),
 	total_contracts integer,
 	status_flag char(1),
@@ -1683,6 +1688,27 @@ CREATE TABLE contracts_spending_transactions(
     award_size_id smallint,
 	agency_id smallint,
 	department_id integer,
+	disb_document_id  character varying(20),
+	disb_vendor_name  character varying,
+	disb_check_eft_issued_date  date,
+	disb_agency_name  character varying(100),
+	disb_department_short_name  character varying(15),
+	disb_check_amount  numeric(16,2),
+	disb_expenditure_object_name  character varying(40),
+	disb_budget_name  character varying(60),
+	disb_contract_number  character varying,
+	disb_purpose  character varying,
+	disb_reporting_code  character varying(15),
+	disb_spending_category_name  character varying,
+	disb_agency_id  smallint,
+	disb_vendor_id  integer,
+	disb_expenditure_object_id  integer,
+	disb_department_id  integer,
+	disb_spending_category_id  smallint,
+	disb_agreement_id  bigint,
+	disb_contract_document_code  character varying(8),
+	disb_master_agreement_id  bigint,
+	disb_fiscal_year_id  smallint,
 	status_flag char(1),
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);	
@@ -1693,7 +1719,8 @@ CREATE TABLE aggregateon_contracts_expense(
 	expenditure_object_id integer,
 	expenditure_object_name character varying(40),
 	encumbered_amount numeric(16,2),
-	spending_amount numeric(16,2)	
+	spending_amount_disb numeric(16,2),
+	spending_amount numeric(16,2)
 ) DISTRIBUTED BY (original_agreement_id);	
 
 -- End Contract Aggregate Tables
@@ -1821,7 +1848,9 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
   	percent_difference numeric(17,4),
   	original_or_modified varchar,
   	award_size_id smallint,
-  	award_category_id smallint
+  	award_category_id smallint,
+  	document_version smallint,
+  	latest_flag char(1)
  ) DISTRIBUTED BY (document_code_id);
  
  -- tables for contracts by industry and contracts by size

@@ -165,6 +165,21 @@ select etl.initializedate('1900-01-01'::date,'2200-12-31'::date);
 				  WHEN month_value = 5 THEN 11
 				  WHEN month_value = 6 THEN 12
 				  END);
+				  
+	UPDATE ref_month
+	SET month_short_name = (CASE WHEN month_value = 1 THEN 'JAN'
+				  WHEN month_value = 2 THEN 'FEB'
+				  WHEN month_value = 3 THEN 'MAR'
+				  WHEN month_value = 4 THEN 'APR'
+				  WHEN month_value = 5 THEN 'MAY'
+				  WHEN month_value = 6 THEN 'JUN'
+				  WHEN month_value = 7 THEN 'JUL'
+				  WHEN month_value = 8 THEN 'AUG'
+				  WHEN month_value = 9 THEN 'SEP'
+				  WHEN month_value = 10 THEN 'OCT'
+				  WHEN month_value = 11 THEN 'NOV'
+				  WHEN month_value = 12 THEN 'DEC'
+				  END);
 --------------------------------------------------------------------------------------------------------------------------------------------
 
 COPY etl.stg_award_method FROM '/home/gpadmin/prerelease/NYC/AwardMethod.csv' CSV QUOTE as '"' ;

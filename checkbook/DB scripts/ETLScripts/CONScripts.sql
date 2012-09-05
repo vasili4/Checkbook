@@ -1543,7 +1543,7 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_agreement_snapshot(original_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
 						     master_agreement_id bigint,ending_year smallint, ending_year_id smallint ,rank_value smallint,agreement_id bigint,
 						     effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id smallint,effective_end_fiscal_year smallint,
-						     effective_end_fiscal_year_id smallint,registered_fiscal_year smallint)
+						     effective_end_fiscal_year_id smallint,registered_fiscal_year smallint,original_version_flag char(1))
 	DISTRIBUTED BY 	(original_agreement_id);				      
 	
 	-- Get the latest version for every year of modification
@@ -1560,7 +1560,8 @@ BEGIN
 		max(effective_begin_fiscal_year_id) as effective_begin_fiscal_year_id,
 		max(effective_end_fiscal_year) as effective_end_fiscal_year,
 		max(effective_end_fiscal_year_id) as effective_end_fiscal_year_id,
-		NULL as registered_fiscal_year
+		NULL as registered_fiscal_year,
+		'N' as original_version_flag
 	FROM	tmp_agreement_flag_changes a JOIN history_agreement b ON a.first_agreement_id = b.original_agreement_id
 	GROUP  BY 1,2,3;
 
@@ -1605,6 +1606,10 @@ BEGIN
 	WHERE	year_value = ending_year - 1
 		AND ending_year is not null;
 	
+	UPDATE tmp_agreement_snapshot
+	SET original_version_flag = 'Y'
+	WHERE rank_value = 1;
+	
 	RAISE NOTICE 'PCON5';
 	
 	INSERT INTO agreement_snapshot_deleted(original_agreement_id, starting_year, load_id, deleted_date)
@@ -1648,7 +1653,7 @@ BEGIN
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
-		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
+		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		'N' as master_agreement_yn, coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
@@ -1692,7 +1697,8 @@ BEGIN
 		max(effective_begin_calendar_year_id) as effective_begin_fiscal_year_id,
 		max(effective_end_calendar_year) as effective_end_fiscal_year,
 		max(effective_end_calendar_year_id) as effective_end_fiscal_year_id,
-		NULL as registered_fiscal_year
+		NULL as registered_fiscal_year,
+		'N' as original_version_flag
 	FROM	tmp_agreement_flag_changes a JOIN history_agreement b ON a.first_agreement_id = b.original_agreement_id
 	GROUP  BY 1,2,3;
 
@@ -1738,6 +1744,10 @@ BEGIN
 	WHERE	year_value = ending_year - 1
 		AND ending_year is not null;
 
+	UPDATE tmp_agreement_snapshot
+	SET original_version_flag = 'Y'
+	WHERE rank_value = 1;
+	
 	RAISE NOTICE 'PCON8';
 	
 	INSERT INTO agreement_snapshot_cy_deleted(original_agreement_id, starting_year, load_id, deleted_date)
@@ -1780,7 +1790,7 @@ BEGIN
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
-		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,b.original_version_flag,
+		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		'N' as master_agreement_yn,coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
@@ -1909,6 +1919,315 @@ EXCEPTION
 	
 	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
 	VALUES(p_job_id_in,'etl.postProcessContracts',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
+	RETURN 0;
+	
+END;
+$$ language plpgsql;
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.refreshContractsPreAggregateTables(p_job_id_in bigint) RETURNS INT AS $$
+DECLARE
+	l_start_time  timestamp;
+	l_end_time  timestamp;
+	
+BEGIN
+	
+	
+
+	l_start_time := timeofday()::timestamp;
+	
+	
+	TRUNCATE agreement_snapshot_expanded;
+	
+	INSERT INTO agreement_snapshot_expanded
+SELECT  original_agreement_id ,
+	agreement_id,
+	fiscal_year ,
+	description ,
+	contract_number ,
+	vendor_id ,
+	agency_id,
+	industry_type_id,
+	award_size_id,
+	original_contract_amount ,
+	maximum_contract_amount ,
+	rfed_amount,
+	starting_year,	
+	ending_year ,
+	dollar_difference , 
+	percent_difference ,
+	award_method_id,
+	document_code_id,
+	master_agreement_id,
+	master_agreement_yn,
+	status_flag
+FROM	
+(SELECT original_agreement_id,
+	agreement_id,
+	generate_series(effective_begin_year,effective_end_year,1) as fiscal_year,
+	description,
+	contract_number,
+	vendor_id,
+	agency_id,
+	industry_type_id,
+	award_size_id,
+	original_contract_amount,
+	maximum_contract_amount,
+	rfed_amount,
+	starting_year,	
+	ending_year,
+	dollar_difference,
+	percent_difference,
+	award_method_id,
+	document_code_id,
+	master_agreement_id,
+	master_agreement_yn,
+	'A' as status_flag
+FROM	agreement_snapshot ) expanded_tbl  WHERE fiscal_year between starting_year AND ending_year
+AND fiscal_year >= 2010 AND ( (fiscal_year <= extract(year from now()::date) AND extract(month from now()::date) <= 6) OR
+		     (fiscal_year <= (extract(year from now()::date)::smallint)+1 AND extract(month from now()::date) > 6) );
+
+INSERT INTO agreement_snapshot_expanded
+SELECT original_agreement_id,
+	agreement_id,
+	registered_year,
+	description,
+	contract_number,
+	vendor_id,
+	agency_id,
+	industry_type_id,
+	award_size_id,
+	original_contract_amount,
+	maximum_contract_amount,
+	rfed_amount,
+	starting_year,	
+	ending_year,
+	dollar_difference,
+	percent_difference,
+	award_method_id,
+	document_code_id,
+	master_agreement_id,
+	master_agreement_yn,
+	'R' as status_flag
+FROM	agreement_snapshot
+WHERE registered_year between starting_year AND ending_year
+AND registered_year >= 2010 ;
+	
+RAISE NOTICE 'PRE_CON_AGGR1';
+
+CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded AS 
+SELECT * from agreement_snapshot_expanded 
+WHERE master_agreement_yn = 'N';
+
+CREATE TEMPORARY TABLE tmp_ct_master_agreement_snapshot_expanded AS 
+SELECT * from agreement_snapshot_expanded 
+WHERE master_agreement_yn = 'Y';
+
+RAISE NOTICE 'PRE_CON_AGGR2';
+
+CREATE TEMPORARY TABLE tmp_ct_master_agreements_rfed(original_master_agreement_id bigint, status_flag char(1), fiscal_year smallint, rfed_amount numeric(16,2)) DISTRIBUTED BY(original_master_agreement_id);
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
+FROM tmp_ct_child_agreement_snapshot_expanded cagse, tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
+WHERE magse.status_flag = 'A' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
+AND ha.master_agreement_id = magse.original_agreement_id AND cagse.fiscal_year = magse.fiscal_year 
+AND cagse.status_flag = magse.status_flag AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+RAISE NOTICE 'PRE_CON_AGGR2.1';
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
+FROM tmp_ct_child_agreement_snapshot_expanded cagse, tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
+WHERE magse.status_flag = 'R' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
+AND ha.master_agreement_id = magse.original_agreement_id  AND cagse.status_flag = magse.status_flag AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+RAISE NOTICE 'PRE_CON_AGGR2.2';
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+FROM tmp_ct_master_agreement_snapshot_expanded magse, agreement_snapshot ha, ref_document_code dc
+WHERE magse.status_flag = 'A' AND dc.document_code = 'MA1' AND ha.master_agreement_yn = 'N' 
+AND ha.master_agreement_id = magse.original_agreement_id AND magse.fiscal_year between ha.starting_year and coalesce(ha.ending_year,ha.starting_year)
+AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+RAISE NOTICE 'PRE_CON_AGGR2.3';
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+FROM tmp_ct_master_agreement_snapshot_expanded magse, agreement_snapshot ha, ref_document_code dc
+WHERE magse.status_flag = 'R' AND dc.document_code = 'MA1' AND ha.master_agreement_yn = 'N' 
+AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
+AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+UPDATE agreement_snapshot_expanded a
+SET rfed_amount = b.rfed_amount
+FROM tmp_ct_master_agreements_rfed b
+WHERE a.original_agreement_id = b.original_master_agreement_id
+AND a.fiscal_year = b.fiscal_year
+AND a.status_flag = b.status_flag
+AND a.master_agreement_yn = 'Y';
+
+
+RAISE NOTICE 'PRE_CON_AGGR3';
+
+-- changes for agreement_snapshot_expanded_cy
+
+	TRUNCATE agreement_snapshot_expanded_cy;
+	
+	
+INSERT INTO agreement_snapshot_expanded_cy
+SELECT  original_agreement_id ,
+	agreement_id,
+	fiscal_year ,
+	description ,
+	contract_number ,
+	vendor_id ,
+	agency_id,
+	industry_type_id,
+	award_size_id,
+	original_contract_amount ,
+	maximum_contract_amount ,
+	rfed_amount,
+	starting_year,	
+	ending_year ,
+	dollar_difference , 
+	percent_difference ,
+	award_method_id,
+	document_code_id,
+	master_agreement_id,
+	master_agreement_yn,
+	status_flag
+FROM	
+(SELECT original_agreement_id,
+	agreement_id,
+	generate_series(effective_begin_year,effective_end_year,1) as fiscal_year,
+	description,
+	contract_number,
+	vendor_id,
+	agency_id,
+	industry_type_id,
+	award_size_id,
+	original_contract_amount,
+	maximum_contract_amount,
+	rfed_amount,
+	starting_year,	
+	ending_year,
+	dollar_difference,
+	percent_difference,
+	award_method_id,
+	document_code_id,
+	master_agreement_id,
+	master_agreement_yn,
+	'A' as status_flag
+FROM	agreement_snapshot_cy ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
+AND fiscal_year >= 2010 AND (fiscal_year <= extract(year from now()::date) ) ;
+
+INSERT INTO agreement_snapshot_expanded_cy
+SELECT original_agreement_id,
+	agreement_id,
+	registered_year,
+	description,
+	contract_number,
+	vendor_id,
+	agency_id,
+	industry_type_id,
+	award_size_id,
+	original_contract_amount,
+	maximum_contract_amount,
+	rfed_amount,
+	starting_year,	
+	ending_year,
+	dollar_difference,
+	percent_difference,
+	award_method_id,
+	document_code_id,
+	master_agreement_id,
+	master_agreement_yn,
+	'R' as status_flag
+FROM	agreement_snapshot_cy
+WHERE registered_year between starting_year AND ending_year
+AND registered_year >= 2010 ;
+
+RAISE NOTICE 'PRE_CON_AGGR4';
+
+CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_cy AS 
+SELECT * from agreement_snapshot_expanded_cy 
+WHERE master_agreement_yn = 'N';
+
+CREATE TEMPORARY TABLE tmp_ct_master_agreement_snapshot_expanded_cy AS 
+SELECT * from agreement_snapshot_expanded_cy 
+WHERE master_agreement_yn = 'Y';
+
+
+TRUNCATE tmp_ct_master_agreements_rfed;
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
+FROM tmp_ct_child_agreement_snapshot_expanded_cy cagse, tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
+WHERE magse.status_flag = 'A' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
+AND ha.master_agreement_id = magse.original_agreement_id AND cagse.fiscal_year = magse.fiscal_year 
+AND cagse.status_flag = magse.status_flag AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
+FROM tmp_ct_child_agreement_snapshot_expanded_cy cagse, tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
+WHERE magse.status_flag = 'R' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
+AND ha.master_agreement_id = magse.original_agreement_id  AND cagse.status_flag = magse.status_flag AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, agreement_snapshot_cy ha, ref_document_code dc
+WHERE magse.status_flag = 'A' AND dc.document_code = 'MA1' AND ha.master_agreement_yn = 'N' 
+AND ha.master_agreement_id = magse.original_agreement_id AND magse.fiscal_year between ha.starting_year and coalesce(ha.ending_year,ha.starting_year)
+AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+INSERT INTO tmp_ct_master_agreements_rfed
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, agreement_snapshot_cy ha, ref_document_code dc
+WHERE magse.status_flag = 'R' AND dc.document_code = 'MA1' AND ha.master_agreement_yn = 'N' 
+AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
+AND magse.document_code_id = dc.document_code_id 
+GROUP BY 1,2,3;
+
+UPDATE agreement_snapshot_expanded_cy a
+SET rfed_amount = b.rfed_amount
+FROM tmp_ct_master_agreements_rfed b
+WHERE a.original_agreement_id = b.original_master_agreement_id
+AND a.fiscal_year = b.fiscal_year
+AND a.status_flag = b.status_flag
+AND a.master_agreement_yn = 'Y';
+	
+	RAISE NOTICE 'PRE_CON_AGGR5';
+	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_job_id_in,'etl.refreshContractsPreAggregateTables',1,l_start_time,l_end_time);
+	
+			RETURN 1;
+						
+	
+
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in refreshContractsPreAggregateTables';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.refreshContractsPreAggregateTables',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
 	
 	RETURN 0;
 	

@@ -910,6 +910,7 @@ BEGIN
 	
 	RAISE NOTICE 'PMAG3'; 
 	
+	/*
 	-- Populating the REFD_AMOUNT by calculating it from all the children.
 	
 	CREATE TEMPORARY TABLE tmp_rfed_loaded_master_agreements(master_agreement_id bigint,original_master_agreement_id bigint,doc_appl_last_dt date) DISTRIBUTED BY (original_master_agreement_id);
@@ -944,13 +945,13 @@ BEGIN
 	
 	-- Populating the agreement_snapshot tables
 
-	
+	*/
 		
 -- Populating the agreement_snapshot tables for Fiscal Year (FY)
 	
 	CREATE TEMPORARY TABLE tmp_master_agreement_snapshot(original_master_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
 						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id 
-						     smallint,effective_end_fiscal_year smallint,   effective_end_fiscal_year_id smallint, registered_fiscal_year smallint)
+						     smallint,effective_end_fiscal_year smallint,   effective_end_fiscal_year_id smallint, registered_fiscal_year smallint, original_version_flag char(1))
 	DISTRIBUTED BY 	(original_master_agreement_id);				      
 	
 	-- Get the latest version for every year of modification
@@ -966,7 +967,8 @@ BEGIN
 		max(effective_begin_fiscal_year_id) as effective_begin_fiscal_year_id,
 		max(effective_end_fiscal_year) as effective_end_fiscal_year,
 		max(effective_end_fiscal_year_id) as effective_end_fiscal_year_id,
-		max(registered_fiscal_year) as registered_fiscal_year
+		max(registered_fiscal_year) as registered_fiscal_year,
+		'N' as original_version_flag
 	FROM	tmp_master_agreement_flag_changes a JOIN history_master_agreement b ON a.first_master_agreement_id = b.original_master_agreement_id
 	GROUP  BY 1,2,3;
 	
@@ -1005,6 +1007,9 @@ BEGIN
 	WHERE	year_value = ending_year - 1
 		AND ending_year is not null;
 	
+	UPDATE tmp_master_agreement_snapshot
+	SET original_version_flag = 'Y'
+	WHERE rank_value = 1;
 	RAISE NOTICE 'PMAG5'; 
 	
 	
@@ -1045,7 +1050,7 @@ BEGIN
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,b.rfed_amount,
-		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,b.original_version_flag,
+		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn, 
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
 	FROM	tmp_master_agreement_snapshot a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
@@ -1070,7 +1075,7 @@ BEGIN
 	
 	CREATE TEMPORARY TABLE tmp_master_agreement_snapshot_cy(original_master_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
 						     ending_year smallint, ending_year_id smallint ,rank_value smallint,master_agreement_id bigint, effective_begin_calendar_year smallint,effective_begin_calendar_year_id 
-						     smallint,effective_end_calendar_year smallint,   effective_end_calendar_year_id smallint, registered_calendar_year smallint)
+						     smallint,effective_end_calendar_year smallint,   effective_end_calendar_year_id smallint, registered_calendar_year smallint, original_version_flag char(1))
 	DISTRIBUTED BY 	(original_master_agreement_id);				      
 			
 	INSERT INTO tmp_master_agreement_snapshot_cy		
@@ -1084,7 +1089,8 @@ BEGIN
 		max(effective_begin_calendar_year_id) as effective_begin_calendar_year_id,
 		max(effective_end_calendar_year) as effective_end_calendar_year,
 		max(effective_end_calendar_year_id) as effective_end_calendar_year_id,
-		max(registered_calendar_year) as registered_calendar_year
+		max(registered_calendar_year) as registered_calendar_year,
+		'N' as original_version_flag
 	FROM	tmp_master_agreement_flag_changes a JOIN history_master_agreement b ON a.first_master_agreement_id = b.original_master_agreement_id
 	GROUP  BY 1,2,3;
 	
@@ -1126,6 +1132,9 @@ BEGIN
 		AND ending_year is not null;
 		
 
+	UPDATE tmp_master_agreement_snapshot_cy
+	SET original_version_flag = 'Y'
+	WHERE rank_value = 1;
 	
 	RAISE NOTICE 'PMAG7'; 
 	
@@ -1166,7 +1175,7 @@ BEGIN
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,b.rfed_amount,
-		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,b.original_version_flag,
+		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn,
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
 	FROM	tmp_master_agreement_snapshot_cy a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
