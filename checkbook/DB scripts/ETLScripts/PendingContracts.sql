@@ -340,7 +340,7 @@ BEGIN
 	TRUNCATE pending_contracts;
 	
 	INSERT INTO pending_contracts(document_code_id,document_agency_id,document_id,parent_document_code_id,
-				      parent_document_agency_id,parent_document_id,encumbrance_mount,original_maximum_amount,
+				      parent_document_agency_id,parent_document_id,encumbrance_amount,original_maximum_amount,
 				      revised_maximum_amount,revised_maximum_amount_mod, vendor_legal_name,vendor_customer_code,description,
 				      submitting_agency_id,oaisis_submitting_agency_desc,submitting_agency_code	,awarding_agency_id,
 				      oaisis_awarding_agency_desc,awarding_agency_code,contract_type_name,cont_type_code,
@@ -353,8 +353,8 @@ BEGIN
 				      original_agreement_id, funding_agency_id, funding_agency_code, funding_agency_name, funding_agency_short_name,
 				      dollar_difference, percent_difference,original_or_modified,award_size_id, award_category_id, document_version, latest_flag )
 	SELECT document_code_id,document_agency_id,con_no,parent_document_code_id,
-	      parent_document_agency_id,con_par_reg_num,con_cur_encumbrance,con_original_max,
-	      con_rev_max,(CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount_mod,vc_legal_name,con_vc_code,con_purpose,
+	      parent_document_agency_id,con_par_reg_num,(CASE WHEN con_cur_encumbrance IS NULL THEN 0 ELSE con_cur_encumbrance END) as encumbrance_amount,(CASE WHEN con_original_max IS NULL THEN 0 ELSE con_original_max END) as  original_maximum_amount,
+	      (CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount,(CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount_mod,vc_legal_name,con_vc_code,con_purpose,
 	      submitting_agency_id,submitting_agency_desc,submitting_agency_code,awarding_agency_id,
 	      awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,
 	      am_desc,am_code,con_term_from,con_term_to,con_rev_start_dt,

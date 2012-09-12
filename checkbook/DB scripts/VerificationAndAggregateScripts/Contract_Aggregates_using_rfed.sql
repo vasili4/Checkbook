@@ -672,8 +672,6 @@ award_method_id smallint,
 document_agency_id smallint,
 industry_type_id smallint,
 award_size_id smallint,
-agency_id smallint,
-department_id integer,
 disb_document_id  character varying(20),
 disb_vendor_name  character varying,
 disb_check_eft_issued_date  date,
@@ -711,8 +709,6 @@ SELECT 	d.disbursement_line_item_id,
 		a.agency_id as document_agency_id,
 		a.industry_type_id,
 		a.award_size_id,
-		e.agency_id,
-		f.department_id,
 		d.document_id,
 		d.vendor_name,
 		d.check_eft_issued_date,
@@ -736,12 +732,9 @@ SELECT 	d.disbursement_line_item_id,
 		d.check_eft_issued_nyc_year_id,
 		'A' as status_flag,
 		'B' as type_of_year
-FROM   agreement_snapshot_expanded a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
-WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
-AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
-AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
-AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
-AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.fiscal_year
 AND a.status_flag='A' 
 UNION ALL
  SELECT d.disbursement_line_item_id, 
@@ -754,8 +747,6 @@ UNION ALL
 		a.agency_id as document_agency_id,
 		a.industry_type_id,
 		a.award_size_id,
-		e.agency_id,
-		f.department_id,
 		d.document_id,
 		d.vendor_name,
 		d.check_eft_issued_date,
@@ -779,12 +770,9 @@ UNION ALL
 		d.check_eft_issued_nyc_year_id,
 		'R' as status_flag,
 		'B' as type_of_year
-FROM   agreement_snapshot_expanded a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
-WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
-AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
-AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.fiscal_year
-AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
-AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.fiscal_year
 AND a.status_flag='R' ;
 
  INSERT INTO contracts_spending_transactions
@@ -798,8 +786,6 @@ AND a.status_flag='R' ;
 		a.agency_id as document_agency_id,
 		a.industry_type_id,
 		a.award_size_id,
-		e.agency_id,
-		f.department_id,
 		d.document_id,
 		d.vendor_name,
 		d.check_eft_issued_date,
@@ -823,12 +809,9 @@ AND a.status_flag='R' ;
 		d.calendar_fiscal_year_id,
 		'A' as status_flag,
 		'C' as type_of_year
-FROM   agreement_snapshot_expanded_cy a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
-WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
-AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
-AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
-AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
-AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.calendar_fiscal_year
 AND a.status_flag='A' 
 UNION ALL
 SELECT 	d.disbursement_line_item_id, 
@@ -841,8 +824,6 @@ SELECT 	d.disbursement_line_item_id,
 		a.agency_id as document_agency_id,
 		a.industry_type_id,
 		a.award_size_id,
-		e.agency_id,
-		f.department_id,
 		d.document_id,
 		d.vendor_name,
 		d.check_eft_issued_date,
@@ -866,12 +847,9 @@ SELECT 	d.disbursement_line_item_id,
 		d.calendar_fiscal_year_id,
 		'R' as status_flag,
 		'C' as type_of_year
-FROM   agreement_snapshot_expanded_cy a, ref_year b, history_agreement_accounting_line c, disbursement_line_item_details d, ref_agency_history e, ref_department_history f
-WHERE a.fiscal_year = b.year_value AND a.agreement_id = c.agreement_id 
-AND a.original_agreement_id = d.agreement_id AND c.line_number =  d.agreement_accounting_line_number
-AND c.commodity_line_number = d.agreement_commodity_line_number AND a.fiscal_year >= d.calendar_fiscal_year
-AND d.agreement_accounting_line_number IS NOT NULL AND d.agreement_commodity_line_number IS NOT NULL
-AND e.agency_history_id = c.agency_history_id AND f.department_history_id = c.department_history_id 
+FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.calendar_fiscal_year
 AND a.status_flag='R' ;
  
  

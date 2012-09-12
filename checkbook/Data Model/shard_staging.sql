@@ -2476,8 +2476,6 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 	document_agency_id smallint,
 	industry_type_id smallint,
     award_size_id smallint,
-	agency_id smallint,
-	department_id integer,
 	disb_document_id  character varying(20),
 	disb_vendor_name  character varying,
 	disb_check_eft_issued_date  date,
@@ -2511,7 +2509,12 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.contracts_spendin
   	SELECT contracts_spending_transactions__0.disbursement_line_item_id,contracts_spending_transactions__0.original_agreement_id,contracts_spending_transactions__0.fiscal_year,
   	contracts_spending_transactions__0.fiscal_year_id,contracts_spending_transactions__0.document_code_id, contracts_spending_transactions__0.vendor_id,contracts_spending_transactions__0.award_method_id,
   	contracts_spending_transactions__0.document_agency_id, contracts_spending_transactions__0.industry_type_id, contracts_spending_transactions__0.award_size_id,
-  	contracts_spending_transactions__0.agency_id,contracts_spending_transactions__0.department_id,
+  	contracts_spending_transactions__0.disb_document_id,contracts_spending_transactions__0.disb_vendor_name,contracts_spending_transactions__0.disb_check_eft_issued_date,contracts_spending_transactions__0.disb_agency_name,
+  	contracts_spending_transactions__0.disb_department_short_name,contracts_spending_transactions__0.disb_check_amount,contracts_spending_transactions__0.disb_expenditure_object_name,
+  	contracts_spending_transactions__0.disb_budget_name,contracts_spending_transactions__0.disb_contract_number,contracts_spending_transactions__0.disb_purpose,contracts_spending_transactions__0.disb_reporting_code,
+  	contracts_spending_transactions__0.disb_spending_category_name,contracts_spending_transactions__0.disb_agency_id,contracts_spending_transactions__0.disb_vendor_id,contracts_spending_transactions__0.disb_expenditure_object_id,
+  	contracts_spending_transactions__0.disb_department_id,contracts_spending_transactions__0.disb_spending_category_id,contracts_spending_transactions__0.disb_agreement_id,contracts_spending_transactions__0.disb_contract_document_code,
+  	contracts_spending_transactions__0.disb_master_agreement_id,contracts_spending_transactions__0.disb_fiscal_year_id,
   	contracts_spending_transactions__0.status_flag,contracts_spending_transactions__0.type_of_year
   	FROM   contracts_spending_transactions__0;	
   	
@@ -2709,7 +2712,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
   	parent_document_code_id smallint,
   	parent_document_agency_id  smallint,
  	parent_document_id  varchar,
- 	encumbrance_mount numeric(15,2),
+ 	encumbrance_amount numeric(15,2),
  	original_maximum_amount numeric(15,2),
  	revised_maximum_amount numeric(15,2),
  	revised_maximum_amount_mod numeric(15,2),
@@ -2774,7 +2777,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  CREATE VIEW pending_contracts AS 
  	SELECT pending_contracts__0.document_code_id,pending_contracts__0.document_agency_id,pending_contracts__0.document_id,
  		pending_contracts__0.parent_document_code_id,pending_contracts__0.parent_document_agency_id,pending_contracts__0.parent_document_id,
- 		pending_contracts__0.encumbrance_mount,pending_contracts__0.original_maximum_amount,pending_contracts__0.revised_maximum_amount,pending_contracts__0.revised_maximum_amount_mod,
+ 		pending_contracts__0.encumbrance_amount,pending_contracts__0.original_maximum_amount,pending_contracts__0.revised_maximum_amount,pending_contracts__0.revised_maximum_amount_mod,
  		pending_contracts__0.vendor_legal_name,pending_contracts__0.vendor_customer_code,pending_contracts__0.description,
  		pending_contracts__0.submitting_agency_id,pending_contracts__0.oaisis_submitting_agency_desc,pending_contracts__0.submitting_agency_code,
  		pending_contracts__0.awarding_agency_id,pending_contracts__0.oaisis_awarding_agency_desc,pending_contracts__0.awarding_agency_code,

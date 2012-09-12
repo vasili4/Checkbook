@@ -1045,7 +1045,7 @@ BEGIN
 		ROUND((( coalesce(b.maximum_spending_limit,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		e.agreement_type_id,
 		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
-		g.expenditure_object_names,	k.industry_type_id, (CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
+		g.expenditure_object_names,	(CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id, (CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
@@ -1170,7 +1170,7 @@ BEGIN
 		ROUND((( coalesce(b.maximum_spending_limit,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,	
 		e.agreement_type_id,
 		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,		
-		g.expenditure_object_names,k.industry_type_id, (CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
+		g.expenditure_object_names,(CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id, (CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
