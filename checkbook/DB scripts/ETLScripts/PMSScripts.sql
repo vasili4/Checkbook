@@ -430,9 +430,10 @@ BEGIN
 	RAISE NOTICE 'PAYROLL 1.1';
 	INSERT INTO payroll(payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 						  payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
-						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
-						  amount_basis_id,base_pay,overtime_pay,other_payments,
-						  gross_pay, gross_pay_mod, agency_id,agency_code,agency_name,
+						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary_original,annual_salary,
+						  amount_basis_id,base_pay_original,base_pay,
+						  overtime_pay_original,overtime_pay,other_payments_original,other_payments,
+						  gross_pay_original,gross_pay,  agency_id,agency_code,agency_name,
 						  department_id,department_code,department_name,
 						  employee_id,employee_name,fiscal_year_id,pay_date,
 						  calendar_fiscal_year_id,calendar_fiscal_year,
@@ -440,9 +441,10 @@ BEGIN
 						  created_date,created_load_id)
 	SELECT payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
-	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary,
-	       amount_basis_id,base_pay,overtime_pay,other_payments,
-	       gross_pay,(CASE WHEN gross_pay IS NULL THEN 0 ELSE gross_pay END) as gross_pay_mod, agency_id,agency_code,agency_name,
+	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary as annual_salary_original,coalesce(annual_salary,0) as annual_salary,
+	       amount_basis_id,base_pay as base_pay_original,coalesce(base_pay,0) as base_pay, 
+	       overtime_pay as overtime_pay_original,coalesce(overtime_pay,0) as overtime_pay, other_payments as other_payments_original,coalesce(other_payments,0) as other_payments,
+	       gross_pay as gross_pay_original,coalesce(gross_pay,0) as gross_pay, agency_id,agency_code,agency_name,
 	       department_id,department_code,department_name,
 	       employee_id,employee_name,fiscal_year_id,pay_date,
 	       calendar_fiscal_year_id,calendar_fiscal_year,
@@ -1029,12 +1031,12 @@ BEGIN
 		
 	INSERT INTO payroll_summary(payroll_summary_id,agency_history_id,pay_cycle_code,
     				    expenditure_object_history_id, payroll_number,payroll_description,department_history_id,
-    				    pms_fiscal_year ,budget_code_id ,total_amount,
+    				    pms_fiscal_year ,budget_code_id ,total_amount_original,total_amount,
 				    pay_date_id,fiscal_year,fiscal_year_id,calendar_fiscal_year_id, calendar_fiscal_year,
 				    created_load_id, created_date)
 	SELECT payroll_summary_id, agency_history_id,pay_cycle,
     	       expenditure_object_history_id, pyrl_no,pyrl_desc,department_history_id,
-    	       pms_fy ,budget_code_id ,total_amt,
+    	       pms_fy ,budget_code_id ,total_amt,coalesce(total_amt,0) as total_amount,
 	       pay_date_id,fiscal_year,fiscal_year_id,calendar_fiscal_year_id, calendar_fiscal_year,
 	       p_load_id_in,now()::timestamp
 	FROM   etl.stg_payroll_summary
@@ -1047,7 +1049,7 @@ BEGIN
 				spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
 				agency_short_name,department_short_name,load_id)
 	SELECT 	payroll_summary_id,pay_date_id,fiscal_year_id,calendar_month_id,
-		fund_class_id,total_amt,agency_id,agency,expenditure_object_id,department_id,pay_date::date,
+		fund_class_id,coalesce(total_amt,0) as check_amount,agency_id,agency,expenditure_object_id,department_id,pay_date::date,
 		agency_name,department_name,uoa,expenditure_object_name,object,budget_code_id,
 		bud_code,budget_code_name,'001',2 as spending_category_id,
 		'Payroll',calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
@@ -1070,14 +1072,15 @@ BEGIN
     	       expenditure_object_history_id = b.expenditure_object_history_id,
     	       payroll_description = b.pyrl_desc,
     	       department_history_id = b.department_history_id,    	       
-    	       total_amount = b.total_amt,	      
+    	       total_amount_original = b.total_amt,	
+    	       total_amount = coalesce(b.total_amt,0),
 	       updated_load_id = p_load_id_in,
 	       updated_date = now()::timestamp
 	FROM   tmp_payroll_summary_update b
 	WHERE  a.payroll_summary_id = b.payroll_summary_id;	
 	
 	UPDATE  disbursement_line_item_details a
-	SET     check_amount = b.total_amt,
+	SET     check_amount = coalesce(b.total_amt,0),
 		agency_name = b.agency_name,
 		department_name = b.department_name,
 		expenditure_object_name = b.expenditure_object_name,

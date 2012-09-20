@@ -439,7 +439,9 @@ BEGIN
 				agency_history_id,document_id,document_version,
 				tracking_number,record_date_id,budget_fiscal_year,
 				document_fiscal_year,document_period,description,
-				actual_amount,total_amount,maximum_spending_limit,
+				actual_amount_original,actual_amount,
+				total_amount_original,total_amount,
+				maximum_spending_limit_original,maximum_spending_limit,
 				replacing_master_agreement_id,replaced_by_master_agreement_id,
 				award_status_id,procurement_id,procurement_type_id,
 				effective_begin_date_id,effective_end_date_id,reason_modification,
@@ -451,7 +453,7 @@ BEGIN
 				borough_code,block_code,lot_code,
 				council_district_code,vendor_history_id,vendor_preference_level,
 				board_approved_award_no, board_approved_award_date_id, 
-				original_contract_amount,registered_date_id,oca_number,
+				original_contract_amount_original,original_contract_amount,registered_date_id,oca_number,
 				number_solicitation,document_name,original_term_begin_date_id,
 				original_term_end_date_id,privacy_flag,created_load_id,created_date,
 				registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
@@ -464,7 +466,9 @@ BEGIN
 		a.agency_history_id,a.doc_id,a.doc_vers_no,
 		a.trkg_no,a.record_date_id,a.doc_bfy,
 		a.doc_fy_dc,a.doc_per_dc,a.doc_dscr,
-		a.doc_actu_am,a.ord_tot_am,a.ma_prch_lmt_am,
+		a.doc_actu_am,(CASE WHEN a.doc_actu_am IS NULL THEN 0 ELSE a.doc_actu_am END ) as actual_amount,
+		a.ord_tot_am, (CASE WHEN a.ord_tot_am IS NULL THEN 0 ELSE a.ord_tot_am END ) as total_amount,
+		a.ma_prch_lmt_am, (CASE WHEN a.ma_prch_lmt_am IS NULL THEN 0 ELSE a.ma_prch_lmt_am END ) as maximum_spending_limit,
 		0 as replacing_master_agreement_id,0 as replaced_by_master_agreement_id,
 		a.cntrc_sta,a.prcu_id,a.prcu_typ_id,
 		a.effective_begin_date_id,a.effective_end_date_id,a.reas_mod_dc,
@@ -476,7 +480,7 @@ BEGIN
 		c.brgh_cd,c.blck_cd,c.lot_cd,
 		c.coun_dist_cd,b.vendor_history_id,b.vend_pref_lvl,
 		a.brd_awd_no,a.board_approved_award_date_id,
-		a.orig_max_ct_amt,a.registered_date_id,a.oca_no,
+		a.orig_max_ct_amt, (CASE WHEN a.orig_max_ct_amt IS NULL THEN 0 ELSE a.orig_max_ct_amt END ) as original_contract_amount, a.registered_date_id,a.oca_no,
 		c.out_of_no_so,a.doc_nm,a.original_term_begin_date_id,
 		a.original_term_end_date_id,d.privacy_flag,p_load_id_in,now()::timestamp,
 		registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
@@ -546,9 +550,12 @@ BEGIN
 		document_fiscal_year = b.doc_fy_dc,
 		document_period = b.doc_per_dc,
 		description = b.doc_dscr,
-		actual_amount = b.doc_actu_am,
-		total_amount = b.ord_tot_am,
-		maximum_spending_limit = b.ma_prch_lmt_am,
+		actual_amount_original = b.doc_actu_am,
+		actual_amount = (CASE WHEN b.doc_actu_am IS NULL THEN 0 ELSE b.doc_actu_am END ) ,
+		total_amount_original = b.ord_tot_am,
+		total_amount = (CASE WHEN b.ord_tot_am IS NULL THEN 0 ELSE b.ord_tot_am END ) , 
+		maximum_spending_limit_original = b.ma_prch_lmt_am,
+		maximum_spending_limit = (CASE WHEN b.ma_prch_lmt_am IS NULL THEN 0 ELSE b.ma_prch_lmt_am END ) , 
 		replacing_master_agreement_id = b.replacing_master_agreement_id,
 		replaced_by_master_agreement_id = b.replaced_by_master_agreement_id,
 		award_status_id = b.award_status_id,
@@ -580,7 +587,8 @@ BEGIN
 		vendor_preference_level = b.vend_pref_lvl,
 		board_approved_award_no = b.brd_awd_no,
 		board_approved_award_date_id = b.board_approved_award_date_id,
-		original_contract_amount = b.orig_max_ct_amt,
+		original_contract_amount_original = b.orig_max_ct_amt,
+		original_contract_amount = (CASE WHEN b.orig_max_ct_amt IS NULL THEN 0 ELSE b.orig_max_ct_amt END ) ,
 		registered_date_id = b.registered_date_id,
 		oca_number = b.oca_no,
 		number_solicitation = b.out_of_no_so,
@@ -1019,7 +1027,7 @@ BEGIN
 	
 	INSERT INTO agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
-				       original_contract_amount,maximum_contract_amount,maximum_contract_amount_mod,description,
+				       original_contract_amount,maximum_contract_amount,description,
 					vendor_history_id,vendor_id,vendor_code,vendor_name,
 					dollar_difference,
 					percent_difference,
@@ -1027,7 +1035,7 @@ BEGIN
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
 					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
-					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
+					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,
 					load_id,last_modified_date)
@@ -1038,7 +1046,7 @@ BEGIN
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
 	        		      WHEN a.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
 	        		      ELSE a.effective_end_fiscal_year_id END),b.contract_number,
-	        b.original_contract_amount,b.maximum_spending_limit,(CASE WHEN b.maximum_spending_limit IS NULL THEN 0 ELSE b.maximum_spending_limit END) as maximum_contract_amount_mod,b.description,
+	        b.original_contract_amount,b.maximum_spending_limit,b.description,
 		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),
 		coalesce(b.maximum_spending_limit,0) - coalesce(b.original_contract_amount,0) as dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
@@ -1049,7 +1057,7 @@ BEGIN
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
-		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,b.rfed_amount,
+		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
 		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn, 
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
@@ -1144,7 +1152,7 @@ BEGIN
 	
 	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
 				       agreement_id, ending_year,ending_year_id,contract_number,
-				       original_contract_amount,maximum_contract_amount,maximum_contract_amount_mod,description,
+				       original_contract_amount,maximum_contract_amount,description,
 					vendor_history_id,vendor_id,vendor_code,vendor_name,
 					dollar_difference,
 					percent_difference,
@@ -1152,7 +1160,7 @@ BEGIN
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
 					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
-					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
+					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,
 					load_id,last_modified_date)
@@ -1163,7 +1171,7 @@ BEGIN
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
 	        		      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year_id
 	        		      ELSE b.effective_end_calendar_year_id END),b.contract_number,
-	        b.original_contract_amount,b.maximum_spending_limit,(CASE WHEN b.maximum_spending_limit IS NULL THEN 0 ELSE b.maximum_spending_limit END) as maximum_contract_amount_mod,b.description,
+	        b.original_contract_amount,b.maximum_spending_limit,b.description,
 		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),
 		coalesce(b.maximum_spending_limit,0) - coalesce(b.original_contract_amount,0) as dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
@@ -1174,7 +1182,7 @@ BEGIN
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
-		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,b.rfed_amount,
+		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
 		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn,
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)

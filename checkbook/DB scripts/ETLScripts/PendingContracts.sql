@@ -340,24 +340,26 @@ BEGIN
 	TRUNCATE pending_contracts;
 	
 	INSERT INTO pending_contracts(document_code_id,document_agency_id,document_id,parent_document_code_id,
-				      parent_document_agency_id,parent_document_id,encumbrance_amount,original_maximum_amount,
-				      revised_maximum_amount,revised_maximum_amount_mod, vendor_legal_name,vendor_customer_code,description,
+				      parent_document_agency_id,parent_document_id,encumbrance_amount_original,encumbrance_amount,
+				      original_maximum_amount_original,original_maximum_amount,
+				      revised_maximum_amount_original,revised_maximum_amount, vendor_legal_name,vendor_customer_code,description,
 				      submitting_agency_id,oaisis_submitting_agency_desc,submitting_agency_code	,awarding_agency_id,
 				      oaisis_awarding_agency_desc,awarding_agency_code,contract_type_name,cont_type_code,
-				      award_method_name,award_method_code,start_date,end_date,revised_start_date,
+				      award_method_name,award_method_code,award_method_id,start_date,end_date,revised_start_date,
 				      revised_end_date,cif_received_date,cif_fiscal_year, cif_fiscal_year_id, tracking_number,board_award_number,
 				      oca_number,version_number,contract_number,fms_parent_contract_number,
 				      submitting_agency_name,submitting_agency_short_name,awarding_agency_name,awarding_agency_short_name,
 				      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,
 				      cif_received_date_id,document_agency_code,document_agency_name,document_agency_short_name,  
 				      original_agreement_id, funding_agency_id, funding_agency_code, funding_agency_name, funding_agency_short_name,
-				      dollar_difference, percent_difference,original_or_modified,award_size_id, award_category_id, document_version, latest_flag )
+				      dollar_difference, percent_difference,original_or_modified,award_size_id, award_category_id, industry_type_id, document_version, latest_flag )
 	SELECT document_code_id,document_agency_id,con_no,parent_document_code_id,
-	      parent_document_agency_id,con_par_reg_num,(CASE WHEN con_cur_encumbrance IS NULL THEN 0 ELSE con_cur_encumbrance END) as encumbrance_amount,(CASE WHEN con_original_max IS NULL THEN 0 ELSE con_original_max END) as  original_maximum_amount,
-	      (CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount,(CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount_mod,vc_legal_name,con_vc_code,con_purpose,
+	      parent_document_agency_id,con_par_reg_num,con_cur_encumbrance as encumbrance_amount_original,(CASE WHEN con_cur_encumbrance IS NULL THEN 0 ELSE con_cur_encumbrance END) as encumbrance_amount, 
+	      con_original_max as original_maximum_amount_original, (CASE WHEN con_original_max IS NULL THEN 0 ELSE con_original_max END) as  original_maximum_amount, 
+	      con_rev_max as revised_maximum_amount_original, (CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount,vc_legal_name,con_vc_code,con_purpose,
 	      submitting_agency_id,submitting_agency_desc,submitting_agency_code,awarding_agency_id,
 	      awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,
-	      am_desc,am_code,con_term_from,con_term_to,con_rev_start_dt,
+	      am_desc,am_code,b.award_method_id,con_term_from,con_term_to,con_rev_start_dt,
 	      con_rev_end_dt,con_cif_received_date,cif_fiscal_year, cif_fiscal_year_id, con_pin,con_internal_pin,
 	      con_batch_suffix,con_version,contract_number,con_par_trans_code || con_par_ad_code || con_par_reg_num as fms_parent_contract_number,
 	      submitting_agency_name,submitting_agency_short_name,awarding_agency_name,awarding_agency_short_name,
@@ -370,8 +372,11 @@ BEGIN
 		original_or_modified,
 		(CASE WHEN con_rev_max IS NULL THEN 5 WHEN con_rev_max <= 5000 THEN 4 WHEN con_rev_max  > 5000 
 		            AND con_rev_max  <= 100000 THEN 3 WHEN  con_rev_max > 100000 AND con_rev_max <= 1000000 THEN 2 WHEN con_rev_max > 1000000 THEN 1 
-            ELSE 5 END) as award_size_id, award_category_id, (CASE WHEN con_version = '' THEN 0 ELSE con_version::int END) as document_version, 'N' as latest_flag
-	FROM  etl.stg_pending_contracts;
+            ELSE 5 END) as award_size_id, award_category_id, (CASE WHEN lpad(a.cont_code,2,'0') = '05' THEN 1 ELSE c.industry_type_id END) as industry_type_id,
+            (CASE WHEN con_version = '' THEN 0 ELSE con_version::int END) as document_version, 'N' as latest_flag
+	FROM  etl.stg_pending_contracts a 
+	LEFT JOIN ref_award_method b ON lpad(a.am_code,3,0) = lpad(b.award_method_code,3,'0')
+	LEFT JOIN ref_award_category_industry c ON c.award_category_code = a.award_category_code ;
 	
 	CREATE TEMPORARY TABLE tmp_pc_update_latest_flag AS
 	SELECT contract_number, max(document_version) as document_version

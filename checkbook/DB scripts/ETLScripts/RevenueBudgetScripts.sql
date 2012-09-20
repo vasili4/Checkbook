@@ -316,9 +316,10 @@ Raise NOTICE 'Revenue Budget 1.1';
 	WHERE action_flag = 'U' AND budget_id IS NOT NULL;
 
 	UPDATE revenue_budget a
-	SET 	adopted_amount = b.adopted_amount,
-		current_modified_budget_amount = b.current_budget_amount,
-		current_modified_budget_amount_mod = (CASE WHEN b.current_budget_amount IS NULL THEN 0 ELSE b.current_budget_amount END),
+	SET 	adopted_amount_original = b.adopted_amount,
+			adopted_amount = coalesce(b.adopted_amount,0),
+		current_modified_budget_amount_original = b.current_budget_amount,
+		current_modified_budget_amount = coalesce(b.current_budget_amount,0),
 		updated_load_id = b.load_id,
 		updated_date = now()::timestamp
 	FROM 	tmp_revenue_budget_data_to_update b
@@ -353,14 +354,14 @@ Raise NOTICE 'Revenue Budget 1.1';
 	
 	
 	INSERT INTO revenue_budget(budget_fiscal_year, fund_class_id, agency_history_id,  budget_code_id, 
-			    adopted_amount, current_modified_budget_amount,   current_modified_budget_amount_mod, 
+			    adopted_amount_original, adopted_amount, current_modified_budget_amount_original,   current_modified_budget_amount, 
 			 created_load_id,created_date,
 			 budget_fiscal_year_id,agency_id,
 			   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
 			   agency_short_name,revenue_category_id,revenue_category_code,revenue_category_name,
 			   funding_class_id,funding_class_code,funding_class_name,budget_code_name)				      
 	   SELECT a.budget_fiscal_year, a.fund_class_id, a.agency_history_id, a.budget_code_id, 
-					 a.adopted_amount, a.current_budget_amount, (CASE WHEN a.current_budget_amount IS NULL THEN 0 ELSE a.current_budget_amount END) as current_modified_budget_amount_mod,
+					 a.adopted_amount as adopted_amount_original, coalesce(a.adopted_amount,0) as adopted_amount, a.current_budget_amount as current_modified_budget_amount_original, coalesce(a.current_budget_amount,0) as current_modified_budget_amount,
 					 p_load_id_in,now()::timestamp,
 					 a.budget_fiscal_year_id,a.agency_id,
 					a.agency_name,a.budget_code,a.agency_code,a.revenue_source_code,a.revenue_source_name,a.revenue_source_id,

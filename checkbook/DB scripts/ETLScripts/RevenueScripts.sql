@@ -744,7 +744,7 @@ BEGIN
 
 	INSERT INTO revenue(record_date_id, fiscal_period, fiscal_year,  budget_fiscal_year, fiscal_quarter,  
 			    event_category,  event_type,  bank_account_code,  posting_pair_type,  posting_code,  
-			    debit_credit_indicator,  line_function, posting_amount,  increment_decrement_indicator,  time_of_occurence,  
+			    debit_credit_indicator,  line_function, posting_amount_original, posting_amount,  increment_decrement_indicator,  time_of_occurence,  
 			    balance_sheet_account_code,  balance_sheet_account_type,  expenditure_object_history_id,  government_branch_code,  cabinet_code,  
 			    agency_history_id, department_history_id,  reporting_activity_code,  budget_code_id,  fund_category,  
 			    fund_type,  fund_group,  balance_sheet_account_class_code,  balance_sheet_account_category_code,  balance_sheet_account_group_code, 
@@ -759,7 +759,7 @@ BEGIN
 			    created_date, fiscal_year_id, budget_fiscal_year_id)
 	SELECT 	b.record_date_id, a.per_dc, a.fy_dc, a.bfy, a.fqtr, 
 		a.evnt_cat_id, a.evnt_typ_id, a.bank_acct_cd, a.pstng_pr_typ, a.pstng_cd_id, 
-		a.drcr_ind, a.ln_func_cd, -1 * a.pstng_am, a.incr_dcrs_ind, a.run_tmdt, 
+		a.drcr_ind, a.ln_func_cd, -1 * a.pstng_am as posting_amount_original, -1 * coalesce(a.pstng_am,0) as posting_amount, a.incr_dcrs_ind, a.run_tmdt, 
 		a.bsa_cd, a.bsa_typ_ind, b.expenditure_object_history_id, a.govt_brn_cd, a.cab_cd, 
 		b.agency_history_id, b.department_history_id, a.actv_cd, b.budget_code_id, a.fcat_cd, 
 		a.ftyp_cd, a.fgrp_cd, a.bscl_cd, a.bsct_cd, a.bsg_cd, 
@@ -834,14 +834,14 @@ BEGIN
 
 	
 				
-	INSERT INTO revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,posting_amount_mod,
+	INSERT INTO revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,
 					revenue_category_id,revenue_source_id,fiscal_year_id,agency_id,
 					department_id,revenue_class_id,fund_class_id,funding_class_id,
 					budget_code_id,budget_fiscal_year_id,agency_name,revenue_category_name,
 					revenue_source_name,budget_fiscal_year,department_name,revenue_class_name,
 					fund_class_name,funding_class_name,agency_code,revenue_class_code,fund_class_code,funding_class_code,
 					revenue_category_code,revenue_source_code,agency_short_name,department_short_name,agency_history_id, load_id, last_modified_date)
-	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,(CASE WHEN a.posting_amount IS NULL THEN 0 ELSE a.posting_amount END) as posting_amount_mod,
+	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,
 			a.revenue_category_id,a.revenue_source_id,d.year_id,b.agency_id,
 			c.department_id,a.revenue_class_id,a.fund_class_id,e.funding_class_id,
 			a.budget_code_id,f.year_id,b.agency_name,g.revenue_category_name,

@@ -859,7 +859,7 @@ BEGIN
 				agency_history_id,document_id,document_version,
 				tracking_number,record_date_id,budget_fiscal_year,
 				document_fiscal_year,document_period,description,
-				actual_amount,maximum_contract_amount,
+				actual_amount_original,actual_amount,maximum_contract_amount_original,maximum_contract_amount,
 				amendment_number,replacing_agreement_id,replaced_by_agreement_id,
 				procurement_id,procurement_type_id,
 				effective_begin_date_id,effective_end_date_id,reason_modification,
@@ -872,12 +872,12 @@ BEGIN
 				effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 				effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 		   		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		   		source_updated_calendar_year_id,contract_number,brd_awd_no,rfed_amount)
+		   		source_updated_calendar_year_id,contract_number,brd_awd_no,rfed_amount_original,rfed_amount)
 	SELECT	d.agreement_id,a.master_agreement_id,a.document_code_id,
 		a.agency_history_id,a.doc_id,a.doc_vers_no,
 		a.trkg_no,a.record_date_id,a.doc_bfy,
 		a.doc_fy_dc,a.doc_per_dc,a.doc_dscr,
-		a.doc_actu_am,a.max_cntrc_am,
+		a.doc_actu_am,(CASE WHEN a.doc_actu_am IS NULL THEN 0 ELSE a.doc_actu_am END) as actual_amount,a.max_cntrc_am,(CASE WHEN a.max_cntrc_am IS NULL THEN 0 ELSE a.max_cntrc_am END) as maximum_contract_amount,
 		a.amend_no,0 as replacing_agreement_id,0 as replaced_by_agreement_id,
 		a.prcu_id,a.prcu_typ_id,
 		a.effective_begin_date_id,a.effective_end_date_id,a.reas_mod_dc,
@@ -890,7 +890,7 @@ BEGIN
 		effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 		effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.brd_awd_no,a.rfed_am
+		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.brd_awd_no,a.rfed_am, (CASE WHEN a.rfed_am IS NULL THEN 0 ELSE a.rfed_am END) as rfed_amount
 	FROM	etl.stg_con_po_header a JOIN etl.stg_con_po_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 					LEFT JOIN etl.stg_con_po_award_detail c ON a.doc_cd = c.doc_cd AND a.doc_dept_cd = c.doc_dept_cd 
@@ -942,8 +942,10 @@ BEGIN
 		document_fiscal_year = b.doc_fy_dc,
 		document_period = b.doc_per_dc,
 		description = b.doc_dscr,
-		actual_amount = b.doc_actu_am,
-		maximum_contract_amount = b.max_cntrc_am,
+		actual_amount_original = b.doc_actu_am,
+		actual_amount = (CASE WHEN b.doc_actu_am IS NULL THEN 0 ELSE b.doc_actu_am END) ,
+		maximum_contract_amount_original = b.max_cntrc_am,
+		maximum_contract_amount = (CASE WHEN b.max_cntrc_am IS NULL THEN 0 ELSE b.max_cntrc_am END) , 
 		amendment_number = b.amend_no,
 		replacing_agreement_id = b.replacing_agreement_id,
 		replaced_by_agreement_id = b.replaced_by_agreement_id,
@@ -981,7 +983,8 @@ BEGIN
 		source_updated_calendar_year = b.source_updated_calendar_year,
 		source_updated_calendar_year_id = b.source_updated_calendar_year_id,
 		brd_awd_no = b.brd_awd_no,
-		rfed_amount = b.rfed_am
+		rfed_amount_original = b.rfed_am,
+		rfed_amount = (CASE WHEN b.rfed_am IS NULL THEN 0 ELSE b.rfed_am END) 
 	FROM	tmp_con_po_update b
 	WHERE	a.agreement_id = b.agreement_id;
 
@@ -990,18 +993,18 @@ BEGIN
 	-- Agreement line changes
 	
 	INSERT INTO history_agreement_accounting_line(agreement_id,commodity_line_number,line_number,
-			event_type_code,description,line_amount,
+			event_type_code,description,line_amount_original,line_amount,
 			budget_fiscal_year,fiscal_year,fiscal_period,
 			fund_class_id,agency_history_id,department_history_id,
 			expenditure_object_history_id,revenue_source_id,location_code,
-			budget_code_id,reporting_code,rfed_line_amount,created_load_id,
+			budget_code_id,reporting_code,rfed_line_amount_original,rfed_line_amount,created_load_id,
 			created_date)	
 	SELECT  d.agreement_id,b.doc_comm_ln_no,b.doc_actg_ln_no,
-		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,
+		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,(CASE WHEN b.ln_am IS NULL THEN 0 ELSE b.ln_am END) as line_amount,
 		b.bfy,b.fy_dc,b.per_dc,
 		b.fund_class_id,b.agency_history_id,b.department_history_id,
 		b.expenditure_object_history_id,null as revenue_source_id,b.loc_cd,
-		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,p_load_id_in,
+		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,(CASE WHEN b.rfed_ln_am IS NULL THEN 0 ELSE b.rfed_ln_am END) as rfed_line_amount, p_load_id_in,
 		now()::timestamp
 	FROM	etl.stg_con_po_header a JOIN etl.stg_con_po_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -1038,18 +1041,18 @@ BEGIN
 	RAISE NOTICE '7';
 	
 	INSERT INTO history_agreement_accounting_line(agreement_id,commodity_line_number,line_number,
-			event_type_code,description,line_amount,
+			event_type_code,description,line_amount_original,line_amount,
 			budget_fiscal_year,fiscal_year,fiscal_period,
 			fund_class_id,agency_history_id,department_history_id,
 			expenditure_object_history_id,revenue_source_id,location_code,
-			budget_code_id,reporting_code,rfed_line_amount,created_load_id,
+			budget_code_id,reporting_code,rfed_line_amount_original,rfed_line_amount,created_load_id,
 			created_date)	
 	SELECT  d.agreement_id,b.doc_comm_ln_no,b.doc_actg_ln_no,
-		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,
+		b.evnt_typ_id,b.actg_ln_dscr,b.ln_am,(CASE WHEN b.ln_am IS NULL THEN 0 ELSE b.ln_am END) as line_amount,
 		b.bfy,b.fy_dc,b.per_dc,
 		b.fund_class_id,b.agency_history_id,b.department_history_id,
 		b.expenditure_object_history_id,null as revenue_source_id,b.loc_cd,
-		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,p_load_id_in,
+		b.budget_code_id,b.rpt_cd,b.rfed_ln_am,(CASE WHEN b.rfed_ln_am IS NULL THEN 0 ELSE b.rfed_ln_am END) as rfed_line_amount,p_load_id_in,
 		now()::timestamp
 	FROM	etl.stg_con_po_header a JOIN etl.stg_con_po_accounting_line b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd 
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
@@ -1098,7 +1101,8 @@ BEGIN
 	UPDATE  history_agreement_accounting_line f
 	SET     event_type_code = b.evnt_typ_id,
 		description = b.actg_ln_dscr,
-		line_amount = b.ln_am,
+		line_amount_original = b.ln_am,
+		line_amount = (CASE WHEN b.ln_am IS NULL THEN 0 ELSE b.ln_am END),
 		budget_fiscal_year = b.bfy,
 		fiscal_year = b.fy_dc,
 		fiscal_period = b.per_dc,
@@ -1109,7 +1113,8 @@ BEGIN
 		location_code = b.loc_cd,
 		budget_code_id = b.budget_code_id,
 		reporting_code = b.rpt_cd,
-		rfed_line_amount = b.rfed_ln_am,
+		rfed_line_amount_original = b.rfed_ln_am,
+		rfed_line_amount = (CASE WHEN b.rfed_ln_am IS NULL THEN 0 ELSE b.rfed_ln_am END) ,
 		updated_load_id = p_load_id_in,
 		updated_date = now()::timestamp
 	FROM   tmp_po_con_line_items_update b		      	      
