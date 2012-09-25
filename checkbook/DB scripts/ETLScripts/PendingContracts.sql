@@ -375,7 +375,7 @@ BEGIN
             ELSE 5 END) as award_size_id, award_category_id, (CASE WHEN lpad(a.cont_code,2,'0') = '05' THEN 1 ELSE c.industry_type_id END) as industry_type_id,
             (CASE WHEN con_version = '' THEN 0 ELSE con_version::int END) as document_version, 'N' as latest_flag
 	FROM  etl.stg_pending_contracts a 
-	LEFT JOIN ref_award_method b ON lpad(a.am_code,3,0) = lpad(b.award_method_code,3,'0')
+	LEFT JOIN ref_award_method b ON (case when length(a.am_code)= 1 THEN lpad(a.am_code,2,'0') ELSE a.am_code END) = b.award_method_code
 	LEFT JOIN ref_award_category_industry c ON c.award_category_code = a.award_category_code ;
 	
 	CREATE TEMPORARY TABLE tmp_pc_update_latest_flag AS

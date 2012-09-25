@@ -1033,7 +1033,8 @@ BEGIN
 					percent_difference,
 					agreement_type_id,
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
-					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
+					expenditure_object_names,industry_type_id, 
+					industry_type_name,award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
@@ -1053,7 +1054,8 @@ BEGIN
 		ROUND((( coalesce(b.maximum_spending_limit,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
 		e.agreement_type_id,
 		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
-		g.expenditure_object_names,	(CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id, (CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
+		g.expenditure_object_names,	(CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id, 
+		(CASE WHEN e.agreement_type_code = '05' THEN 'Construction Services' ELSE l.industry_type_name END) as industry_type_name,(CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
@@ -1077,7 +1079,8 @@ BEGIN
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
-		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code ;
+		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id;
 
 		-- Populating the agreement_snapshot tables for Calendar Year (CY)
 	
@@ -1158,7 +1161,8 @@ BEGIN
 					percent_difference,
 					agreement_type_id,
 					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
-					expenditure_object_names,industry_type_id, award_size_id,effective_begin_date,effective_begin_date_id,
+					expenditure_object_names,industry_type_id, 
+					industry_type_name,award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
@@ -1178,7 +1182,8 @@ BEGIN
 		ROUND((( coalesce(b.maximum_spending_limit,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,	
 		e.agreement_type_id,
 		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,		
-		g.expenditure_object_names,(CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id, (CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
+		g.expenditure_object_names,(CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id, 
+		(CASE WHEN e.agreement_type_code = '05' THEN 'Construction Services' ELSE l.industry_type_name END) as industry_type_name,(CASE WHEN b.maximum_spending_limit IS NULL THEN 5 WHEN b.maximum_spending_limit <= 5000 THEN 4 WHEN b.maximum_spending_limit > 5000 
 		AND b.maximum_spending_limit <= 100000 THEN 3 	WHEN  b.maximum_spending_limit > 100000 AND b.maximum_spending_limit <= 1000000 THEN 2 WHEN b.maximum_spending_limit > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
@@ -1202,7 +1207,8 @@ BEGIN
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
-		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code ;
+		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id;
 	
 	-- Associate contracts/agreements to the original version of the master agreement
 	

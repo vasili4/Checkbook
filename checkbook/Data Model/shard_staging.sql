@@ -836,6 +836,7 @@ CREATE EXTERNAL WEB TABLE ref_agency__0 (
     agency_name character varying,
     agency_short_name character varying,
     original_agency_name character varying,
+    is_display char(1),
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
@@ -849,7 +850,8 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_agency AS
-    SELECT ref_agency__0.agency_id, ref_agency__0.agency_code, ref_agency__0.agency_name, ref_agency__0.agency_short_name,ref_agency__0.original_agency_name, ref_agency__0.created_date, ref_agency__0.updated_date, ref_agency__0.created_load_id, ref_agency__0.updated_load_id FROM ONLY ref_agency__0;
+    SELECT ref_agency__0.agency_id, ref_agency__0.agency_code, ref_agency__0.agency_name, ref_agency__0.agency_short_name,ref_agency__0.original_agency_name,ref_agency__0.is_display, 
+    ref_agency__0.created_date, ref_agency__0.updated_date, ref_agency__0.created_load_id, ref_agency__0.updated_load_id FROM ONLY ref_agency__0;
 
 --
 -- Name: ref_agency_history__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -2613,6 +2615,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
 	   expenditure_object_codes character varying,
 	   expenditure_object_names character varying,
 	   industry_type_id smallint,
+	   industry_type_name character varying(50),
    	   award_size_id smallint,
 	   effective_begin_date date,
 	   effective_begin_date_id integer,
@@ -2648,7 +2651,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapsho
   		agreement_snapshot__0.dollar_difference,agreement_snapshot__0.percent_difference,agreement_snapshot__0.master_agreement_id,agreement_snapshot__0.master_contract_number,
   		agreement_snapshot__0.agreement_type_id,agreement_snapshot__0.agreement_type_code,agreement_snapshot__0.agreement_type_name,agreement_snapshot__0.award_category_id,agreement_snapshot__0.award_category_code,
   		agreement_snapshot__0.award_category_name,agreement_snapshot__0.award_method_id,agreement_snapshot__0.award_method_code,agreement_snapshot__0.award_method_name,
-  		agreement_snapshot__0.expenditure_object_codes,agreement_snapshot__0.expenditure_object_names,agreement_snapshot__0.industry_type_id,agreement_snapshot__0.award_size_id,
+  		agreement_snapshot__0.expenditure_object_codes,agreement_snapshot__0.expenditure_object_names,agreement_snapshot__0.industry_type_id,agreement_snapshot__0.industry_type_name,agreement_snapshot__0.award_size_id,
   		agreement_snapshot__0.effective_begin_date,agreement_snapshot__0.effective_begin_date_id,
   		agreement_snapshot__0.effective_begin_year,agreement_snapshot__0.effective_begin_year_id,agreement_snapshot__0.effective_end_date,
   		agreement_snapshot__0.effective_end_date_id,agreement_snapshot__0.effective_end_year,agreement_snapshot__0.effective_end_year_id,
@@ -2696,6 +2699,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot_cy__0(
 	  expenditure_object_codes character varying,
 	  expenditure_object_names character varying,
 	  industry_type_id smallint,
+	  industry_type_name character varying(50),
    	  award_size_id smallint,
 	  effective_begin_date date,
 	  effective_begin_date_id integer,
@@ -2731,7 +2735,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapsho
   		agreement_snapshot_cy__0.dollar_difference,agreement_snapshot_cy__0.percent_difference,agreement_snapshot_cy__0.master_agreement_id,agreement_snapshot_cy__0.master_contract_number,
   		agreement_snapshot_cy__0.agreement_type_id,agreement_snapshot_cy__0.agreement_type_code,agreement_snapshot_cy__0.agreement_type_name,agreement_snapshot_cy__0.award_category_id,agreement_snapshot_cy__0.award_category_code,
   		agreement_snapshot_cy__0.award_category_name,agreement_snapshot_cy__0.award_method_id,agreement_snapshot_cy__0.award_method_code,agreement_snapshot_cy__0.award_method_name,
-   		agreement_snapshot_cy__0.expenditure_object_codes,agreement_snapshot_cy__0.expenditure_object_names,agreement_snapshot_cy__0.industry_type_id,agreement_snapshot_cy__0.award_size_id,
+   		agreement_snapshot_cy__0.expenditure_object_codes,agreement_snapshot_cy__0.expenditure_object_names,agreement_snapshot_cy__0.industry_type_id,agreement_snapshot_cy__0.industry_type_name,agreement_snapshot_cy__0.award_size_id,
    		agreement_snapshot_cy__0.effective_begin_date,agreement_snapshot_cy__0.effective_begin_date_id,
   		agreement_snapshot_cy__0.effective_begin_year,agreement_snapshot_cy__0.effective_begin_year_id,agreement_snapshot_cy__0.effective_end_date,
   		agreement_snapshot_cy__0.effective_end_date_id,agreement_snapshot_cy__0.effective_end_year,agreement_snapshot_cy__0.effective_end_year_id,

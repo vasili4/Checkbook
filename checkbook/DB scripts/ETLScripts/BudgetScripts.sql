@@ -8,7 +8,7 @@ processbudget
 
 -- DROP FUNCTION etl.updateforeignkeysforbudget(bigint);
 
-CREATE OR REPLACE FUNCTION etl.updateforeignkeysforbudget(p_load_id_in bigint)
+CREATE OR REPLACE FUNCTION etl.updateforeignkeysforbudget(p_load_file_id_in bigint,p_load_id_in bigint)
   RETURNS integer AS $$
 
 DECLARE
@@ -400,7 +400,7 @@ DECLARE
 
 BEGIN	      
 
-	l_fk_update := etl.updateForeignKeysForBudget(p_load_id_in);
+	l_fk_update := etl.updateForeignKeysForBudget(p_load_file_id_in,p_load_id_in);
 
 	IF l_fk_update <> 1 THEN
 		RETURN -1;

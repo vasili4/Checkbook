@@ -10,3 +10,26 @@ delete from vendor where vendor_customer_code = '12345A'
 delete from vendor_history where vendor_history_id > 140800
 delete from vendor_business_type where vendor_history_id > 140800
 delete from vendor_address where vendor_history_id > 140800
+
+
+
+select * from etl.etl_data_load_file where load_id = 13 
+
+update etl.etl_data_load_file set processed_flag = 'V' where load_file_id= 8
+
+
+budget								agency_history_id
+disbursement						agency_history_id
+disbursement_line_item				agency_history_id
+history_agreement					agency_history_id
+history_agreement_accounting_line	agency_history_id
+history_master_agreement			agency_history_id
+payroll								agency_history_id
+payroll_summary						agency_history_id
+pending_contracts					submitting_agency_id
+pending_contracts					awarding_agency_id
+pending_contracts					funding_agency_id
+pending_contracts					document_agency_id
+revenue								document_agency_history_id
+revenue								agency_history_id
+revenue_budget						agency_history_id

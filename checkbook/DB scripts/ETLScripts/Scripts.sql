@@ -3,7 +3,7 @@
 	validatedata	
 	processdata
 	isEligibleForConsumption
-	errorhandler
+	processhandler
 	refreshaggregates
 	grantaccess
 	refreshfactandaggregatetables
@@ -226,7 +226,7 @@ EXCEPTION
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
 
-	-- l_exception :=  etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	-- l_exception :=  etl.processhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
 	
 	l_end_time := timeofday()::timestamp;
 	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
@@ -650,7 +650,7 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in validatedatanew';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 	
-	-- l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	-- l_exception := etl.processhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
 	l_end_time := timeofday()::timestamp;
 	
 	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
@@ -781,7 +781,7 @@ EXCEPTION
 	RAISE NOTICE 'Exception Occurred in processdata';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
 
-	-- l_exception := etl.errorhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
+	-- l_exception := etl.processhandler(l_job_id,l_data_source_code,l_load_id,p_load_file_id_in);
 	l_end_time := timeofday()::timestamp;
 	
 	INSERT INTO etl.etl_script_execution_status(load_file_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
@@ -831,7 +831,7 @@ $$ language plpgsql;
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION etl.errorhandler(p_load_file_id_in int) RETURNS INT AS $$
+CREATE OR REPLACE FUNCTION etl.processhandler(p_load_file_id_in int) RETURNS INT AS $$
 DECLARE
 	l_data_source_code etl.ref_data_source.data_source_code%TYPE;
 	l_load_id bigint;
@@ -889,7 +889,7 @@ BEGIN
 EXCEPTION
 	WHEN OTHERS THEN
 	
-	RAISE NOTICE 'Exception Occurred in errorhandler';
+	RAISE NOTICE 'Exception Occurred in processhandler';
 	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;		
 	
 	RETURN 0;
@@ -1100,7 +1100,131 @@ EXCEPTION
 END;
 
 $$  LANGUAGE plpgsql ;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+CREATE OR REPLACE FUNCTION etl.updateagenciesdisplayflag(p_job_id_in bigint) RETURNS INT AS $$
+DECLARE
+	l_count int;
+BEGIN
+						  
+	-- Load different agency ids from all the domains
+	
+	CREATE TEMPORARY TABLE tmp_all_agencies_display(agency_id smallint, table_name varchar, column_name varchar)	
+	DISTRIBUTED BY(agency_id);
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'budget' as table_name, 'agency_history_id' as column_name
+	FROM budget a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('B');
+	
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'disbursement' as table_name, 'agency_history_id' as column_name
+	FROM disbursement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('F');
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'disbursement_line_item' as table_name, 'agency_history_id' as column_name
+	FROM disbursement_line_item a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('F');
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'history_agreement' as table_name, 'agency_history_id' as column_name
+	FROM history_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('C','F');
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'history_agreement_accounting_line' as table_name, 'agency_history_id' as column_name
+	FROM history_agreement_accounting_line a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('C','F');
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'history_master_agreement' as table_name, 'agency_history_id' as column_name
+	FROM history_master_agreement a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('M','C');
+	
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'payroll' as table_name, 'agency_history_id' as column_name
+	FROM payroll a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('P');
+	
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'payroll_summary' as table_name, 'agency_history_id' as column_name
+	FROM payroll_summary a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('PS');
+	
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'revenue' as table_name, 'agency_history_id' as column_name
+	FROM revenue a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON a.load_id = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('R');
+	
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'revenue' as table_name, 'document_agency_history_id' as column_name
+	FROM revenue a JOIN ref_agency_history b ON a.document_agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON a.load_id = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('R');
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct b.agency_id, 'revenue_budget' as table_name, 'agency_history_id' as column_name
+	FROM revenue_budget a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
+	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('RB');
+	
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct submitting_agency_id, 'pending_contracts' as table_name, 'submitting_agency_id' as column_name
+	FROM pending_contracts ;
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct awarding_agency_id, 'pending_contracts' as table_name, 'awarding_agency_id' as column_name
+	FROM pending_contracts ;
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct funding_agency_id, 'pending_contracts' as table_name, 'funding_agency_id' as column_name
+	FROM pending_contracts ;
+	
+	INSERT INTO tmp_all_agencies_display
+	SELECT distinct document_agency_id, 'pending_contracts' as table_name, 'document_agency_id' as column_name
+	FROM pending_contracts ;
+	
+	
+	CREATE TEMPORARY TABLE tmp_all_agencies_to_update_is_display(agency_id smallint)	
+	DISTRIBUTED BY(agency_id);
+	
+	
+	INSERT INTO tmp_all_agencies_to_update_is_display
+	SELECT distinct agency_id
+	FROM tmp_all_agencies_display ;
+	
+	
+	UPDATE ref_agency a
+	SET is_display = 'Y'
+	FROM	tmp_all_agencies_to_update_is_display b
+	WHERE	a.agency_id = b.agency_id ;
+	
+	
+	RETURN 1;
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in updateagenciesdisplayflag';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+END;
+$$ language plpgsql;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION etl.refreshfactandaggregatetables(p_job_id_in bigint)
@@ -1146,6 +1270,13 @@ BEGIN
 	ELSE 
 			RETURN 0;
 	END IF;	
+	
+	IF l_status = 1 THEN 
+		l_status :=etl.updateagenciesdisplayflag(p_job_id_in);
+	ELSE 
+			RETURN 0;
+	END IF;	
+	
 	
 		l_end_time := timeofday()::timestamp;
 	
