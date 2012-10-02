@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /home/gpadmin/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/PreProcessing_DataFiles/
+cd /vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/PreProcessing_DataFiles/
 
 echo $1
 echo $2
