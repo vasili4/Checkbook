@@ -183,7 +183,7 @@ var time_hours = substr(currenttime, 11, 2);
 
 var total_avilable_sql = &quot;select count(*) as total_available_count from etl.etl_data_load where  files_available_flag = &apos;Y&apos; and job_id = &quot; +nextval;
 
-var coa_available_sql = &quot;select count(*) as coa_available_count from etl.etl_data_load where  files_available_flag = &apos;Y&apos; and data_source_code in (&apos;A&apos;,&apos;D&apos;,&apos;E&apos;,&apos;L&apos;,&apos;O&apos;) and job_id = &quot; +nextval;</jsScript_script>
+var coa_available_sql = &quot;select count(*) as coa_available_count from etl.etl_data_load where  files_available_flag = &apos;Y&apos; and data_source_code in (&apos;A&apos;,&apos;D&apos;,&apos;E&apos;,&apos;L&apos;,&apos;O&apos;,&apos;RS&apos;,&apos;RC&apos;,&apos;RY&apos;,&apos;BC&apos;,&apos;FC&apos;) and job_id = &quot; +nextval;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>total_avilable_sql</name>
         <rename>total_avilable_sql</rename>
         <type>String</type>
@@ -306,7 +306,7 @@ var coa_available_sql = &quot;select count(*) as coa_available_count from etl.et
  <leftvalue>total_available_count</leftvalue>
  <function>&gt;=</function>
  <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>12</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
+ <value><name>constant</name><type>Integer</type><text>17</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -338,7 +338,7 @@ var coa_available_sql = &quot;select count(*) as coa_available_count from etl.et
    <leftvalue>time_hours</leftvalue>
    <function>&gt;=</function>
    <rightvalue/>
-   <value><name>constant</name><type>Integer</type><text>20</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value>   </condition>
+   <value><name>constant</name><type>Integer</type><text>8</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value>   </condition>
   </conditions>
  </condition>
     </compare>
@@ -368,7 +368,7 @@ var coa_available_sql = &quot;select count(*) as coa_available_count from etl.et
  <leftvalue>coa_available_count</leftvalue>
  <function>&gt;=</function>
  <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>5</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
+ <value><name>constant</name><type>Integer</type><text>10</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -565,7 +565,7 @@ var coa_available_sql = &quot;select count(*) as coa_available_count from etl.et
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;There are no files to process today&apos;;
+var title=&apos;Not processing the files today&apos;;
 var body=&apos;We do not have the sufficient files in FISA to process them&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>

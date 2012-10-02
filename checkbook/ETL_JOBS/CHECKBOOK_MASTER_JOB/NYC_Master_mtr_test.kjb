@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>NYC_Master</name>
+  <name>NYC_Master_mtr_test</name>
     <description/>
     <extended_description/>
     <job_version/>
+    <job_status>0</job_status>
   <directory>&#47;</directory>
   <created_user>-</created_user>
   <created_date>2012&#47;01&#47;24 16:09:28.673</created_date>
@@ -311,8 +312,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>965</xloc>
-      <yloc>133</yloc>
+      <xloc>958</xloc>
+      <yloc>25</yloc>
       </entry>
   </entries>
   <hops>
@@ -393,7 +394,7 @@
       <to>REFRESH_AGGREGATES</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
-      <enabled>Y</enabled>
+      <enabled>N</enabled>
       <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
@@ -402,17 +403,17 @@
       <to>SEND_EMAIL_LOAD_STATISTICS 1</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
-      <enabled>Y</enabled>
+      <enabled>N</enabled>
       <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>REFRESH_AGGREGATES</from>
-      <to>Abort NYC MASTER  job</to>
+      <from>PROCESS FILES MASTER</from>
+      <to>SEND_EMAIL_LOAD_STATISTICS 1</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
-      <evaluation>N</evaluation>
+      <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
   </hops>

@@ -349,11 +349,11 @@
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var sql=&apos;select etl.refreshaggregates(p_jobid)&apos;;
+var sql=&apos;select etl.refreshfactandaggregatetables(p_jobid)&apos;;
 
 sql=replace(sql,&apos;p_jobid&apos;,nextval);
 
-var name=&apos;etl.refreshaggregates&apos;;</jsScript_script>
+var name=&apos;etl.refreshfactandaggregatetables&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>sql</name>
         <rename>sql</rename>
         <type>String</type>
@@ -389,7 +389,7 @@ var name=&apos;etl.refreshaggregates&apos;;</jsScript_script>
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;Error in job &apos;+nextval+&apos; while executing etl.refreshaggregates&apos;;
+var title=&apos;Error in job &apos;+nextval+&apos; while executing etl.refreshfactandaggregatetables&apos;;
 var body=&apos;Error msg: Job ID - &apos;+nextval+&quot; Database Error - &quot;+err+&quot; Error No - &quot;+err1;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>

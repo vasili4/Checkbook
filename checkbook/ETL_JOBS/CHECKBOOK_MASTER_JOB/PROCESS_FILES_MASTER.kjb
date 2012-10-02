@@ -117,11 +117,17 @@
             </parameter>            <parameter>            <name>l_file_timestamp</name>
             <stream_name>l_file_timestamp</stream_name>
             <value/>
+            </parameter>            <parameter>            <name>l_file_name</name>
+            <stream_name>l_file_name</stream_name>
+            <value/>
             </parameter>            <parameter>            <name>l_load_id</name>
             <stream_name>l_load_id</stream_name>
             <value/>
-            </parameter>            <parameter>            <name>l_file_name</name>
-            <stream_name>l_file_name</stream_name>
+            </parameter>            <parameter>            <name>l_data_source_name</name>
+            <stream_name>l_data_source_name</stream_name>
+            <value/>
+            </parameter>            <parameter>            <name>l_standard_file_name</name>
+            <stream_name>l_standard_file_name</stream_name>
             <value/>
             </parameter>      </parameters>      <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>

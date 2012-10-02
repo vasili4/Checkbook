@@ -17,7 +17,17 @@
             <description/>
         </parameter>
         <parameter>
+            <name>l_data_source_name</name>
+            <default_value/>
+            <description/>
+        </parameter>
+        <parameter>
             <name>l_file_name</name>
+            <default_value/>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>l_file_timestamp</name>
             <default_value/>
             <description/>
         </parameter>
@@ -28,6 +38,11 @@
         </parameter>
         <parameter>
             <name>l_load_id</name>
+            <default_value/>
+            <description/>
+        </parameter>
+        <parameter>
+            <name>l_standard_file_name</name>
             <default_value/>
             <description/>
         </parameter>
@@ -102,6 +117,16 @@
           <variable_value>${l_data_source_code}</variable_value>
           <variable_type>CURRENT_JOB</variable_type>
         </field>
+        <field>
+          <variable_name>loop_data_source_name</variable_name>
+          <variable_value>${l_data_source_name}</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
+        <field>
+          <variable_name>loop_standard_file_name</variable_name>
+          <variable_value>${l_standard_file_name}</variable_value>
+          <variable_type>JVM</variable_type>
+        </field>
       </fields>
       <parallel>N</parallel>
       <draw>Y</draw>
@@ -170,8 +195,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>716</xloc>
-      <yloc>33</yloc>
+      <xloc>953</xloc>
+      <yloc>37</yloc>
       </entry>
     <entry>
       <name>VALIDATE_DATA</name>
@@ -202,8 +227,8 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>899</xloc>
-      <yloc>37</yloc>
+      <xloc>1136</xloc>
+      <yloc>41</yloc>
       </entry>
     <entry>
       <name>PROCESS_DATA</name>
@@ -234,8 +259,33 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1111</xloc>
-      <yloc>37</yloc>
+      <xloc>1348</xloc>
+      <yloc>41</yloc>
+      </entry>
+    <entry>
+      <name>EXE ETL PL SCRIPT</name>
+      <description>Shell</description>
+      <type>SHELL</type>
+      <filename>${Internal.Job.Filename.Directory}&#47;PreProcessing_DataFiles&#47;master_preprocess.sh</filename>
+      <work_directory/>
+      <arg_from_previous>N</arg_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <set_logfile>Y</set_logfile>
+      <logfile>${Internal.Job.Filename.Directory}&#47;Shards&#47;log_preprocess_datafile</logfile>
+      <set_append_logfile>N</set_append_logfile>
+      <logext>log</logext>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <insertScript>N</insertScript>
+      <script>sh &#47;vol2&#47;ETLScripts&#47;ETL_NIGHTLY&#47;Shards&#47;shards_refresh1.sh</script>
+      <loglevel>Detailed</loglevel>
+      <argument0>${l_data_source_name}</argument0>
+      <argument1>${l_standard_file_name}</argument1>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>748</xloc>
+      <yloc>38</yloc>
       </entry>
   </entries>
   <hops>
@@ -258,15 +308,6 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>COPY FILE TO PROCESS</from>
-      <to>STAGE_AND_ARCHIVE</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>STAGE_AND_ARCHIVE</from>
       <to>VALIDATE_DATA</to>
       <from_nr>0</from_nr>
@@ -278,6 +319,24 @@
     <hop>
       <from>VALIDATE_DATA</from>
       <to>PROCESS_DATA</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>COPY FILE TO PROCESS</from>
+      <to>EXE ETL PL SCRIPT</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>EXE ETL PL SCRIPT</from>
+      <to>STAGE_AND_ARCHIVE</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

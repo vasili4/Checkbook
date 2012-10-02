@@ -132,11 +132,15 @@
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var to_position = indexOf(short_filename,&apos;.ASC&apos;);
+var to_position = indexOf(short_filename,&apos;.txt&apos;);
 
 var from_position = to_position - 14;
 
-var file_timestamp = substr(short_filename,from_position,14);
+var file_timestamp = &quot;&quot;;
+
+if(data_source_code != &apos;PC&apos;)
+file_timestamp = substr(short_filename,from_position,14);
+
 
 var patterm_match_sql = &quot;SELECT  (CASE WHEN  &apos;original_file_name&apos; SIMILAR TO &apos;pattern_name&apos; = &apos;t&apos; THEN &apos;Y&apos; ELSE &apos;N&apos; END)::varchar(1) as pattern_matched_flag&quot;;
 
@@ -537,12 +541,16 @@ var feed_type = &apos;D&apos;;
 
 var display_type = &apos;&apos;;
 
-if (indexOf(short_filename,&apos;MTHLY&apos;) &gt; 0)
-feed_type = &apos;M&apos;;
-else if (indexOf(short_filename,&apos;WKLY&apos;) &gt; 0)
-feed_type = &apos;W&apos;;
-else
-feed_type = &apos;D&apos;;
+
+&#47;&#47; if (indexOf(short_filename,&apos;MTHLY&apos;) &gt; 0)
+&#47;&#47; feed_type = &apos;M&apos;;
+&#47;&#47; else if (indexOf(short_filename,&apos;WKLY&apos;) &gt; 0)
+&#47;&#47; feed_type = &apos;W&apos;;
+&#47;&#47; else
+&#47;&#47; feed_type = &apos;D&apos;;
+
+
+&#47;&#47; may be the above logic can be removed
 
 
 if(data_source_code == &apos;F&apos;)
