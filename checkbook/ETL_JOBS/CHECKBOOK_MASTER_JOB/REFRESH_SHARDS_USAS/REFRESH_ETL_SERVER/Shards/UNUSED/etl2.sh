@@ -1,0 +1,1 @@
+time ./etl-2.pl > ./etl-2.out 2>&1
