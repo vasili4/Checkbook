@@ -13,7 +13,7 @@ if [[ $1 = "" ]]; then
 	exit;
 fi
 
-host=`hostname`
+host=`hostname -s`
 #update shard table to know that we are starting
 psql -h mdw -U gpadmin --dbname USASpending -c "insert into refresh_shards_status (shard_name,latest_flag,rsync_flag, rsync_start_date, refresh_start_date) values ('$host', 1, 0, now(), now())" 
 
@@ -23,7 +23,7 @@ gpstop -ia
 
 #Rename Current/OLD Directories
 nic=1
-for dir in /data/gpdb_master /data/gpdb_p1 /data/gpdb_p2 /data/gpdb_p3 /data/gpdb_p4
+for dir in /data /vol0 /vol1 /vol2 /vol3 /vol4 /vol5
 do
 	cd $dir
 	#ignore EAP and old releases

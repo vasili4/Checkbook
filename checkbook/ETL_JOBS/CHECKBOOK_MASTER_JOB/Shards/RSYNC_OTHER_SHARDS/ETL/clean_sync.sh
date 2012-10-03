@@ -9,7 +9,7 @@
 #########################
 
 #cleanup OLD Directories
-for dir in /data/gpdb_master /data/gpdb_p1 /data/gpdb_p2 /data/gpdb_p3 /data/gpdb_p4
+for dir in /data /vol0 /vol1 /vol2 /vol3 /vol4 /vol5
 do
 	cd $dir
 	#ignore EAP releases
