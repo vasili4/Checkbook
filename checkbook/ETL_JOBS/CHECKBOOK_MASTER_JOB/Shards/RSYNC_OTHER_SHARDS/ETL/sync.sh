@@ -15,7 +15,7 @@ fi
 
 host=`hostname -s`
 #update shard table to know that we are starting
-psql -h mdw -U gpadmin --dbname USASpending -c "insert into refresh_shards_status (shard_name,latest_flag,rsync_flag, rsync_start_date, refresh_start_date) values ('$host', 1, 0, now(), now())" 
+psql -h mdw -U gpadmin --dbname checkbook_new -c "insert into etl.refresh_shards_status (shard_name,latest_flag,rsync_flag, rsync_start_date, refresh_start_date) values ('$host', 1, 0, now(), now())" 
 
 
 #stop the database
@@ -73,6 +73,6 @@ if  [ $output -gt 0 ]
 then
 	echo "We have errors - not updating the table to move forward"
 else
-	psql -h mdw -U gpadmin --dbname USASpending -c "update refresh_shards_status set rsync_flag = 1, rsync_end_date = now(), refresh_end_date = now() where latest_flag = 1 and shard_name = '$host'"
+	psql -h mdw -U gpadmin --dbname checkbook_new -c "update etl.refresh_shards_status set rsync_flag = 1, rsync_end_date = now(), refresh_end_date = now() where latest_flag = 1 and shard_name = '$host'"
 fi
 

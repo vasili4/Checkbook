@@ -2536,6 +2536,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 	disb_contract_document_code  character varying(8),
 	disb_master_agreement_id  bigint,
 	disb_fiscal_year_id  smallint,
+	disb_check_eft_issued_cal_month_id integer,
 	status_flag char(1),
 	type_of_year char(1)
 ) 	
@@ -2553,7 +2554,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.contracts_spendin
   	contracts_spending_transactions__0.disb_budget_name,contracts_spending_transactions__0.disb_contract_number,contracts_spending_transactions__0.disb_purpose,contracts_spending_transactions__0.disb_reporting_code,
   	contracts_spending_transactions__0.disb_spending_category_name,contracts_spending_transactions__0.disb_agency_id,contracts_spending_transactions__0.disb_vendor_id,contracts_spending_transactions__0.disb_expenditure_object_id,
   	contracts_spending_transactions__0.disb_department_id,contracts_spending_transactions__0.disb_spending_category_id,contracts_spending_transactions__0.disb_agreement_id,contracts_spending_transactions__0.disb_contract_document_code,
-  	contracts_spending_transactions__0.disb_master_agreement_id,contracts_spending_transactions__0.disb_fiscal_year_id,
+  	contracts_spending_transactions__0.disb_master_agreement_id,contracts_spending_transactions__0.disb_fiscal_year_id,contracts_spending_transactions__0.disb_check_eft_issued_cal_month_id,
   	contracts_spending_transactions__0.status_flag,contracts_spending_transactions__0.type_of_year
   	FROM   contracts_spending_transactions__0;	
   	
