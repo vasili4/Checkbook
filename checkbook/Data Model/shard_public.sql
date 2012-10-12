@@ -1744,11 +1744,12 @@ CREATE TABLE contracts_spending_transactions(
 
 CREATE TABLE aggregateon_contracts_expense(
 	original_agreement_id bigint,
-	expenditure_object_id integer,
+	expenditure_object_code character varying(4),
 	expenditure_object_name character varying(40),
 	encumbered_amount numeric(16,2),
 	spending_amount_disb numeric(16,2),
-	spending_amount numeric(16,2)
+	spending_amount numeric(16,2),
+	is_disbursements_exist char(1)
 ) DISTRIBUTED BY (original_agreement_id);	
 
 -- End Contract Aggregate Tables
@@ -1920,6 +1921,16 @@ CREATE TABLE ref_award_category_industry (
  CREATE INDEX idx_agreement_id_disbursement_line_item_details ON disbursement_line_item_details(agreement_id);
  
  CREATE INDEX idx_agreement_id_disbursement_line_item ON disbursement_line_item(agreement_id);
+ 
+ -- 10/12/2012
+ 
+ CREATE INDEX idx_ma_agreement_id_disbursement_line_item_details ON disbursement_line_item_details(master_agreement_id);
+ 
+ CREATE INDEX idx_disb_agreement_id_contracts_spending_transactions ON contracts_spending_transactions(disb_agreement_id);
+ 
+ CREATE INDEX idx_orig_agr_id_aggregateon_contracts_cumulative_spending ON aggregateon_contracts_cumulative_spending(original_agreement_id);
+ 
+ 
  
  
  

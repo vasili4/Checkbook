@@ -1068,18 +1068,19 @@ AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.calendar_fi
 AND a.status_flag='R'",20
 ContractsByExpenseCategory,aggregateon_contracts_expense,"CREATE TABLE aggregateon_contracts_expense(
 	original_agreement_id bigint,
-	expenditure_object_id integer,
+	expenditure_object_code character varying(4),
 	expenditure_object_name character varying(40),
 	encumbered_amount numeric(16,2),
 	spending_amount_disb numeric(16,2),
-	spending_amount numeric(16,2)
-) DISTRIBUTED BY (original_agreement_id)","SELECT m.original_agreement_id, p.expenditure_object_id, p.expenditure_object_name, m.encumbered_amount,coalesce(n.spending_amount_disb,0) as spending_amount_disb, m.spending_amount
+	spending_amount numeric(16,2),
+	is_disbursements_exist char(1)
+) DISTRIBUTED BY (original_agreement_id)","SELECT m.original_agreement_id, m.expenditure_object_code, m.expenditure_object_name, m.encumbered_amount,coalesce(n.spending_amount_disb,0) as spending_amount_disb, m.spending_amount, 
+(CASE WHEN n.original_agreement_id IS NULL THEN 'N' ELSE 'Y' END) as is_disbursements_exist
 FROM
- (SELECT a.original_agreement_id, c.expenditure_object_id,  sum(b.line_amount) as encumbered_amount, sum(b.rfed_line_amount) as spending_amount
- FROM history_agreement a, history_agreement_accounting_line b , ref_expenditure_object_history c
- WHERE a.agreement_id = b.agreement_id AND a.latest_flag = 'Y' AND b.expenditure_object_history_id = c.expenditure_object_history_id
- GROUP BY 1,2) m LEFT JOIN
- (SELECT agreement_id as original_agreement_id, expenditure_object_id, sum(check_amount) as spending_amount_disb
+ (SELECT a.original_agreement_id, d.expenditure_object_code,  d.expenditure_object_name, sum(b.line_amount) as encumbered_amount, sum(b.rfed_line_amount) as spending_amount
+ FROM history_agreement a, history_agreement_accounting_line b , ref_expenditure_object_history c, ref_expenditure_object d 
+ WHERE a.agreement_id = b.agreement_id AND a.latest_flag = 'Y' AND b.expenditure_object_history_id = c.expenditure_object_history_id AND  c.expenditure_object_id = d.expenditure_object_id
+ GROUP BY 1,2,3) m LEFT JOIN
+ (SELECT agreement_id as original_agreement_id, expenditure_object_code, sum(check_amount) as spending_amount_disb
  FROM disbursement_line_item_details
- GROUP BY 1,2) n ON m.original_agreement_id = n.original_agreement_id AND m.expenditure_object_id = n.expenditure_object_id 
- JOIN ref_expenditure_object p ON p.expenditure_object_id = m.expenditure_object_id ",,21
+ GROUP BY 1,2) n ON m.original_agreement_id = n.original_agreement_id AND m.expenditure_object_code = n.expenditure_object_code ",,21

@@ -1941,13 +1941,15 @@ CREATE TABLE contracts_spending_transactions(
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);	
 
+
 CREATE TABLE aggregateon_contracts_expense(
 	original_agreement_id bigint,
-	expenditure_object_id integer,
+	expenditure_object_code character varying(4),
 	expenditure_object_name character varying(40),
 	encumbered_amount numeric(16,2),
 	spending_amount_disb numeric(16,2),
-	spending_amount numeric(16,2)
+	spending_amount numeric(16,2),
+	is_disbursements_exist char(1)
 ) DISTRIBUTED BY (original_agreement_id);	
 
 -- tables for contracts by industry and contracts by size

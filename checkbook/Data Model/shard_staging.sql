@@ -2560,11 +2560,12 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.contracts_spendin
   	
 CREATE EXTERNAL WEB TABLE aggregateon_contracts_expense__0(
 	original_agreement_id bigint,
-	expenditure_object_id integer,
+	expenditure_object_code character varying(4),
 	expenditure_object_name character varying(40),
 	encumbered_amount numeric(16,2),
 	spending_amount_disb numeric(16,2),
-	spending_amount numeric(16,2)
+	spending_amount numeric(16,2),
+	is_disbursements_exist char(1)
 ) 
 EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_expense to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
@@ -2572,8 +2573,8 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 
 
    CREATE VIEW aggregateon_contracts_expense AS
-     	SELECT aggregateon_contracts_expense__0.original_agreement_id,aggregateon_contracts_expense__0.expenditure_object_id,aggregateon_contracts_expense__0.expenditure_object_name,
-  	aggregateon_contracts_expense__0.encumbered_amount,aggregateon_contracts_expense__0.spending_amount_disb,aggregateon_contracts_expense__0.spending_amount
+     	SELECT aggregateon_contracts_expense__0.original_agreement_id,aggregateon_contracts_expense__0.expenditure_object_code,aggregateon_contracts_expense__0.expenditure_object_name,
+  	aggregateon_contracts_expense__0.encumbered_amount,aggregateon_contracts_expense__0.spending_amount_disb,aggregateon_contracts_expense__0.spending_amount,aggregateon_contracts_expense__0.is_disbursements_exist
   	  	FROM   aggregateon_contracts_expense__0;	
  
   	

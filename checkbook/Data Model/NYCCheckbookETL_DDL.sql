@@ -3259,7 +3259,7 @@ DISTRIBUTED BY (job_id);
 
 CREATE TABLE etl.refresh_shards_status
 (
-  shard_name character(5),
+  shard_name character(10),
   latest_flag smallint,
   sql_flag smallint,
   sql_start_date timestamp without time zone,
