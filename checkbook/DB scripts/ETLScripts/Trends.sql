@@ -976,6 +976,12 @@ INSERT INTO trends_assesed_valuation_tax_rate_class (category, fiscal_year, asse
 update  trends_assesed_valuation_tax_rate_class set display_yn ='N' where fiscal_year <1997;
 update  trends_assesed_valuation_tax_rate_class set display_yn ='Y' where fiscal_year >=1997;
 
+alter table trends_assesed_valuation_tax_rate_class add column superscript_value character(1);
+
+update trends_assesed_valuation_tax_rate_class set superscript_value ='1' where category ='Total' and fiscal_year not in(2011,1995);
+update trends_assesed_valuation_tax_rate_class set superscript_value ='1' where category ='Class Four Total' and fiscal_year =1995;
+
+
 -- 14) trends_assesed_estimated_actual_taxable_property
 
 
@@ -989,7 +995,7 @@ class_three numeric(20,2),
 class_four numeric(20,2),
 less_tax_exempt_property numeric(20,2),
 total_taxable_assesed_value numeric(20,2),
-totl_direct_tax numeric(20,2),
+total_direct_tax numeric(20,2),
 estimated_actual_taxable_value numeric(20,2),
 assesed_value_percentage numeric(20,2)
 )
@@ -1429,6 +1435,10 @@ COPY  trends_hudson_yards_infrastructure_temp FROM '/home/gpadmin/TREDDY/TRENDS/
 INSERT INTO trends_hudson_yards_infrastructure  select * from trends_hudson_yards_infrastructure_temp;
 
 update trends_hudson_yards_infrastructure set display_yn ='Y';
+
+
+alter table trends_hudson_yards_infrastructure add column superscript_value character(1);
+update trends_hudson_yards_infrastructure set superscript_value ='1' where fiscal_year  in(2009,2010,2011);
 
 -- 23)
 
