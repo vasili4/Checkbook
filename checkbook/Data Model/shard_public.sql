@@ -100,8 +100,7 @@ CREATE TABLE aggregateon_spending_coa_entities (
     month_id int,
     year_id smallint,
     type_of_year char(1),
-    total_spending_amount numeric(16,2),
-    total_contract_amount numeric(16,2)
+    total_spending_amount numeric(16,2)
 ) DISTRIBUTED BY (department_id);
 
 --
@@ -114,6 +113,7 @@ CREATE TABLE aggregateon_spending_contract (
     vendor_id integer,
     agency_id smallint,
     description character varying(60),
+    spending_category_id smallint,
     year_id smallint,
     type_of_year char(1),
     total_spending_amount numeric(16,2),
@@ -127,12 +127,25 @@ CREATE TABLE aggregateon_spending_contract (
 CREATE TABLE aggregateon_spending_vendor (
     vendor_id integer,
     agency_id smallint,
+    spending_category_id smallint,
     month_id int,
     year_id smallint,
     type_of_year char(1),
     total_spending_amount numeric(16,2),
-    total_contract_amount numeric(16,2)
+    total_contract_amount numeric(16,2),
+    is_all_categories char(1)
 ) DISTRIBUTED BY (vendor_id);
+
+CREATE TABLE aggregateon_spending_vendor_exp_object(
+	vendor_id integer,
+	expenditure_object_id integer,
+	spending_category_id smallint,
+	year_id smallint,
+	type_of_year char(1),
+	total_spending_amount numeric(16,2) )
+DISTRIBUTED BY (expenditure_object_id);	
+
+
 --
 -- Name: budget; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
@@ -1241,13 +1254,7 @@ CREATE TABLE aggregateon_revenue_category_funding_class(
 	current_modified_amount numeric(16,2))
 DISTRIBUTED BY (revenue_category_id);	
 
-CREATE TABLE aggregateon_spending_vendor_exp_object(
-	vendor_id integer,
-	expenditure_object_id integer,
-	year_id smallint,
-	type_of_year char(1),
-	total_spending_amount numeric(16,2) )
-DISTRIBUTED BY (expenditure_object_id);	
+
 
 --
 -- Name: vendor; Type: TABLE; Schema: public; Owner: athiagarajan; Tablespace: 
@@ -1739,7 +1746,10 @@ CREATE TABLE contracts_spending_transactions(
 	disb_check_eft_issued_cal_month_id integer,
 	status_flag char(1),
 	type_of_year char(1)
-) DISTRIBUTED BY (disbursement_line_item_id);	
+) DISTRIBUTED BY (disbursement_line_item_id)
+PARTITION BY RANGE (fiscal_year) 
+(START (2010) END (2014) EVERY (1),
+DEFAULT PARTITION outlying_years);
 
 
 CREATE TABLE aggregateon_contracts_expense(
@@ -1931,7 +1941,14 @@ CREATE TABLE ref_award_category_industry (
  CREATE INDEX idx_orig_agr_id_aggregateon_contracts_cumulative_spending ON aggregateon_contracts_cumulative_spending(original_agreement_id);
  
  
+ -- 11/01/2012
  
+ CREATE INDEX idx_fiscal_year_id_contracts_spending_transactions ON contracts_spending_transactions(fiscal_year_id);
+ CREATE INDEX idx_disb_fiscal_year_id_contracts_spending_transactions ON contracts_spending_transactions(disb_fiscal_year_id);
+ CREATE INDEX idx_disb_cont_doc_code_contracts_spending_transactions ON contracts_spending_transactions(disb_contract_document_code);
+ CREATE INDEX idx_document_agency_id_contracts_spending_transactions ON contracts_spending_transactions(document_agency_id);
+ CREATE INDEX idx_disb_cal_month_id_contracts_spending_transactions ON contracts_spending_transactions(disb_check_eft_issued_cal_month_id);
+    
  
  
  

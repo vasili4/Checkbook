@@ -219,7 +219,7 @@ INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES (
 										
 INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values ('JUDGCLAIMS',now()::timestamp),('MISCPAYVEN',now()::timestamp);
 
-INSERT INTO ref_spending_category(spending_category_id, spending_category_code, spending_category_name) values(3,'cc','Capital Contracts'),(1,'c','Contracts'),(4,'o','Others'),(2,'p','Payroll');
+INSERT INTO ref_spending_category(spending_category_id, spending_category_code, spending_category_name) values(1,'c','Contracts'),(2,'p','Payroll'),(3,'cc','Capital Contracts'),(4,'o','Others'),(5,'ta','Trust & Agency');
 
 INSERT INTO ref_fiscal_period VALUES (1,'July'), 
 				      (2, 'August'),

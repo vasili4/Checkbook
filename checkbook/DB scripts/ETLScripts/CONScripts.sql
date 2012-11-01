@@ -1402,8 +1402,7 @@ BEGIN
 	UPDATE history_agreement a 
 	SET    latest_flag = 'N'
 	FROM   tmp_agreements_update_flags b
-	WHERE  a.agreement_id = b.agreement_id
-		AND a.latest_flag = 'Y';	
+	WHERE  a.agreement_id = b.agreement_id ;	
 	
 	UPDATE history_agreement a 
 	SET     original_version_flag = 'Y',
@@ -1529,8 +1528,7 @@ BEGIN
 	UPDATE history_agreement a 
 	SET    latest_flag = 'N'
 	FROM   tmp_agreements_update b
-	WHERE  a.agreement_id = b.agreement_id
-		AND a.latest_flag = 'Y';	
+	WHERE  a.agreement_id = b.agreement_id;	
 	
 	UPDATE history_agreement a 
 	SET     original_version_flag = 'Y',
@@ -1686,7 +1684,8 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
-		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id;
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
+		WHERE b.source_updated_date_id IS NULL;
 
 		
 	RAISE NOTICE 'PCON6';				
@@ -1826,7 +1825,8 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id		
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
-		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id;
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
+		WHERE b.source_updated_date_id IS NULL;
 
 	RAISE NOTICE 'PCON9';
 			-- Associate Disbursement line item to the original version of the agreement
@@ -2134,6 +2134,19 @@ UPDATE agreement_snapshot_expanded
 SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y';
+
+UPDATE agreement_snapshot X
+SET rfed_amount = Y.rfed_amount
+FROM
+(select a.agreement_id, a.rfed_amount from  agreement_snapshot_expanded a,
+(select agreement_id, max(fiscal_year) as fiscal_year from agreement_snapshot_expanded where master_agreement_yn = 'Y' group by 1) b 
+WHERE a.agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year AND a.status_flag = 'A') Y
+WHERE X.agreement_id = Y.agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
+
+UPDATE agreement_snapshot 
+SET rfed_amount = 0
+WHERE rfed_amount IS NULL 
+AND master_agreement_yn = 'Y' AND latest_flag = 'Y' ;
 
 RAISE NOTICE 'PRE_CON_AGGR3';
 

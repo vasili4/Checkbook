@@ -59,8 +59,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_coa_entities__0 (
     month_id int,
     year_id smallint,
     type_of_year char(1),
-    total_spending_amount numeric,
-    total_contract_amount numeric
+    total_spending_amount numeric
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_coa_entities to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -72,7 +71,7 @@ ENCODING 'UTF8';
 CREATE VIEW aggregateon_spending_coa_entities AS
     SELECT aggregateon_spending_coa_entities__0.department_id, aggregateon_spending_coa_entities__0.agency_id, aggregateon_spending_coa_entities__0.spending_category_id, 
     	aggregateon_spending_coa_entities__0.expenditure_object_id, aggregateon_spending_coa_entities__0.month_id, aggregateon_spending_coa_entities__0.year_id, aggregateon_spending_coa_entities__0.type_of_year,
-    	aggregateon_spending_coa_entities__0.total_spending_amount, aggregateon_spending_coa_entities__0.total_contract_amount FROM ONLY aggregateon_spending_coa_entities__0;
+    	aggregateon_spending_coa_entities__0.total_spending_amount FROM ONLY aggregateon_spending_coa_entities__0;
 
 --
 -- Name: aggregateon_spending_contract__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -84,6 +83,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_contract__0 (
     vendor_id integer,
     agency_id smallint,
     description character varying,
+    spending_category_id smallint,
     year_id smallint,
     type_of_year char(1),
     total_spending_amount numeric,
@@ -98,7 +98,7 @@ ENCODING 'UTF8';
 
 CREATE VIEW aggregateon_spending_contract AS
     SELECT aggregateon_spending_contract__0.agreement_id, aggregateon_spending_contract__0.document_id, aggregateon_spending_contract__0.vendor_id, 
-    aggregateon_spending_contract__0.agency_id, aggregateon_spending_contract__0.description, aggregateon_spending_contract__0.year_id,aggregateon_spending_contract__0.type_of_year, 
+    aggregateon_spending_contract__0.agency_id, aggregateon_spending_contract__0.description, aggregateon_spending_contract__0.spending_category_id, aggregateon_spending_contract__0.year_id,aggregateon_spending_contract__0.type_of_year, 
     aggregateon_spending_contract__0.total_spending_amount, aggregateon_spending_contract__0.total_contract_amount FROM ONLY aggregateon_spending_contract__0;
 
 --
@@ -108,11 +108,13 @@ CREATE VIEW aggregateon_spending_contract AS
 CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor__0 (
     vendor_id integer,
     agency_id smallint,
+    spending_category_id smallint,
     month_id int,
     year_id smallint,
     type_of_year char(1),
     total_spending_amount numeric,
-    total_contract_amount numeric
+    total_contract_amount numeric,
+    is_all_categories char(1)
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_vendor to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -122,8 +124,28 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW aggregateon_spending_vendor AS
-    SELECT aggregateon_spending_vendor__0.vendor_id, aggregateon_spending_vendor__0.agency_id, aggregateon_spending_vendor__0.month_id, aggregateon_spending_vendor__0.year_id,
-    aggregateon_spending_vendor__0.type_of_year, aggregateon_spending_vendor__0.total_spending_amount, aggregateon_spending_vendor__0.total_contract_amount FROM ONLY aggregateon_spending_vendor__0;
+    SELECT aggregateon_spending_vendor__0.vendor_id, aggregateon_spending_vendor__0.agency_id, aggregateon_spending_vendor__0.spending_category_id, aggregateon_spending_vendor__0.month_id, aggregateon_spending_vendor__0.year_id,
+    aggregateon_spending_vendor__0.type_of_year, aggregateon_spending_vendor__0.total_spending_amount, aggregateon_spending_vendor__0.total_contract_amount, aggregateon_spending_vendor__0.is_all_categories FROM ONLY aggregateon_spending_vendor__0;
+
+
+CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor_exp_object__0(
+	vendor_id integer,
+	expenditure_object_id integer,
+	spending_category_id smallint,
+	year_id smallint,
+	type_of_year char(1),
+	total_spending_amount numeric(16,2) 
+)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_vendor_exp_object to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+
+CREATE VIEW aggregateon_spending_vendor_exp_object AS
+	SELECT aggregateon_spending_vendor_exp_object__0.vendor_id, aggregateon_spending_vendor_exp_object__0.expenditure_object_id, aggregateon_spending_vendor_exp_object__0.spending_category_id,
+		aggregateon_spending_vendor_exp_object__0.year_id ,aggregateon_spending_vendor_exp_object__0.type_of_year ,
+		aggregateon_spending_vendor_exp_object__0.total_spending_amount FROM aggregateon_spending_vendor_exp_object__0;
+		
+		
 
 --
 -- Name: budget__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -1929,21 +1951,7 @@ CREATE VIEW aggregateon_revenue_category_funding_class AS
 
 
 	
-CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor_exp_object__0(
-	vendor_id integer,
-	expenditure_object_id integer,
-	year_id smallint,
-	type_of_year char(1),
-	total_spending_amount numeric(16,2) 
-)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_vendor_exp_object to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-ENCODING 'UTF8';
 
-CREATE VIEW aggregateon_spending_vendor_exp_object AS
-	SELECT aggregateon_spending_vendor_exp_object__0.vendor_id, aggregateon_spending_vendor_exp_object__0.expenditure_object_id, 
-		aggregateon_spending_vendor_exp_object__0.year_id ,aggregateon_spending_vendor_exp_object__0.type_of_year ,
-		aggregateon_spending_vendor_exp_object__0.total_spending_amount FROM aggregateon_spending_vendor_exp_object__0;
 
 CREATE EXTERNAL WEB TABLE ref_amount_basis__0 (
   amount_basis_id smallint ,

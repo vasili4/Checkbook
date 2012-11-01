@@ -1446,31 +1446,44 @@ CREATE TABLE aggregateon_spending_coa_entities (
 	month_id int,
 	year_id smallint,
 	type_of_year char(1),
-	total_spending_amount numeric(16,2), 
-	total_contract_amount numeric(16,2)
+	total_spending_amount numeric(16,2)
 	) DISTRIBUTED BY (department_id) ;
-	
-CREATE TABLE aggregateon_spending_vendor (
-	vendor_id integer,
-	agency_id smallint,
-	month_id int,
-	year_id smallint,
-	type_of_year char(1),
-	total_spending_amount numeric(16,2), 
-	total_contract_amount numeric(16,2)
-	) DISTRIBUTED BY (vendor_id) ;
-	
+
 CREATE TABLE aggregateon_spending_contract (
     agreement_id bigint,
     document_id character varying(20),
 	vendor_id integer,
 	agency_id smallint,
 	description character varying(60),
+	spending_category_id smallint,
 	year_id smallint,
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
 	) DISTRIBUTED BY (agreement_id) ;
+
+	
+CREATE TABLE aggregateon_spending_vendor (
+	vendor_id integer,
+	agency_id smallint,
+	spending_category_id smallint,
+	month_id int,
+	year_id smallint,
+	type_of_year char(1),
+	total_spending_amount numeric(16,2), 
+	total_contract_amount numeric(16,2),
+	is_all_categories char(1)
+	) DISTRIBUTED BY (vendor_id) ;
+
+CREATE TABLE aggregateon_spending_vendor_exp_object(
+	vendor_id integer,
+	expenditure_object_id integer,
+	spending_category_id smallint,
+	year_id smallint,
+	type_of_year char(1),
+	total_spending_amount numeric(16,2) )
+DISTRIBUTED BY (expenditure_object_id);	
+
 	
 CREATE TABLE ref_fiscal_period(
 	fiscal_period smallint,
@@ -1489,13 +1502,6 @@ CREATE TABLE aggregateon_revenue_category_funding_class(
 	current_modified_amount numeric(16,2))
 DISTRIBUTED BY (revenue_category_id);	
 
-CREATE TABLE aggregateon_spending_vendor_exp_object(
-	vendor_id integer,
-	expenditure_object_id integer,
-	year_id smallint,
-	type_of_year char(1),
-	total_spending_amount numeric(16,2) )
-DISTRIBUTED BY (expenditure_object_id);	
 
 CREATE TABLE ref_amount_basis (
   amount_basis_id smallint PRIMARY KEY,
