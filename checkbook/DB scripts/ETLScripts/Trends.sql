@@ -1071,8 +1071,8 @@ COPY  trends_nyc_population_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_nyc_po
 
 INSERT INTO trends_nyc_population  select * from trends_nyc_population_temp;
 
-update  trends_nyc_population set display_yn ='Y' where fiscal_year >=2000;
-update  trends_nyc_population set display_yn ='N' where fiscal_year in(2010,2011);
+update  trends_nyc_population set display_yn ='Y';
+
 
 
 
