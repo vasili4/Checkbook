@@ -815,9 +815,9 @@ INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, disp
 INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level,currency_symbol) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level,currency_symbol from trends_changes_in_fund_balances_temp;
 
 
-update  trends_changes_in_fund_balances set display_yn ='N' where fiscal_year <1996;
-update  trends_changes_in_fund_balances set display_yn ='Y' where fiscal_year >=1996;
-update trends_changes_in_fund_balances set display_yn ='N' where fiscal_year = 2011;
+update  trends_changes_in_fund_balances set display_yn ='N' where fiscal_year <1997;
+update  trends_changes_in_fund_balances set display_yn ='Y' where fiscal_year >=1997;
+
 
 -- 12) trends_capital_assets_statistics_function_program
 
