@@ -292,7 +292,7 @@ FROM history_agreement a
    JOIN mwbe_last_job d ON c.job_id >= d.job_id;
 */
 
-
+/*
 
 CREATE  VIEW disbursement_agreement_mwbe AS 
  SELECT COALESCE(a.contract_number,b.contract_number)::varchar(25) AS AgreementID, 
@@ -315,6 +315,28 @@ FROM  history_agreement a
    JOIN vendor z1 on z1.vendor_id =y1.vendor_id
    JOIN mwbe_last_job d ON c.job_id >= d.job_id
   JOIN disbursement_line_item d1 on d1.reference_document_number = Coalesce(a.contract_number,b.contract_number)
+*/
+
+
+CREATE  VIEW disbursement_agreement_mwbe AS 
+select b.contract_number ::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode,b.document_id  AS AgreementDocID, b.effective_begin_date_id AS AgreementStartDate,
+       b.effective_end_date_id AS AgreementEndDate,b.description AS AgreementPurpose,
+       a.agency_id AS AgreementDeptId,a.agency_code AS AgreementDeptCode 
+from disbursement_line_item_details a join history_agreement b on a.agreement_id = b.agreement_id 
+                                      join ref_date rb on  b.effective_begin_date_id =rb.date_id
+                                      join ref_date re on b.effective_end_date_id =re.date_id
+                                      join ref_document_code dc on b.document_code_id = dc.document_code_id
+                                      where b.master_agreement_id is null
+                                    union
+select ma.contract_number ::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode, ma.document_id AS AgreementDocID,ma.effective_begin_date_id AS AgreementStartDate,
+	ma.effective_end_date_id AS AgreementEndDate,ma.description AS AgreementPurpose,
+	a.agency_id AS AgreementDeptId,a.agency_code AS AgreementDeptCode 
+from disbursement_line_item_details a join history_agreement b on a.agreement_id = b.agreement_id 
+				      join history_master_agreement ma on b.master_agreement_id = ma.master_agreement_id	
+                                      join ref_date rb on  b.effective_begin_date_id =rb.date_id
+                                      join ref_date re on b.effective_end_date_id =re.date_id
+                                      join ref_document_code dc on b.document_code_id = dc.document_code_id
+                                      where b.master_agreement_id is not null
 
 
 
