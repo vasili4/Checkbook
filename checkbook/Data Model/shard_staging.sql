@@ -1647,7 +1647,9 @@ CREATE VIEW ref_revenue_source AS
 CREATE EXTERNAL WEB TABLE ref_spending_category__0 (
     spending_category_id smallint,
     spending_category_code character varying,
-    dspending_category_name character varying
+    spending_category_name character varying,
+    display_name character varying,
+    display_order smallint
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_spending_category to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -1657,7 +1659,8 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_spending_category AS
-    SELECT ref_spending_category__0.spending_category_id, ref_spending_category__0.spending_category_code, ref_spending_category__0.dspending_category_name FROM ONLY ref_spending_category__0;
+    SELECT ref_spending_category__0.spending_category_id, ref_spending_category__0.spending_category_code, ref_spending_category__0.spending_category_name,
+    ref_spending_category__0.display_name, ref_spending_category__0.display_order FROM ONLY ref_spending_category__0;
 
 --
 -- Name: ref_year__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -1976,6 +1979,7 @@ CREATE EXTERNAL WEB TABLE employee__0 (
   original_last_name varchar,
   original_initial varchar,
   masked_name varchar,
+  civil_service_title varchar,
   created_date timestamp,
   updated_date timestamp,
   created_load_id int,
@@ -1988,7 +1992,7 @@ ENCODING 'UTF8';
  CREATE VIEW  employee AS
  	SELECT employee__0.employee_id , employee__0.employee_number , employee__0.first_name , employee__0.last_name , 
  		employee__0.initial , employee__0.original_first_name , employee__0.original_last_name , employee__0.original_initial , 
- 		employee__0.masked_name ,employee__0.created_date , employee__0.updated_date , employee__0.created_load_id , employee__0.updated_load_id 
+ 		employee__0.masked_name, employee__0.civil_service_title, employee__0.created_date , employee__0.updated_date , employee__0.created_load_id , employee__0.updated_load_id 
  FROM employee__0; 		
  		
 CREATE EXTERNAL WEB TABLE employee_history__0 (
@@ -1998,6 +2002,7 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
   last_name varchar,
   initial varchar,
   masked_name varchar,
+  civil_service_title varchar,
   created_date timestamp,
   created_load_id int
   )
@@ -2007,7 +2012,7 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
 
  CREATE VIEW employee_history AS
  	SELECT employee_history__0.employee_history_id , employee_history__0.employee_id , employee_history__0.first_name , employee_history__0.last_name ,
- 		employee_history__0.initial , employee_history__0.masked_name,employee_history__0.created_date , employee_history__0.created_load_id 
+ 		employee_history__0.initial , employee_history__0.masked_name, employee_history__0.civil_service_title, employee_history__0.created_date , employee_history__0.created_load_id 
  	FROM   employee_history__0;
  		
 CREATE EXTERNAL WEB TABLE payroll__0(
@@ -2034,6 +2039,7 @@ CREATE EXTERNAL WEB TABLE payroll__0(
 	other_payments numeric(16,2),
 	gross_pay_original  numeric(16,2),
 	gross_pay  numeric(16,2),
+	civil_service_title varchar,
 	orig_pay_cycle_code CHAR(1),
 	agency_id smallint,
 	agency_code varchar,
@@ -2064,7 +2070,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.payroll to stdout
 		payroll__0.payroll_number,payroll__0.job_sequence_number,payroll__0.agency_history_id,payroll__0.fiscal_year,
 		payroll__0.agency_start_date,payroll__0.orig_pay_date_id,payroll__0.pay_frequency,payroll__0.department_history_id,payroll__0.annual_salary_original,payroll__0.annual_salary,
 		payroll__0.amount_basis_id,payroll__0.base_pay_original,payroll__0.base_pay,payroll__0.overtime_pay_original,payroll__0.overtime_pay,
-		payroll__0.other_payments_original,payroll__0.other_payments,payroll__0.gross_pay_original,payroll__0.gross_pay,
+		payroll__0.other_payments_original,payroll__0.other_payments,payroll__0.gross_pay_original,payroll__0.gross_pay, payroll__0.civil_service_title,
 		payroll__0.orig_pay_cycle_code,payroll__0.agency_id,payroll__0.agency_code,payroll__0.agency_name,payroll__0.department_id,
 		payroll__0.department_code,payroll__0.department_name,payroll__0.employee_id,payroll__0.employee_name,payroll__0.fiscal_year_id,
 		payroll__0.pay_date,payroll__0.gross_pay_ytd,payroll__0.calendar_fiscal_year_id,payroll__0.calendar_fiscal_year,payroll__0.gross_pay_cytd,

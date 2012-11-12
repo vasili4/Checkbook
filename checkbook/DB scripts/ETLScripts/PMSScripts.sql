@@ -10,9 +10,15 @@ CREATE OR REPLACE FUNCTION etl.updateEmployees(p_load_id_in bigint) RETURNS INT 
 DECLARE
 BEGIN
 
-	CREATE TEMPORARY TABLE tmp_ref_employee(employee_number varchar,first_name varchar, last_name varchar,initial varchar,
+	CREATE TEMPORARY TABLE tmp_ref_employee(employee_number varchar,first_name varchar, last_name varchar,initial varchar, civil_service_title varchar,
 						exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (employee_number);
+	
+	-- temp script which needs to be removed after we get the data for civil service title
+		
+	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE1' where agency_code = '127';
+	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE2' where agency_code = '131';
+	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE3' where agency_code = '15';
 	
 	-- For all records check if data is modified/new
 	
@@ -22,8 +28,9 @@ BEGIN
 	       a.first_name,
 	       a.last_name,
 	       a.initial,
+	       a.civil_service_title,
 	       (CASE WHEN b.employee_number IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.employee_number IS NOT NULL AND (a.first_name <> b.first_name OR a.last_name <> b.last_name OR a.initial <> b.initial) THEN 'Y' ELSE 'N' END) as modified_flag
+	       (CASE WHEN b.employee_number IS NOT NULL AND (a.first_name <> b.first_name OR a.last_name <> b.last_name OR a.initial <> b.initial OR a.civil_service_title <> b.civil_service_title) THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM   etl.stg_payroll a LEFT JOIN employee b ON a.employee_number = b.employee_number;
 	
 	TRUNCATE etl.employee_id_seq;
@@ -33,7 +40,7 @@ BEGIN
 	FROM   tmp_ref_employee
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial,masked_name)
+	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial,masked_name,civil_service_title)
 	SELECT a.employee_id,b.employee_number,first_name,last_name,initial,now()::timestamp,p_load_id_in,first_name,last_name,initial,
 		coalesce(last_name,'') || (	CASE WHEN coalesce(first_name,'') <> '' AND  coalesce(initial,'') <> '' THEN
 							' ' || first_name || ' ' || initial
@@ -41,7 +48,7 @@ BEGIN
 						     	' ' || first_name 
 						     WHEN coalesce(first_name,'') = '' AND  coalesce(initial,'') <> ''	THEN
 						     	' ' || initial 
-						     END)	as masked_name
+						     END)	as masked_name,civil_service_title
 	FROM   etl.employee_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number;
 	
 	
@@ -54,7 +61,7 @@ BEGIN
 		OR (exists_flag ='Y' and modified_flag='Y');
 
 
-	CREATE TEMPORARY TABLE tmp_ref_employee_1(employee_number varchar,first_name varchar, last_name varchar,initial varchar,
+	CREATE TEMPORARY TABLE tmp_ref_employee_1(employee_number varchar,first_name varchar, last_name varchar,initial varchar, civil_service_title varchar,
 						exists_flag char(1), modified_flag char(1), employee_id int)
 	DISTRIBUTED BY (employee_id);
 
@@ -75,12 +82,13 @@ BEGIN
 						     WHEN coalesce(b.first_name,'') = '' AND  coalesce(b.initial,'') <> ''	THEN
 						     	' ' || b.initial 
 						     END) ,
+		civil_service_title = b.civil_service_title,
 		updated_date = now()::timestamp,
 		updated_load_id = p_load_id_in
 	FROM	tmp_ref_employee_1 b		
 	WHERE	a.employee_id = b.employee_id;
 	
-	INSERT INTO employee_history(employee_history_id,employee_id,first_name,last_name,initial,masked_name,created_date,created_load_id)
+	INSERT INTO employee_history(employee_history_id,employee_id,first_name,last_name,initial,masked_name,civil_service_title,created_date,created_load_id)
 	SELECT a.employee_history_id,c.employee_id,b.first_name,b.last_name,b.initial,
 	coalesce(b.last_name,'') || (	CASE WHEN coalesce(b.first_name,'') <> '' AND  coalesce(b.initial,'') <> '' THEN
 							' ' || b.first_name || ' ' || b.initial
@@ -88,7 +96,7 @@ BEGIN
 						     	' ' || b.first_name 
 						     WHEN coalesce(b.first_name,'') = '' AND  coalesce(b.initial,'') <> ''	THEN
 						     	' ' || b.initial 
-						     END) as masked_name,now()::timestamp,p_load_id_in
+						     END) as masked_name,b.civil_service_title,now()::timestamp,p_load_id_in
 	FROM   etl.employee_history_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number
 		JOIN employee c ON b.employee_number = c.employee_number
 	WHERE   exists_flag ='N'
@@ -118,7 +126,7 @@ BEGIN
 					department_history_id integer,amount_basis_id smallint,payroll_id bigint, action_flag char(1),
 					agency_id smallint, agency_name varchar,department_id integer,
 					department_name varchar,expenditure_object_id integer,
-					fiscal_year_id smallint, employee_id bigint, employee_name varchar,
+					fiscal_year_id smallint, employee_id bigint, employee_name varchar,civil_service_title varchar, 
 					calendar_fiscal_year_id smallint, calendar_fiscal_year smallint,
 					agency_short_name varchar,department_short_name varchar)
 	DISTRIBUTED BY (uniq_id);
@@ -318,8 +326,8 @@ BEGIN
 
 	-- FK: employee_history_id
 	
-	INSERT INTO tmp_fk_pms_values(uniq_id,employee_history_id,employee_id, employee_name)
-	SELECT uniq_id, d.employee_history_id,d.employee_id, d.masked_name
+	INSERT INTO tmp_fk_pms_values(uniq_id,employee_history_id,employee_id, employee_name, civil_service_title)
+	SELECT uniq_id, d.employee_history_id,d.employee_id, d.masked_name, d.civil_service_title
 	FROM
 		(SELECT a.uniq_id,max(c.employee_history_id) as employee_history_id
 		FROM	etl.stg_payroll a JOIN employee b ON a.employee_number = b.employee_number
@@ -359,6 +367,7 @@ BEGIN
 		department_name = ct_table.department_name,
 		employee_id = ct_table.employee_id,
 		employee_name = ct_table.employee_name,
+		civil_service_title = ct_table.civil_service_title,
 		fiscal_year_id = ct_table.fiscal_year_id,
 		calendar_fiscal_year_id = ct_table.calendar_fiscal_year_id,
 		calendar_fiscal_year = ct_table.calendar_fiscal_year,
@@ -381,6 +390,7 @@ BEGIN
 			max(fiscal_year_id) as fiscal_year_id,
 			max(employee_id) as employee_id,
 			max(employee_name) as employee_name,
+			max(civil_service_title) as civil_service_title,
 			max(calendar_fiscal_year_id) as calendar_fiscal_year_id,
 			max(calendar_fiscal_year) as calendar_fiscal_year,
 			max(agency_short_name) as agency_short_name,
@@ -433,7 +443,7 @@ BEGIN
 						  orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary_original,annual_salary,
 						  amount_basis_id,base_pay_original,base_pay,
 						  overtime_pay_original,overtime_pay,other_payments_original,other_payments,
-						  gross_pay_original,gross_pay,  agency_id,agency_code,agency_name,
+						  gross_pay_original,gross_pay,  civil_service_title, agency_id,agency_code,agency_name,
 						  department_id,department_code,department_name,
 						  employee_id,employee_name,fiscal_year_id,pay_date,
 						  calendar_fiscal_year_id,calendar_fiscal_year,
@@ -444,7 +454,7 @@ BEGIN
 	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary as annual_salary_original,coalesce(annual_salary,0) as annual_salary,
 	       amount_basis_id,base_pay as base_pay_original,coalesce(base_pay,0) as base_pay, 
 	       overtime_pay as overtime_pay_original,coalesce(overtime_pay,0) as overtime_pay, other_payments as other_payments_original,coalesce(other_payments,0) as other_payments,
-	       gross_pay as gross_pay_original,coalesce(gross_pay,0) as gross_pay, agency_id,agency_code,agency_name,
+	       gross_pay as gross_pay_original,coalesce(gross_pay,0) as gross_pay, civil_service_title, agency_id,agency_code,agency_name,
 	       department_id,department_code,department_name,
 	       employee_id,employee_name,fiscal_year_id,pay_date,
 	       calendar_fiscal_year_id,calendar_fiscal_year,

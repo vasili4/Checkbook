@@ -1685,7 +1685,7 @@ BEGIN
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
 		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
-		WHERE b.source_updated_date_id IS NULL;
+		WHERE b.source_updated_date_id IS NOT NULL;
 
 		
 	RAISE NOTICE 'PCON6';				
@@ -1826,7 +1826,7 @@ BEGIN
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id		
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
 		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
-		WHERE b.source_updated_date_id IS NULL;
+		WHERE b.source_updated_date_id IS NOT NULL;
 
 	RAISE NOTICE 'PCON9';
 			-- Associate Disbursement line item to the original version of the agreement

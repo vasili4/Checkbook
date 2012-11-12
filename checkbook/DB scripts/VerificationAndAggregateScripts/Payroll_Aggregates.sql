@@ -187,7 +187,7 @@ SELECT agency_id,department_id,calendar_fiscal_year_id,calendar_month_id,'C' as 
 	
 
 	
-	
+/*	
 
 DROP TABLE IF EXISTS aggregateon_payroll_dept ;
 
@@ -313,7 +313,7 @@ FROM payroll e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number
 	JOIN ref_amount_basis z ON e.amount_basis_id = z.amount_basis_id	
 GROUP BY 1,2,3,4,5,6,7;
 
-
+*/
 
 DROP TABLE IF EXISTS  aggregateon_payroll_year;
 

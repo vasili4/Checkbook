@@ -1140,7 +1140,9 @@ CREATE TABLE ref_revenue_source (
 CREATE TABLE ref_spending_category (
     spending_category_id smallint NOT NULL,
     spending_category_code character varying(2),
-    spending_category_name character varying(100)
+    spending_category_name character varying(100),
+    display_name character varying(100),
+    display_order smallint
 ) DISTRIBUTED BY (spending_category_id);
 
 
@@ -1365,6 +1367,7 @@ CREATE TABLE employee (
   original_last_name varchar,
   original_initial varchar,
   masked_name varchar,
+  civil_service_title varchar,
   created_date timestamp,
   updated_date timestamp,
   created_load_id int,
@@ -1379,6 +1382,7 @@ CREATE TABLE employee_history (
   last_name varchar,
   initial varchar,
   masked_name varchar,
+  civil_service_title varchar,
   created_date timestamp,
   created_load_id int
   )
@@ -1409,6 +1413,7 @@ CREATE TABLE payroll(
 	other_payments numeric(16,2),
 	gross_pay_original  numeric(16,2),
 	gross_pay  numeric(16,2),
+	civil_service_title varchar,
 	orig_pay_cycle_code CHAR(1),
 	agency_id smallint,
 	agency_code varchar,
