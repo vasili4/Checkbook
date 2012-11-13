@@ -481,7 +481,7 @@ CREATE TABLE trends_collection_cancellation_abatements_temp
 tax_levy numeric(20,2),
 collection numeric(4,2),
 cancellations numeric(4,2),
-abatement_and_discounts numeric(4,2),
+abatement_and_discounts_1; numeric(4,2),
 uncollected_balance_percent numeric(4,2)
 )
 Distributed by (fiscal_year);
@@ -493,7 +493,7 @@ CREATE TABLE trends_collection_cancellation_abatements
 tax_levy numeric(20,2),
 collection numeric(4,2),
 cancellations numeric(4,2),
-abatement_and_discounts numeric(4,2),
+abatement_and_discounts_1; numeric(4,2),
 uncollected_balance_percent numeric(4,2),
 display_yn char(1)
 )
@@ -999,7 +999,7 @@ class_three numeric(20,2),
 class_four numeric(20,2),
 less_tax_exempt_property numeric(20,2),
 total_taxable_assesed_value numeric(20,2),
-total_direct_tax numeric(20,2),
+total_direct_tax_1 numeric(20,2),
 estimated_actual_taxable_value numeric(20,2),
 assesed_value_percentage numeric(20,2)
 )
@@ -1016,7 +1016,7 @@ class_three numeric(20,2),
 class_four numeric(20,2),
 less_tax_exempt_property numeric(20,2),
 total_taxable_assesed_value numeric(20,2),
-totl_direct_tax numeric(20,2),
+total_direct_tax_1 numeric(20,2),
 estimated_actual_taxable_value numeric(20,2),
 assesed_value_percentage numeric(20,2),
 display_yn char(1)
