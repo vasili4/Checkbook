@@ -525,7 +525,7 @@ CREATE TABLE trends_employment_status_of_resident_population_temp
 fiscal_year smallint,
 civilian_labor_force_new_york_city_employed numeric(20,2),
 civilian_labor_force_unemployed numeric(20,2),	
-unemployment_rate_city_precent	numeric(4,2),
+unemployment_rate_city_percent	numeric(4,2),
 unemployment_rate_united_states_percent numeric(4,2)
 )
 Distributed by (fiscal_year);
@@ -537,7 +537,7 @@ CREATE TABLE trends_employment_status_of_resident_population
 fiscal_year smallint,
 civilian_labor_force_new_york_city_employed numeric(20,2),
 civilian_labor_force_unemployed numeric(20,2),	
-unemployment_rate_city_precent	numeric(4,2),
+unemployment_rate_city_percent	numeric(4,2),
 unemployment_rate_united_states_percent numeric(4,2),
 display_yn char(1)
 )
