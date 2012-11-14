@@ -993,14 +993,14 @@ DROP TABLE IF EXISTS trends_assesed_estimated_actual_taxable_property_temp;
 CREATE TABLE trends_assesed_estimated_actual_taxable_property_temp
 (
 fiscal_year smallint,
-class_one numeric(20,2),
-class_two numeric(20,2),
-class_three numeric(20,2),
-class_four numeric(20,2),
-less_tax_exempt_property numeric(20,2),
-total_taxable_assesed_value numeric(20,2),
+class_one numeric(20,1),
+class_two numeric(20,1),
+class_three numeric(20,1),
+class_four numeric(20,1),
+less_tax_exempt_property numeric(20,1),
+total_taxable_assesed_value numeric(20,1),
 total_direct_tax_1 numeric(20,2),
-estimated_actual_taxable_value numeric(20,2),
+estimated_actual_taxable_value numeric(20,1),
 assesed_value_percentage numeric(20,2)
 )
 Distributed by (fiscal_year);
@@ -1010,14 +1010,14 @@ DROP TABLE IF EXISTS trends_assesed_estimated_actual_taxable_property;
 CREATE TABLE trends_assesed_estimated_actual_taxable_property
 (
 fiscal_year smallint,
-class_one numeric(20,2),
-class_two numeric(20,2),
-class_three numeric(20,2),
-class_four numeric(20,2),
-less_tax_exempt_property numeric(20,2),
-total_taxable_assesed_value numeric(20,2),
+class_one numeric(20,1),
+class_two numeric(20,1),
+class_three numeric(20,1),
+class_four numeric(20,1),
+less_tax_exempt_property numeric(20,1),
+total_taxable_assesed_value numeric(20,1),
 total_direct_tax_1 numeric(20,2),
-estimated_actual_taxable_value numeric(20,2),
+estimated_actual_taxable_value numeric(20,1),
 assesed_value_percentage numeric(20,2),
 display_yn char(1)
 )
