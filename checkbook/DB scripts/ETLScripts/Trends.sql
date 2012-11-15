@@ -481,7 +481,7 @@ CREATE TABLE trends_collection_cancellation_abatements_temp
 tax_levy numeric(20,2),
 collection numeric(4,2),
 cancellations numeric(4,2),
-abatement_and_discounts_1; numeric(4,2),
+abatement_and_discounts_1 numeric(4,2),
 uncollected_balance_percent numeric(4,2)
 )
 Distributed by (fiscal_year);
@@ -493,7 +493,7 @@ CREATE TABLE trends_collection_cancellation_abatements
 tax_levy numeric(20,2),
 collection numeric(4,2),
 cancellations numeric(4,2),
-abatement_and_discounts_1; numeric(4,2),
+abatement_and_discounts_1 numeric(4,2),
 uncollected_balance_percent numeric(4,2),
 display_yn char(1)
 )
