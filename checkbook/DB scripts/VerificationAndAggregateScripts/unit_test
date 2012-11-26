@@ -1,0 +1,55 @@
+select * from ref_agency where agency_name ilike '%OMB%'
+
+select * from ref_agency_history where agency_id = 35
+
+
+
+agency name			agency id		agency history id
+BANKERS TRUST COMPANY		126			129
+"CHEMICAL BANK"			78			89
+"Fleet Financial Services"	54			62
+IT Efficiency Savings		149			115
+"MAC DEBT SERVICE FUNDING"	41			41
+"TRANSITIONAL FINANCE AUTHORITY"35			150
+
+
+select count(*),agency_history_id from budget where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*),agency_history_id from disbursement where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*),agency_history_id from disbursement_line_item where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*),agency_history_id from history_agreement where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*),agency_history_id from history_agreement_accounting_line where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*),agency_history_id from history_master_agreement where agency_history_id in (129,89,62,41,150) group by 2;
+
+select count(*),agency_history_id from payroll where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*),agency_history_id from revenue where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*),document_agency_history_id from revenue where document_agency_history_id in (129,89,62,115,41,150) group by 2;
+select count(*) from etl.stg_revenue where doc_dept_cd = '400'
+
+select count(*),agency_history_id from revenue_budget  where agency_history_id in (129,89,62,115,41,150) group by 2;
+
+select count(*) from pending_contracts where submitting_agency_id in (126,78,35) OR awarding_agency_id in (126,78,35) or funding_agency_id in (126,78,35) or document_agency_id in (126,78,35)
+
+
+
+-- Loading data tests
+
+select count(*) from history_agreement where coalesce(updated_load_id, created_load_id) in (select distinct load_id from etl.etl_data_load where job_id = 5)  -- 66077
+
+select 1347370 - 1312569  == 34801
+
+select 10401 + 43610 + 12065  == 66076
+
+
+select count(*) from history_master_agreement where coalesce(updated_load_id, created_load_id) in (select distinct load_id from etl.etl_data_load where job_id = 5)  -- 1342
+
+
+select count(*) from disbursement  where coalesce(updated_load_id, created_load_id) in (select distinct load_id from etl.etl_data_load where job_id = 5)  -- 76438
+
+select count(*) from etl.archive_fms_header a, etl.etl_data_load b , etl.etl_data_load_file c WHERE a.load_file_id = c.load_file_id and c.load_id = b.load_id and b.job_id = 5  -- 76348

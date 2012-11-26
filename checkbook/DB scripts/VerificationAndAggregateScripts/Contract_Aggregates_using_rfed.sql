@@ -240,7 +240,26 @@ SELECT  a.original_agreement_id,
 	FROM 	agreement_snapshot_expanded a 
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
-	WHERE  a.status_flag='A'
+	WHERE  a.status_flag='A' AND a.master_agreement_yn = 'N'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10
+UNION ALL
+SELECT  a.original_agreement_id,
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),		
+		'A' as status_flag,
+		'B' as type_of_year
+	FROM 	agreement_snapshot_expanded a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.master_agreement_id AND a.fiscal_year = b.fiscal_year 
+	WHERE  a.status_flag='A' AND a.master_agreement_yn = 'Y'
 	GROUP BY 1,2,3,4,5,6,7,8,9,10
 UNION ALL
 SELECT a.original_agreement_id,
@@ -259,7 +278,26 @@ SELECT a.original_agreement_id,
 	FROM 	agreement_snapshot_expanded a 
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
-	WHERE   a.status_flag='R'
+	WHERE   a.status_flag='R' AND a.master_agreement_yn = 'N'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10
+UNION ALL
+SELECT a.original_agreement_id,
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,	
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),
+		'R' as status_flag, 
+		'B' as type_of_year	
+	FROM 	agreement_snapshot_expanded a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.master_agreement_id AND a.fiscal_year = b.fiscal_year 
+	WHERE   a.status_flag='R' AND a.master_agreement_yn = 'Y'
 	GROUP BY 1,2,3,4,5,6,7,8,9,10;
 		
 
@@ -282,7 +320,26 @@ SELECT  a.original_agreement_id,
 	FROM 	agreement_snapshot_expanded_cy a 
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
-	WHERE  a.status_flag='A'
+	WHERE  a.status_flag='A' AND a.master_agreement_yn = 'N'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10
+UNION ALL
+SELECT  a.original_agreement_id,
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,	
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),
+		'A' as status_flag,
+		'C' as type_of_year
+	FROM 	agreement_snapshot_expanded_cy a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.master_agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
+	WHERE  a.status_flag='A' AND a.master_agreement_yn = 'Y'
 	GROUP BY 1,2,3,4,5,6,7,8,9,10
 UNION ALL
 SELECT  a.original_agreement_id,
@@ -301,7 +358,26 @@ SELECT  a.original_agreement_id,
 	FROM 	agreement_snapshot_expanded_cy a 
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
-	WHERE   a.status_flag='R'
+	WHERE   a.status_flag='R' AND a.master_agreement_yn = 'N'
+	GROUP BY 1,2,3,4,5,6,7,8,9,10
+UNION ALL
+SELECT  a.original_agreement_id,
+		a.fiscal_year,
+		ry.year_id,
+		document_code_id,
+		b.check_eft_issued_cal_month_id as month_id,		
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id ,	
+		a.industry_type_id,
+		a.award_size_id,
+		SUM(coalesce(b.check_amount,0)),
+	'R' as status_flag, 
+	'C' as type_of_year	
+	FROM 	agreement_snapshot_expanded_cy a 
+	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
+	LEFT JOIN disbursement_line_item_details b ON a.original_agreement_id = b.master_agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
+	WHERE   a.status_flag='R' AND a.master_agreement_yn = 'Y'
 	GROUP BY 1,2,3,4,5,6,7,8,9,10;
 	
 	

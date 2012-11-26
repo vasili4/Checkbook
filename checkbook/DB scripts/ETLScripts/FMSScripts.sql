@@ -1525,7 +1525,7 @@ BEGIN
 	
 	
 	-- needs to delete after first load
-	
+	/*
 	DELETE FROM ONLY disbursement_line_item_details a
 	USING disbursement b
 	WHERE   a.disbursement_id = b.disbursement_id 
@@ -1538,7 +1538,44 @@ BEGIN
 	
 	DELETE FROM ONLY disbursement
 	WHERE   document_version > 1;
+	*/
 	
+	-- needs to add the script which will delete the version > 1 if we do not have with version = 1
+	
+	/*
+	 
+	CREATE TEMPORARY TABLE tmp_disb_delete_ver_gt1_without_ver0(disbursement_id bigint)
+	DISTRIBUTED  BY (disbursement_id);
+	
+	INSERT INTO tmp_disb_delete_ver_gt1_without_ver0
+	select a.disbursement_id from 
+	(select * from disbursement where document_version > 1) a 
+	LEFT JOIN (select * from disbursement where document_version = 1) b 
+	ON a.document_code_id = b.document_code_id  AND a.agency_history_id = b.agency_history_id AND a.document_id = b.document_id
+	WHERE b.document_id IS NULL ;
+	
+	DELETE FROM disbursement a
+	USING tmp_disb_delete_ver_gt1_without_ver0 b
+	WHERE   a.disbursement_id = b.disbursement_id 
+	AND a.document_version > 1 ;
+	
+	DELETE FROM ONLY disbursement_line_item_details a
+	USING tmp_disb_delete_ver_gt1_without_ver0 b
+	WHERE   a.disbursement_id = b.disbursement_id ;
+	
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
+	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
+	FROM disbursement_line_item a, tmp_disb_delete_ver_gt1_without_ver0 b , etl.etl_data_load c
+	WHERE   a.disbursement_id = b.disbursement_id 	AND coalesce(a.updated_load_id, a.created_load_id) = c.load_id AND c.job_id = p_job_id_in;
+		
+		
+	DELETE FROM ONLY disbursement_line_item a
+	USING tmp_disb_delete_ver_gt1_without_ver0 b
+	WHERE   a.disbursement_id = b.disbursement_id ;
+	
+
+	 
+	 */
 	
 	l_end_time := timeofday()::timestamp;
 	

@@ -56,10 +56,12 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_coa_entities__0 (
     agency_id smallint,
     spending_category_id smallint,
     expenditure_object_id integer,
+    vendor_id integer,
     month_id int,
     year_id smallint,
     type_of_year char(1),
-    total_spending_amount numeric
+    total_spending_amount numeric,
+    total_disbursements integer
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_coa_entities to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -70,8 +72,8 @@ ENCODING 'UTF8';
 
 CREATE VIEW aggregateon_spending_coa_entities AS
     SELECT aggregateon_spending_coa_entities__0.department_id, aggregateon_spending_coa_entities__0.agency_id, aggregateon_spending_coa_entities__0.spending_category_id, 
-    	aggregateon_spending_coa_entities__0.expenditure_object_id, aggregateon_spending_coa_entities__0.month_id, aggregateon_spending_coa_entities__0.year_id, aggregateon_spending_coa_entities__0.type_of_year,
-    	aggregateon_spending_coa_entities__0.total_spending_amount FROM ONLY aggregateon_spending_coa_entities__0;
+    	aggregateon_spending_coa_entities__0.expenditure_object_id, aggregateon_spending_coa_entities__0.vendor_id, aggregateon_spending_coa_entities__0.month_id, aggregateon_spending_coa_entities__0.year_id, 
+    	aggregateon_spending_coa_entities__0.type_of_year, 	aggregateon_spending_coa_entities__0.total_spending_amount,aggregateon_spending_coa_entities__0.total_disbursements FROM ONLY aggregateon_spending_coa_entities__0;
 
 --
 -- Name: aggregateon_spending_contract__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
@@ -80,6 +82,7 @@ CREATE VIEW aggregateon_spending_coa_entities AS
 CREATE EXTERNAL WEB TABLE aggregateon_spending_contract__0 (
     agreement_id bigint,
     document_id character varying,
+    document_code character varying,
     vendor_id integer,
     agency_id smallint,
     description character varying,
@@ -97,7 +100,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW aggregateon_spending_contract AS
-    SELECT aggregateon_spending_contract__0.agreement_id, aggregateon_spending_contract__0.document_id, aggregateon_spending_contract__0.vendor_id, 
+    SELECT aggregateon_spending_contract__0.agreement_id, aggregateon_spending_contract__0.document_id, aggregateon_spending_contract__0.document_code,aggregateon_spending_contract__0.vendor_id, 
     aggregateon_spending_contract__0.agency_id, aggregateon_spending_contract__0.description, aggregateon_spending_contract__0.spending_category_id, aggregateon_spending_contract__0.year_id,aggregateon_spending_contract__0.type_of_year, 
     aggregateon_spending_contract__0.total_spending_amount, aggregateon_spending_contract__0.total_contract_amount FROM ONLY aggregateon_spending_contract__0;
 
@@ -109,7 +112,6 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor__0 (
     vendor_id integer,
     agency_id smallint,
     spending_category_id smallint,
-    month_id int,
     year_id smallint,
     type_of_year char(1),
     total_spending_amount numeric,
@@ -124,7 +126,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW aggregateon_spending_vendor AS
-    SELECT aggregateon_spending_vendor__0.vendor_id, aggregateon_spending_vendor__0.agency_id, aggregateon_spending_vendor__0.spending_category_id, aggregateon_spending_vendor__0.month_id, aggregateon_spending_vendor__0.year_id,
+    SELECT aggregateon_spending_vendor__0.vendor_id, aggregateon_spending_vendor__0.agency_id, aggregateon_spending_vendor__0.spending_category_id, aggregateon_spending_vendor__0.year_id,
     aggregateon_spending_vendor__0.type_of_year, aggregateon_spending_vendor__0.total_spending_amount, aggregateon_spending_vendor__0.total_contract_amount, aggregateon_spending_vendor__0.is_all_categories FROM ONLY aggregateon_spending_vendor__0;
 
 
@@ -2040,6 +2042,8 @@ CREATE EXTERNAL WEB TABLE payroll__0(
 	gross_pay_original  numeric(16,2),
 	gross_pay  numeric(16,2),
 	civil_service_title varchar,
+	salaried_amount numeric(16,2),
+	non_salaried_amount numeric(16,2),
 	orig_pay_cycle_code CHAR(1),
 	agency_id smallint,
 	agency_code varchar,
@@ -2070,7 +2074,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.payroll to stdout
 		payroll__0.payroll_number,payroll__0.job_sequence_number,payroll__0.agency_history_id,payroll__0.fiscal_year,
 		payroll__0.agency_start_date,payroll__0.orig_pay_date_id,payroll__0.pay_frequency,payroll__0.department_history_id,payroll__0.annual_salary_original,payroll__0.annual_salary,
 		payroll__0.amount_basis_id,payroll__0.base_pay_original,payroll__0.base_pay,payroll__0.overtime_pay_original,payroll__0.overtime_pay,
-		payroll__0.other_payments_original,payroll__0.other_payments,payroll__0.gross_pay_original,payroll__0.gross_pay, payroll__0.civil_service_title,
+		payroll__0.other_payments_original,payroll__0.other_payments,payroll__0.gross_pay_original,payroll__0.gross_pay, payroll__0.civil_service_title,payroll__0.salaried_amount,payroll__0.non_salaried_amount,
 		payroll__0.orig_pay_cycle_code,payroll__0.agency_id,payroll__0.agency_code,payroll__0.agency_name,payroll__0.department_id,
 		payroll__0.department_code,payroll__0.department_name,payroll__0.employee_id,payroll__0.employee_name,payroll__0.fiscal_year_id,
 		payroll__0.pay_date,payroll__0.gross_pay_ytd,payroll__0.calendar_fiscal_year_id,payroll__0.calendar_fiscal_year,payroll__0.gross_pay_cytd,
@@ -2128,34 +2132,77 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
  		aggregateon_payroll_agency__0.total_overtime_employees, aggregateon_payroll_agency__0.annual_salary
  	FROM 	aggregateon_payroll_agency__0;	
 
-CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_dept__0(
-	employee_id bigint,
+	
+CREATE  EXTERNAL WEB TABLE aggregateon_payroll_coa_month__0(	
 	agency_id smallint,
 	department_id integer,
 	fiscal_year_id smallint,
+	month_id int,
+	type_of_year char(1),	
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay numeric(16,2) )
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_coa_month to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+  CREATE VIEW aggregateon_payroll_coa_month AS
+  	SELECT aggregateon_payroll_coa_month__0.agency_id, aggregateon_payroll_coa_month__0.department_id, aggregateon_payroll_coa_month__0.fiscal_year_id, 
+  		aggregateon_payroll_coa_month__0.month_id, aggregateon_payroll_coa_month__0.type_of_year, aggregateon_payroll_coa_month__0.base_pay, 
+  		aggregateon_payroll_coa_month__0.overtime_pay, aggregateon_payroll_coa_month__0.other_payments, aggregateon_payroll_coa_month__0.gross_pay 
+  	FROM aggregateon_payroll_coa_month__0;	
+	
+ CREATE  EXTERNAL WEB TABLE aggregateon_payroll_year__0(	
+	fiscal_year_id smallint,
+	type_of_year char(1),	
+	total_employees int,
+	total_salaried_employees int,
+	total_hourly_employees int,
+	total_overtime_employees int)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_year to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';	
+  
+  CREATE VIEW aggregateon_payroll_year AS
+  	SELECT aggregateon_payroll_year__0.fiscal_year_id ,aggregateon_payroll_year__0.type_of_year ,aggregateon_payroll_year__0.total_employees ,
+  		aggregateon_payroll_year__0.total_salaried_employees ,aggregateon_payroll_year__0.total_hourly_employees ,aggregateon_payroll_year__0.total_overtime_employees 
+  	FROM aggregateon_payroll_year__0;	
+  	
+  	
+  	
+  	/* payroll aggregate tables for month_id */
+	
+  	CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_agency_month__0(
+	employee_id bigint,
+	agency_id smallint,
+	fiscal_year_id smallint,
 	type_of_year char(1),
+	month_id int,
 	pay_frequency varchar,
 	type_of_employment varchar,
+	start_date date,		
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
 	gross_pay numeric(16,2) )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_employee_dept to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_employee_agency_month to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
-  CREATE VIEW aggregateon_payroll_employee_dept AS
-  	SELECT aggregateon_payroll_employee_dept__0.employee_id, aggregateon_payroll_employee_dept__0.agency_id,aggregateon_payroll_employee_dept__0.department_id, aggregateon_payroll_employee_dept__0.fiscal_year_id,
-  		aggregateon_payroll_employee_dept__0.type_of_year,aggregateon_payroll_employee_dept__0.pay_frequency,aggregateon_payroll_employee_dept__0.type_of_employment,aggregateon_payroll_employee_dept__0.annual_salary, aggregateon_payroll_employee_dept__0.base_pay,
-  		aggregateon_payroll_employee_dept__0.overtime_pay, aggregateon_payroll_employee_dept__0.other_payments,aggregateon_payroll_employee_dept__0.gross_pay
-  	FROM	aggregateon_payroll_employee_dept__0;	 
-
-CREATE EXTERNAL WEB TABLE aggregateon_payroll_dept__0(	
+ CREATE VIEW aggregateon_payroll_employee_agency_month AS
+  	SELECT aggregateon_payroll_employee_agency_month__0.employee_id, aggregateon_payroll_employee_agency_month__0.agency_id, aggregateon_payroll_employee_agency_month__0.fiscal_year_id,
+  		aggregateon_payroll_employee_agency_month__0.type_of_year,aggregateon_payroll_employee_agency_month__0.month_id,aggregateon_payroll_employee_agency_month__0.pay_frequency,aggregateon_payroll_employee_agency_month__0.type_of_employment,
+  		aggregateon_payroll_employee_agency_month__0.start_date,aggregateon_payroll_employee_agency_month__0.annual_salary, aggregateon_payroll_employee_agency_month__0.base_pay,
+  		aggregateon_payroll_employee_agency_month__0.overtime_pay, aggregateon_payroll_employee_agency_month__0.other_payments,aggregateon_payroll_employee_agency_month__0.gross_pay
+  	FROM	aggregateon_payroll_employee_agency_month__0;	
+  		
+CREATE EXTERNAL WEB TABLE aggregateon_payroll_agency_month__0(	
 	agency_id smallint,	
-	department_id integer,
 	fiscal_year_id smallint,
 	type_of_year char(1),
+	month_id int,
 	base_pay numeric(16,2),
 	other_payments numeric(16,2),
 	gross_pay numeric(16,2),
@@ -2163,24 +2210,39 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_dept__0(
 	total_employees int,
 	total_salaried_employees int,
 	total_hourly_employees int,
-	total_overtime_employees int)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_dept to stdout csv"' ON SEGMENT 0 
+	total_overtime_employees int,
+	annual_salary numeric(16,2))
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_agency_month to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
-   CREATE VIEW  aggregateon_payroll_dept AS
-   	SELECT aggregateon_payroll_dept__0.agency_id, aggregateon_payroll_dept__0.department_id,aggregateon_payroll_dept__0.fiscal_year_id, aggregateon_payroll_dept__0.type_of_year,
-   		aggregateon_payroll_dept__0.base_pay, aggregateon_payroll_dept__0.other_payments,
-   		aggregateon_payroll_dept__0.gross_pay, aggregateon_payroll_dept__0.overtime_pay, aggregateon_payroll_dept__0.total_employees, 
-   		aggregateon_payroll_dept__0.total_salaried_employees, aggregateon_payroll_dept__0.total_hourly_employees, aggregateon_payroll_dept__0.total_overtime_employees
- 	FROM 	aggregateon_payroll_dept__0;	
- 	
- 	
- 	
- 	
- 	
+ CREATE VIEW  aggregateon_payroll_agency_month AS
+ 	SELECT aggregateon_payroll_agency_month__0.agency_id, aggregateon_payroll_agency_month__0.fiscal_year_id, aggregateon_payroll_agency_month__0.type_of_year,
+ 		aggregateon_payroll_agency_month__0.month_id,aggregateon_payroll_agency_month__0.base_pay, aggregateon_payroll_agency_month__0.other_payments, 
+ 		aggregateon_payroll_agency_month__0.gross_pay, aggregateon_payroll_agency_month__0.overtime_pay, aggregateon_payroll_agency_month__0.total_employees, 
+ 		aggregateon_payroll_agency_month__0.total_salaried_employees, aggregateon_payroll_agency_month__0.total_hourly_employees, 
+ 		aggregateon_payroll_agency_month__0.total_overtime_employees, aggregateon_payroll_agency_month__0.annual_salary
+ 	FROM 	aggregateon_payroll_agency_month__0;	
 
 	
+ CREATE  EXTERNAL WEB TABLE aggregateon_payroll_year_and_month__0(	
+	fiscal_year_id smallint,
+	type_of_year char(1),	
+	month_id int,
+	total_employees int,
+	total_salaried_employees int,
+	total_hourly_employees int,
+	total_overtime_employees int)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_year_and_month to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';	
+  
+  CREATE VIEW aggregateon_payroll_year_and_month AS
+  	SELECT aggregateon_payroll_year_and_month__0.fiscal_year_id ,aggregateon_payroll_year_and_month__0.type_of_year ,aggregateon_payroll_year_and_month__0.month_id ,aggregateon_payroll_year_and_month__0.total_employees ,
+  		aggregateon_payroll_year_and_month__0.total_salaried_employees ,aggregateon_payroll_year_and_month__0.total_hourly_employees ,aggregateon_payroll_year_and_month__0.total_overtime_employees 
+  	FROM aggregateon_payroll_year_and_month__0;	
+  	
+  	
 	--
 	-- Name: revenue_budget__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
 	--
@@ -2244,41 +2306,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	
 	
 	 	
- CREATE  EXTERNAL WEB TABLE aggregateon_payroll_coa_month__0(	
-	agency_id smallint,
-	department_id integer,
-	fiscal_year_id smallint,
-	month_id int,
-	type_of_year char(1),	
-	base_pay numeric(16,2),
-	overtime_pay numeric(16,2),
-	other_payments numeric(16,2),
-	gross_pay numeric(16,2) )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_coa_month to stdout csv"' ON SEGMENT 0 
-     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-  ENCODING 'UTF8';
-  
-  CREATE VIEW aggregateon_payroll_coa_month AS
-  	SELECT aggregateon_payroll_coa_month__0.agency_id, aggregateon_payroll_coa_month__0.department_id, aggregateon_payroll_coa_month__0.fiscal_year_id, 
-  		aggregateon_payroll_coa_month__0.month_id, aggregateon_payroll_coa_month__0.type_of_year, aggregateon_payroll_coa_month__0.base_pay, 
-  		aggregateon_payroll_coa_month__0.overtime_pay, aggregateon_payroll_coa_month__0.other_payments, aggregateon_payroll_coa_month__0.gross_pay 
-  	FROM aggregateon_payroll_coa_month__0;	
-	
- CREATE  EXTERNAL WEB TABLE aggregateon_payroll_year__0(	
-	fiscal_year_id smallint,
-	type_of_year char(1),	
-	total_employees int,
-	total_salaried_employees int,
-	total_hourly_employees int,
-	total_overtime_employees int)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_year to stdout csv"' ON SEGMENT 0 
-     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
-  ENCODING 'UTF8';	
-  
-  CREATE VIEW aggregateon_payroll_year AS
-  	SELECT aggregateon_payroll_year__0.fiscal_year_id ,aggregateon_payroll_year__0.type_of_year ,aggregateon_payroll_year__0.total_employees ,
-  		aggregateon_payroll_year__0.total_salaried_employees ,aggregateon_payroll_year__0.total_hourly_employees ,aggregateon_payroll_year__0.total_overtime_employees 
-  	FROM aggregateon_payroll_year__0;	
+ 
   	
 CREATE EXTERNAL WEB TABLE payroll_summary__0 (
     payroll_summary_id bigint,

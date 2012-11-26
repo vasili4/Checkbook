@@ -1445,15 +1445,18 @@ CREATE TABLE aggregateon_spending_coa_entities (
 	agency_id smallint,
 	spending_category_id smallint,
 	expenditure_object_id integer,
+	vendor_id integer,
 	month_id int,
 	year_id smallint,
 	type_of_year char(1),
-	total_spending_amount numeric(16,2)
+	total_spending_amount numeric(16,2),
+	total_disbursements integer
 	) DISTRIBUTED BY (department_id) ;
 
 CREATE TABLE aggregateon_spending_contract (
     agreement_id bigint,
     document_id character varying(20),
+    document_code character varying(8),
 	vendor_id integer,
 	agency_id smallint,
 	description character varying(60),
@@ -1469,7 +1472,6 @@ CREATE TABLE aggregateon_spending_vendor (
 	vendor_id integer,
 	agency_id smallint,
 	spending_category_id smallint,
-	month_id int,
 	year_id smallint,
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
@@ -1568,6 +1570,8 @@ CREATE TABLE payroll(
 	gross_pay_original  numeric(16,2),
 	gross_pay  numeric(16,2),
 	civil_service_title varchar,
+	salaried_amount numeric(16,2),
+	non_salaried_amount numeric(16,2),
 	orig_pay_cycle_code CHAR(1),
 	agency_id smallint,
 	agency_code varchar,
@@ -1628,35 +1632,6 @@ CREATE TABLE aggregateon_payroll_agency(
 	annual_salary numeric(16,2))
 DISTRIBUTED BY (agency_id);
 
-CREATE TABLE aggregateon_payroll_employee_dept(
-	employee_id bigint,
-	agency_id smallint,
-	department_id integer,
-	fiscal_year_id smallint,
-	type_of_year char(1),
-	pay_frequency varchar,
-	type_of_employment varchar,	
-	annual_salary numeric(16,2),
-	base_pay numeric(16,2),
-	overtime_pay numeric(16,2),
-	other_payments numeric(16,2),
-	gross_pay numeric(16,2) )
-DISTRIBUTED BY (employee_id);
-
-CREATE TABLE aggregateon_payroll_dept(	
-	agency_id smallint,	
-	department_id integer,
-	fiscal_year_id smallint,
-	type_of_year char(1),
-	base_pay numeric(16,2),
-	other_payments numeric(16,2),	
-	gross_pay numeric(16,2),
-	overtime_pay numeric(16,2),
-	total_employees int,
-	total_salaried_employees int,
-	total_hourly_employees int,
-	total_overtime_employees int)
-DISTRIBUTED BY (agency_id);
 
 CREATE TABLE aggregateon_payroll_coa_month(	
 	agency_id smallint,
@@ -1679,6 +1654,53 @@ CREATE TABLE aggregateon_payroll_year(
 	total_hourly_employees int,
 	total_overtime_employees int)
 DISTRIBUTED BY (fiscal_year_id);
+
+/* payroll aggregate tables for month_id */
+
+
+CREATE TABLE aggregateon_payroll_employee_agency_month(
+	employee_id bigint,
+	agency_id smallint,
+	fiscal_year_id smallint,
+	type_of_year char(1),
+	month_id int,
+	pay_frequency varchar,
+	type_of_employment varchar,
+	start_date date,	
+	annual_salary numeric(16,2),
+	base_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay numeric(16,2) )
+DISTRIBUTED BY (employee_id);
+
+CREATE TABLE aggregateon_payroll_agency_month(	
+	agency_id smallint,	
+	fiscal_year_id smallint,
+	type_of_year char(1),
+	month_id int,
+	base_pay numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay numeric(16,2),
+	overtime_pay numeric(16,2),
+	total_employees int,
+	total_salaried_employees int,
+	total_hourly_employees int,
+	total_overtime_employees int,
+	annual_salary numeric(16,2))
+DISTRIBUTED BY (agency_id);
+
+
+CREATE TABLE aggregateon_payroll_year_and_month(	
+	fiscal_year_id smallint,
+	type_of_year char(1),	
+	month_id int,
+	total_employees int,
+	total_salaried_employees int,
+	total_hourly_employees int,
+	total_overtime_employees int)
+DISTRIBUTED BY (fiscal_year_id);
+
 
 	
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);

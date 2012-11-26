@@ -299,8 +299,8 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 	RAISE NOTICE '3.4';
 
 	CREATE TEMPORARY TABLE tmp_ref_department_1(uniq_id bigint,agency_code varchar,agency_id int,fund_class_code varchar,fund_class_id int,
-						  department_code varchar(20),fiscal_year smallint,department_name varchar, exists_flag char(1), 
-						  modified_flag char(1),department_short_name varchar, department_id smallint)
+						  department_code varchar(20),fiscal_year smallint,department_name varchar, department_short_name varchar,exists_flag char(1), 
+						  modified_flag char(1), department_id int)
 	DISTRIBUTED BY (department_id);
 
 	INSERT INTO tmp_ref_department_1

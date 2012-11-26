@@ -7,54 +7,42 @@ CREATE TABLE aggregateon_spending_coa_entities (
 	agency_id smallint,
 	spending_category_id smallint,
 	expenditure_object_id integer,
+	vendor_id integer,
 	month_id int,
 	year_id smallint,
 	type_of_year char(1),
-	total_spending_amount numeric(16,2)
+	total_spending_amount numeric(16,2),
+	total_disbursements integer
 	) DISTRIBUTED BY (department_id) ;
 	
 	
 INSERT INTO aggregateon_spending_coa_entities
-SELECT department_id,agency_id,
-       spending_category_id,
-       expenditure_object_id,       
-       month_id,
-       year_id,
-       'B' as type_of_year,
-       sum(total_spending_amount) total_spending_amount
-  FROM (SELECT agency_id,
-               spending_category_id,
-               expenditure_object_id,
-               department_id,
-               COALESCE(master_agreement_id, agreement_id) AS agreement_id,
-               check_eft_issued_cal_month_id AS month_id,
-               check_eft_issued_nyc_year_id AS year_id,
-               sum(check_amount) AS total_spending_amount
-          FROM disbursement_line_item_details a
-          JOIN ref_fund_class b ON a.fund_class_id = b.fund_class_id           
-  GROUP BY 1,2,3,4,5,6,7) X
+SELECT department_id,
+		agency_id,
+       	spending_category_id,
+       	expenditure_object_id,   
+       	vendor_id,
+       	check_eft_issued_cal_month_id as month_id,
+       	check_eft_issued_nyc_year_id as year_id,
+       	'B' as type_of_year,
+       	sum(check_amount) total_spending_amount,
+       	count(*) as total_disbursements
+  FROM disbursement_line_item_details 
   GROUP BY 1,2,3,4,5,6,7 ;
   
   
 INSERT INTO aggregateon_spending_coa_entities
-SELECT department_id,agency_id,
-       spending_category_id,
-       expenditure_object_id,       
-       month_id,
-       year_id,
-       'C' as type_of_year,
-       sum(total_spending_amount) total_spending_amount
-  FROM (SELECT agency_id,
-               spending_category_id,
-               expenditure_object_id,
-               department_id,
-               COALESCE(master_agreement_id, agreement_id) AS agreement_id,
-               check_eft_issued_cal_month_id AS month_id,
-               calendar_fiscal_year_id AS year_id,
-               sum(check_amount) AS total_spending_amount
-          FROM disbursement_line_item_details a
-          JOIN ref_fund_class b ON a.fund_class_id = b.fund_class_id 
-  GROUP BY 1,2,3,4,5,6,7) X
+SELECT 	department_id,
+		agency_id,
+       	spending_category_id,
+       	expenditure_object_id,     
+       	vendor_id,
+       	check_eft_issued_cal_month_id AS month_id,
+        calendar_fiscal_year_id AS year_id,
+       	'C' as type_of_year,
+       	sum(check_amount) total_spending_amount,
+       	count(*) as total_disbursements
+  FROM disbursement_line_item_details
   GROUP BY 1,2,3,4,5,6,7 ;
   
   
@@ -88,7 +76,18 @@ SELECT department_id,agency_id,
   GROUP BY 1,2,3,4,5,6,7) X
   GROUP BY 1,2,3,4,5,6,7 ;
   
-  
+example :
+
+AgId	DeptId	SpeCat	expObjId	year	month	agid	contAmount
+100		1000	1		10			2012	jan		12345	1M
+100		1000	1		10			2012	Feb		12345	2m
+100		1000	1		10			2012	Mar		12345	2m
+100		1000	1		11			2012	Feb		12345	2m
+100		1000	1		12			2012	Feb		12345	2m
+100		1000	1		13			2012	Feb		12345	2m
+
+
+
 INSERT INTO aggregateon_spending_coa_entities
 SELECT department_id,agency_id,
        spending_category_id,
@@ -129,6 +128,7 @@ DROP TABLE IF EXISTS aggregateon_spending_contract ;
 CREATE TABLE aggregateon_spending_contract (
     agreement_id bigint,
     document_id character varying(20),
+    document_code character varying(8),
 	vendor_id integer,
 	agency_id smallint,
 	description character varying(60),	
@@ -142,13 +142,14 @@ CREATE TABLE aggregateon_spending_contract (
 	
 
 INSERT INTO aggregateon_spending_contract
-SELECT agreement_id, contract_number, vendor_id, agency_id, description,  
+SELECT agreement_id, contract_number, contract_document_code, vendor_id, agency_id, description,  
 spending_category_id, year_id, type_of_year,
  sum(total_spending_amount) total_spending_amount,
   sum(contract_amount) total_contract_amount
 FROM
 (SELECT COALESCE(master_agreement_id, agreement_id) as agreement_id, 
        COALESCE(master_contract_number,contract_number) as contract_number,
+       COALESCE(master_contract_document_code,contract_document_code) as contract_document_code,
        COALESCE(master_contract_vendor_id,contract_vendor_id) as vendor_id,
        COALESCE(master_contract_agency_id,contract_agency_id) as agency_id,
        COALESCE(master_purpose,purpose) as description,
@@ -158,20 +159,21 @@ FROM
        sum(check_amount) AS total_spending_amount,
        MIN(COALESCE(maximum_spending_limit,maximum_contract_amount)) AS contract_amount
   FROM disbursement_line_item_details 
-  WHERE agreement_id IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8
+  WHERE agreement_id IS NOT NULL AND contract_number IS NOT NULL
+GROUP BY 1,2,3,4,5,6,7,8,9
 ) X
-GROUP BY 1,2,3,4,5,6,7,8  ;
+GROUP BY 1,2,3,4,5,6,7,8,9  ;
 
 
 INSERT INTO aggregateon_spending_contract
-SELECT agreement_id, contract_number, vendor_id, agency_id, description,  
+SELECT agreement_id, contract_number, contract_document_code, vendor_id, agency_id, description,  
  spending_category_id, year_id, type_of_year,
  sum(total_spending_amount) total_spending_amount,
   sum(contract_amount) total_contract_amount
   FROM
 (SELECT COALESCE(master_agreement_id, agreement_id) as agreement_id,
        COALESCE(master_contract_number,contract_number) as contract_number,
+       COALESCE(master_contract_document_code,contract_document_code) as contract_document_code,
        COALESCE(master_contract_vendor_id_cy,contract_vendor_id_cy) as vendor_id,
        COALESCE(master_contract_agency_id_cy,contract_agency_id_cy) as agency_id,
        COALESCE(master_purpose_cy,purpose_cy) as description,
@@ -181,9 +183,9 @@ SELECT agreement_id, contract_number, vendor_id, agency_id, description,
        sum(check_amount) AS total_spending_amount,
        MIN(COALESCE(maximum_spending_limit_cy,maximum_contract_amount_cy)) AS contract_amount
   FROM disbursement_line_item_details
-  WHERE agreement_id IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8 ) X
- GROUP BY 1,2,3,4,5,6,7,8 ;
+  WHERE agreement_id IS NOT NULL AND contract_number IS NOT NULL
+GROUP BY 1,2,3,4,5,6,7,8,9 ) X
+ GROUP BY 1,2,3,4,5,6,7,8,9 ;
  
  
  -- SpendingByVendorId
@@ -194,7 +196,6 @@ CREATE TABLE aggregateon_spending_vendor (
 	vendor_id integer,
 	agency_id smallint,
 	spending_category_id smallint,
-	month_id int,
 	year_id smallint,
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
@@ -205,8 +206,7 @@ CREATE TABLE aggregateon_spending_vendor (
 	
   
   INSERT INTO aggregateon_spending_vendor
-  SELECT X.vendor_id, X.agency_id, X.spending_category_id,       
-       X.month_id,
+  SELECT X.vendor_id, X.agency_id, X.spending_category_id,   
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
@@ -215,35 +215,32 @@ CREATE TABLE aggregateon_spending_vendor (
   FROM (SELECT agency_id,
                vendor_id,
                spending_category_id,
-               check_eft_issued_cal_month_id as month_id,
                check_eft_issued_nyc_year_id AS year_id,
                'B' as type_of_year,
                sum(check_amount) AS total_spending_amount
           FROM    disbursement_line_item_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6) X
+GROUP BY 1,2,3,4) X
 LEFT JOIN (SELECT vendor_id, agency_id, spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount
  FROM aggregateon_spending_contract WHERE type_of_year = 'B' 
  GROUP BY 1,2,3,4) Y
  ON X.vendor_id = Y.vendor_id AND X.agency_id = Y.agency_id AND X.spending_category_id = Y.spending_category_id AND X.year_id = Y.year_id 
  UNION ALL
-   SELECT X.vendor_id, X.agency_id, X.spending_category_id::smallint,       
-       X.month_id,
+   SELECT X.vendor_id, X.agency_id, X.spending_category_id::smallint,     
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
        Y.total_contract_amount,
        'Y' as is_all_categories
   FROM (SELECT agency_id,
-               vendor_id,
-               NULL as spending_category_id,
-               check_eft_issued_cal_month_id as month_id,
+               vendor_id,               
                check_eft_issued_nyc_year_id AS year_id,
+               NULL as spending_category_id,
                'B' as type_of_year,
                sum(check_amount) AS total_spending_amount
           FROM    disbursement_line_item_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6) X
+GROUP BY 1,2,3) X
 LEFT JOIN (SELECT vendor_id, agency_id, year_id, SUM(total_contract_amount) as total_contract_amount
 FROM 
 (SELECT agreement_id, vendor_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
@@ -253,8 +250,7 @@ FROM
  
  
  INSERT INTO aggregateon_spending_vendor
-  SELECT X.vendor_id, X.agency_id, X.spending_category_id,       
-       X.month_id,
+  SELECT X.vendor_id, X.agency_id, X.spending_category_id, 
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
@@ -263,20 +259,18 @@ FROM
   FROM (SELECT agency_id,
                vendor_id,
                spending_category_id,
-               check_eft_issued_cal_month_id as month_id,
                calendar_fiscal_year_id AS year_id,
                'C' as type_of_year,
                sum(check_amount) AS total_spending_amount
           FROM    disbursement_line_item_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6) X
+GROUP BY 1,2,3,4) X
 LEFT JOIN (SELECT vendor_id, agency_id, spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount
  FROM aggregateon_spending_contract WHERE type_of_year = 'C' 
  GROUP BY 1,2,3,4) Y
  ON X.vendor_id = Y.vendor_id AND X.agency_id = Y.agency_id AND X.spending_category_id = Y.spending_category_id AND X.year_id = Y.year_id 
  UNION ALL
-   SELECT X.vendor_id, X.agency_id, X.spending_category_id::smallint,       
-       X.month_id,
+   SELECT X.vendor_id, X.agency_id, X.spending_category_id::smallint,  
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
@@ -284,14 +278,13 @@ LEFT JOIN (SELECT vendor_id, agency_id, spending_category_id, year_id, sum(total
        'Y' as is_all_categories
   FROM (SELECT agency_id,
                vendor_id,
-               NULL as spending_category_id,
-               check_eft_issued_cal_month_id as month_id,
                calendar_fiscal_year_id AS year_id,
+               NULL as spending_category_id,
                'C' as type_of_year,
                sum(check_amount) AS total_spending_amount
           FROM    disbursement_line_item_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6) X
+GROUP BY 1,2,3) X
 LEFT JOIN (SELECT vendor_id, agency_id, year_id, SUM(total_contract_amount) as total_contract_amount
 FROM 
 (SELECT agreement_id, vendor_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
