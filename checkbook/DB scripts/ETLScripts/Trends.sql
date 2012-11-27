@@ -78,6 +78,7 @@ INSERT INTO trends_gen_fund_revenue (category, fiscal_year, amount, display_orde
 update trends_gen_fund_revenue set display_yn ='N' where fiscal_year <1997;
 update trends_gen_fund_revenue set display_yn ='Y' where fiscal_year >=1997;
 
+DROP TABLE trends_gen_fund_revenue_temp;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- For General Fund Expenditures
@@ -158,6 +159,9 @@ INSERT INTO trends_gen_fund_expenditure (category, fiscal_year, amount, display_
 
 update trends_gen_fund_expenditure set display_yn ='N' where fiscal_year <1997;
 update trends_gen_fund_expenditure set display_yn ='Y' where fiscal_year >=1997;
+
+
+DROP TABLE trends_gen_fund_expenditure_temp;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- For Capital Projects
@@ -239,6 +243,7 @@ INSERT INTO trends_capital_projects (category, fiscal_year, amount, display_orde
 update trends_capital_projects set display_yn ='N' where fiscal_year <1997;
 update trends_capital_projects set display_yn ='Y' where fiscal_year >=1997;
 
+DROP TABLE trends_capital_projects_temp;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- For Ratios of Outstanding debt
@@ -304,6 +309,8 @@ INSERT INTO trends_ratios_outstanding_debt  select * from trends_ratios_outstand
 
 update trends_ratios_outstanding_debt set display_yn ='N' where fiscal_year <1997;
 update trends_ratios_outstanding_debt set display_yn ='Y' where fiscal_year >=1997;
+
+DROP TABLE trends_ratios_outstanding_debt_temp;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- For Property tax Levies
@@ -356,6 +363,8 @@ INSERT INTO trends_property_tax_levies  select * from trends_property_tax_levies
 
 update trends_property_tax_levies set display_yn ='N' where fiscal_year <1997;
 update trends_property_tax_levies set display_yn ='Y' where fiscal_year >=1997;
+
+DROP TABLE trends_property_tax_levies_temp;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- For Personal Income
@@ -472,6 +481,9 @@ INSERT INTO trends_personal_income (category, fips, area, line_code, fiscal_year
 
 update trends_personal_income set display_yn ='Y' where fiscal_year>=1980;
 
+DROP TABLE trends_personal_income_temp;
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 -- 6) Trends_collection_cancellation_abatements
 
 DROP TABLE IF EXISTS trends_collection_cancellation_abatements_temp;
@@ -514,6 +526,9 @@ INSERT INTO trends_collection_cancellation_abatements  select * from trends_coll
 
 update  trends_collection_cancellation_abatements set display_yn ='N' where fiscal_year <1997;
 update  trends_collection_cancellation_abatements set display_yn ='Y' where fiscal_year >=1997;
+
+DROP TABLE trends_collection_cancellation_abatements_temp;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 7) trends_employment_status_of_resident_population
 
@@ -558,6 +573,9 @@ INSERT INTO trends_employment_status_of_resident_population  select * from trend
 update  trends_employment_status_of_resident_population set display_yn ='N' where fiscal_year <1996;
 update  trends_employment_status_of_resident_population set display_yn ='Y' where fiscal_year >=1996;
 
+DROP TABLE trends_employment_status_of_resident_population_temp;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 8) trends_non_agricultural_wage_salary_employement
 
 DROP TABLE IF EXISTS trends_non_agricultural_wage_salary_employement_temp;
@@ -628,6 +646,9 @@ INSERT INTO trends_non_agricultural_wage_salary_employement (category, fiscal_ye
 
 update  trends_non_agricultural_wage_salary_employement set display_yn ='N' where fiscal_year <1997;
 update  trends_non_agricultural_wage_salary_employement set display_yn ='Y' where fiscal_year >=1997;
+
+DROP TABLE trends_non_agricultural_wage_salary_employement_temp;
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 9)
 
 DROP TABLE IF EXISTS trends_numberofcityemployees_temp;
@@ -701,6 +722,9 @@ INSERT INTO trends_numberofcityemployees (category, fiscal_year, amount, display
 update  trends_numberofcityemployees  set display_yn ='N' where fiscal_year <1997;
 update  trends_numberofcityemployees  set display_yn ='Y' where fiscal_year >=1997;
 
+DROP TABLE trends_numberofcityemployees_temp;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 10)  trends_new_york_city_educational_construction
 
 DROP TABLE IF EXISTS trends_new_york_city_educational_construction_temp;
@@ -743,7 +767,9 @@ INSERT INTO trends_new_york_city_educational_construction  select * from trends_
 
 update  trends_new_york_city_educational_construction set display_yn ='N' where fiscal_year <2005;
 
+DROP TABLE trends_new_york_city_educational_construction_temp;
 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 11) trends_changes_in_fund_balances
 
 DROP TABLE IF EXISTS trends_changes_in_fund_balances_temp;
@@ -818,7 +844,9 @@ INSERT INTO trends_changes_in_fund_balances (category, fiscal_year, amount, disp
 update  trends_changes_in_fund_balances set display_yn ='N' where fiscal_year <1997;
 update  trends_changes_in_fund_balances set display_yn ='Y' where fiscal_year >=1997;
 
+DROP TABLE trends_changes_in_fund_balances_temp;
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 12) trends_capital_assets_statistics_function_program
 
 DROP TABLE IF EXISTS trends_capital_assets_statistics_function_program_temp;
@@ -875,6 +903,8 @@ INSERT INTO trends_capital_assets_statistics_function_program (category, fiscal_
 update  trends_capital_assets_statistics_function_program set display_yn ='N' where fiscal_year <2002;
 update  trends_capital_assets_statistics_function_program set display_yn ='Y' where fiscal_year >=2002;
 
+DROP TABLE trends_capital_assets_statistics_function_program_temp;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 13) trends_assesed_valuation_tax_rate_class
 
 
@@ -986,6 +1016,9 @@ update trends_assesed_valuation_tax_rate_class set superscript_value ='1' where 
 update trends_assesed_valuation_tax_rate_class set superscript_value ='1' where category ='Class Four Total' and fiscal_year =1995;
 
 
+DROP TABLE trends_assesed_valuation_tax_rate_class_temp;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 14) trends_assesed_estimated_actual_taxable_property
 
 
@@ -1039,6 +1072,9 @@ update  trends_assesed_estimated_actual_taxable_property set display_yn ='N' whe
 update  trends_assesed_estimated_actual_taxable_property set display_yn ='Y' where fiscal_year >=1997;
 
 
+DROP TABLE trends_assesed_estimated_actual_taxable_property_temp;
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 -- 15)  trends_nyc_population_temp
 
 DROP TABLE IF EXISTS trends_nyc_population_temp;
@@ -1073,8 +1109,9 @@ INSERT INTO trends_nyc_population  select * from trends_nyc_population_temp;
 
 update  trends_nyc_population set display_yn ='Y';
 
+DROP TABLE trends_nyc_population_temp;
 
-
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 16)  trends_property_tax
 
@@ -1108,7 +1145,9 @@ INSERT INTO trends_property_tax select * from trends_property_tax_temp;
 update  trends_property_tax set display_yn ='N' where fiscal_year <1997;
 update  trends_property_tax set display_yn ='Y' where fiscal_year >=1997;
 
+DROP TABLE trends_property_tax_temp;
 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 17) trends_person_receiving_pubic_assistance
 
 DROP TABLE IF EXISTS trends_person_receiving_pubic_assistance_temp;
@@ -1136,6 +1175,10 @@ COPY  trends_person_receiving_pubic_assistance_temp FROM '/home/gpadmin/TREDDY/T
 INSERT INTO trends_person_receiving_pubic_assistance select * from trends_person_receiving_pubic_assistance_temp;
 
 update trends_person_receiving_pubic_assistance set display_yn ='Y' where fiscal_year >=2002;
+
+DROP TABLE trends_person_receiving_pubic_assistance_temp;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 18)
 
@@ -1185,6 +1228,10 @@ COPY  trends_pledged_revenue_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_pledg
 INSERT INTO trends_pledged_revenue select * from trends_pledged_revenue_temp;
 update  trends_pledged_revenue set display_yn ='N' where fiscal_year <2002;
 update  trends_pledged_revenue set display_yn ='Y' where fiscal_year >=2002;
+
+DROP TABLE trends_pledged_revenue_temp;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 19)
 
 DROP TABLE IF EXISTS trends_uncollected_parking_violation_temp;
@@ -1252,7 +1299,8 @@ INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount,
 update  trends_uncollected_parking_violation set display_yn ='N' where fiscal_year <1997;
 update  trends_uncollected_parking_violation set display_yn ='Y' where fiscal_year >=1997; 
 
-
+DROP TABLE trends_uncollected_parking_violation_temp;
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 20)  trends_changes_net_assets
 
@@ -1323,6 +1371,9 @@ INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_or
 update  trends_changes_net_assets set display_yn ='N' where fiscal_year <2002;
 update  trends_changes_net_assets set display_yn ='Y' where fiscal_year >=2002;
 
+DROP TABLE trends_changes_net_assets_temp;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 21) trends_government_funds
 
 DROP TABLE IF EXISTS trends_government_funds_temp;
@@ -1393,6 +1444,11 @@ update  trends_government_funds set display_yn ='N' where fiscal_year <1997;
 update  trends_government_funds set display_yn ='Y' where fiscal_year >=1997;
 
 
+DROP TABLE trends_government_funds_temp;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 -- 22)  trends_hudson_yards_infrastructure
 
 DROP TABLE IF EXISTS trends_hudson_yards_infrastructure_temp;
@@ -1444,6 +1500,9 @@ update trends_hudson_yards_infrastructure set display_yn ='Y';
 alter table trends_hudson_yards_infrastructure add column superscript_value character(1);
 update trends_hudson_yards_infrastructure set superscript_value ='1' where fiscal_year  in(2009,2010,2011);
 
+DROP TABLE trends_hudson_yards_infrastructure_temp;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 23)
 
 DROP TABLE IF EXISTS trends_legal_debt_margin_temp;
@@ -1515,6 +1574,10 @@ INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_ord
 update  trends_legal_debt_margin set display_yn ='N' where fiscal_year <1997;
 update  trends_legal_debt_margin set display_yn ='Y' where fiscal_year >=1997;
 
+DROP TABLE trends_legal_debt_margin_temp;
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 -- 24) trends_ratios_general_bonded_debt_outstanding
 
 DROP TABLE IF EXISTS trends_ratios_general_bonded_debt_outstanding_temp;
@@ -1546,3 +1609,6 @@ INSERT INTO trends_ratios_general_bonded_debt_outstanding select * from trends_r
 
 update  trends_ratios_general_bonded_debt_outstanding set display_yn ='N' where fiscal_year <1997;
 update  trends_ratios_general_bonded_debt_outstanding set display_yn ='Y' where fiscal_year >=1997;
+
+
+DROP TABLE trends_ratios_general_bonded_debt_outstanding_temp;
