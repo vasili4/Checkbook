@@ -848,7 +848,7 @@ CREATE EXTERNAL table etl.ext_stg_funding_class
  doc_dept_cd varchar,
 fy varchar,
 funding_class_code varchar,
-name varchar,
+funding_class_name varchar,
 short_name varchar,
 category_name varchar,
 cty_fund_fl varchar,
@@ -866,9 +866,10 @@ FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
 encoding 'utf8';
 
 CREATE TABLE etl.stg_funding_class 
-(fy int,
+(
+fy int,
  funding_class_code varchar(5),
- name varchar(52),
+ funding_class_name varchar(52),
  short_name varchar(50),
  category_name varchar(52),
  cty_fund_fl varchar,
