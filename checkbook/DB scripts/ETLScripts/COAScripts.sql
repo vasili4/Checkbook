@@ -789,7 +789,7 @@ BEGIN
 		WHERE  a.load_file_id = p_load_file_id_in     
 		INTO   fc_data_source_code;
 
-	CREATE TEMPORARY TABLE tmp_ref_funding_class(uniq_id bigint,fy int,funding_class_code varchar(5),name varchar(52),
+	CREATE TEMPORARY TABLE tmp_ref_funding_class(uniq_id bigint,fy int,funding_class_code varchar(5),funding_class_name varchar(52),
 				short_name varchar(50),category_name varchar(52),cty_fund_fl bit,
 				intr_cty_fl bit,fund_aloc_req_fl bit,tbl_last_dt varchar(20),
 				ams_row_vers_no char(1),rsfcls_nm_up varchar(52),fund_category varchar(50),
@@ -804,7 +804,7 @@ BEGIN
 	SELECT  a.uniq_id,
 		a.fy, 
 	       a.funding_class_code,
-	       a.name,
+	       a.funding_class_name,
 	       a.short_name,
 	       a.category_name,
 	(case when a.cty_fund_fl='1' then 1::bit else 0::bit end),
@@ -815,7 +815,7 @@ BEGIN
 	       a.rsfcls_nm_up,
 	       a.fund_category,
 	       (CASE WHEN b.funding_class_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.funding_class_code IS NOT NULL AND a.name <> b.funding_class_name THEN 'Y' ELSE 'N' END) as modified_flag
+	       (CASE WHEN b.funding_class_code IS NOT NULL AND a.funding_class_name <> b.funding_class_name THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM   etl.stg_funding_class a LEFT JOIN ref_funding_class b ON a.funding_class_code = b.funding_class_code and a.fy = b.fiscal_year;
 	
 	Raise notice '1';
@@ -833,7 +833,7 @@ BEGIN
 	Raise notice '3';
 
 INSERT INTO   ref_funding_class(funding_class_id,fiscal_year,funding_class_code,funding_class_name,funding_class_short_name,category_name,city_fund_flag,intra_city_flag,fund_allocation_required_flag,category_code,created_date,created_load_id)
-SELECT a.funding_class_id,b.fy,b.funding_class_code,b.name,b.short_name,b.category_name,
+SELECT a.funding_class_id,b.fy,b.funding_class_code,b.funding_class_name,b.short_name,b.category_name,
 	 b.cty_fund_fl,b.intr_cty_fl , b.fund_aloc_req_fl ,b.fund_category,
 	now()::timestamp, p_load_id_in     
 from etl.ref_funding_class_id_seq a JOIN tmp_ref_funding_class b ON a.uniq_id = b.uniq_id;
@@ -847,16 +847,16 @@ from etl.ref_funding_class_id_seq a JOIN tmp_ref_funding_class b ON a.uniq_id = 
 		END IF;
 
 
-CREATE TEMPORARY TABLE tmp_ref_funding_class_1(funding_class_code varchar(5),name varchar(52), exists_flag char(1), modified_flag char(1), funding_class_id smallint)
+CREATE TEMPORARY TABLE tmp_ref_funding_class_1(funding_class_code varchar(5),funding_class_name varchar(52), exists_flag char(1), modified_flag char(1), funding_class_id smallint)
 	DISTRIBUTED BY (funding_class_id);
 
 	INSERT INTO tmp_ref_funding_class_1
-	SELECT a.funding_class_code,a.name,b.funding_class_id FROM tmp_ref_funding_class a JOIN ref_funding_class b ON a.funding_class_code = b.funding_class_code and a.fy = b.fiscal_year
+	SELECT a.funding_class_code,a.funding_class_name,b.funding_class_id FROM tmp_ref_funding_class a JOIN ref_funding_class b ON a.funding_class_code = b.funding_class_code and a.fy = b.fiscal_year
 	WHERE exists_flag ='Y' and modified_flag='Y';
 Raise notice '5';
 	
 	UPDATE ref_funding_class a
-	SET	funding_class_name= b.name,
+	SET	funding_class_name= b.funding_class_name,
 		updated_date = now()::timestamp,
 		updated_load_id =p_load_id_in
 	FROM	tmp_ref_funding_class_1 b		
