@@ -1447,7 +1447,7 @@ etl.ext_stg_pms_summary_data_feed,bud_code_desc,varchar,etl.stg_payroll_summary,
 etl.ext_stg_pms_summary_data_feed,total_amt,varchar,etl.stg_payroll_summary,total_amt,numeric,14
 etl.ext_stg_funding_class,fy,varchar,etl.stg_funding_class,fy,int,2
 etl.ext_stg_funding_class,funding_class_code,varchar,etl.stg_funding_class,funding_class_code,varchar(5),3
-etl.ext_stg_funding_class,name,varchar,etl.stg_funding_class,name,varchar(52),4
+etl.ext_stg_funding_class,funding_class_name,varchar,etl.stg_funding_class,funding_class_name,varchar(52),4
 etl.ext_stg_funding_class,short_name,varchar,etl.stg_funding_class,short_name,varchar(50),5
 etl.ext_stg_funding_class,category_name,varchar,etl.stg_funding_class,category_name,varchar(52),6
 etl.ext_stg_funding_class,cty_fund_fl,varchar,etl.stg_funding_class,cty_fund_fl,int,7
