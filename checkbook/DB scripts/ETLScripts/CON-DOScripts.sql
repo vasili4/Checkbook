@@ -57,7 +57,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from Delivery Order header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency from Delivery Order header');
 	END IF;
 	
 	RAISE NOTICE '1.1';
@@ -78,7 +78,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from Delivery Order header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency_history from Delivery Order header');
 	END IF;
 	
 	RAISE NOTICE '1.3';
@@ -219,7 +219,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New MAG records inserted from delivery order contracts');
+		VALUES(p_load_file_id_in,'C',l_count, '# of records inserted into history_master_agreement');
 	END IF;
 
 	-- Updating the newly created MAG identifier.
@@ -324,7 +324,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New fund class records inserted from delivery order accounting lines');	
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_fund_class from delivery order accounting lines');	
 	END IF;	
 	
 	INSERT INTO tmp_fk_values_do1_acc_line(uniq_id,fund_class_id)
@@ -368,7 +368,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from delivery order accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency from delivery order accounting lines');
 	END IF;
 	
 	RAISE NOTICE '1.2';
@@ -392,7 +392,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from delivery order accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency_history records inserted from delivery order accounting lines');
 	END IF;
 	
 	INSERT INTO tmp_fk_values_do1_acc_line(uniq_id,agency_history_id)
@@ -456,7 +456,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New department records inserted from delivery order accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_department from delivery order accounting lines');
 	END IF;
 	
 	RAISE NOTICE '1.5';
@@ -482,7 +482,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New department history records inserted from delivery order accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_department_history from delivery order accounting lines');
 	END IF;
 
 	RAISE NOTICE '1.6';
@@ -541,7 +541,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New expenditure object records inserted from delivery order accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_expenditure_object from delivery order accounting lines');
 	END IF;
 	
 	-- Generate the expenditure_object history id for history records
@@ -565,7 +565,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New expenditure object history records inserted from delivery order accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_expenditure_object_history from delivery order accounting lines');
 	END IF;
 
 	RAISE NOTICE '1.11';
@@ -743,7 +743,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id_in,'C','DO1',l_count,'# of delivery orders inserted in history_agreement table');
+		VALUES(p_load_file_id_in,'C','DO1',l_count,'# of records inserted into history_agreement');
 	END IF;	
 	
 	/* Updates */
