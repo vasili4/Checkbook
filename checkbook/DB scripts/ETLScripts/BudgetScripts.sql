@@ -97,7 +97,7 @@ BEGIN
 	
 		IF l_count > 0 THEN
 			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-			VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from expense budget');
+			VALUES(p_load_file_id_in,'B',l_count, 'Number of recods inserted into ref_agency_history from expense budget');
 		END IF;
 	
 
@@ -186,7 +186,7 @@ BEGIN
 		
 			IF l_count > 0 THEN
 				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-				VALUES(p_load_file_id_in,'C',l_count, 'New department history records inserted from expense budget');
+				VALUES(p_load_file_id_in,'B',l_count, 'Number of records inserted into ref_department_history from expense budget');
 		END IF;
 	
 
@@ -249,7 +249,7 @@ BEGIN
 		
 			IF l_count > 0 THEN
 				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-				VALUES(p_load_file_id_in,'C',l_count, 'New budget code records inserted from expense budget');
+				VALUES(p_load_file_id_in,'B',l_count, 'Number of records inserted into ref_budget_code from expense budget');
 		END IF;
 		
 		
@@ -510,7 +510,7 @@ BEGIN
 	
 	IF l_count>0 THEN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'B',l_count,'# of records inserted in budget ');
+	VALUES(p_load_file_id_in,'B',l_count,'# of records inserted into budget ');
 	END IF;
 	
 	RAISE NOTICE 'BUDGET 2';
