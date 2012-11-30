@@ -66,7 +66,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from PO contracts header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency from PO contracts header');
 	END IF;
 	
 	RAISE NOTICE '1.1';
@@ -87,7 +87,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from PO contracts header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency_history from PO contracts header');
 	END IF;
 	
 	RAISE NOTICE '1.3';
@@ -436,7 +436,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New fund class records inserted from PO contracts accounting lines');	
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_fund_class from PO contracts accounting lines');	
 	END IF;	
 	
 	INSERT INTO tmp_po_fk_values_acc_line(uniq_id,fund_class_id)
@@ -480,7 +480,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from PO contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency from PO contracts accounting lines');
 	END IF;
 	
 	RAISE NOTICE '1.2';
@@ -504,7 +504,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from PO contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency_history from PO contracts accounting lines');
 	END IF;
 	
 	INSERT INTO tmp_po_fk_values_acc_line(uniq_id,agency_history_id)
@@ -567,7 +567,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New department records inserted from PO contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted from ref_department from PO contracts accounting lines');
 	END IF;
 	
 	RAISE NOTICE '1.5';
@@ -593,7 +593,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New department history records inserted from general contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted from ref_department_history from PO contracts accounting lines');
 	END IF;
 
 	RAISE NOTICE '1.6';
@@ -653,7 +653,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New expenditure object records inserted from PO contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_expenditure_object from PO contracts accounting lines');
 	END IF;
 	
 	-- Generate the expenditure_object history id for history records
@@ -1145,7 +1145,7 @@ BEGIN
 
 		GET DIAGNOSTICS l_count = ROW_COUNT;
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id_in,'C','POC,PCC1,POD',l_count,'# of records inserted in history_agreement_worksite ');
+		VALUES(p_load_file_id_in,'C','POC,PCC1,POD',l_count,'# of records inserted into  history_agreement_worksite ');
 		
 	END LOOP; 
 		
