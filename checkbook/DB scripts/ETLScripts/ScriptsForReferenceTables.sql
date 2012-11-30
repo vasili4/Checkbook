@@ -1,12 +1,12 @@
-COPY etl.ref_data_source FROM '/home/gpadmin/prerelease/NYC/ref_data_source.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_data_source FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/ref_data_source.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_column_mapping FROM '/home/gpadmin/prerelease/NYC/ref_column_mapping.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_column_mapping FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/ref_column_mapping.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_validation_rule FROM '/home/gpadmin/prerelease/NYC/ref_validation_rule.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_validation_rule FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/ref_validation_rule.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_file_name_pattern FROM '/home/gpadmin/prerelease/NYC/ref_file_name_pattern.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_file_name_pattern FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/ref_file_name_pattern.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.aggregate_tables FROM '/home/gpadmin/prerelease/NYC/widget_aggregate_tables.csv' CSV HEADER QUOTE as '"';
+COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/widget_aggregate_tables.csv' CSV HEADER QUOTE as '"';
 
 ---------------------------------------------------------------------------------------------------------------------------------
 
@@ -98,13 +98,17 @@ INSERT INTO ref_address_type(address_type_code,address_type_name,created_date) V
 											('PR','Ordering',now()::timestamp),
 											('WR','Account Administrator',now()::timestamp),
 											('OT','Other',now()::timestamp);
+
+update ref_address_type set created_date = now()::timestamp;
 											
 INSERT INTO ref_business_type(business_type_code,business_type_name,created_date) values ('EENT','Emerging Enterprises Business',now()::timestamp),
 				     ('EXMP','Exempt From MWBE Rpt Card',now()::timestamp),
 				     ('LOCB','Local Business',now()::timestamp),
 				     ('MNRT','Minority Owned',now()::timestamp),
 				     ('WMNO','Woman Owned',now()::timestamp);
-				     
+
+update ref_business_type set created_date = now()::timestamp;
+
 INSERT INTO ref_minority_type values (1,'Unspecified MWBE',now()::timestamp),
 				     (2,'African American',now()::timestamp),
 				     (3,'Hispanic American',now()::timestamp),
@@ -115,12 +119,15 @@ INSERT INTO ref_minority_type values (1,'Unspecified MWBE',now()::timestamp),
 				     (8,'Other',now()::timestamp),
 				     (9,'Caucasian Woman',now()::timestamp),
 				     (10,'Asian American',now()::timestamp);		
+
 				     
+update ref_minority_type set created_date = now()::timestamp;
+
 INSERT INTO ref_business_type_status values (1,'Requested',now()::timestamp),
 					(2,'Accepted',now()::timestamp),
 					(3,'Rejected',now()::timestamp);
 					
-
+update ref_business_type_status set created_date = now()::timestamp;
 
 			
 /* CREATE TABLE etl.stg_funding_class(
@@ -137,7 +144,7 @@ INSERT INTO ref_business_type_status values (1,'Requested',now()::timestamp),
 	rsfcls_nm_up  varchar(52),
 	fund_category  varchar(50));
 	
-COPY etl.stg_funding_class FROM '/home/gpadmin/prerelease/NYC/FundingClass.txt' DELIMITER AS '|' ESCAPE '~' FILL MISSING FIELDS;		
+COPY etl.stg_funding_class FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/FundingClass.txt' DELIMITER AS '|' ESCAPE '~' FILL MISSING FIELDS;		
 
 
 INSERT INTO   ref_funding_class(funding_class_code,funding_class_name,funding_class_short_name,category_name,city_fund_flag,intra_city_flag,fund_allocation_required_flag,category_code,created_date)
@@ -182,16 +189,16 @@ select etl.initializedate('1900-01-01'::date,'2200-12-31'::date);
 				  END);
 --------------------------------------------------------------------------------------------------------------------------------------------
 
-COPY etl.stg_award_method FROM '/home/gpadmin/prerelease/NYC/AwardMethod.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_method FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/AwardMethod.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_method(award_method_code,award_method_name,created_date) SELECT  award_method_code,award_method_name,now()::timestamp  FROM etl.stg_award_method;
 
-COPY etl.stg_agreement_type FROM '/home/gpadmin/prerelease/NYC/AgreementType.csv' DELIMITER AS ',' ;
+COPY etl.stg_agreement_type FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/AgreementType.csv' DELIMITER AS ',' ;
   
 insert into ref_agreement_type(agreement_type_code,agreement_type_name,created_date) SELECT agreement_type_code,name,now()::timestamp from etl.stg_agreement_type;											
 
 
-COPY etl.stg_award_category FROM '/home/gpadmin/prerelease/NYC/AgreementCategory.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_category FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/AgreementCategory.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_category(award_category_code,award_category_name,created_date) SELECT award_category_code, award_method_name,now()::timestamp  from etl.stg_award_category;  
 
@@ -216,8 +223,13 @@ INSERT INTO ref_document_code(document_code,document_name,created_date) VALUES (
 										('N/A','N/A (PRIVACY/SECURITY)',now()::timestamp),
 										('MAR','MAR',now()::timestamp),
 										('CTR','CTR',now()::timestamp);
+
+update ref_document_code set created_date = now()::timestamp;
 										
 INSERT INTO ref_miscellaneous_vendor(vendor_customer_code,created_date) values ('JUDGCLAIMS',now()::timestamp),('MISCPAYVEN',now()::timestamp);
+
+update ref_miscellaneous_vendor set created_date = now()::timestamp;
+
 
 INSERT INTO ref_spending_category(spending_category_id, spending_category_code, spending_category_name, display_name, display_order) 
 values(1,'c','Contracts', 'Contract Spending', 4),(2,'p','Payroll', 'Payroll Spending', 2),(3,'cc','Capital Contracts', 'Capital Spending', 3),
@@ -246,6 +258,7 @@ INSERT INTO ref_industry_type(industry_type_id, industry_type_name,created_date)
 																						(3,'Professional Services',now()::timestamp),
 																						(4,'Standardized Services',now()::timestamp),
 																						(5,'Not Classified',now()::timestamp);
+update ref_industry_type set created_date = now()::timestamp;
 
 INSERT INTO ref_award_size(award_size_id, award_size_name,created_date) VALUES(1,'Greater than $1 Million',now()::timestamp),
 																						(2,'Between $100,000 and $1 Million',now()::timestamp),
@@ -253,7 +266,10 @@ INSERT INTO ref_award_size(award_size_id, award_size_name,created_date) VALUES(1
 																						(4,'Less than $5,000',now()::timestamp),
 																						(5,'Unclassified',now()::timestamp);
 
-COPY etl.stg_award_category_industry FROM '/home/gpadmin/prerelease/NYC/AgreementIndustryCategory.csv' CSV QUOTE as '"' ;
+update ref_award_size set created_date = now()::timestamp;
+																						 
+																						 
+COPY etl.stg_award_category_industry FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/AgreementIndustryCategory.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_category_industry(award_category_code,industry_type_id,created_date) SELECT award_category_code, industry_type_id,now()::timestamp  from etl.stg_award_category_industry;  
 
@@ -302,7 +318,6 @@ insert into ref_expenditure_cancel_reason(expenditure_cancel_reason_id) values (
 INSERT INTO ref_amount_basis(amount_basis_id,amount_basis_name) VALUES (1,'ANNUAL'),(2,'DAILY'),(3,'HOURLY');
 
 
-INSERT INTO ref_document_code(document_code_id, document_code, document_name, created_date) VALUES(nextval('seq_ref_document_code_document_code_id'),'N/A','N/A (PRIVACY/SECURITY)',now()::timestamp);
 
 INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name) VALUES(nextval('seq_ref_agency_agency_id'),'N/A','N/A (PRIVACY/SECURITY)','N/A (PRIVACY/SECURITY)', now()::timestamp, 'N/A');
 

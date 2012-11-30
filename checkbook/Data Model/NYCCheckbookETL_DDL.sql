@@ -1557,7 +1557,7 @@ CREATE EXTERNAL TABLE ext_stg_con_data_feed(
 	col171 varchar(100),
 	col172 varchar(100))
 LOCATION (
-	    'gpfdist://192.168.3.23:8081/datafiles/CON_feed.txt')
+	    'gpfdist://mdw1:8081/datafiles/CON_feed.txt')
 	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
 ENCODING 'UTF8';
 
@@ -4134,7 +4134,7 @@ ALTER TABLE archive_payroll_summary ADD COLUMN load_file_id bigint;
 
 CREATE TABLE invalid_payroll_summary (LIKE archive_payroll_summary) DISTRIBUTED BY (uniq_id);	
 	
-CREATE TABLE payroll_summary_id_seq(uniq_id bigint,payroll_summary_id bigint default nextval('public.seq_payroll_summary_payroll_summary_id'))
+CREATE TABLE payroll_summary_id_seq(uniq_id bigint,payroll_summary_id bigint default nextval('public.seq_disbursement_line_item_id'))
 DISTRIBUTED BY (uniq_id);
 	
 --------------------------------------------------------------------------------------------------------------------------------------------------

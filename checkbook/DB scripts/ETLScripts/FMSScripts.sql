@@ -1526,7 +1526,13 @@ BEGIN
 	
 	
 	-- needs to delete after first load
-	/*
+	
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
+	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
+	FROM disbursement_line_item a, disbursement b
+	WHERE   a.disbursement_id = b.disbursement_id 
+	AND b.document_version > 1;
+	 
 	DELETE FROM ONLY disbursement_line_item_details a
 	USING disbursement b
 	WHERE   a.disbursement_id = b.disbursement_id 
@@ -1539,7 +1545,7 @@ BEGIN
 	
 	DELETE FROM ONLY disbursement
 	WHERE   document_version > 1;
-	*/
+	
 	
 	-- needs to add the script which will delete the version > 1 if we do not have with version = 1
 	

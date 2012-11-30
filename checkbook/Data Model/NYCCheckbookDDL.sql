@@ -1,7 +1,7 @@
 create language plpgsql;
 
 /* Sequences for reference tables*/
---CREATE SEQUENCE seq_etl_data_load_load_id;
+--  CREATE SEQUENCE seq_etl_data_load_load_id;
 CREATE SEQUENCE seq_ref_agency_agency_id;
 CREATE SEQUENCE seq_ref_fund_class_fund_class_id;
 CREATE SEQUENCE seq_ref_department_department_id;
@@ -562,7 +562,7 @@ CREATE TABLE vendor (
     updated_date timestamp without time zone
 ) distributed by (vendor_id);
 
---ALTER TABLE vendor ADD constraint fk_vendor_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
+-- ALTER TABLE vendor ADD constraint fk_vendor_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 
 CREATE TABLE vendor_history (
     vendor_history_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_history_vendor_history_id'::regclass) NOT NULL,
@@ -595,7 +595,7 @@ CREATE TABLE vendor_address (
 ALTER TABLE vendor_address ADD constraint fk_vendor_address_vendor_history foreign key (vendor_history_id) references vendor_history (vendor_history_id);
 ALTER TABLE vendor_address ADD constraint fk_vendor_address_address foreign key (address_id) references address (address_id);
 ALTER TABLE vendor_address ADD constraint fk_vendor_address_ref_address_type foreign key (address_type_id) references ref_address_type (address_type_id);
---ALTER TABLE vendor_address ADD constraint fk_vendor_address_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+-- ALTER TABLE vendor_address ADD constraint fk_vendor_address_etl_data_load foreign key (load_id) references etl_data_load (load_id);
 ALTER TABLE vendor_address ADD constraint fk_vendor_addressr_ref_date foreign key (effective_begin_date_id) references ref_date (date_id);
 ALTER TABLE vendor_address ADD constraint fk_vendor_address_ref_date_1 foreign key (effective_end_date_id) references ref_date (date_id);
 
@@ -615,7 +615,7 @@ CREATE TABLE vendor_business_type (
 
 ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_vendor_history foreign key (vendor_history_id) references vendor_history (vendor_history_id);
 ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_ref_business_type foreign key (business_type_id) references ref_business_type (business_type_id);
---ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_etl_data_load foreign key (load_id) references etl_data_load (load_id);
+-- ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_etl_data_load foreign key (load_id) references etl_data_load (load_id);
 ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_ref_minority_type foreign key (minority_type_id) references ref_minority_type (minority_type_id);
 
 CREATE TABLE fmsv_business_type (
@@ -752,7 +752,7 @@ CREATE TABLE history_master_agreement
 )
 DISTRIBUTED BY (master_agreement_id);
 
- ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load(load_id);
+ -- ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load(load_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_agreement_type FOREIGN KEY (agreement_type_id) REFERENCES ref_agreement_type(agreement_type_id);
  ALTER TABLE  history_master_agreement ADD CONSTRAINT fk_history_master_agreement_ref_award_category_1 FOREIGN KEY (award_category_id_1) REFERENCES ref_award_category(award_category_id);
@@ -1092,7 +1092,7 @@ CREATE TABLE payroll_summary (
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_exp_object_history foreign key (expenditure_object_history_id) references ref_expenditure_object_history (expenditure_object_history_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
---ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
+-- ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 ALTER TABLE  payroll_summary ADD constraint fk_payroll_summary_ref_agency_summary foreign key (agency_history_id) references ref_agency_history (agency_history_id);
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1175,7 +1175,7 @@ CREATE TABLE revenue (
     created_date timestamp without time zone    
 ) distributed by (revenue_id);
 
-ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_etl_data_load FOREIGN KEY (load_id) REFERENCES etl_data_load(load_id);
+-- ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_etl_data_load FOREIGN KEY (load_id) REFERENCES etl_data_load(load_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_agency_history_2 FOREIGN KEY (document_agency_history_id) REFERENCES ref_agency_history(agency_history_id);
 ALTER TABLE  revenue ADD CONSTRAINT fk_revenue_ref_agency_history_3 FOREIGN KEY (ref_document_agency_history_id) REFERENCES ref_agency_history(agency_history_id);
@@ -1244,7 +1244,7 @@ ALTER TABLE  budget ADD constraint fk_budget_ref_agency_history FOREIGN KEY (age
 ALTER TABLE  budget ADD constraint fk_budget_ref_department_history FOREIGN KEY (department_history_id) REFERENCES ref_department_history(department_history_id);
 ALTER TABLE  budget ADD constraint fk_budget_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
 ALTER TABLE  budget ADD constraint fk_budget_ref_object_class_history foreign key (object_class_history_id) references ref_object_class_history (object_class_history_id);
---ALTER TABLE  budget ADD constraint fk_budget_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
+-- ALTER TABLE  budget ADD constraint fk_budget_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 ALTER TABLE  budget ADD constraint fk_budget_ref_date foreign key (source_updated_date_id) references ref_date (date_id);
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1283,7 +1283,7 @@ CREATE TABLE revenue_budget
 ) DISTRIBUTED BY (budget_id);
 
 
-ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load (load_id);
+-- ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_etl_data_load FOREIGN KEY (created_load_id) REFERENCES etl_data_load (load_id);
 ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_agency_history FOREIGN KEY (agency_history_id)  REFERENCES ref_agency_history (agency_history_id);
 ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_budget_code FOREIGN KEY (budget_code_id) REFERENCES ref_budget_code (budget_code_id);
 ALTER TABLE  revenue_budget ADD  CONSTRAINT fk_revenue_budget_ref_fund_class FOREIGN KEY (fund_class_id) REFERENCES ref_fund_class (fund_class_id);
@@ -1339,7 +1339,7 @@ ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_type FOREIGN KEY (expenditure_cancel_type_id) REFERENCES ref_expenditure_cancel_type(expenditure_cancel_type_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_status FOREIGN KEY (expenditure_status_id) REFERENCES ref_expenditure_status(expenditure_status_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
---ALTER TABLE  disbursement ADD constraint fk_disbursement_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
+-- ALTER TABLE  disbursement ADD constraint fk_disbursement_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date foreign key (record_date_id) references ref_date (date_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_1 foreign key (check_eft_issued_date_id) references ref_date (date_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_2 foreign key (check_eft_record_date_id) references ref_date (date_id);
@@ -1352,7 +1352,7 @@ ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_2 foreign key 
  ALTER TABLE  disbursement_line_item ADD constraint fk_disb_line_item_ref_exp_object_history foreign key (expenditure_object_history_id) references ref_expenditure_object_history (expenditure_object_history_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_budget_code foreign key (budget_code_id) references ref_budget_code (budget_code_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_agreement foreign key (agreement_id) references history_agreement (agreement_id);
- --ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
+ -- ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
  ALTER TABLE  disbursement_line_item ADD constraint fk_disbursement_line_item_ref_location_history foreign key (location_history_id) references ref_location_history (location_history_id);
 
 
