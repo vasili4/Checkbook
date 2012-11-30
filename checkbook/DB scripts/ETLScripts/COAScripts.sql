@@ -49,7 +49,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'A',l_count, 'New agency records inserted from COA Agency Feed');
+		VALUES(p_load_file_id_in,'A',l_count, '# of records inserted into ref_agency');
 	END IF;
 	
 	-- Generate the agency history id for history records
@@ -86,7 +86,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'A',l_count, 'Agency records updated from COA Agency Feed');
+		VALUES(p_load_file_id_in,'A',l_count, '# of records updated in ref_agency');
 	END IF;
 	
 	RAISE NOTICE '2';
@@ -102,7 +102,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'A',l_count, 'New agency history records inserted from COA Agency Feed');
+		VALUES(p_load_file_id_in,'A',l_count, '# of records inserted into ref_agency_history');
 	END IF;		
 
 	UPDATE ref_agency
@@ -201,7 +201,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, 'New agency records inserted from COA Department Feed');
+		VALUES(p_load_file_id_in,'D',l_count, 'Number of records inserted into ref_agency from COA Department Feed');
 	END IF;
 	
 	TRUNCATE etl.ref_agency_history_id_seq;
@@ -223,7 +223,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, 'New agency history records inserted from COA Department Feed');
+		VALUES(p_load_file_id_in,'D',l_count, 'Number of records inserted into ref_agency_history from COA Department Feed');
 	END IF;
 	
 	-- Generate the fund class identifier for new fund class
@@ -260,7 +260,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, 'New fund class records inserted from COA Department Feed');
+		VALUES(p_load_file_id_in,'D',l_count, 'Number of records inserted into ref_fund_class from COA Department Feed');
 	END IF;
 	
 	RAISE NOTICE '3.2';
@@ -282,7 +282,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, 'New department records inserted from COA Department Feed');
+		VALUES(p_load_file_id_in,'D',l_count, 'Number of records inserted into ref_department');
 	END IF;
 	
 	RAISE NOTICE '3.3';
@@ -322,7 +322,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, 'Department records updated from COA Department Feed');
+		VALUES(p_load_file_id_in,'D',l_count, '# of records updated in ref_department');
 	END IF;
 	
 	RAISE NOTICE '5';
@@ -339,7 +339,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, 'New Department history records inserted from COA Department Feed');
+		VALUES(p_load_file_id_in,'D',l_count, '# of records inserted into ref_department_history');
 	END IF;
 	
 	RETURN 1;
@@ -389,7 +389,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'E',l_count, 'New expenditure object records inserted from COA Expenditure Object Feed');
+		VALUES(p_load_file_id_in,'E',l_count, '# of records inserted into ref_expenditure_object');
 	END IF;
 	
 	-- Generate the expenditure_object history id for history records
@@ -423,7 +423,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'E',l_count, 'Expenditure Object records updated from COA Expenditure Object Feed');
+		VALUES(p_load_file_id_in,'E',l_count, '# of records updated in ref_expenditure_object');
 	END IF;
 	
 	RAISE NOTICE '2';
@@ -439,7 +439,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'E',l_count, 'Expenditure Object history records inserted from COA Expenditure Object Feed');
+		VALUES(p_load_file_id_in,'E',l_count, '# of records inserted into ref_expenditure_object_history');
 	END IF;		
 		
 	RETURN 1;
@@ -523,7 +523,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'L',l_count, 'New agency records inserted from COA Location Feed');
+		VALUES(p_load_file_id_in,'L',l_count, 'Number of records inserted into ref_agency from COA Location Feed');
 	END IF;
 	
 	TRUNCATE etl.ref_agency_history_id_seq;
@@ -545,7 +545,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'L',l_count, 'Agency history records inserted from COA Location Feed');
+		VALUES(p_load_file_id_in,'L',l_count, 'Number of records inserted into ref_agency_history from COA Location Feed');
 	END IF;
 	
 	-- Generate the location id for new records
@@ -565,7 +565,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'L',l_count, 'Location records inserted from COA Location Feed');
+		VALUES(p_load_file_id_in,'L',l_count, '# of records inserted into ref_location');
 	END IF;
 	
 	RAISE NOTICE '3.3';
@@ -603,7 +603,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'L',l_count, 'Location records updated from COA Location Feed');
+		VALUES(p_load_file_id_in,'L',l_count, '# of records updated in ref_location');
 	END IF;
 	
 	RAISE NOTICE '5';
@@ -619,7 +619,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'L',l_count, 'Location history records inserted from COA Location Feed');
+		VALUES(p_load_file_id_in,'L',l_count, '# of records inserted into ref_location_history');
 	END IF;
 	
 	RETURN 1;
@@ -679,7 +679,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'O',l_count, 'Object class records inserted from COA Object Class Feed');
+		VALUES(p_load_file_id_in,'O',l_count, '# of records inserted into ref_object_class');
 	END IF;
 	
 	RAISE NOTICE 'start.2';
@@ -715,7 +715,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'O',l_count, 'Object class records updated from COA Object Class Feed');
+		VALUES(p_load_file_id_in,'O',l_count, '# of records updated in ref_object_class');
 	END IF;
 	
 	RAISE NOTICE '2';
@@ -740,7 +740,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'O',l_count, 'Object Class history records inserted from COA Object Class Feed');
+		VALUES(p_load_file_id_in,'O',l_count, '# of records inserted into ref_object_class_history');
 	END IF;
 	
 	RETURN 1;
@@ -843,7 +843,7 @@ from etl.ref_funding_class_id_seq a JOIN tmp_ref_funding_class b ON a.uniq_id = 
 				
 		IF fc_ins_count> 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,fc_data_source_code,fc_ins_count, 'insert');
+		VALUES(p_load_file_id_in,fc_data_source_code,fc_ins_count, '# of records inserted into ref_funding_class');
 		END IF;
 
 
@@ -869,7 +869,7 @@ Raise notice '5';
 				
 		IF fc_update_count>0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,fc_data_source_code,fc_update_count, 'update');
+		VALUES(p_load_file_id_in,fc_data_source_code,fc_update_count, '# of records updated in ref_funding_class');
 		END IF;
 
 
@@ -949,7 +949,7 @@ BEGIN
 	
 	IF ry_ins_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,ry_data_source_code,ry_ins_count, '# of records inserted into revenue_category');
+		VALUES(p_load_file_id_in,ry_data_source_code,ry_ins_count, '# of records inserted into ref_revenue_category');
 	END IF;
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_category_1(uniq_id bigint,rscat_cd varchar(20),rscat_nm varchar,rscat_sh_nm varchar, exists_flag char(1), modified_flag char(1), revenue_category_id smallint)
@@ -975,7 +975,7 @@ BEGIN
 	
 	IF ry_update_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,ry_data_source_code,ry_update_count, '# of records updated in revenue_category ');
+		VALUES(p_load_file_id_in,ry_data_source_code,ry_update_count, '# of records updated in ref_revenue_category');
 	END IF;
 
 	RAISE NOTICE 'INSIDE';
@@ -1048,7 +1048,7 @@ BEGIN
 	
 	IF rc_ins_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,rc_data_source_code,rc_ins_count, '# of records inserted into revenue_class');
+		VALUES(p_load_file_id_in,rc_data_source_code,rc_ins_count, '# of records inserted into ref_revenue_class');
 	END IF;
 
 	CREATE TEMPORARY TABLE tmp_ref_revenue_class_1(uniq_id bigint,rscls_cd varchar(20),
@@ -1078,7 +1078,7 @@ BEGIN
 	
 	IF rc_update_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,rc_data_source_code,rc_update_count, '# of records updated in revenue_class');
+		VALUES(p_load_file_id_in,rc_data_source_code,rc_update_count, '# of records updated in ref_revenue_class');
 	END IF;
 	
 	RAISE NOTICE 'INSIDE';
@@ -1300,7 +1300,7 @@ BEGIN
 	
 	IF rs_ins_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,rs_data_source_code,rs_ins_count,'# of records inserted in revenue_source');
+		VALUES(p_load_file_id_in,rs_data_source_code,rs_ins_count,'# of records inserted in ref_revenue_source');
 	END IF;
 
 	RAISE NOTICE 'RS - 4';
@@ -1332,7 +1332,7 @@ BEGIN
 	
 	IF rs_update_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,rs_data_source_code,rs_update_count, '# of records updated in revenue_source');
+		VALUES(p_load_file_id_in,rs_data_source_code,rs_update_count, '# of records updated in ref_revenue_source');
 	END IF;
 
 	RAISE NOTICE 'INSIDE';
@@ -1595,7 +1595,7 @@ BEGIN
 	
 	IF bc_ins_count>0 THEN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,bc_data_source_code,bc_ins_count, '# of records inserted into budget_code');
+	VALUES(p_load_file_id_in,bc_data_source_code,bc_ins_count, '# of records inserted into ref_budget_code');
 	END IF;
 
 
@@ -1651,8 +1651,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE;
 ALTER FUNCTION etl.processbudgetcode(integer, bigint)
   OWNER TO gpadmin;
-
-
-
-
-
