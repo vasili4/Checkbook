@@ -1916,6 +1916,7 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4),
   	original_or_modified varchar,
+  	original_or_modified_desc varchar,
   	award_size_id smallint,
   	award_category_id smallint,
   	industry_type_id smallint,

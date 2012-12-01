@@ -2848,6 +2848,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4),
   	original_or_modified varchar,
+  	original_or_modified_desc varchar,
   	award_size_id smallint,
   	award_category_id smallint,
   	industry_type_id smallint,
@@ -2880,7 +2881,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  		pending_contracts__0.document_agency_code,pending_contracts__0.document_agency_name,pending_contracts__0.document_agency_short_name, 		
  		pending_contracts__0.funding_agency_id,pending_contracts__0.funding_agency_code,pending_contracts__0.funding_agency_name,
  		pending_contracts__0.funding_agency_short_name,pending_contracts__0.original_agreement_id,pending_contracts__0.dollar_difference,
- 		pending_contracts__0.percent_difference, pending_contracts__0.original_or_modified, pending_contracts__0.award_size_id, 
+ 		pending_contracts__0.percent_difference, pending_contracts__0.original_or_modified, pending_contracts__0.original_or_modified_desc, pending_contracts__0.award_size_id, 
  		pending_contracts__0.award_category_id, pending_contracts__0.industry_type_id, pending_contracts__0.document_version,	pending_contracts__0.latest_flag 		
  	FROM pending_contracts__0;
  	
