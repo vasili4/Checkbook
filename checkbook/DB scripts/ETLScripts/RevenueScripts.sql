@@ -93,6 +93,15 @@ BEGIN
 				now()::timestamp,p_load_id_in
 	FROM   etl.ref_fund_class_id_seq a JOIN tmp_fk_revenue_new_fund_class b ON a.uniq_id = b.uniq_id;	
 	
+	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	  	IF l_count >0 THEN
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+			VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_fund_class from Revenue');
+	END IF;
+	
+	
 	INSERT INTO tmp_fk_revenue_values(uniq_id,fund_class_id)
 	SELECT	a.uniq_id, d.fund_class_id
 	FROM etl.stg_revenue a JOIN ref_fund_class b ON COALESCE(a.fcls_cd,'---') = COALESCE(b.fund_class_code,'---')
@@ -133,6 +142,13 @@ BEGIN
 	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_revenue_values_new_agencies b ON a.uniq_id = b.uniq_id;
 			
 
+	
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		  	IF l_count >0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_agency from Revenue');
+	END IF;
+
 	-- Generate the agency history id for history records
 	
 	TRUNCATE etl.ref_agency_history_id_seq;
@@ -146,6 +162,16 @@ BEGIN
 					      ELSE '<Non-Applicable Agency>' END)  as agency_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_agency_history_id_seq a JOIN etl.ref_agency_id_seq b ON a.uniq_id = b.uniq_id
 		JOIN etl.stg_revenue c ON a.uniq_id = c.uniq_id;
+
+
+	
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		  	IF l_count >0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_agency_history from Revenue');
+	END IF;
+
+
 
 	INSERT INTO tmp_fk_revenue_values(uniq_id,agency_history_id)
 	SELECT	a.uniq_id, max(c.agency_history_id) as agency_history_id
@@ -319,6 +345,14 @@ BEGIN
 	FROM   etl.ref_department_id_seq a JOIN tmp_fk_revenue_values_new_dept b ON a.uniq_id = b.uniq_id;
 
 	
+	
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		  	IF l_count >0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_department from Revenue');
+	END IF;
+	
+	
 	-- Generate the department history id for history records
 	
 	TRUNCATE etl.ref_department_history_id_seq;
@@ -339,6 +373,14 @@ BEGIN
 
 
 	RAISE NOTICE '5';
+	
+	
+	
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		  	IF l_count >0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_department from Revenue');
+	END IF;
 	
 	INSERT INTO tmp_fk_revenue_values(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
@@ -392,6 +434,16 @@ BEGIN
 			ELSE '<Non-Applicable Expenditure Object>' END) as original_expenditure_object_name
 	FROM   etl.ref_expenditure_object_id_seq a JOIN tmp_fk_revenue_values_new_exp_object b ON a.uniq_id = b.uniq_id;
 
+	
+	
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		  	IF l_count >0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_expenditure_object from Revenue');
+	END IF;
+	
+	
+	
 	-- Generate the expenditure_object history id for history records
 	
 	TRUNCATE etl.ref_expenditure_object_history_id_seq;
@@ -406,6 +458,12 @@ BEGIN
 			ELSE '<Non-Applicable Expenditure Object>' END) as expenditure_object_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_expenditure_object_history_id_seq a JOIN tmp_fk_revenue_values_new_exp_object b ON a.uniq_id = b.uniq_id
 		JOIN etl.ref_expenditure_object_id_seq c ON a.uniq_id = c.uniq_id;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+		  	IF l_count >0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_expenditure_object_history from Revenue');
+	END IF;
 
 	INSERT INTO tmp_fk_revenue_values(uniq_id,expenditure_object_history_id)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
@@ -454,6 +512,13 @@ BEGIN
 		agency_id,fund_class_id,now()::timestamp,p_load_id_in
 	FROM   etl.ref_budget_code_id_seq a JOIN tmp_fk_revenue_values_new_budget_codes b ON a.uniq_id = b.uniq_id;
 
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_budget_code from Revenue');
+	END IF;
+
 	INSERT INTO tmp_fk_revenue_values(uniq_id,budget_code_id)
 	SELECT	a.uniq_id, b.budget_code_id 
 	FROM etl.stg_revenue a JOIN ref_budget_code b ON COALESCE(a.func_cd,'---') = b.budget_code AND a.fy_dc = b.fiscal_year
@@ -495,6 +560,12 @@ BEGIN
 		now()::timestamp,p_load_id_in
 	FROM   etl.ref_object_class_id_seq a JOIN tmp_fk_revenue_values_new_obj_class b ON a.uniq_id = b.uniq_id;
 		
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_object_class from Revenue');
+	END IF;
+	
 	TRUNCATE etl.ref_object_class_history_id_seq;
 	
 	INSERT INTO etl.ref_object_class_history_id_seq(uniq_id)
@@ -506,6 +577,13 @@ BEGIN
 					    ELSE '<Unknown Object Class>' End )  as object_class_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_object_class_history_id_seq a JOIN etl.ref_object_class_id_seq b ON a.uniq_id = b.uniq_id
 		JOIN tmp_fk_revenue_values_new_obj_class c ON a.uniq_id = c.uniq_id;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_object_class from Revenue');
+	END IF;
+
 
 	INSERT INTO tmp_fk_revenue_values(uniq_id,object_class_history_id)
 	SELECT	a.uniq_id, max(d.object_class_history_id)  
@@ -544,6 +622,12 @@ BEGIN
 					    ELSE '<Unknown Revenue Category>' End ) as revenue_category_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_revenue_category_id_seq a JOIN tmp_fk_revenue_values_new_rev_category b ON a.uniq_id = b.uniq_id;
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_revenue_category from Revenue');
+	END IF;
+	
 	INSERT INTO tmp_fk_revenue_values(uniq_id,revenue_category_id)
 	SELECT	a.uniq_id, b.revenue_category_id 
 	FROM etl.stg_revenue a JOIN ref_revenue_category b ON COALESCE(a.rscat_cd,'---') = b.revenue_category_code ;
@@ -578,6 +662,12 @@ BEGIN
 					    ELSE '<Unknown Revenue Class>' End )as revenue_class_name,now()::timestamp,p_load_id_in
 	FROM   etl.ref_revenue_class_id_seq a JOIN tmp_fk_revenue_values_new_rev_class b ON a.uniq_id = b.uniq_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_revenue_class from Revenue');
+	END IF;
+	
 	
 	INSERT INTO tmp_fk_revenue_values(uniq_id,revenue_class_id)
 	SELECT	a.uniq_id, b.revenue_class_id 
@@ -613,6 +703,11 @@ BEGIN
 					    now()::timestamp,p_load_id_in
 	FROM   etl.ref_revenue_source_id_seq a JOIN tmp_fk_revenue_values_new_rev_source b ON a.uniq_id = b.uniq_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'Number of records inserted into ref_revenue_source from Revenue');
+	END IF;
 	
 	INSERT INTO tmp_fk_revenue_values(uniq_id,revenue_source_id)
 	SELECT	a.uniq_id, b.revenue_source_id 
@@ -776,7 +871,7 @@ BEGIN
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'R',l_count,'# of records inserted in budget ');
+	VALUES(p_load_file_id_in,'R',l_count,'# of records inserted in revenue ');
 		
 	/******************
 	INSERT into revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,
