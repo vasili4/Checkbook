@@ -250,6 +250,12 @@ BEGIN
 		NULL as vendor_sub_code,p_load_id_in as created_load_id, now()::timestamp
 	FROM	etl.tmp_all_vendors a JOIN etl.vendor_id_seq b ON a.uniq_id = b.uniq_id;
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'# of records inserted into vendor');
+	END IF;
+
 
 	RAISE NOTICE 'VENDOR 5';
 
@@ -274,6 +280,12 @@ BEGIN
 			JOIN vendor c ON a.vendor_customer_code = c.vendor_customer_code AND coalesce(a.misc_acct_fl,0)::bit = c.miscellaneous_vendor_flag
 	WHERE coalesce(a.misc_acct_fl,0) = 0;
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'# of records inserted into vendor_history');
+	END IF;
+	
 	INSERT INTO vendor_history(vendor_history_id, vendor_id, legal_name,alias_name,miscellaneous_vendor_flag ,vendor_sub_code,
     		load_id ,created_date)
 	SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,a.alias_nm,coalesce(a.misc_acct_fl,0)::bit,
@@ -281,6 +293,12 @@ BEGIN
 	FROM	etl.tmp_all_vendors a JOIN etl.vendor_history_id_seq b ON a.uniq_id = b.uniq_id
 		JOIN etl.vendor_id_seq c ON a.uniq_id = c.uniq_id
 	WHERE coalesce(a.misc_acct_fl,0) = 1;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'# of records inserted into vendor_history');
+	END IF;
 
 		
 	RAISE NOTICE 'VENDOR 6';	
@@ -378,6 +396,11 @@ BEGIN
 		JOIN etl.vendor_address_id_seq c ON a.uniq_id = c.uniq_id	   
 		LEFT JOIN ref_address_type g ON a.address_type_code = g.address_type_code;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'# inserted into vendor_address');
+	END IF;
 
 	RAISE NOTICE 'VENDOR 8';
 	
@@ -390,6 +413,11 @@ BEGIN
 		JOIN etl.vendor_history_id_seq d ON a.uniq_id = d.uniq_id
 		WHERE a.is_new_vendor ='Y' OR a.is_name_changed='Y' OR a.is_vendor_address_changed = 'Y' OR a.is_bus_type_changed = 'Y';
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			  	IF l_count >0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'R',l_count,'# records inserted into vendor_business_type');
+	END IF;
 	
 	RETURN 1;
 	
