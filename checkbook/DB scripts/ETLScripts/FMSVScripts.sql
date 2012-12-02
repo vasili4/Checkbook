@@ -30,7 +30,7 @@ BEGIN
 	GET DIAGNOSTICS rec_count = ROW_COUNT;	
 	
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'V',rec_count, '# of vendor business type records');
+	VALUES(p_load_file_id_in,'V',rec_count, '# of records inserted into fmsv_business_type');
 	
 	RETURN 1;
 
