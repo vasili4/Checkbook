@@ -178,7 +178,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'P',l_count, 'New agency records inserted from payroll');
+		VALUES(p_load_file_id_in,'P',l_count, 'Number of records inserted into ref_agency from payroll');
 	END IF;
 	
 	RAISE NOTICE 'PMS 1.1';
@@ -199,7 +199,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'P',l_count, 'New agency history records inserted from payroll');
+		VALUES(p_load_file_id_in,'P',l_count, 'Number of records inserted into ref_agency_history from payroll');
 	END IF;
 	
 	RAISE NOTICE '1.3';
@@ -270,7 +270,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'P',l_count, 'New department records inserted from payroll');
+		VALUES(p_load_file_id_in,'P',l_count, 'Number of records inserted into ref_department from payroll');
 	END IF;
 	
 	RAISE NOTICE '1.5';
@@ -296,7 +296,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'P',l_count, 'New department history records inserted from payroll');
+		VALUES(p_load_file_id_in,'P',l_count, 'Number of records inserted into ref_department_history from payroll');
 	END IF;
 	
 
@@ -471,7 +471,7 @@ BEGIN
 		
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'P',l_count,'# of new PMS records');
+	VALUES(p_load_file_id_in,'P',l_count,'# of records inserted into payroll');
 	
 	-- Updating the gross pay YTD based on budget fiscal year
 	
@@ -666,7 +666,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PS',l_count, 'New agency records inserted from payroll summary');
+		VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into ref_agency from payroll summary');
 	END IF;
 	
 	RAISE NOTICE '1.1';
@@ -687,7 +687,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PS',l_count, 'New agency history records inserted from payroll summary');
+		VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into ref_agency_history from payroll summary');
 	END IF;
 	
 	RAISE NOTICE '1.3';
@@ -750,7 +750,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PS',l_count, 'New department records inserted from payroll summary');
+		VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into ref_department from payroll summary');
 	END IF;
 	
 	RAISE NOTICE '1.5';
@@ -776,7 +776,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PS',l_count, 'New department history records inserted from payroll summary');
+		VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into ref_department_history from payroll summary');
 	END IF;
 	
 	RAISE NOTICE '1.6';
@@ -837,7 +837,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PS',l_count, 'New expenditure object records inserted from payroll summary');
+		VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into ref_expenditure_object from payroll summary');
 	END IF;
 	
 	-- Generate the expenditure_object history id for history records
@@ -860,7 +860,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PS',l_count, 'New expenditure object history records inserted from payroll summary');
+		VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into ref_expenditure_object_history from payroll summary');
 	END IF;
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,expenditure_object_history_id,expenditure_object_id,expenditure_object_name)
@@ -915,7 +915,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PS',l_count, 'New budget code records inserted from payroll summary');
+		VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into ref_budget_code from payroll summary');
 	END IF;
 	
 	INSERT INTO tmp_fk_pms_summay_values(uniq_id,budget_code_id,budget_code_name)
@@ -1075,7 +1075,7 @@ BEGIN
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'PS',l_count,'# of new PMS Summary records');
+	VALUES(p_load_file_id_in,'PS',l_count,'# of records inserted into payroll_summary');
 
 	CREATE TEMPORARY TABLE tmp_payroll_summary_update AS
 	SELECT *
@@ -1110,7 +1110,7 @@ BEGIN
 	       
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'PS',l_count,'# of updated PMS Summary records');
+	VALUES(p_load_file_id_in,'PS',l_count,'# of records updated in payroll_summary');
 			
 	RETURN 1;
 	
