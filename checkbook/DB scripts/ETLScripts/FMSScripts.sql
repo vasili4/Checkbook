@@ -59,7 +59,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New agency records inserted from disbursements header');
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_agency from disbursements header');
 	END IF;
 	
 	RAISE NOTICE '1.1';
@@ -80,7 +80,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from disbursements header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records into ref_agency_history from disbursements header');
 	END IF;
 	
 	RAISE NOTICE '1.3';
@@ -216,7 +216,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New fund class records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_fund_class from disbursements accounting lines');	
 	END IF;	
 	
 	
@@ -263,7 +263,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New agency records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_agency from disbursements accounting lines');	
 	END IF;	
 	
 	RAISE NOTICE '1.2';
@@ -284,7 +284,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New agency history records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_agency_history from disbursements accounting lines');	
 	END IF;	
 	
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,agency_history_id)
@@ -348,7 +348,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New department records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_department from disbursements accounting lines');	
 	END IF;	
 	
 	RAISE NOTICE '1.5';
@@ -375,7 +375,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New department history records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_department_history from disbursements accounting lines');	
 	END IF;	
 	
 	RAISE NOTICE '1.6';
@@ -437,7 +437,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New expenditure records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_expenditure_object from disbursements accounting lines');	
 	END IF;	
 	
 	-- Generate the expenditure_object history id for history records
@@ -461,7 +461,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New expenditure history records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_expenditure_object_history from disbursements accounting lines');	
 	END IF;	
 	
 	INSERT INTO tmp_fk_values_fms_acc_line(uniq_id,expenditure_object_history_id)
@@ -521,7 +521,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New location records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_location from disbursements accounting lines');	
 	END IF;	
 	
 
@@ -547,7 +547,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New location history records inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into ref_location_history from disbursements accounting lines');	
 	END IF;	
 	
 
@@ -769,7 +769,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'F',l_count, 'New contracts inserted from disbursements accounting lines');	
+		VALUES(p_load_file_id_in,'F',l_count, 'Number of records inserted into history_agreement from disbursements accounting lines');	
 	END IF;		
 	
 	RAISE NOTICE 'FMS AC 3';
