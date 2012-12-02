@@ -67,7 +67,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from MAG header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency from MAG header');
 	END IF;
 	
 	RAISE NOTICE '1.1';
@@ -88,7 +88,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from MAG header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency_history from MAG header');
 	END IF;
 	
 	RAISE NOTICE '1.3';
@@ -500,7 +500,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'M',l_count, 'New MAG records inserted from MAG Feed');
+		VALUES(p_load_file_id_in,'M',l_count, '# of records inserted into history_master_agreement from MAG Feed');
 	END IF;	
 	
 	RAISE NOTICE 'MAG 6';
@@ -621,7 +621,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'M',l_count, 'MAG records updated from MAG Feed');
+		VALUES(p_load_file_id_in,'M',l_count, '# of records updated in history_master_agreement from MAG Feed');
 	END IF;
 	
 	RAISE NOTICE 'MAG 7';
@@ -656,7 +656,7 @@ BEGIN
 
 		GET DIAGNOSTICS l_count = ROW_COUNT;
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id_in,'M','',l_count,'# of records inserted in all_agreement_worksite ');
+		VALUES(p_load_file_id_in,'M','',l_count,'# of records inserted into history_agreement_worksite from MAG Feed');
 		
 	END LOOP; 
 	
