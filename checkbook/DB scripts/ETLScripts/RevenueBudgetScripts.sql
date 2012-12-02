@@ -76,7 +76,7 @@ $BODY$
   	GET DIAGNOSTICS l_count = ROW_COUNT;
   	IF l_count >0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted into agency from revenue_budget ');
+		VALUES(p_load_file_id_in,'RB',l_count,'Number of records inserted into ref_agency from revenue_budget ');
 	END IF;
   
   	RAISE NOTICE '1.1';
@@ -98,7 +98,7 @@ $BODY$
   	GET DIAGNOSTICS l_count = ROW_COUNT;
 	  	IF l_count >0 THEN
 			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-			VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted into agency from revenue_budget ');
+			VALUES(p_load_file_id_in,'RB',l_count,'Number of records inserted into ref_agency_history from revenue_budget ');
 	END IF;
   	
   	RAISE NOTICE '1.3';
@@ -327,7 +327,7 @@ Raise NOTICE 'Revenue Budget 1.1';
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'RB',l_count,'# of records updated in revenue budget ');
+	VALUES(p_load_file_id_in,'RB',l_count,'# of records updated in revenue_budget ');
 	
 	
 	--To popluate revenue_category_id,code and name
@@ -373,7 +373,7 @@ Raise NOTICE 'Revenue Budget 1.1';
    
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted in revenue_budget ');
+	VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted into revenue_budget ');
 	
 	RAISE NOTICE 'BUDGET 2';
 
