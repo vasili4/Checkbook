@@ -71,7 +71,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from general contracts header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency  from general contracts header');
 	END IF;
 	
 	RAISE NOTICE '1.1';
@@ -92,7 +92,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from general contracts header');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency_history from general contracts header');
 	END IF;
 	
 	RAISE NOTICE '1.3';
@@ -391,7 +391,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New MAG records inserted from general contracts');
+		VALUES(p_load_file_id_in,'C',l_count, '# of records inserted into history_master_agreement inserted from general contracts');
 	END IF;
 	
 	-- Updating the newly created MAG identifier.
@@ -500,7 +500,7 @@ BEGIN
 
 	IF l_count > 0 THEN 
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New fund class records inserted from general contracts accounting lines');	
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_fund_class from general contracts accounting lines');	
 	END IF;	
 	
 	INSERT INTO tmp_fk_values_acc_line(uniq_id,fund_class_id)
@@ -544,7 +544,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency records inserted from general contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency from general contracts accounting lines');
 	END IF;
 	
 	RAISE NOTICE '1.2';
@@ -568,7 +568,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New agency history records inserted from general contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_agency_history from general contracts accounting lines');
 	END IF;
 	
 	INSERT INTO tmp_fk_values_acc_line(uniq_id,agency_history_id)
@@ -631,7 +631,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New department records inserted from general contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_department from general contracts accounting lines');
 	END IF;
 	
 	RAISE NOTICE '1.5';
@@ -657,7 +657,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New department history records inserted from general contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into department_history_id from general contracts accounting lines');
 	END IF;
 
 	RAISE NOTICE '1.6';
@@ -717,7 +717,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New expenditure object records inserted from general contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_expenditure_object from general contracts accounting lines');
 	END IF;
 	
 	-- Generate the expenditure_object history id for history records
@@ -741,7 +741,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'C',l_count, 'New expenditure object history records inserted from general contracts accounting lines');
+		VALUES(p_load_file_id_in,'C',l_count, 'Number of records inserted into ref_expenditure_object_history from general contracts accounting lines');
 	END IF;
 
 	RAISE NOTICE '1.11';
@@ -1100,7 +1100,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id_in,'C','CT1',l_count,'# of General Contracts updated in history_agreement');
+		VALUES(p_load_file_id_in,'C','CT1',l_count,'# of records updated in history_agreement from General Contracts');
 	END IF;
 	
 	RAISE NOTICE '5';
@@ -1246,7 +1246,7 @@ BEGIN
 
 		GET DIAGNOSTICS l_count = ROW_COUNT;
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-		VALUES(p_load_file_id_in,'C','CT1,CTA1',l_count,'# of records inserted in all_agreement_worksite ');
+		VALUES(p_load_file_id_in,'C','CT1,CTA1',l_count,'# of records inserted in history_agreement_worksite ');
 		
 	END LOOP; 
 		
