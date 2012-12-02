@@ -956,7 +956,16 @@ BEGIN
 			JOIN etl.etl_data_load m ON a.load_id = m.load_id
 		WHERE m.job_id = p_job_id_in AND m.data_source_code ='R' ;
 		
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+				  	IF l_count >0 THEN
+						INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+						VALUES(p_load_file_id_in,'R',l_count,'# of records inserted into revenue_details');
+	END IF;
+		
+		
 		l_end_time := timeofday()::timestamp;
+		
+		
 		
 		INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
 		VALUES(p_job_id_in,'etl.processrevenuedetails',1,l_start_time,l_end_time);
