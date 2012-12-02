@@ -55,7 +55,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PC',l_count, 'New agency records inserted from Pending Contracts');
+		VALUES(p_load_file_id_in,'PC',l_count, 'Number of records inserted into ref_agency from Pending Contracts');
 	END IF;
 	
 	RAISE NOTICE '3';
@@ -76,7 +76,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PC',l_count, 'New agency history records inserted from Pending Contracts');
+		VALUES(p_load_file_id_in,'PC',l_count, 'Number of records inserted into ref_agency_history from Pending Contracts');
 	END IF;
 	
 	INSERT INTO tmp_fk_values_pc (uniq_id,document_agency_id,document_agency_name,document_agency_short_name)
@@ -145,7 +145,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PC',l_count, 'New agency records inserted from Pending Contracts');
+		VALUES(p_load_file_id_in,'PC',l_count, 'Number of records inserted into ref_agency from Pending Contracts');
 	END IF;
 	
 	RAISE NOTICE '6';
@@ -166,7 +166,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'PC',l_count, 'New agency history records inserted from Pending Contracts');
+		VALUES(p_load_file_id_in,'PC',l_count, 'Number of records inserted into ref_agency_history from Pending Contracts');
 	END IF;
 	
 	
