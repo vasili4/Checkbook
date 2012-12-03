@@ -36,7 +36,7 @@ CREATE EXTERNAL WEB TABLE address__0 (
     state character varying,
     zip character varying,
     country character varying
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.address to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.address to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -62,7 +62,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_coa_entities__0 (
     type_of_year char(1),
     total_spending_amount numeric,
     total_disbursements integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_coa_entities to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_spending_coa_entities to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -91,7 +91,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_contract__0 (
     type_of_year char(1),
     total_spending_amount numeric,
     total_contract_amount numeric
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_contract to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_spending_contract to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -117,7 +117,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor__0 (
     total_spending_amount numeric,
     total_contract_amount numeric,
     is_all_categories char(1)
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_vendor to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_spending_vendor to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -138,7 +138,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_spending_vendor_exp_object__0(
 	type_of_year char(1),
 	total_spending_amount numeric(16,2) 
 )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_spending_vendor_exp_object to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_spending_vendor_exp_object to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -195,7 +195,7 @@ CREATE EXTERNAL WEB TABLE budget__0 (
     updated_date timestamp without time zone,
     agency_short_name varchar,
     department_short_name varchar
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.budget to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.budget to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -247,7 +247,7 @@ CREATE EXTERNAL WEB TABLE disbursement__0 (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.disbursement to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.disbursement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -298,7 +298,7 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item__0 (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone    
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.disbursement_line_item to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.disbursement_line_item to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -392,7 +392,7 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
 	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.disbursement_line_item_details to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.disbursement_line_item_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -463,7 +463,7 @@ CREATE EXTERNAL WEB TABLE revenue_details__0 (
 	load_id integer,
     last_modified_date timestamp without time zone
 	
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.revenue_details to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -570,7 +570,7 @@ CREATE EXTERNAL WEB TABLE history_agreement__0 (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.history_agreement to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.history_agreement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -633,7 +633,7 @@ CREATE EXTERNAL WEB TABLE history_agreement_accounting_line__0 (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.history_agreement_accounting_line to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.history_agreement_accounting_line to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -672,7 +672,7 @@ CREATE EXTERNAL WEB TABLE history_agreement_commodity__0 (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.history_agreement_commodity to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.history_agreement_commodity to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -697,7 +697,7 @@ CREATE EXTERNAL WEB TABLE history_agreement_worksite__0 (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.history_agreement_worksite to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.history_agreement_worksite to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -796,7 +796,7 @@ CREATE EXTERNAL WEB TABLE history_master_agreement__0 (
   updated_load_id integer,
   created_date timestamp without time zone,
   updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.history_master_agreement to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.history_master_agreement to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -839,7 +839,7 @@ CREATE EXTERNAL WEB TABLE ref_address_type__0 (
     address_type_code character varying,
     address_type_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_address_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_address_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -865,7 +865,7 @@ CREATE EXTERNAL WEB TABLE ref_agency__0 (
     updated_date timestamp without time zone,
     created_load_id integer,
     updated_load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_agency to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_agency to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -888,7 +888,7 @@ CREATE EXTERNAL WEB TABLE ref_agency_history__0 (
     agency_short_name character varying,
     created_date timestamp without time zone,
     load_id integer    
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_agency_history to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_agency_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -908,7 +908,7 @@ CREATE EXTERNAL WEB TABLE ref_agreement_type__0 (
     agreement_type_code character varying,
     agreement_type_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_agreement_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_agreement_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -928,7 +928,7 @@ CREATE EXTERNAL WEB TABLE ref_award_category__0 (
     award_category_code character varying,
     award_category_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_award_category to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_award_category to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -948,7 +948,7 @@ CREATE EXTERNAL WEB TABLE ref_award_method__0 (
     award_method_code character varying,
     award_method_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_award_method to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_award_method to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -982,7 +982,7 @@ CREATE EXTERNAL WEB TABLE ref_budget_code__0 (
     load_id integer,
     updated_date timestamp without time zone,
     updated_load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_budget_code to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_budget_code to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1002,7 +1002,7 @@ CREATE EXTERNAL WEB TABLE ref_business_type__0 (
     business_type_code character varying,
     business_type_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_business_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_business_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1021,7 +1021,7 @@ CREATE EXTERNAL WEB TABLE ref_business_type_status__0 (
     business_type_status_id smallint,
     business_type_status character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_business_type_status to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_business_type_status to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1040,7 +1040,7 @@ CREATE EXTERNAL WEB TABLE ref_data_source__0 (
     data_source_code character varying,
     description character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_data_source to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_data_source to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1060,7 +1060,7 @@ CREATE EXTERNAL WEB TABLE ref_date__0 (
     date date,
     nyc_year_id smallint,
     calendar_month_id int
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_date to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_date to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1089,7 +1089,7 @@ CREATE EXTERNAL WEB TABLE ref_department__0 (
     updated_date timestamp without time zone,
     created_load_id integer,
     updated_load_id integer    
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_department to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_department to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1114,7 +1114,7 @@ CREATE EXTERNAL WEB TABLE ref_department_history__0 (
     fiscal_year smallint,
     created_date timestamp without time zone,
     load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_department_history to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_department_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1134,7 +1134,7 @@ CREATE EXTERNAL WEB TABLE ref_document_code__0 (
     document_code character varying,
     document_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_document_code to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_document_code to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1153,7 +1153,7 @@ CREATE EXTERNAL WEB TABLE ref_expenditure_cancel_reason__0 (
     expenditure_cancel_reason_id smallint,
     expenditure_cancel_reason_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_expenditure_cancel_reason to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_expenditure_cancel_reason to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1172,7 +1172,7 @@ CREATE EXTERNAL WEB TABLE ref_expenditure_cancel_type__0 (
     expenditure_cancel_type_id smallint,
     expenditure_cancel_type_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_expenditure_cancel_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_expenditure_cancel_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1197,7 +1197,7 @@ CREATE EXTERNAL WEB TABLE ref_expenditure_object__0 (
     updated_date timestamp without time zone,
     created_load_id integer,
     updated_load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_expenditure_object to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_expenditure_object to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1219,7 +1219,7 @@ CREATE EXTERNAL WEB TABLE ref_expenditure_object_history__0 (
     fiscal_year smallint,
     created_date timestamp without time zone,
     load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_expenditure_object_history to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_expenditure_object_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1239,7 +1239,7 @@ CREATE EXTERNAL WEB TABLE ref_expenditure_privacy_type__0 (
     expenditure_privacy_code character varying,
     expenditure_privacy_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_expenditure_privacy_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_expenditure_privacy_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1258,7 +1258,7 @@ CREATE EXTERNAL WEB TABLE ref_expenditure_status__0 (
     expenditure_status_id smallint,
     expenditure_status_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_expenditure_status to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_expenditure_status to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1279,7 +1279,7 @@ CREATE EXTERNAL WEB TABLE ref_fund_class__0 (
     fund_class_name character varying,
     created_load_id integer,
     created_date timestamp without time zone    
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_fund_class to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_fund_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1309,7 +1309,7 @@ CREATE EXTERNAL WEB TABLE ref_funding_class__0 (
     updated_date timestamp,
     created_load_id integer,
     updated_load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_funding_class to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_funding_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1333,7 +1333,7 @@ CREATE EXTERNAL WEB TABLE ref_funding_source__0 (
     funding_source_code character varying,
     funding_source_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_funding_source to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_funding_source to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1359,7 +1359,7 @@ CREATE EXTERNAL WEB TABLE ref_location__0 (
     updated_date timestamp without time zone,
     created_load_id integer,
     updated_load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_location to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_location to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1382,7 +1382,7 @@ CREATE EXTERNAL WEB TABLE ref_location_history__0 (
     location_short_name character varying,
     created_date timestamp without time zone,
     load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_location_history to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_location_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1402,7 +1402,7 @@ CREATE EXTERNAL WEB TABLE ref_minority_type__0 (
     minority_type_id smallint,
     minority_type_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_minority_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_minority_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1422,7 +1422,7 @@ CREATE EXTERNAL WEB TABLE ref_miscellaneous_vendor__0 (
     misc_vendor_id smallint,
     vendor_customer_code character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_miscellaneous_vendor to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_miscellaneous_vendor to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1444,7 +1444,7 @@ CREATE EXTERNAL WEB TABLE ref_month__0 (
     year_id smallint,
     display_order smallint,
     month_short_name varchar(3)
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_month to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_month to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1481,7 +1481,7 @@ CREATE EXTERNAL WEB TABLE ref_object_class__0 (
     updated_date timestamp without time zone,
     created_load_id integer,
     updated_load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_object_class to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_object_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1514,7 +1514,7 @@ CREATE EXTERNAL WEB TABLE ref_object_class_history__0 (
     related_object_class_code character varying,
     created_date timestamp without time zone,
     load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_object_class_history to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_object_class_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1541,7 +1541,7 @@ CREATE EXTERNAL WEB TABLE ref_revenue_category__0 (
     created_load_id integer,
     updated_load_id integer,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_revenue_category to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_revenue_category to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1569,7 +1569,7 @@ CREATE EXTERNAL WEB TABLE ref_revenue_class__0 (
     created_load_id integer,
     updated_load_id integer,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_revenue_class to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_revenue_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1622,7 +1622,7 @@ CREATE EXTERNAL WEB TABLE ref_revenue_source__0 (
     updated_load_id integer,
     updated_date timestamp without time zone,
     created_load_id integer
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_revenue_source to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_revenue_source to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1652,7 +1652,7 @@ CREATE EXTERNAL WEB TABLE ref_spending_category__0 (
     spending_category_name character varying,
     display_name character varying,
     display_order smallint
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_spending_category to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_spending_category to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1671,7 +1671,7 @@ CREATE VIEW ref_spending_category AS
 CREATE EXTERNAL WEB TABLE ref_year__0 (
     year_id smallint,
     year_value smallint
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_year to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_year to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1762,7 +1762,7 @@ CREATE EXTERNAL WEB TABLE revenue__0 (
     budget_fiscal_year_id smallint,    
     load_id integer,
     created_date timestamp without time zone  
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.revenue to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1792,7 +1792,7 @@ CREATE EXTERNAL WEB TABLE vendor__0 (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.vendor to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.vendor to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1817,7 +1817,7 @@ CREATE EXTERNAL WEB TABLE vendor_address__0 (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.vendor_address to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.vendor_address to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1841,7 +1841,7 @@ CREATE EXTERNAL WEB TABLE vendor_business_type__0 (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.vendor_business_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.vendor_business_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1866,7 +1866,7 @@ CREATE EXTERNAL WEB TABLE vendor_history__0 (
     load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.vendor_history to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.vendor_history to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1901,7 +1901,7 @@ CREATE EXTERNAL WEB TABLE vendor_details__0 (
 	business_type_name	character varying(50),
 	minority_type_id	smallint,
 	minority_type_name	character varying(50)
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.vendor_details to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.vendor_details to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1919,7 +1919,7 @@ CREATE EXTERNAL WEB TABLE ref_fiscal_period__0(
 	fiscal_period smallint,
 	fiscal_period_name varchar
 )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_fiscal_period to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_fiscal_period to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1940,7 +1940,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_class__0(
 	current_modified_amount numeric(16,2)
 )
 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_revenue_category_funding_class to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_category_funding_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1963,7 +1963,7 @@ CREATE EXTERNAL WEB TABLE ref_amount_basis__0 (
   amount_basis_name varchar(50) ,
   created_date timestamp 
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_amount_basis to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_amount_basis to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -1987,7 +1987,7 @@ CREATE EXTERNAL WEB TABLE employee__0 (
   created_load_id int,
   updated_load_id int
   )
-  EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.employee to stdout csv"' ON SEGMENT 0 
+  EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.employee to stdout csv"' ON SEGMENT 0 
    FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
   
@@ -2008,7 +2008,7 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
   created_date timestamp,
   created_load_id int
   )
-  EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.employee_history to stdout csv"' ON SEGMENT 0 
+  EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.employee_history to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
 
@@ -2065,7 +2065,7 @@ CREATE EXTERNAL WEB TABLE payroll__0(
 	created_load_id int,
 	updated_date timestamp,
 	updated_load_id int)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.payroll to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	
   
@@ -2096,7 +2096,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_agency__0(
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
 	gross_pay numeric(16,2) )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_employee_agency to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_employee_agency to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2120,7 +2120,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_agency__0(
 	total_hourly_employees int,
 	total_overtime_employees int,
 	annual_salary numeric(16,2))
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_agency to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_agency to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2143,7 +2143,7 @@ CREATE  EXTERNAL WEB TABLE aggregateon_payroll_coa_month__0(
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
 	gross_pay numeric(16,2) )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_coa_month to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_coa_month to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2160,7 +2160,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	total_salaried_employees int,
 	total_hourly_employees int,
 	total_overtime_employees int)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_year to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_year to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	
   
@@ -2187,7 +2187,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
 	gross_pay numeric(16,2) )
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_employee_agency_month to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_employee_agency_month to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2212,7 +2212,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_agency_month__0(
 	total_hourly_employees int,
 	total_overtime_employees int,
 	annual_salary numeric(16,2))
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_agency_month to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_agency_month to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2233,7 +2233,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	total_salaried_employees int,
 	total_hourly_employees int,
 	total_overtime_employees int)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payroll_year_and_month to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_year_and_month to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	
   
@@ -2281,7 +2281,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_payro
 	  budget_code_name character varying
 
 	)
-	 EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
+	 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_budget to stdout csv"' ON SEGMENT 0 
 	 FORMAT 'csv' (delimiter ',' null '' escape '"' quote '"')
 	ENCODING 'UTF8';
 		
@@ -2330,7 +2330,7 @@ CREATE EXTERNAL WEB TABLE payroll_summary__0 (
     updated_date timestamp without time zone,
     updated_load_id integer
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.payroll_summary to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll_summary to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2365,7 +2365,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.payroll_summary t
  	master_agreement_yn character(1),
  	status_flag char(1)
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot_expanded to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.agreement_snapshot_expanded to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
 
@@ -2401,7 +2401,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot_expanded_cy__0(
 	master_agreement_yn character(1),
 	status_flag char(1)
 	)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot_expanded_cy to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.agreement_snapshot_expanded_cy to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	 
   
@@ -2437,7 +2437,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_contracts_cumulative_spending__0(
 	status_flag char(1),
 	type_of_year char(1)	
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_cumulative_spending to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_contracts_cumulative_spending to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	 
   
@@ -2470,7 +2470,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 	status_flag char(1),
 	type_of_year char(1)
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_spending_by_month to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_contracts_spending_by_month to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2504,7 +2504,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 	status_flag char(1),
 	type_of_year char(1)
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total_contracts to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_total_contracts to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2534,7 +2534,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_total
 	status_flag char(1),
 	type_of_year char(1)
 ) 	
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_department to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_contracts_department to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2582,7 +2582,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contr
 	status_flag char(1),
 	type_of_year char(1)
 ) 	
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.contracts_spending_transactions to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contracts_spending_transactions to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2609,7 +2609,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_contracts_expense__0(
 	spending_amount numeric(16,2),
 	is_disbursements_exist char(1)
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.aggregateon_contracts_expense to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_contracts_expense to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	
 
@@ -2681,7 +2681,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
   	  load_id integer,
       last_modified_date timestamp without time zone
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.agreement_snapshot to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2765,7 +2765,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot_cy__0(
   	  load_id integer,
       last_modified_date timestamp without time zone
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.agreement_snapshot_cy to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.agreement_snapshot_cy to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
   
@@ -2856,7 +2856,7 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
   	latest_flag char(1)
 	
  )
- EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.pending_contracts to stdout csv"' ON SEGMENT 0 
+ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.pending_contracts to stdout csv"' ON SEGMENT 0 
       FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
    ENCODING 'UTF8';
    
@@ -2891,7 +2891,7 @@ CREATE EXTERNAL WEB TABLE ref_industry_type__0 (
     industry_type_id smallint ,
     industry_type_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_industry_type to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_industry_type to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -2904,7 +2904,7 @@ CREATE VIEW ref_industry_type AS
     award_size_id smallint ,
     award_size_name character varying,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_award_size to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_award_size to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
@@ -2918,7 +2918,7 @@ CREATE VIEW ref_award_size AS
     award_category_code character varying(10),
     industry_type_id smallint,
     created_date timestamp without time zone
-) EXECUTE E' psql -h mdw1 -p 5432  checkbook_new -c "copy public.ref_award_category_industry to stdout csv"' ON SEGMENT 0 
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_award_category_industry to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 

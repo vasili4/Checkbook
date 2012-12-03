@@ -118,7 +118,7 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForPMS(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count int;
+	l_count bigint;
 BEGIN
 
 	RAISE NOTICE ' INSIDE PMS 1';

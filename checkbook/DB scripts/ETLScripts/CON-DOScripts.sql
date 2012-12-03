@@ -6,7 +6,7 @@
 */
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForDO1InHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count smallint;
+	l_count bigint;
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	
@@ -152,7 +152,7 @@ DECLARE
 	l_worksite_col_array VARCHAR ARRAY[10];
 	l_array_ctr smallint;
 	l_fk_update int;
-	l_count int;
+	l_count bigint;
 BEGIN
 						  
 	-- Fetch all the contracts associated with MAG
@@ -258,7 +258,7 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForDOInAccLine(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count int;
+	l_count bigint;
 BEGIN
 	-- UPDATING FK VALUES IN ETL.STG_CON_DO1_ACCOUNTING_LINE
 	
@@ -621,7 +621,7 @@ $$ language plpgsql;
 CREATE OR REPLACE FUNCTION etl.processCONDeliveryOrders(p_load_file_id_in int,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
 	l_fk_update int;
-	l_count int;
+	l_count bigint;
 BEGIN
 				      
 	l_fk_update := etl.updateForeignKeysForDO1InHeader(p_load_file_id_in,p_load_id_in);

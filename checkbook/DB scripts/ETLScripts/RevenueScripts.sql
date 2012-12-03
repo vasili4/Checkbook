@@ -13,6 +13,7 @@ Functions defined
 CREATE OR REPLACE FUNCTION etl.updateforeignkeysforrevenue(p_load_id_in bigint)
   RETURNS integer AS $$
 DECLARE
+l_count bigint;
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	
@@ -921,6 +922,7 @@ $BODY$
 DECLARE
 	l_start_time  timestamp;
 	l_end_time  timestamp;
+	l_count bigint;
 BEGIN
 	-- Inserting into the revenue_details
 	l_start_time := timeofday()::timestamp;

@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION etl.updateforeignkeysforbudget(p_load_file_id_in bigi
   RETURNS integer AS $$
 
 DECLARE
-l_count int;
+l_count bigint;
 
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR BUDGET DATA*/		

@@ -12,7 +12,7 @@ set search_path=etl;
 
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForMAGInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count smallint;
+	l_count bigint;
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	

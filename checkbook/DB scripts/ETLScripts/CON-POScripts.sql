@@ -13,7 +13,7 @@ set search_path=public;
 
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForPOInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count smallint;
+	l_count bigint;
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	
@@ -262,7 +262,7 @@ DECLARE
 	l_worksite_col_array VARCHAR ARRAY[10];
 	l_array_ctr smallint;
 	l_fk_update int;
-	l_count int;
+	l_count bigint;
 BEGIN
 						  
 	-- Fetch all the contracts associated with MAG
@@ -369,7 +369,7 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForPOInAccLine(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count integer;
+	l_count bigint;
 BEGIN
 	-- UPDATING FK VALUES IN ETL.STG_CON_po_ACCOUNTING_LINE
 	
@@ -736,7 +736,7 @@ DECLARE
 	l_fk_update int;
 	l_worksite_per_array VARCHAR ARRAY[10];
 	l_insert_sql VARCHAR;
-	l_count int;
+	l_count bigint;
 BEGIN
 	l_worksite_col_array := ARRAY['wk_site_cd_01',
 				      'wk_site_cd_02',

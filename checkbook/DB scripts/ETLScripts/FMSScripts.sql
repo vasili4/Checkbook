@@ -9,7 +9,7 @@ set search_path=public;
 */
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInHeader(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count smallint;
+	l_count bigint;
 BEGIN
 	/* UPDATING FOREIGN KEY VALUES	FOR THE HEADER RECORD*/		
 	
@@ -148,7 +148,7 @@ $$ language plpgsql;
 
 CREATE OR REPLACE FUNCTION etl.updateForeignKeysForFMSInAccLine(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count smallint;
+	l_count bigint;
 	
 BEGIN
 	-- UPDATING FK VALUES IN ETL.STG_FMS_ACCOUNTING_LINE
@@ -675,7 +675,7 @@ DECLARE
 	l_worksite_col_array VARCHAR ARRAY[10];
 	l_array_ctr smallint;
 	l_fk_update int;
-	l_count int;
+	l_count bigint;
 BEGIN
 						  
 	-- updating staging table columns (rqporf_doc_id, rqporf_doc_dept_cd,  rqporf_doc_cd)  with 'N/A' if it has 'N/A (PRIVACY/SECURITY)'
@@ -827,6 +827,7 @@ DECLARE
 	l_display_type char(1);
 	l_masked_agreement_id bigint;
 	l_masked_vendor_history_id integer;
+	l_count bigint;
 BEGIN
 
 

@@ -14,6 +14,7 @@ DECLARE
 	l_data_source_code char(2);
 	l_vendor_stg_table VARCHAR;
 	l_update_query varchar;
+	l_count bigint;
 
 BEGIN
 
