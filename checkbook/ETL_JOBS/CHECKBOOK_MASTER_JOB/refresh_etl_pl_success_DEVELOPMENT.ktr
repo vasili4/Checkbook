@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>refresh2_etl_pl_success</name>
+    <name>refresh_etl_pl_success_DEVELOPMENT</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -62,9 +62,9 @@
     <clusterschemas>
     </clusterschemas>
   <created_user/>
-  <created_date>2012&#47;02&#47;13 15:01:27.359</created_date>
+  <created_date>2012&#47;11&#47;28 17:24:01.424</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2010&#47;05&#47;19 14:22:09.247</modified_date>
+  <modified_date>2009&#47;09&#47;23 15:36:12.031</modified_date>
   </info>
   <notepads>
   </notepads>
@@ -90,8 +90,33 @@
       <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
     </attributes>
   </connection>
+  <connection>
+    <name>MySQL DB</name>
+    <server>${FAADS_MYSQL_HOST}</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>${FAADS_MYSQL_DBNAME}</database>
+    <port>${FAADS_MYSQL_PORT}</port>
+    <username>${FAADS_MYSQL_USER}</username>
+    <password>${FAADS_MYSQL_PASS}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>EXTRA_OPTION_MYSQL.defaultFetchSize</code><attribute>500</attribute></attribute>
+      <attribute><code>EXTRA_OPTION_MYSQL.useCursorFetch</code><attribute>true</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>PORT_NUMBER</code><attribute>${FAADS_MYSQL_PORT}</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+    </attributes>
+  </connection>
   <order>
-  <hop> <from>Filter rows</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Filter rows</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value</from><to>Mail</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2</from><to>Mail 2</to><enabled>Y</enabled> </hop>  <hop> <from>Table input</from><to>Get Variables</to><enabled>Y</enabled> </hop>  </order>
+  <hop> <from>Filter rows</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>  <hop> <from>Table input</from><to>Get Variables</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2</from><to>Mail 2</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value</from><to>Mail</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Filter rows</to><enabled>Y</enabled> </hop>  </order>
   <step>
     <name>Filter rows</name>
     <type>FilterRows</type>
@@ -110,12 +135,12 @@
  <leftvalue>total_shards_refreshed</leftvalue>
  <function>&gt;=</function>
  <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>5</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
+ <value><name>constant</name><type>Integer</type><text>1</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>582</xloc>
-      <yloc>391</yloc>
+      <xloc>383</xloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -194,8 +219,8 @@
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>384</xloc>
-      <yloc>391</yloc>
+      <xloc>185</xloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -250,8 +275,8 @@
       </embeddedimages>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>845</xloc>
-      <yloc>391</yloc>
+      <xloc>646</xloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -306,8 +331,8 @@
       </embeddedimages>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>583</xloc>
-      <yloc>134</yloc>
+      <xloc>384</xloc>
+      <yloc>86</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -327,8 +352,8 @@
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;Refreshing shards 2 has errors executing etl.pl&apos;;
-var body=&apos;Refreshing shards 2 has errors executing etl.pl. So proceeding to execute etl-fix.pl&apos;;</jsScript_script>
+var title=&apos;Refreshing shards has errors executing etl.pl&apos;;
+var body=&apos;Refreshing shards has errors executing etl.pl. So proceeding to execute etl-fix.pl&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>
         <type>String</type>
@@ -343,8 +368,8 @@ var body=&apos;Refreshing shards 2 has errors executing etl.pl. So proceeding to
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>717</xloc>
-      <yloc>391</yloc>
+      <xloc>518</xloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -364,8 +389,8 @@ var body=&apos;Refreshing shards 2 has errors executing etl.pl. So proceeding to
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;Refreshing Shards 2 finished successfully&apos;;
-var body=&apos;Refreshing Shards 2 finished successfully&apos;;</jsScript_script>
+var title=&apos;Refreshing Shards finished successfully&apos;;
+var body=&apos;Refreshing Shards finished successfully&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>
         <type>String</type>
@@ -380,8 +405,8 @@ var body=&apos;Refreshing Shards 2 finished successfully&apos;;</jsScript_script
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>583</xloc>
-      <yloc>259</yloc>
+      <xloc>384</xloc>
+      <yloc>211</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -397,7 +422,7 @@ var body=&apos;Refreshing Shards 2 finished successfully&apos;;</jsScript_script
            <schema_name/>
            </partitioning>
     <connection>GP DB</connection>
-    <sql>SELECT count(*) as total_shards_refreshed  FROM etl.refresh_shards_status where  shard_name IN (&apos;sdw1&apos;,&apos;sdw3&apos;) and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1);</sql>
+    <sql>SELECT count(*) as total_shards_refreshed  FROM etl.refresh_shards_status where  shard_name IN (&apos;mdw4&apos;) and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1);</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>
@@ -405,8 +430,8 @@ var body=&apos;Refreshing Shards 2 finished successfully&apos;;</jsScript_script
     <lazy_conversion_active>N</lazy_conversion_active>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>220</xloc>
-      <yloc>391</yloc>
+      <xloc>21</xloc>
+      <yloc>343</yloc>
       <draw>Y</draw>
       </GUI>
     </step>

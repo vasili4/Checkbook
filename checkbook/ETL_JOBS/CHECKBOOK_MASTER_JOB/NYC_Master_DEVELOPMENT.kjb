@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>NYC_Master</name>
+  <name>NYC_Master_DEVELOPMENT</name>
     <description/>
     <extended_description/>
     <job_version/>
+    <job_status>0</job_status>
   <directory>&#47;</directory>
   <created_user>-</created_user>
   <created_date>2012&#47;01&#47;24 16:09:28.673</created_date>
@@ -285,12 +286,12 @@
       <yloc>133</yloc>
       </entry>
     <entry>
-      <name>Shards Refresh</name>
+      <name>Shards Refresh Development</name>
       <description>Job</description>
       <type>JOB</type>
       <specification_method>filename</specification_method>
       <job_object_id/>
-      <filename>${Internal.Job.Filename.Directory}\Shards_Main_Job.kjb</filename>
+      <filename>${Internal.Job.Filename.Directory}\Shards_Main_Job_DEVELOPMENT.kjb</filename>
       <jobname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -408,10 +409,10 @@
     </hop>
     <hop>
       <from>SEND_EMAIL_LOAD_STATISTICS 1</from>
-      <to>Shards Refresh</to>
+      <to>Shards Refresh Development</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>refresh2_etl_pl_success</name>
+    <name>Varnish USe All</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -62,36 +62,120 @@
     <clusterschemas>
     </clusterschemas>
   <created_user/>
-  <created_date>2012&#47;02&#47;13 15:01:27.359</created_date>
+  <created_date>2012&#47;10&#47;23 18:09:19.184</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2010&#47;05&#47;19 14:22:09.247</modified_date>
+  <modified_date>2010&#47;01&#47;19 17:38:13.444</modified_date>
   </info>
   <notepads>
   </notepads>
-  <connection>
-    <name>GP DB</name>
-    <server>${CHECKBOOK_DB_HOST}</server>
-    <type>GREENPLUM</type>
-    <access>Native</access>
-    <database>${CHECKBOOK_DB_NAME}</database>
-    <port>5432</port>
-    <username>${CHECKBOOK_DB_USER}</username>
-    <password>${CHECKBOOK_DB_PASS}</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
-      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
-      <attribute><code>PORT_NUMBER</code><attribute>5432</attribute></attribute>
-      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
-      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>N</attribute></attribute>
-      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
-    </attributes>
-  </connection>
   <order>
-  <hop> <from>Filter rows</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Filter rows</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value</from><to>Mail</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2</from><to>Mail 2</to><enabled>Y</enabled> </hop>  <hop> <from>Table input</from><to>Get Variables</to><enabled>Y</enabled> </hop>  </order>
+  <hop> <from>Modified Java Script Value</from><to>Execute a process</to><enabled>Y</enabled> </hop>  <hop> <from>Generate Rows</from><to>Get Variables</to><enabled>Y</enabled> </hop>  <hop> <from>Get Variables</from><to>Modified Java Script Value</to><enabled>Y</enabled> </hop>  <hop> <from>Execute a process</from><to>Blocking Step</to><enabled>Y</enabled> </hop>  <hop> <from>Mail 1</from><to>Abort Varnish Use All 1</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 1</from><to>Mail 1</to><enabled>Y</enabled> </hop>  <hop> <from>Execute a process</from><to>Modified Java Script Value 1</to><enabled>Y</enabled> </hop>  <hop> <from>Mail 2</from><to>Abort Varnish Use All 2</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 2</from><to>Mail 2</to><enabled>Y</enabled> </hop>  <hop> <from>Blocking Step</from><to>Filter rows</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Modified Java Script Value 2</to><enabled>Y</enabled> </hop>  <hop> <from>Mail 3</from><to>Dummy (do nothing)</to><enabled>Y</enabled> </hop>  <hop> <from>Filter rows</from><to>Modified Java Script Value 3</to><enabled>Y</enabled> </hop>  <hop> <from>Modified Java Script Value 3</from><to>Mail 3</to><enabled>Y</enabled> </hop>  </order>
+  <step>
+    <name>Abort Varnish Use All 1</name>
+    <type>Abort</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <row_threshold>0</row_threshold>
+      <message/>
+      <always_log_rows>Y</always_log_rows>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>606</xloc>
+      <yloc>626</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Abort Varnish Use All 2</name>
+    <type>Abort</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <row_threshold>0</row_threshold>
+      <message/>
+      <always_log_rows>Y</always_log_rows>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>981</xloc>
+      <yloc>618</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Blocking Step</name>
+    <type>BlockingStep</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <pass_all_rows>N</pass_all_rows>
+      <directory>%%java.io.tmpdir%%</directory>
+      <prefix>block</prefix>
+      <cache_size>5000</cache_size>
+      <compress>Y</compress>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>791</xloc>
+      <yloc>246</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Dummy (do nothing)</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1409</xloc>
+      <yloc>245</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Execute a process</name>
+    <type>ExecProcess</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <processfield>script</processfield>
+    <resultfieldname>result</resultfieldname>
+    <errorfieldname/>
+    <exitvaluefieldname/>
+    <failwhennotsuccess>N</failwhennotsuccess>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>604</xloc>
+      <yloc>246</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
   <step>
     <name>Filter rows</name>
     <type>FilterRows</type>
@@ -102,20 +186,41 @@
            <method>none</method>
            <schema_name/>
            </partitioning>
-<send_true_to>Modified Java Script Value 2</send_true_to>
-<send_false_to>Modified Java Script Value</send_false_to>
+<send_true_to>Modified Java Script Value 3</send_true_to>
+<send_false_to>Modified Java Script Value 2</send_false_to>
     <compare>
 <condition>
  <negated>N</negated>
- <leftvalue>total_shards_refreshed</leftvalue>
- <function>&gt;=</function>
+ <leftvalue>result</leftvalue>
+ <function>=</function>
  <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>5</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
+ <value><name>constant</name><type>String</type><text>Varnish is now using default All Servers configuration.</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value> </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>582</xloc>
-      <yloc>391</yloc>
+      <xloc>976</xloc>
+      <yloc>246</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Generate Rows</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <fields>
+    </fields>
+    <limit>1</limit>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>59</xloc>
+      <yloc>245</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -191,17 +296,29 @@
         <precision>-1</precision>
         <trim_type>none</trim_type>
       </field>
+      <field>
+        <name>nextval</name>
+        <variable>${MASTER_ETL_JOB_ID}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
     </fields>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>384</xloc>
-      <yloc>391</yloc>
+      <xloc>201</xloc>
+      <yloc>245</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Mail</name>
+    <name>Mail 1</name>
     <type>Mail</type>
     <description/>
     <distribute>Y</distribute>
@@ -219,7 +336,7 @@
       <replyto>EMAIL_FROM</replyto>
       <replytoname/>
       <subject>title</subject>
-      <include_date>Y</include_date>
+      <include_date>N</include_date>
       <include_subfolders>N</include_subfolders>
       <zipFilenameDynamic>N</zipFilenameDynamic>
       <isFilenameDynamic>N</isFilenameDynamic>
@@ -250,8 +367,8 @@
       </embeddedimages>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>845</xloc>
-      <yloc>391</yloc>
+      <xloc>604</xloc>
+      <yloc>503</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -275,7 +392,7 @@
       <replyto>EMAIL_FROM</replyto>
       <replytoname/>
       <subject>title</subject>
-      <include_date>Y</include_date>
+      <include_date>N</include_date>
       <include_subfolders>N</include_subfolders>
       <zipFilenameDynamic>N</zipFilenameDynamic>
       <isFilenameDynamic>N</isFilenameDynamic>
@@ -306,14 +423,102 @@
       </embeddedimages>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>583</xloc>
-      <yloc>134</yloc>
+      <xloc>979</xloc>
+      <yloc>495</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Mail 3</name>
+    <type>Mail</type>
+    <description/>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+      <server>EMAIL_SERVER</server>
+      <port>EMAIL_PORT</port>
+      <destination>EMAIL_TO</destination>
+      <destinationCc>EMAIL_CC</destinationCc>
+      <destinationBCc/>
+      <replyToAddresses/>
+      <replyto>EMAIL_FROM</replyto>
+      <replytoname/>
+      <subject>title</subject>
+      <include_date>N</include_date>
+      <include_subfolders>N</include_subfolders>
+      <zipFilenameDynamic>N</zipFilenameDynamic>
+      <isFilenameDynamic>N</isFilenameDynamic>
+      <dynamicFieldname/>
+      <dynamicWildcard/>
+      <dynamicZipFilename/>
+      <sourcefilefoldername/>
+      <sourcewildcard/>
+      <contact_person/>
+      <contact_phone/>
+      <comment>body</comment>
+      <include_files>N</include_files>
+      <zip_files>N</zip_files>
+      <zip_name/>
+      <zip_limit_size>0</zip_limit_size>
+      <use_auth>N</use_auth>
+      <use_secure_auth>N</use_secure_auth>
+      <auth_user/>
+      <auth_password>Encrypted </auth_password>
+      <only_comment>N</only_comment>
+      <use_HTML>N</use_HTML>
+      <use_Priority>N</use_Priority>
+    <encoding>UTF-8</encoding>
+    <priority>normal</priority>
+    <importance>normal</importance>
+    <secureconnectiontype>SSL</secureconnectiontype>
+      <embeddedimages>
+      </embeddedimages>
+     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>1268</xloc>
+      <yloc>244</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
     <name>Modified Java Script Value</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <copies>1</copies>
+         <partitioning>
+           <method>none</method>
+           <schema_name/>
+           </partitioning>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+var fileDirectory = getVariable(&quot;Internal.Transformation.Filename.Directory&quot;,&quot;&quot;);
+fileDirectory = replace(fileDirectory,&quot;file:&#47;&#47;&quot;,&quot;&quot;);
+var script = &quot;sh &quot;+fileDirectory+&quot;&#47;Shards&#47;varnish_all.sh&quot;;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>script</name>
+        <rename>script</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
+ <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
+      <xloc>352</xloc>
+      <yloc>246</yloc>
+      <draw>Y</draw>
+      </GUI>
+    </step>
+
+  <step>
+    <name>Modified Java Script Value 1</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -327,8 +532,8 @@
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;Refreshing shards 2 has errors executing etl.pl&apos;;
-var body=&apos;Refreshing shards 2 has errors executing etl.pl. So proceeding to execute etl-fix.pl&apos;;</jsScript_script>
+var title=&apos;Error executing varnish use all script&apos;;
+var body=&apos;Error Description - &apos;+err+&apos; Error Code - &apos;+err1;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>
         <type>String</type>
@@ -343,8 +548,8 @@ var body=&apos;Refreshing shards 2 has errors executing etl.pl. So proceeding to
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>717</xloc>
-      <yloc>391</yloc>
+      <xloc>604</xloc>
+      <yloc>388</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
@@ -364,8 +569,8 @@ var body=&apos;Refreshing shards 2 has errors executing etl.pl. So proceeding to
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;Refreshing Shards 2 finished successfully&apos;;
-var body=&apos;Refreshing Shards 2 finished successfully&apos;;</jsScript_script>
+var title=&apos;Varnish Use All Failed&apos;;
+var body=&apos;Varnish Use All Failed&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>
         <type>String</type>
@@ -380,15 +585,15 @@ var body=&apos;Refreshing Shards 2 finished successfully&apos;;</jsScript_script
         <replace>N</replace>
       </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>583</xloc>
-      <yloc>259</yloc>
+      <xloc>979</xloc>
+      <yloc>380</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step>
-    <name>Table input</name>
-    <type>TableInput</type>
+    <name>Modified Java Script Value 3</name>
+    <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
     <copies>1</copies>
@@ -396,22 +601,47 @@ var body=&apos;Refreshing Shards 2 finished successfully&apos;;</jsScript_script
            <method>none</method>
            <schema_name/>
            </partitioning>
-    <connection>GP DB</connection>
-    <sql>SELECT count(*) as total_shards_refreshed  FROM etl.refresh_shards_status where  shard_name IN (&apos;sdw1&apos;,&apos;sdw3&apos;) and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1);</sql>
-    <limit>0</limit>
-    <lookup/>
-    <execute_each_row>N</execute_each_row>
-    <variables_active>N</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-     <cluster_schema/>
+    <compatible>N</compatible>
+    <jsScripts>      <jsScript>        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>&#47;&#47;Script here
+
+
+var title=&apos;Varnish Use Group All transformation for Job &apos; + nextval;
+var body=&apos;Varnish Use All Transformation in Shards Main job successful&apos;;</jsScript_script>
+      </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
+        <rename>title</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>      <field>        <name>body</name>
+        <rename>body</rename>
+        <type>String</type>
+        <length>-1</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>    </fields>     <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
-      <xloc>220</xloc>
-      <yloc>391</yloc>
+      <xloc>1121</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
       </GUI>
     </step>
 
   <step_error_handling>
+      <error>
+        <source_step>Execute a process</source_step>
+        <target_step>Modified Java Script Value 1</target_step>
+        <is_enabled>Y</is_enabled>
+        <nr_valuename/>
+        <descriptions_valuename>err</descriptions_valuename>
+        <fields_valuename/>
+        <codes_valuename>err1</codes_valuename>
+        <max_errors>-1</max_errors>
+        <max_pct_errors>-1</max_pct_errors>
+        <min_pct_rows>-1</min_pct_rows>
+      </error>
   </step_error_handling>
    <slave-step-copy-partition-distribution>
 </slave-step-copy-partition-distribution>

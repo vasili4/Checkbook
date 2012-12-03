@@ -62,7 +62,7 @@
     <clusterschemas>
     </clusterschemas>
   <created_user/>
-  <created_date>2012&#47;02&#47;23 14:11:26.276</created_date>
+  <created_date>2012&#47;11&#47;30 15:12:55.524</created_date>
   <modified_user>-</modified_user>
   <modified_date>2009&#47;09&#47;23 15:36:12.031</modified_date>
   </info>
@@ -70,13 +70,13 @@
   </notepads>
   <connection>
     <name>GP DB</name>
-    <server>${DB_HOST}</server>
+    <server>${CHECKBOOK_DB_HOST}</server>
     <type>GREENPLUM</type>
     <access>Native</access>
-    <database>${DB_NAME}</database>
+    <database>${CHECKBOOK_DB_NAME}</database>
     <port>5432</port>
-    <username>${DB_USER}</username>
-    <password>${DB_PASS}</password>
+    <username>${CHECKBOOK_DB_USER}</username>
+    <password>${CHECKBOOK_DB_PASS}</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -135,7 +135,7 @@
  <leftvalue>total_shards_refreshed</leftvalue>
  <function>&gt;=</function>
  <rightvalue/>
- <value><name>constant</name><type>Integer</type><text>3</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
+ <value><name>constant</name><type>Integer</type><text>2</text><length>-1</length><precision>0</precision><isnull>N</isnull><mask>#;-#</mask></value> </condition>
     </compare>
      <cluster_schema/>
  <remotesteps>   <input>   </input>   <output>   </output> </remotesteps>    <GUI>
@@ -158,7 +158,7 @@
     <fields>
       <field>
         <name>EMAIL_FROM</name>
-        <variable>${NYC_EMAIL_FROM}</variable>
+        <variable>${EMAIL_FROM}</variable>
         <type>String</type>
         <format/>
         <currency/>
@@ -170,7 +170,7 @@
       </field>
       <field>
         <name>EMAIL_TO</name>
-        <variable>${NYC_EMAIL_TO}</variable>
+        <variable>${EMAIL_TO}</variable>
         <type>String</type>
         <format/>
         <currency/>
@@ -182,7 +182,7 @@
       </field>
       <field>
         <name>EMAIL_CC</name>
-        <variable>${NYC_EMAIL_CC}</variable>
+        <variable>${EMAIL_CC}</variable>
         <type>String</type>
         <format/>
         <currency/>
@@ -194,7 +194,7 @@
       </field>
       <field>
         <name>EMAIL_SERVER</name>
-        <variable>${NYC_EMAIL_SERVER}</variable>
+        <variable>${EMAIL_SERVER}</variable>
         <type>String</type>
         <format/>
         <currency/>
@@ -206,7 +206,7 @@
       </field>
       <field>
         <name>EMAIL_PORT</name>
-        <variable>${NYC_EMAIL_PORT}</variable>
+        <variable>${EMAIL_PORT}</variable>
         <type>String</type>
         <format/>
         <currency/>
@@ -353,7 +353,7 @@
         <jsScript_script>&#47;&#47;Script here
 
 var title=&apos;Refreshing shards has errors executing etl.pl&apos;;
-var body=&apos;Refreshing shards has errors executing etl.pl.&apos; &apos;;</jsScript_script>
+var body=&apos;Refreshing shards has errors executing etl.pl. So proceeding to execute etl-fix.pl&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>
         <type>String</type>
@@ -389,8 +389,8 @@ var body=&apos;Refreshing shards has errors executing etl.pl.&apos; &apos;;</jsS
         <jsScript_name>Script 1</jsScript_name>
         <jsScript_script>&#47;&#47;Script here
 
-var title=&apos;Refreshing Shards finished successfully&apos;;
-var body=&apos;Refreshing Shards finished successfully&apos;;</jsScript_script>
+var title=&apos;Refreshing Shards1 finished successfully&apos;;
+var body=&apos;Refreshing Shards1 finished successfully&apos;;</jsScript_script>
       </jsScript>    </jsScripts>    <fields>      <field>        <name>title</name>
         <rename>title</rename>
         <type>String</type>
@@ -422,7 +422,7 @@ var body=&apos;Refreshing Shards finished successfully&apos;;</jsScript_script>
            <schema_name/>
            </partitioning>
     <connection>GP DB</connection>
-    <sql>SELECT count(*) as total_shards_refreshed  FROM refresh_shards_status where  shard_name IN (&apos;sdw51&apos;,&apos;sdw52&apos;,&apos;sdw53&apos;) and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1);</sql>
+    <sql>SELECT count(*) as total_shards_refreshed  FROM etl.refresh_shards_status where  shard_name IN (&apos;sdw1&apos;,&apos;sdw2&apos;) and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1);</sql>
     <limit>0</limit>
     <lookup/>
     <execute_each_row>N</execute_each_row>

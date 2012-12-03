@@ -21,7 +21,7 @@ use Time::HiRes;
 my $RUN = 1;
 my @TABLES;
 my $numForks = 0;
-my $maxForks = 5;
+my $maxForks = 1;
 my $FILE_SQL = "./tmp/etl.sql";
 my $SQL_INDEX = "SELECT c2.relname, pg_catalog.pg_get_indexdef(i.indexrelid, 0, true) FROM pg_catalog.pg_class c, pg_catalog.pg_class c2, pg_catalog.pg_index i WHERE c.relname like 'CHANGEME\%' AND c.oid = i.indrelid AND i.indexrelid = c2.oid ORDER BY i.indisprimary DESC, i.indisunique DESC, c2.relname";
 my $SQL = "
@@ -29,7 +29,7 @@ my $SQL = "
 
 	truncate table public.CHANGEME_TABLE;
 	CHANGEME_INDEX_DROP
-	insert into public.CHANGEME_TABLE select * from s.CHANGEME_TABLE;
+	insert into public.CHANGEME_TABLE select * from staging.CHANGEME_TABLE;
 	CHANGEME_INDEX_CREATE
 
 	commit;
@@ -37,7 +37,7 @@ my $SQL = "
 ";
 
 print `date`;
-open(TABLES, "psql -p 5432 -A -t -c \"select viewname from pg_views where schemaname = 's' order by 1\" |") || die "Can't Get List of Tables";
+open(TABLES, "psql   -d checkbook_latest -p 5432 -A -t -c \"select viewname from pg_views where schemaname = 'staging' order by 1\" |") || die "Can't Get List of Tables";
 while(my $table=<TABLES>)
 {
 	chop $table;
@@ -63,7 +63,7 @@ do
 			$numForks++;
 		}
 	}
-} until($pid == -1 || $numForks >= $#TABLES);
+} until($pid == -1 || $numForks >= $#TABLES + 1);
 print `date`;
 
 sub forkChild
@@ -89,7 +89,7 @@ sub forkChild
 		my $INDEX_CREATE = "";
 		my $tmp = $SQL_INDEX;
 		$tmp =~ s/CHANGEME/$table/;
-		open(INDEXES, "psql -p 5432 -A -t -c \"$tmp\" |") || die "Can't Get List of Indexes for $table";
+		open(INDEXES, "psql -d checkbook_latest -p 5432 -A -t -c \"$tmp\" |") || die "Can't Get List of Indexes for $table";
 		while(my $index=<INDEXES>)
 		{
 			chop $index;
@@ -110,7 +110,7 @@ sub forkChild
 
 		print "Running: $table\n";
 		print "$sql\n\n";
-		system("psql -p 5432 -f $FILE_SQL.$ctr") if $RUN;
+		system("psql -d checkbook_latest -p 5432 -f $FILE_SQL.$ctr") if $RUN;
 		#unlink "$FILE_SQL.$ctr";
 
 		my $t_end = [Time::HiRes::gettimeofday];
@@ -119,11 +119,3 @@ sub forkChild
 		exit(0);
 	}
 }
-my $kid;
-do
-{
-	$kid = waitpid(-1, 0);
-} while $kid > 0;
-
-#system("psql -h 10.2.3.201 -c \"insert into refresh_shards_status (uniq_id, script_name, status) values (0, 'etl.pl', 1)\"");
-system("psql -h mdw -c \"insert into refresh_shards_status (uniq_id, script_name, status) values (0, 'etl.pl', 1)\"");

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>Refresh_Shards1</name>
+  <name>Refresh_Shards1_DEVELOPMNET</name>
     <description/>
     <extended_description/>
     <job_version/>
@@ -60,7 +60,7 @@
       <name>EXE ETL PL SCRIPT</name>
       <description>Shell</description>
       <type>SHELL</type>
-      <filename>${Internal.Job.Filename.Directory}&#47;Shards&#47;shards_refresh1.sh</filename>
+      <filename>${Internal.Job.Filename.Directory}&#47;Shards&#47;shards_refresh1_development.sh</filename>
       <work_directory/>
       <arg_from_previous>N</arg_from_previous>
       <exec_per_row>N</exec_per_row>
@@ -137,13 +137,13 @@
       <schemaname/>
       <tablename>refresh_shards_status</tablename>
       <success_condition>rows_count_greater_equal</success_condition>
-      <rows_count_value>2</rows_count_value>
+      <rows_count_value>1</rows_count_value>
       <is_custom_sql>Y</is_custom_sql>
       <is_usevars>N</is_usevars>
-      <custom_sql>select * from etl.refresh_shards_status where shard_name IN (&apos;sdw1&apos;,&apos;sdw2&apos;) and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1)</custom_sql>
+      <custom_sql>select * from etl.refresh_shards_status where shard_name IN (&apos;mdw4&apos;) and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1)</custom_sql>
       <add_rows_result>N</add_rows_result>
       <maximum_timeout>0</maximum_timeout>
-      <check_cycle_time>900</check_cycle_time>
+      <check_cycle_time>240</check_cycle_time>
       <success_on_timeout>N</success_on_timeout>
       <clear_result_rows>Y</clear_result_rows>
       <parallel>N</parallel>
@@ -158,7 +158,7 @@
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;refresh_etl_pl_success.ktr</filename>
+      <filename>${Internal.Job.Filename.Directory}&#47;refresh_etl_pl_success_DEVELOPMENT.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -181,7 +181,7 @@
       </parameters>      <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>965</xloc>
+      <xloc>964</xloc>
       <yloc>337</yloc>
       </entry>
     <entry>
@@ -201,81 +201,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>8</xloc>
-      <yloc>338</yloc>
-      </entry>
-    <entry>
-      <name>Clear PGPOOL Cache1</name>
-      <description>Shell</description>
-      <type>SHELL</type>
-      <filename>${Internal.Job.Filename.Directory}&#47;Shards&#47;pgpool_clear_cache1.sh</filename>
-      <work_directory/>
-      <arg_from_previous>N</arg_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>Y</set_logfile>
-      <logfile>${Internal.Job.Filename.Directory}&#47;Shards&#47;pgpool_clear_cache1_log</logfile>
-      <set_append_logfile>N</set_append_logfile>
-      <logext>log</logext>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <insertScript>N</insertScript>
-      <script>sh &#47;vol2&#47;ETLScripts&#47;ETL_NIGHTLY&#47;Shards&#47;pgpool_clear_cache1.sh</script>
-      <loglevel>Detailed</loglevel>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>1152</xloc>
-      <yloc>337</yloc>
-      </entry>
-    <entry>
-      <name>Abort job Refresh Shards 14</name>
-      <description>Abort job</description>
-      <type>ABORT</type>
-      <message/>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>1154</xloc>
-      <yloc>682</yloc>
-      </entry>
-    <entry>
-      <name>Mail 4</name>
-      <description>Mail</description>
-      <type>MAIL</type>
-      <server>${EMAIL_SERVER}</server>
-      <port>${EMAIL_PORT}</port>
-      <destination>${EMAIL_TO}</destination>
-      <destinationCc>${EMAIL_CC}</destinationCc>
-      <destinationBCc/>
-      <replyto>${EMAIL_FROM}</replyto>
-      <replytoname/>
-      <subject>Error in Refresh Shards1 Job ${MASTER_ETL_JOB_ID}</subject>
-      <include_date>N</include_date>
-      <contact_person/>
-      <contact_phone/>
-      <comment>Clear PGPOOL Cache1 failed</comment>
-      <include_files>N</include_files>
-      <zip_files>N</zip_files>
-      <zip_name/>
-      <use_auth>N</use_auth>
-      <use_secure_auth>N</use_secure_auth>
-      <auth_user/>
-      <auth_password>Encrypted </auth_password>
-      <only_comment>N</only_comment>
-      <use_HTML>N</use_HTML>
-      <use_Priority>N</use_Priority>
-      <encoding>UTF-8</encoding>
-      <priority>normal</priority>
-      <importance>normal</importance>
-      <secureconnectiontype>SSL</secureconnectiontype>
-      <replyToAddresses/>
-      <filetypes>      </filetypes>      <embeddedimages>
-      </embeddedimages>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>1152</xloc>
-      <yloc>502</yloc>
+      <xloc>131</xloc>
+      <yloc>335</yloc>
       </entry>
     <entry>
       <name>DUMMY 1</name>
@@ -294,40 +221,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>1469</xloc>
-      <yloc>324</yloc>
-      </entry>
-    <entry>
-      <name>Varnish Use Group2</name>
-      <description>Transformation</description>
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Job.Filename.Directory}&#47;varnish_use_group2.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <parameters>        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>283</xloc>
-      <yloc>337</yloc>
+      <xloc>1216</xloc>
+      <yloc>334</yloc>
       </entry>
     <entry>
       <name>Abort job Refresh Shards 15</name>
@@ -337,8 +232,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>596</xloc>
-      <yloc>837</yloc>
+      <xloc>961</xloc>
+      <yloc>711</yloc>
       </entry>
     <entry>
       <name>Mail 5</name>
@@ -376,47 +271,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>583</xloc>
-      <yloc>619</yloc>
-      </entry>
-    <entry>
-      <name>Mail 6</name>
-      <description>Mail</description>
-      <type>MAIL</type>
-      <server>${EMAIL_SERVER}</server>
-      <port>${EMAIL_PORT}</port>
-      <destination>${EMAIL_TO}</destination>
-      <destinationCc>${EMAIL_CC}</destinationCc>
-      <destinationBCc/>
-      <replyto>${EMAIL_FROM}</replyto>
-      <replytoname/>
-      <subject>Refresh Shards1 Job ${MASTER_ETL_JOB_ID} Completed</subject>
-      <include_date>N</include_date>
-      <contact_person/>
-      <contact_phone/>
-      <comment>Clear PGPOOL Cache1 succeeded</comment>
-      <include_files>N</include_files>
-      <zip_files>N</zip_files>
-      <zip_name/>
-      <use_auth>N</use_auth>
-      <use_secure_auth>N</use_secure_auth>
-      <auth_user/>
-      <auth_password>Encrypted </auth_password>
-      <only_comment>N</only_comment>
-      <use_HTML>N</use_HTML>
-      <use_Priority>N</use_Priority>
-      <encoding>UTF-8</encoding>
-      <priority>normal</priority>
-      <importance>normal</importance>
-      <secureconnectiontype>SSL</secureconnectiontype>
-      <replyToAddresses/>
-      <filetypes>      </filetypes>      <embeddedimages>
-      </embeddedimages>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>1359</xloc>
-      <yloc>522</yloc>
+      <xloc>958</xloc>
+      <yloc>511</yloc>
       </entry>
   </entries>
   <hops>
@@ -441,24 +297,6 @@
     <hop>
       <from>Mail 1</from>
       <to>Abort job Refresh Shards 11</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Clear PGPOOL Cache1</from>
-      <to>Mail 4</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Mail 4</from>
-      <to>Abort job Refresh Shards 14</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -493,53 +331,8 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Varnish Use Group2</from>
-      <to>Mail 5</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Clear PGPOOL Cache1</from>
-      <to>Mail 6</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>N</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Mail 6</from>
-      <to>DUMMY 1</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>N</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>ETL PL SUCCESS</from>
-      <to>Clear PGPOOL Cache1</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Varnish Use Group2</from>
-      <to>EXE ETL PL SCRIPT</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>START</from>
-      <to>Varnish Use Group2</to>
+      <to>EXE ETL PL SCRIPT</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -547,7 +340,7 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Clear PGPOOL Cache1</from>
+      <from>ETL PL SUCCESS</from>
       <to>DUMMY 1</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
