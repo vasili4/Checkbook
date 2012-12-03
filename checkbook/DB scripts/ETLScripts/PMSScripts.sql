@@ -517,6 +517,8 @@ BEGIN
 	WHERE	a.payroll_id = b.payroll_id;	
 	
 	
+	
+	
 	RAISE NOTICE 'PAYROLL 1.5';
 	-- Updating the gross pay YTD based on calendar fiscal year
 	
@@ -557,6 +559,7 @@ BEGIN
 	       updated_date =  (CASE WHEN b.created_load_id <> a.created_load_id THEN now()::timestamp END)	
 	FROM   tmp_employee_rec_gross_pay_1 b
 	WHERE	a.payroll_id = b.payroll_id;		
+	
 	
 	
 	RAISE NOTICE 'PAYROLL 1.8';
@@ -1057,6 +1060,15 @@ BEGIN
 	       p_load_id_in,now()::timestamp
 	FROM   etl.stg_payroll_summary
 	WHERE  action_flag = 'I';
+	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+		
+		IF l_count > 0 THEN
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+			VALUES(p_load_file_id_in,'PS',l_count, '# of records inserted into payroll_summary');
+	END IF;
+	
 
 	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,check_eft_issued_date_id,check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
 				fund_class_id,check_amount,agency_id,agency_code,expenditure_object_id,department_id,check_eft_issued_date,
@@ -1072,6 +1084,15 @@ BEGIN
 		agency_short_name,department_short_name,p_load_id_in
 	FROM 	etl.stg_payroll_summary
 	WHERE  action_flag = 'I';
+	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			
+			IF l_count > 0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'PS',l_count, '# of records inserted into disbursement_line_item_details');
+		END IF;
+	
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
@@ -1095,6 +1116,13 @@ BEGIN
 	FROM   tmp_payroll_summary_update b
 	WHERE  a.payroll_summary_id = b.payroll_summary_id;	
 	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+				
+				IF l_count > 0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'PS',l_count, '# of records updated in payroll_summary');
+		END IF;
+	
 	UPDATE  disbursement_line_item_details a
 	SET     check_amount = coalesce(b.total_amt,0),
 		agency_name = b.agency_name,
@@ -1111,6 +1139,14 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'PS',l_count,'# of records updated in payroll_summary');
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+					
+					IF l_count > 0 THEN
+						INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+						VALUES(p_load_file_id_in,'PS',l_count, '# of records updated in disbursement_line_item_details');
+		END IF;
+				
 			
 	RETURN 1;
 	
