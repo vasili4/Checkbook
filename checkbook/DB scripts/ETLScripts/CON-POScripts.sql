@@ -898,6 +898,12 @@ BEGIN
 					 JOIN tmp_po_con d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag='I';
 	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+		IF l_count > 0 THEN 
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
+			VALUES(p_load_file_id_in,'C','PO',l_count,'# of records inserted into history_agreement');
+	END IF;	
 
 	RAISE NOTICE '3';
 	/* Updates */
@@ -988,6 +994,13 @@ BEGIN
 	FROM	tmp_con_po_update b
 	WHERE	a.agreement_id = b.agreement_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			IF l_count > 0 THEN 
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
+				VALUES(p_load_file_id_in,'C','PO',l_count,'# of records updated in history_agreement');
+	END IF;	
+
+
 	RAISE NOTICE '5';
 	
 	-- Agreement line changes
@@ -1010,6 +1023,12 @@ BEGIN
 					     AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 					     JOIN tmp_po_con d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag = 'I';
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+			IF l_count > 0 THEN 
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
+				VALUES(p_load_file_id_in,'C','PO',l_count,'# of records inserted into history_agreement_accounting_line');
+	END IF;	
 
 	RAISE NOTICE '6';
 	-- Identify the agreement accounting lines which need to be deleted/updated
@@ -1059,6 +1078,12 @@ BEGIN
 					     JOIN tmp_po_con d ON a.uniq_id = d.uniq_id
 					     JOIN tmp_po_acc_lines_actions e ON d.agreement_id = e.agreement_id AND b.doc_actg_ln_no = e.line_number AND b.doc_comm_ln_no = e.commodity_line_number
 	WHERE   d.action_flag = 'U' AND e.action_flag='I';
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+				IF l_count > 0 THEN 
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
+					VALUES(p_load_file_id_in,'C','PO',l_count,'# of records inserted into history_agreement_accounting_line');
+	END IF;	
 	
 	RAISE NOTICE '8';
 	
@@ -1119,6 +1144,13 @@ BEGIN
 		updated_date = now()::timestamp
 	FROM   tmp_po_con_line_items_update b		      	      
 	WHERE  b.agreement_accounting_line_id = f.agreement_accounting_line_id ;	       
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+				IF l_count > 0 THEN 
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
+					VALUES(p_load_file_id_in,'C','PO',l_count,'# of records updated in history_agreement_accounting_line');
+	END IF;	
+
 
 	RAISE NOTICE '11';
 	
