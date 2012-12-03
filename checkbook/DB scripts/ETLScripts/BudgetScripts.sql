@@ -78,6 +78,14 @@ BEGIN
 	now()::timestamp,p_load_id_in,'<Unknown Agency>' as original_agency_name,'N/A'
 	FROM   etl.ref_agency_id_seq a JOIN tmp_fk_bdgt_values_new_agencies b ON a.uniq_id = b.uniq_id;
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+		
+			IF l_count > 0 THEN
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'B',l_count, 'Number of recods inserted into ref_agency from expense budget');
+		END IF;
+	
+	
 	RAISE NOTICE '1.1';
 
 	-- Generate the agency history id for history records
@@ -162,6 +170,13 @@ BEGIN
 			ELSE 'Non-Applicable Department' END) as original_department_name,
 		'N/A'
 	FROM   etl.ref_department_id_seq a JOIN tmp_fk_values_bdgt_new_dept b ON a.uniq_id = b.uniq_id;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+			
+				IF l_count > 0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'B',l_count, 'Number of records inserted into ref_department from expense budget');
+		END IF;
 
 	RAISE NOTICE '1.5';
 	-- Generate the department history id for history records
@@ -292,6 +307,13 @@ BEGIN
 	INSERT INTO ref_object_class(object_class_id,object_class_code,object_class_name,created_date,created_load_id,original_object_class_name)
 	SELECT a.object_class_id,b.object_class_code,'<Unknown Object Class>' as object_class_name,now()::timestamp,p_load_id_in,'<Unknown Object Class>' as original_object_class_name
 	FROM   etl.ref_object_class_id_seq a JOIN tmp_fk_bdgt_values_new_object_class b ON a.uniq_id = b.uniq_id;
+
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+			
+				IF l_count > 0 THEN
+					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+					VALUES(p_load_file_id_in,'B',l_count, 'Number of records inserted into ref_object_class from expense budget');
+		END IF;
 
 	RAISE NOTICE '2.1';
 
