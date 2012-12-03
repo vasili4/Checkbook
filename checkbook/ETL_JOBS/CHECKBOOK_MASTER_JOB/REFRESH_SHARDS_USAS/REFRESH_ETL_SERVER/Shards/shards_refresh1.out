@@ -1,0 +1,210 @@
+UPDATE 46
+INSERT 0 1
+[sdw51] real	44m23.849s
+[sdw51] user	0m0.655s
+[sdw51] sys	0m1.007s
+[sdw51] We have errors - not updating the table to move forward
+[sdw51] UPDATE 1
+[sdw51] 
+[sdw51] real	0m0.049s
+[sdw51] user	0m0.000s
+[sdw51] sys	0m0.001s
+[sdw51]
+20100525:20:12:14:gpstop:sdw51:gpadmin-[INFO]:-Starting gpstop with args: '-ia'
+20100525:20:12:14:gpstop:sdw51:gpadmin-[INFO]:-Gathering information and validating the environment...
+20100525:20:12:14:gpstop:sdw51:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+20100525:20:12:14:gpstop:sdw51:gpadmin-[INFO]:-Obtaining Segment details from master...
+20100525:20:12:14:gpstop:sdw51:gpadmin-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+20100525:20:12:15:gpstop:sdw51:gpadmin-[INFO]:-There are 0 connections to the database
+20100525:20:12:15:gpstop:sdw51:gpadmin-[INFO]:-Commencing Master instance shutdown with mode='immediate'
+20100525:20:12:15:gpstop:sdw51:gpadmin-[INFO]:-Master host=localhost
+20100525:20:12:15:gpstop:sdw51:gpadmin-[INFO]:-Commencing Master instance shutdown with mode=immediate
+20100525:20:12:15:gpstop:sdw51:gpadmin-[INFO]:-Master segment instance directory=/data/gpdb_master/gp-1
+20100525:20:12:16:gpstop:sdw51:gpadmin-[INFO]:-No standby master host configured
+20100525:20:12:16:gpstop:sdw51:gpadmin-[INFO]:-Commencing parallel segment instance shutdown, please wait...
+..... 
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-------------------------------------------------
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-Parallel process exit status
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-------------------------------------------------
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-Total processes marked as completed         = 4
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-Total processes marked as failed            = 0 
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-------------------------------------------------
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-Total instances marked invalid and bypassed = 0 
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-Successfully shutdown 4 of 4 segment instances 
+20100525:20:12:21:gpstop:sdw51:gpadmin-[INFO]:-Database successfully shutdown with no errors reported
+[sdw52] 20100525:20:26:23:gpstart:sdw52:gpadmin-[INFO]:-Gathering information and validating the environment...
+[sdw52] 20100525:20:26:24:gpstart:sdw52:gpadmin-[INFO]:-local Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+[sdw52] 20100525:20:26:24:gpstart:sdw52:gpadmin-[INFO]:-Starting Master instance in admin mode
+[sdw52] 20100525:20:26:25:gpstart:sdw52:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[sdw52] 20100525:20:26:25:gpstart:sdw52:gpadmin-[INFO]:-Obtaining Segment details from master...
+[sdw52] 20100525:20:26:25:gpstart:sdw52:gpadmin-[INFO]:-Master Started...
+[sdw52] 20100525:20:26:25:gpstart:sdw52:gpadmin-[INFO]:-Shutting down master
+[sdw52] 20100525:20:26:26:gpstart:sdw52:gpadmin-[INFO]:-No standby master configured.  skipping...
+[sdw52] 20100525:20:26:26:gpstart:sdw52:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+[sdw52] ...................... 
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-Process results...
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-----------------------------------------------------
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-Total processes marked as completed             = 4
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-Total processes marked as failed                = 0 
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-----------------------------------------------------
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-Total instances marked invalid and bypassed     = 0 
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-Successfully started 4 of 4 segment instances 
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-----------------------------------------------------
+[sdw52] 20100525:20:26:48:gpstart:sdw52:gpadmin-[INFO]:-Starting Master instance localhost directory /data/gpdb_master/gp-1 
+[sdw52] 20100525:20:26:49:gpstart:sdw52:gpadmin-[INFO]:-Command pg_ctl reports Master localhost instance active
+[sdw52] 20100525:20:26:49:gpstart:sdw52:gpadmin-[INFO]:-Database successfully started with no errors reported
+[sdw52] UPDATE 1
+[sdw53] INSERT 0 1
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Starting gpstop with args: '-ia'
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Gathering information and validating the environment...
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Obtaining Segment details from master...
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-There are 0 connections to the database
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Commencing Master instance shutdown with mode='immediate'
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Master host=localhost
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Commencing Master instance shutdown with mode=immediate
+[sdw53] 20100525:20:11:16:gpstop:sdw53:gpadmin-[INFO]:-Master segment instance directory=/data/gpdb_master/gp-1
+[sdw53] 20100525:20:11:17:gpstop:sdw53:gpadmin-[INFO]:-No standby master host configured
+[sdw53] 20100525:20:11:17:gpstop:sdw53:gpadmin-[INFO]:-Commencing parallel segment instance shutdown, please wait...
+[sdw53] ..... 
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-------------------------------------------------
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-Parallel process exit status
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-------------------------------------------------
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-Total processes marked as completed         = 4
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-Total processes marked as failed            = 0 
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-------------------------------------------------
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-Total instances marked invalid and bypassed = 0 
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-Successfully shutdown 4 of 4 segment instances 
+[sdw53] 20100525:20:11:22:gpstop:sdw53:gpadmin-[INFO]:-Database successfully shutdown with no errors reported
+[sdw53] mv /data/gpdb_master/gp-1 /data/gpdb_master/gp-1.old
+[sdw53] rsync -a sdw51-1:/data/gpdb_master/gp-1 /data/gpdb_master
+[sdw53] mv /data/gpdb_p1/gp0 /data/gpdb_p1/gp0.old
+[sdw53] rsync -a sdw51-2:/data/gpdb_p1/gp0 /data/gpdb_p1
+[sdw53] mv /data/gpdb_p2/gp1 /data/gpdb_p2/gp1.old
+[sdw53] rsync -a sdw51-3:/data/gpdb_p2/gp1 /data/gpdb_p2
+[sdw53] mv /data/gpdb_p3/gp2 /data/gpdb_p3/gp2.old
+[sdw53] rsync -a sdw51-4:/data/gpdb_p3/gp2 /data/gpdb_p3
+[sdw53] mv /data/gpdb_p4/gp3 /data/gpdb_p4/gp3.old
+[sdw53] rsync -a sdw51-1:/data/gpdb_p4/gp3 /data/gpdb_p4
+[sdw53] 20100525:20:24:01:gpstart:sdw53:gpadmin-[INFO]:-Starting gpstart with args: '-a'
+[sdw53] 20100525:20:24:01:gpstart:sdw53:gpadmin-[INFO]:-Gathering information and validating the environment...
+[sdw53] 20100525:20:24:02:gpstart:sdw53:gpadmin-[INFO]:-local Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+[sdw53] 20100525:20:24:02:gpstart:sdw53:gpadmin-[INFO]:-Starting Master instance in admin mode
+[sdw53] 20100525:20:24:03:gpstart:sdw53:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[sdw53] 20100525:20:24:03:gpstart:sdw53:gpadmin-[INFO]:-Obtaining Segment details from master...
+[sdw53] 20100525:20:24:03:gpstart:sdw53:gpadmin-[INFO]:-Master Started...
+[sdw53] 20100525:20:24:03:gpstart:sdw53:gpadmin-[INFO]:-Shutting down master
+[sdw53] 20100525:20:24:04:gpstart:sdw53:gpadmin-[INFO]:-No standby master configured.  skipping...
+[sdw53] 20100525:20:24:04:gpstart:sdw53:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+[sdw53] .................... 
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-Process results...
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-----------------------------------------------------
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-Total processes marked as completed             = 4
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-Total processes marked as failed                = 0 
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-----------------------------------------------------
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-Total instances marked invalid and bypassed     = 0 
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-Successfully started 4 of 4 segment instances 
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-----------------------------------------------------
+[sdw53] 20100525:20:24:24:gpstart:sdw53:gpadmin-[INFO]:-Starting Master instance localhost directory /data/gpdb_master/gp-1 
+[sdw53] 20100525:20:24:25:gpstart:sdw53:gpadmin-[INFO]:-Command pg_ctl reports Master localhost instance active
+[sdw53] 20100525:20:24:26:gpstart:sdw53:gpadmin-[INFO]:-Database successfully started with no errors reported
+[sdw53] UPDATE 1
+[sdw56] 20100525:20:40:00:gpstart:sdw56:gpadmin-[INFO]:-Gathering information and validating the environment...
+[sdw56] 20100525:20:40:00:gpstart:sdw56:gpadmin-[INFO]:-local Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+[sdw56] 20100525:20:40:00:gpstart:sdw56:gpadmin-[INFO]:-Starting Master instance in admin mode
+[sdw56] 20100525:20:40:01:gpstart:sdw56:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[sdw56] 20100525:20:40:01:gpstart:sdw56:gpadmin-[INFO]:-Obtaining Segment details from master...
+[sdw56] 20100525:20:40:02:gpstart:sdw56:gpadmin-[INFO]:-Master Started...
+[sdw56] 20100525:20:40:02:gpstart:sdw56:gpadmin-[INFO]:-Shutting down master
+[sdw56] 20100525:20:40:03:gpstart:sdw56:gpadmin-[INFO]:-No standby master configured.  skipping...
+[sdw56] 20100525:20:40:03:gpstart:sdw56:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+[sdw56] ..................... 
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-Process results...
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-----------------------------------------------------
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-Total processes marked as completed             = 4
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-Total processes marked as failed                = 0 
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-----------------------------------------------------
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-Total instances marked invalid and bypassed     = 0 
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-Successfully started 4 of 4 segment instances 
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-----------------------------------------------------
+[sdw56] 20100525:20:40:24:gpstart:sdw56:gpadmin-[INFO]:-Starting Master instance localhost directory /data/gpdb_master/gp-1 
+[sdw56] 20100525:20:40:25:gpstart:sdw56:gpadmin-[INFO]:-Command pg_ctl reports Master localhost instance active
+[sdw56] 20100525:20:40:25:gpstart:sdw56:gpadmin-[INFO]:-Database successfully started with no errors reported
+[sdw56] UPDATE 1
+[sdw57] INSERT 0 1
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Starting gpstop with args: '-ia'
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Gathering information and validating the environment...
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Obtaining Segment details from master...
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-There are 0 connections to the database
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Commencing Master instance shutdown with mode='immediate'
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Master host=localhost
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Commencing Master instance shutdown with mode=immediate
+[sdw57] 20100525:20:27:05:gpstop:sdw57:gpadmin-[INFO]:-Master segment instance directory=/data/gpdb_master/gp-1
+[sdw57] 20100525:20:27:06:gpstop:sdw57:gpadmin-[INFO]:-No standby master host configured
+[sdw57] 20100525:20:27:06:gpstop:sdw57:gpadmin-[INFO]:-Commencing parallel segment instance shutdown, please wait...
+[sdw57] ..... 
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-------------------------------------------------
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-Parallel process exit status
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-------------------------------------------------
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-Total processes marked as completed         = 4
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-Total processes marked as failed            = 0 
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-------------------------------------------------
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-Total instances marked invalid and bypassed = 0 
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-Successfully shutdown 4 of 4 segment instances 
+[sdw57] 20100525:20:27:11:gpstop:sdw57:gpadmin-[INFO]:-Database successfully shutdown with no errors reported
+[sdw57] mv /data/gpdb_master/gp-1 /data/gpdb_master/gp-1.old
+[sdw57] rsync -a sdw51-1:/data/gpdb_master/gp-1 /data/gpdb_master
+[sdw57] mv /data/gpdb_p1/gp0 /data/gpdb_p1/gp0.old
+[sdw57] rsync -a sdw51-2:/data/gpdb_p1/gp0 /data/gpdb_p1
+[sdw57] mv /data/gpdb_p2/gp1 /data/gpdb_p2/gp1.old
+[sdw57] rsync -a sdw51-3:/data/gpdb_p2/gp1 /data/gpdb_p2
+[sdw57] mv /data/gpdb_p3/gp2 /data/gpdb_p3/gp2.old
+[sdw57] rsync -a sdw51-4:/data/gpdb_p3/gp2 /data/gpdb_p3
+[sdw57] mv /data/gpdb_p4/gp3 /data/gpdb_p4/gp3.old
+[sdw57] rsync -a sdw51-1:/data/gpdb_p4/gp3 /data/gpdb_p4
+[sdw57] 20100525:20:39:45:gpstart:sdw57:gpadmin-[INFO]:-Starting gpstart with args: '-a'
+[sdw57] 20100525:20:39:45:gpstart:sdw57:gpadmin-[INFO]:-Gathering information and validating the environment...
+[sdw57] 20100525:20:39:45:gpstart:sdw57:gpadmin-[INFO]:-local Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+[sdw57] 20100525:20:39:45:gpstart:sdw57:gpadmin-[INFO]:-Starting Master instance in admin mode
+[sdw57] 20100525:20:39:46:gpstart:sdw57:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[sdw57] 20100525:20:39:46:gpstart:sdw57:gpadmin-[INFO]:-Obtaining Segment details from master...
+[sdw57] 20100525:20:39:47:gpstart:sdw57:gpadmin-[INFO]:-Master Started...
+[sdw57] 20100525:20:39:47:gpstart:sdw57:gpadmin-[INFO]:-Shutting down master
+[sdw57] 20100525:20:39:48:gpstart:sdw57:gpadmin-[INFO]:-No standby master configured.  skipping...
+[sdw57] 20100525:20:39:48:gpstart:sdw57:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+[sdw57] ..................... 
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-Process results...
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-----------------------------------------------------
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-Total processes marked as completed             = 4
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-Total processes marked as failed                = 0 
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-----------------------------------------------------
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-Total instances marked invalid and bypassed     = 0 
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-Successfully started 4 of 4 segment instances 
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-----------------------------------------------------
+[sdw57] 20100525:20:40:09:gpstart:sdw57:gpadmin-[INFO]:-Starting Master instance localhost directory /data/gpdb_master/gp-1 
+[sdw57] 20100525:20:40:10:gpstart:sdw57:gpadmin-[INFO]:-Command pg_ctl reports Master localhost instance active
+[sdw57] 20100525:20:40:10:gpstart:sdw57:gpadmin-[INFO]:-Database successfully started with no errors reported
+[sdw57] UPDATE 1
+[sdw52] removing /data/gpdb_master/gp-1.old
+[sdw52] removing /data/gpdb_p1/gp0.old
+[sdw52] removing /data/gpdb_p2/gp1.old
+[sdw52] removing /data/gpdb_p3/gp2.old
+[sdw52] removing /data/gpdb_p4/gp3.old
+[sdw53] removing /data/gpdb_master/gp-1.old
+[sdw53] removing /data/gpdb_p1/gp0.old
+[sdw53] removing /data/gpdb_p2/gp1.old
+[sdw53] removing /data/gpdb_p3/gp2.old
+[sdw53] removing /data/gpdb_p4/gp3.old
+[sdw56] removing /data/gpdb_master/gp-1.old
+[sdw56] removing /data/gpdb_p1/gp0.old
+[sdw56] removing /data/gpdb_p2/gp1.old
+[sdw56] removing /data/gpdb_p3/gp2.old
+[sdw56] removing /data/gpdb_p4/gp3.old
+[sdw57] removing /data/gpdb_master/gp-1.old
+[sdw57] removing /data/gpdb_p1/gp0.old
+[sdw57] removing /data/gpdb_p2/gp1.old
+[sdw57] removing /data/gpdb_p3/gp2.old
+[sdw57] removing /data/gpdb_p4/gp3.old
