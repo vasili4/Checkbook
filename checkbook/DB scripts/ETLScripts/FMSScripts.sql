@@ -950,6 +950,14 @@ BEGIN
 		JOIN tmp_all_disbs d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag='I';
 		
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+							
+			IF l_count > 0 THEN 
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'F',l_count, '# of records inserted into disbursement');	
+	END IF;	
+		
+		
 	RAISE NOTICE 'FMS 15';
 	
 	CREATE TEMPORARY TABLE tmp_disbs_update AS
@@ -993,6 +1001,14 @@ BEGIN
 	FROM	tmp_disbs_update b
 	WHERE	a.disbursement_id = b.disbursement_id;
 	
+		GET DIAGNOSTICS l_count = ROW_COUNT;	
+				
+					IF l_count > 0 THEN 
+						INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+						VALUES(p_load_file_id_in,'F',l_count, '# of records updated in disbursement');	
+	END IF;	
+	
+	
 	RAISE NOTICE 'FMS 16';
 	
 	-- Disbursement line item changes
@@ -1034,6 +1050,12 @@ BEGIN
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 		JOIN etl.seq_disbursement_line_item_id c ON a.uniq_id = c.uniq_id
 		JOIN etl.seq_expenditure_expenditure_id d ON b.uniq_id = d.uniq_id;
+		
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+			IF l_count > 0 THEN 
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'F',l_count, '# of records inserted into disbursements_line_item');	
+	END IF;	
 
 	RAISE NOTICE 'FMS 17';
 	
@@ -1093,6 +1115,14 @@ BEGIN
 					JOIN tmp_all_disbs d ON b.uniq_id = d.uniq_id
 					JOIN tmp_disbs_lines_actions e ON d.disbursement_id = e.disbursement_id AND a.doc_actg_ln_no = e.line_number 
 	WHERE   d.action_flag = 'U' AND e.action_flag='I';
+	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+	
+		IF l_count > 0 THEN 
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+			VALUES(p_load_file_id_in,'F',l_count, '# of records inserted into disbursements_line_item');	
+	END IF;	
 	
 	RAISE NOTICE 'FMS 18.1';
 	
@@ -1163,6 +1193,13 @@ BEGIN
 		file_type = b.file_type
 	FROM   tmp_disbs_line_items_update b			      	      
 	WHERE   f.disbursement_line_item_id = b.disbursement_line_item_id ;	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+		
+			IF l_count > 0 THEN 
+				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+				VALUES(p_load_file_id_in,'F',l_count, '# of records updated in disbursements_line_item');	
+	END IF;	
 	
 	RAISE NOTICE 'FMS 20';	
 
@@ -1262,6 +1299,8 @@ BEGIN
 			JOIN etl.etl_data_load z ON coalesce(a.updated_load_id, a.created_load_id) = z.load_id
 		WHERE z.job_id = p_job_id_in AND z.data_source_code IN ('C','M','F');
 		
+		
+	
 	
 	RAISE NOTICE 'FMS RF 2';
 	
