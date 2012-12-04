@@ -740,7 +740,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'O',l_count, '# of records inserted into ref_object_class_history');
+		VALUES(p_load_file_id_in,'O',l_count, 'Number of records inserted into ref_object_class_history');
 	END IF;
 	
 	RETURN 1;
