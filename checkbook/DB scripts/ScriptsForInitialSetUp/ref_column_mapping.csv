@@ -286,7 +286,7 @@ etl.ext_stg_fms_data_feed,col48,varchar,etl.stg_fms_accounting_line,rpt_cd,varch
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_ct_header,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_ct_header,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_ct_header,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_ct_header,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_ct_header,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_ct_header,doc_nm,varchar,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_ct_header,doc_rec_dt_dc,date,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_ct_header,doc_bfy,int,8
@@ -397,7 +397,7 @@ etl.ext_stg_con_data_feed,col112,varchar,etl.stg_con_ct_header,doc_func_cd,int,1
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_ct_vendor,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_ct_vendor,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_ct_vendor,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_ct_vendor,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_ct_vendor,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_ct_vendor,doc_vend_ln_no,int,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_ct_vendor,vend_cust_cd,varchar,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_ct_vendor,ad_id,varchar,8
@@ -435,7 +435,7 @@ etl.ext_stg_con_data_feed,col39,varchar,etl.stg_con_ct_vendor,disc_alw_4_fl,bpch
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_ct_award_detail,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_ct_award_detail,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_ct_award_detail,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_ct_award_detail,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_ct_award_detail,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_ct_award_detail,awd_meth_cd,varchar,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_ct_award_detail,awd_lvl_cd,varchar,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_ct_award_detail,cttyp_cd,varchar,8
@@ -502,7 +502,7 @@ etl.ext_stg_con_data_feed,col68,varchar,etl.stg_con_ct_award_detail,percent_10,"
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_ct_accounting_line,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_ct_accounting_line,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_ct_accounting_line,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_ct_accounting_line,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_ct_accounting_line,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_ct_accounting_line,doc_vend_ln_no,int,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_ct_accounting_line,doc_comm_ln_no,int,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_ct_accounting_line,doc_actg_ln_no,int,8
@@ -571,7 +571,7 @@ etl.ext_stg_con_data_feed,col70,varchar,etl.stg_con_ct_accounting_line,rl_fl_2,b
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_po_header,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_po_header,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_po_header,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_po_header,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_po_header,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_po_header,doc_nm,varchar,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_po_header,doc_rec_dt_dc,date,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_po_header,doc_bfy,int,8
@@ -664,7 +664,7 @@ etl.ext_stg_con_data_feed,col94,varchar,etl.stg_con_po_header,doc_func_cd,int,94
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_po_award_detail,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_po_award_detail,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_po_award_detail,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_po_award_detail,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_po_award_detail,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_po_award_detail,awd_meth_cd,varchar,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_po_award_detail,awd_lvl_cd,varchar,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_po_award_detail,cttyp_cd,varchar,8
@@ -697,7 +697,7 @@ etl.ext_stg_con_data_feed,col34,varchar,etl.stg_con_po_award_detail,percent_10,"
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_po_vendor,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_po_vendor,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_po_vendor,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_po_vendor,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_po_vendor,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_po_vendor,doc_vend_ln_no,int,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_po_vendor,vend_cust_cd,varchar,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_po_vendor,lgl_nm,varchar,8
@@ -733,7 +733,7 @@ etl.ext_stg_con_data_feed,col37,varchar,etl.stg_con_po_vendor,disc_alw_4_fl,bpch
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_po_accounting_line,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_po_accounting_line,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_po_accounting_line,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_po_accounting_line,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_po_accounting_line,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_po_accounting_line,doc_vend_ln_no,int,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_po_accounting_line,doc_comm_ln_no,int,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_po_accounting_line,doc_actg_ln_no,int,8
@@ -802,7 +802,7 @@ etl.ext_stg_con_data_feed,col70,varchar,etl.stg_con_po_accounting_line,rl_fl_2,b
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_do1_header,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_do1_header,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_do1_header,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_do1_header,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_do1_header,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_do1_header,doc_nm,varchar,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_do1_header,doc_rec_dt_dc,date,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_do1_header,doc_bfy,int,8
@@ -890,7 +890,7 @@ etl.ext_stg_con_data_feed,col89,varchar,etl.stg_con_do1_header,doc_func_cd,int,8
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_do1_vendor,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_do1_vendor,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_do1_vendor,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_do1_vendor,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_do1_vendor,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_do1_vendor,doc_vend_ln_no,int,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_do1_vendor,vend_cust_cd,varchar,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_do1_vendor,lgl_nm,varchar,8
@@ -925,7 +925,7 @@ etl.ext_stg_con_data_feed,col36,varchar,etl.stg_con_do1_vendor,disc_alw_4_fl,bpc
 etl.ext_stg_con_data_feed,doc_cd,varchar,etl.stg_con_do1_accounting_line,doc_cd,varchar,2
 etl.ext_stg_con_data_feed,doc_dept_cd,varchar,etl.stg_con_do1_accounting_line,doc_dept_cd,varchar,3
 etl.ext_stg_con_data_feed,doc_id,varchar,etl.stg_con_do1_accounting_line,doc_id,varchar,4
-etl.ext_stg_con_data_feed,doc_vers_no,int,etl.stg_con_do1_accounting_line,doc_vers_no,int,5
+etl.ext_stg_con_data_feed,doc_vers_no,varchar,etl.stg_con_do1_accounting_line,doc_vers_no,int,5
 etl.ext_stg_con_data_feed,col6,varchar,etl.stg_con_do1_accounting_line,doc_vend_ln_no,int,6
 etl.ext_stg_con_data_feed,col7,varchar,etl.stg_con_do1_accounting_line,doc_comm_ln_no,int,7
 etl.ext_stg_con_data_feed,col8,varchar,etl.stg_con_do1_accounting_line,doc_actg_ln_no,int,8
