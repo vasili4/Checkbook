@@ -1388,7 +1388,7 @@ CREATE EXTERNAL TABLE ext_stg_con_data_feed(
 	doc_cd varchar(8),
 	doc_dept_cd varchar(20),
 	doc_id varchar(20),
-	doc_vers_no int,
+	doc_vers_no varchar,
 	col6 varchar(100),
 	col7 varchar(100),
 	col8 varchar(100),
