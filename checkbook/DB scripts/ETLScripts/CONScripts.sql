@@ -1651,8 +1651,8 @@ BEGIN
 	
 	RAISE NOTICE 'PCON5';
 	
-	INSERT INTO agreement_snapshot_deleted(original_agreement_id, starting_year, load_id, deleted_date)
-	SELECT a.original_agreement_id, a.starting_year, l_load_id, now()::timestamp
+	INSERT INTO agreement_snapshot_deleted(agreement_id, original_agreement_id, starting_year, master_agreement_yn, load_id, deleted_date, job_id)
+	SELECT a.agreement_id, a.original_agreement_id, a.starting_year, a.master_agreement_yn, l_load_id, now()::timestamp, p_job_id_in
 	FROM agreement_snapshot a , tmp_agreement_snapshot b
 	WHERE a.original_agreement_id = b.original_agreement_id;
 	
@@ -1673,7 +1673,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn,load_id,last_modified_date)
+					master_agreement_yn,load_id,last_modified_date,job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year OR b.effective_end_fiscal_year IS NULL THEN a.starting_year
@@ -1696,7 +1696,7 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn, coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
+		'N' as master_agreement_yn, coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id
@@ -1793,8 +1793,8 @@ BEGIN
 	
 	RAISE NOTICE 'PCON8';
 	
-	INSERT INTO agreement_snapshot_cy_deleted(original_agreement_id, starting_year, load_id, deleted_date)
-	SELECT a.original_agreement_id, a.starting_year, l_load_id, now()::timestamp
+	INSERT INTO agreement_snapshot_cy_deleted(agreement_id, original_agreement_id, starting_year, master_agreement_yn, load_id, deleted_date, job_id)
+	SELECT a.agreement_id, a.original_agreement_id, a.starting_year, a.master_agreement_yn, l_load_id, now()::timestamp, p_job_id_in
 	FROM agreement_snapshot_cy a , tmp_agreement_snapshot b
 	WHERE a.original_agreement_id = b.original_agreement_id;
 	
@@ -1814,7 +1814,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					master_agreement_yn,load_id,last_modified_date)
+					master_agreement_yn,load_id,last_modified_date, job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 				      WHEN b.effective_end_calendar_year < a.starting_year  OR b.effective_end_calendar_year IS NULL THEN a.starting_year
@@ -1837,7 +1837,7 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		'N' as master_agreement_yn,coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date)
+		'N' as master_agreement_yn,coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id

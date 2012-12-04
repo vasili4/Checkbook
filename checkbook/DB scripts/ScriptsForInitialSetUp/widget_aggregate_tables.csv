@@ -1117,7 +1117,46 @@ type_of_year char(1)
 FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
 WHERE a.fiscal_year = b.year_value 
 AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.fiscal_year
-AND a.status_flag='A' 
+AND a.status_flag='A' AND a.master_agreement_yn = 'N'
+UNION ALL
+SELECT 	d.disbursement_line_item_id, 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		a.industry_type_id,
+		a.award_size_id,
+		d.document_id,
+		d.vendor_name,
+		d.check_eft_issued_date,
+		d.agency_name,
+		d.department_short_name,
+		d.check_amount,
+		d.expenditure_object_name,
+		d.budget_name,
+		d.contract_number,
+		d.purpose,
+		d.reporting_code,
+		d.spending_category_name,
+		d.agency_id,
+		d.vendor_id,
+		d.expenditure_object_id,
+		d.department_id,
+		d.spending_category_id,
+		d.agreement_id,
+		d.contract_document_code,
+		d.master_agreement_id,
+		d.check_eft_issued_nyc_year_id,
+		d.check_eft_issued_cal_month_id,
+		'A' as status_flag,
+		'B' as type_of_year
+FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.master_agreement_id  AND a.fiscal_year >= d.fiscal_year
+AND a.status_flag='A' AND a.master_agreement_yn = 'Y'
 UNION ALL
  SELECT d.disbursement_line_item_id, 
 		a.original_agreement_id,
@@ -1156,7 +1195,46 @@ UNION ALL
 FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
 WHERE a.fiscal_year = b.year_value 
 AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.fiscal_year
-AND a.status_flag='R'","SELECT d.disbursement_line_item_id, 
+AND a.status_flag='R' AND a.master_agreement_yn = 'N' 
+UNION ALL
+ SELECT d.disbursement_line_item_id, 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		a.industry_type_id,
+		a.award_size_id,
+		d.document_id,
+		d.vendor_name,
+		d.check_eft_issued_date,
+		d.agency_name,
+		d.department_short_name,
+		d.check_amount,
+		d.expenditure_object_name,
+		d.budget_name,
+		d.contract_number,
+		d.purpose,
+		d.reporting_code,
+		d.spending_category_name,
+		d.agency_id,
+		d.vendor_id,
+		d.expenditure_object_id,
+		d.department_id,
+		d.spending_category_id,
+		d.agreement_id,
+		d.contract_document_code,
+		d.master_agreement_id,
+		d.check_eft_issued_nyc_year_id,
+		d.check_eft_issued_cal_month_id,
+		'R' as status_flag,
+		'B' as type_of_year
+FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.master_agreement_id  AND a.fiscal_year >= d.fiscal_year
+AND a.status_flag='R' AND a.master_agreement_yn = 'Y' ","SELECT d.disbursement_line_item_id, 
 		a.original_agreement_id,
 		a.fiscal_year,
 		b.year_id,
@@ -1193,7 +1271,46 @@ AND a.status_flag='R'","SELECT d.disbursement_line_item_id,
 FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
 WHERE a.fiscal_year = b.year_value 
 AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.calendar_fiscal_year
-AND a.status_flag='A' 
+AND a.status_flag='A' AND a.master_agreement_yn = 'N' 
+UNION ALL
+ SELECT d.disbursement_line_item_id, 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		a.industry_type_id,
+		a.award_size_id,
+		d.document_id,
+		d.vendor_name,
+		d.check_eft_issued_date,
+		d.agency_name,
+		d.department_short_name,
+		d.check_amount,
+		d.expenditure_object_name,
+		d.budget_name,
+		d.contract_number,
+		d.purpose,
+		d.reporting_code,
+		d.spending_category_name,
+		d.agency_id,
+		d.vendor_id,
+		d.expenditure_object_id,
+		d.department_id,
+		d.spending_category_id,
+		d.agreement_id,
+		d.contract_document_code,
+		d.master_agreement_id,
+		d.calendar_fiscal_year_id,
+		d.check_eft_issued_cal_month_id,
+		'A' as status_flag,
+		'C' as type_of_year
+FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.master_agreement_id  AND a.fiscal_year >= d.calendar_fiscal_year
+AND a.status_flag='A' AND a.master_agreement_yn = 'Y' 
 UNION ALL
 SELECT 	d.disbursement_line_item_id, 
 		a.original_agreement_id,
@@ -1232,7 +1349,46 @@ SELECT 	d.disbursement_line_item_id,
 FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
 WHERE a.fiscal_year = b.year_value 
 AND a.original_agreement_id = d.agreement_id  AND a.fiscal_year >= d.calendar_fiscal_year
-AND a.status_flag='R'",20
+AND a.status_flag='R' AND a.master_agreement_yn = 'N'
+UNION ALL
+SELECT 	d.disbursement_line_item_id, 
+		a.original_agreement_id,
+		a.fiscal_year,
+		b.year_id,
+		a.document_code_id,
+		a.vendor_id,
+		a.award_method_id,
+		a.agency_id as document_agency_id,
+		a.industry_type_id,
+		a.award_size_id,
+		d.document_id,
+		d.vendor_name,
+		d.check_eft_issued_date,
+		d.agency_name,
+		d.department_short_name,
+		d.check_amount,
+		d.expenditure_object_name,
+		d.budget_name,
+		d.contract_number,
+		d.purpose,
+		d.reporting_code,
+		d.spending_category_name,
+		d.agency_id,
+		d.vendor_id,
+		d.expenditure_object_id,
+		d.department_id,
+		d.spending_category_id,
+		d.agreement_id,
+		d.contract_document_code,
+		d.master_agreement_id,
+		d.calendar_fiscal_year_id,
+		d.check_eft_issued_cal_month_id,
+		'R' as status_flag,
+		'C' as type_of_year
+FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
+WHERE a.fiscal_year = b.year_value 
+AND a.original_agreement_id = d.master_agreement_id  AND a.fiscal_year >= d.calendar_fiscal_year
+AND a.status_flag='R' AND a.master_agreement_yn = 'Y' ",20
 ContractsByExpenseCategory,aggregateon_contracts_expense,"CREATE TABLE aggregateon_contracts_expense(
 	original_agreement_id bigint,
 	expenditure_object_code character varying(4),

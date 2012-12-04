@@ -1976,6 +1976,7 @@ CREATE TABLE ref_award_category_industry (
  CREATE INDEX idx_disb_cont_doc_code_contracts_spending_transactions ON contracts_spending_transactions(disb_contract_document_code);
  CREATE INDEX idx_document_agency_id_contracts_spending_transactions ON contracts_spending_transactions(document_agency_id);
  CREATE INDEX idx_disb_cal_month_id_contracts_spending_transactions ON contracts_spending_transactions(disb_check_eft_issued_cal_month_id);
+ CREATE INDEX idx_document_code_id_contracts_spending_transactions ON contracts_spending_transactions(document_code_id);
     
  
  

@@ -1710,20 +1710,24 @@ DISTRIBUTED BY (fiscal_year_id);
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
 
 CREATE TABLE agreement_snapshot_deleted (
+  agreement_id bigint NOT NULL,
   original_agreement_id bigint NOT NULL,
   starting_year smallint,
+  master_agreement_yn character(1),
   load_id integer,
   deleted_date timestamp without time zone,
   job_id bigint
-) DISTRIBUTED BY (original_agreement_id);
+) DISTRIBUTED BY (agreement_id);
 
 CREATE TABLE agreement_snapshot_cy_deleted (
+  agreement_id bigint NOT NULL,
   original_agreement_id bigint NOT NULL,
   starting_year smallint,
+  master_agreement_yn character(1),
   load_id integer,
   deleted_date timestamp without time zone,
   job_id bigint
-) DISTRIBUTED BY (original_agreement_id);
+) DISTRIBUTED BY (agreement_id);
 
 
 CREATE TABLE deleted_agreement_accounting_line (LIKE history_agreement_accounting_line) DISTRIBUTED BY (agreement_id);
