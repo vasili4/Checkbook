@@ -838,6 +838,8 @@ BEGIN
 					     JOIN tmp_do1_con d ON a.uniq_id = d.uniq_id
 	WHERE   action_flag = 'I';
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	
 	IF l_count > 0 THEN
 			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
 			VALUES(p_load_file_id_in,'C','DO1',l_count,'# of records inserted  into history_agreement_accounting_line');

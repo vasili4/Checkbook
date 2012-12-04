@@ -1568,7 +1568,7 @@ BEGIN
 	-- needs to delete after first load
 	
 	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
-	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
+	SELECT a.disbursement_line_item_id, coalesce(a.updated_load_id, a.created_load_id), now()::timestamp
 	FROM disbursement_line_item a, disbursement b
 	WHERE   a.disbursement_id = b.disbursement_id 
 	AND b.document_version > 1;
