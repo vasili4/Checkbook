@@ -960,7 +960,8 @@ CREATE TABLE history_agreement (
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
-   last_modified_date timestamp without time zone
+   last_modified_date timestamp without time zone,
+   job_id bigint
  ) DISTRIBUTED BY (original_agreement_id);
  
 
@@ -1812,7 +1813,7 @@ CREATE TABLE agreement_snapshot_expanded(
 	vendor_id int,
 	agency_id smallint,
 	industry_type_id smallint,
-    award_size_id smallint,
+        award_size_id smallint,
 	original_contract_amount numeric(16,2) ,
 	maximum_contract_amount numeric(16,2),
 	rfed_amount numeric(16,2),
