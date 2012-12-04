@@ -873,7 +873,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 	IF l_count >0 THEN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'R',l_count,'# of records inserted in revenue ');
+	VALUES(p_load_file_id_in,'R',l_count,'# of records inserted in revenue');
 	END IF;
 	
 	/******************
