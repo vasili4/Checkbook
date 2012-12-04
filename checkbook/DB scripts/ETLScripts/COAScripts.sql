@@ -102,7 +102,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'A',l_count, '# of records inserted into ref_agency_history');
+		VALUES(p_load_file_id_in,'A',l_count, 'Number of records inserted into ref_agency_history');
 	END IF;		
 
 	UPDATE ref_agency
@@ -339,7 +339,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, '# of records inserted into ref_department_history');
+		VALUES(p_load_file_id_in,'D',l_count, 'Number of records inserted into ref_department_history');
 	END IF;
 	
 	RETURN 1;
