@@ -1085,14 +1085,7 @@ BEGIN
 	FROM 	etl.stg_payroll_summary
 	WHERE  action_flag = 'I';
 	
-	
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-			
-			IF l_count > 0 THEN
-				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-				VALUES(p_load_file_id_in,'PS',l_count, 'Number of records inserted into disbursement_line_item_details');
-		END IF;
-	
+		
 	
 	CREATE TEMPORARY TABLE tmp_payroll_summary_update AS
 	SELECT *
@@ -1136,12 +1129,6 @@ BEGIN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'PS',l_count,'# of records updated in payroll_summary');
 	
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-					
-					IF l_count > 0 THEN
-						INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-						VALUES(p_load_file_id_in,'PS',l_count, 'Number of records updated in disbursement_line_item_details');
-		END IF;
 				
 			
 	RETURN 1;
