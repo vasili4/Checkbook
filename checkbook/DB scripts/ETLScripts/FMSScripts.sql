@@ -1126,13 +1126,14 @@ BEGIN
 	
 	RAISE NOTICE 'FMS 18.1';
 	
-	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
-	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
-	FROM disbursement_line_item a, tmp_disbs_lines_actions b , tmp_all_disbs c
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id,load_id,deleted_date,job_id)
+	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp,z.job_id
+	FROM disbursement_line_item a, tmp_disbs_lines_actions b , tmp_all_disbs c,etl.etl_data_load z
 	WHERE   a.disbursement_id = b.disbursement_id 		
 		AND a.line_number = b.line_number		
 		AND a.disbursement_id = c.disbursement_id
-		AND b.action_flag = 'D' AND c.action_flag='U';
+		AND b.action_flag = 'D' AND c.action_flag='U'
+		AND z.load_id = COALESCE(a.updated_load_id,created_load_id);
 	
 	
 	RAISE NOTICE 'FMS 18.2';
@@ -1567,10 +1568,11 @@ BEGIN
 	
 	-- needs to delete after first load
 	
-	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
-	SELECT a.disbursement_line_item_id, coalesce(a.updated_load_id, a.created_load_id), now()::timestamp
-	FROM disbursement_line_item a, disbursement b
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date,job_id)
+	SELECT a.disbursement_line_item_id, coalesce(a.updated_load_id, a.created_load_id), now()::timestamp,z.job_id
+	FROM disbursement_line_item a, disbursement b,etl.etl_data_load z
 	WHERE   a.disbursement_id = b.disbursement_id 
+	AND z.load_id = COALESCE(a.updated_load_id,a.created_load_id)
 	AND b.document_version > 1;
 	 
 	DELETE FROM ONLY disbursement_line_item_details a
@@ -1610,8 +1612,8 @@ BEGIN
 	USING tmp_disb_delete_ver_gt1_without_ver0 b
 	WHERE   a.disbursement_id = b.disbursement_id ;
 	
-	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date)
-	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date,job_id)
+	SELECT a.disbursement_line_item_id, p_load_id_in, now()::timestamp,c.job_id
 	FROM disbursement_line_item a, tmp_disb_delete_ver_gt1_without_ver0 b , etl.etl_data_load c
 	WHERE   a.disbursement_id = b.disbursement_id 	AND coalesce(a.updated_load_id, a.created_load_id) = c.load_id AND c.job_id = p_job_id_in;
 		
