@@ -871,10 +871,11 @@ BEGIN
 	FROM etl.stg_revenue a JOIN tmp_fk_revenue_values1 b ON a.uniq_id = b.uniq_id;
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
-	
+	IF l_count >0 THEN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'R',l_count,'# of records inserted in revenue ');
-		
+	END IF;
+	
 	/******************
 	INSERT into revenue_details(revenue_id,fiscal_year,fiscal_period,posting_amount,
 					revenue_category_id,revenue_source_id,fiscal_year_id,agency_id,
