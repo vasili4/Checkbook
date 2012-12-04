@@ -332,15 +332,16 @@ CREATE TABLE disbursement_line_item_details(
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-    agreement_commodity_line_number integer,
-    agreement_vendor_line_number integer, 
-    reference_document_number character varying,   
-    reference_document_code varchar(8),
+        agreement_commodity_line_number integer,
+        agreement_vendor_line_number integer, 
+        reference_document_number character varying,   
+        reference_document_code varchar(8),
 	contract_document_code varchar(8),
 	master_contract_document_code varchar(8),
 	file_type char(1),
 	load_id integer,
-    last_modified_date timestamp without time zone
+        last_modified_date timestamp without time zone,
+        job_id bigint
 	)
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -1851,7 +1852,8 @@ CREATE TABLE agreement_snapshot(
 	  original_version_flag character(1),
   	  latest_flag character(1),
   	  load_id integer,
-      last_modified_date timestamp without time zone
+          last_modified_date timestamp without time zone,
+          job_id bigint
 ) DISTRIBUTED BY (original_agreement_id);
 
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
