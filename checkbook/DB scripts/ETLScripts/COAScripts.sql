@@ -439,7 +439,7 @@ BEGIN
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'E',l_count, '# of records inserted into ref_expenditure_object_history');
+		VALUES(p_load_file_id_in,'E',l_count, '# of records inserted into ref_expenditure_object');
 	END IF;		
 		
 	RETURN 1;
