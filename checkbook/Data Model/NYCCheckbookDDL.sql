@@ -1055,13 +1055,14 @@ CREATE TABLE disbursement_line_item (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-  ) distributed by (disbursement_line_item_id);
+   ) distributed by (disbursement_line_item_id);
 
 
 CREATE TABLE disbursement_line_item_deleted (
   disbursement_line_item_id bigint NOT NULL,
   load_id integer,
-  deleted_date timestamp without time zone
+  deleted_date timestamp without time zone,
+  job_id bigint
 ) DISTRIBUTED BY (disbursement_line_item_id);
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1425,7 +1426,8 @@ CREATE TABLE disbursement_line_item_details(
 	master_contract_document_code varchar(8),
 	file_type char(1),
 	load_id integer,
-	last_modified_date timestamp without time zone
+	last_modified_date timestamp without time zone,
+	job_id bigint
 )
 DISTRIBUTED BY (disbursement_line_item_id);
 
@@ -1711,14 +1713,16 @@ CREATE TABLE agreement_snapshot_deleted (
   original_agreement_id bigint NOT NULL,
   starting_year smallint,
   load_id integer,
-  deleted_date timestamp without time zone
+  deleted_date timestamp without time zone,
+  job_id bigint
 ) DISTRIBUTED BY (original_agreement_id);
 
 CREATE TABLE agreement_snapshot_cy_deleted (
   original_agreement_id bigint NOT NULL,
   starting_year smallint,
   load_id integer,
-  deleted_date timestamp without time zone
+  deleted_date timestamp without time zone,
+  job_id bigint
 ) DISTRIBUTED BY (original_agreement_id);
 
 
