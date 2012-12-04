@@ -1247,11 +1247,10 @@ BEGIN
 
 
 		GET DIAGNOSTICS l_count = ROW_COUNT;
-				
 				IF l_count > 0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-					VALUES(p_load_file_id_in,'C','CT1,CTA1'l_count,'# of records updated  in history_agreement_accounting_line from General Contracts');
-	END IF;
+					VALUES(p_load_file_id_in,'C','CT1,CTA1',l_count,'# of records updated  in history_agreement_accounting_line from General Contracts');
+	                END IF;
 
 	RAISE NOTICE '11';
 	
