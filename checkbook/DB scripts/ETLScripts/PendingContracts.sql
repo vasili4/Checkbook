@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION etl.processPendingContracts(p_load_file_id_in bigint,p_load_id_in bigint) RETURNS INT AS $$
 DECLARE
-	l_count smallint;
+	l_count bigint;
 BEGIN
 	CREATE TEMPORARY TABLE tmp_fk_values_pc (uniq_id bigint, document_code_id smallint, document_agency_id smallint,
 						parent_document_code_id smallint, parent_document_agency_id smallint,submitting_agency_id smallint,
@@ -377,6 +377,15 @@ BEGIN
 	FROM  etl.stg_pending_contracts a 
 	LEFT JOIN ref_award_method b ON (case when length(a.am_code)= 1 THEN lpad(a.am_code,2,'0') ELSE a.am_code END) = b.award_method_code
 	LEFT JOIN ref_award_category_industry c ON c.award_category_code = a.award_category_code ;
+	
+	
+	GET DIAGNOSTICS l_count = ROW_COUNT;	
+	
+		IF l_count > 0 THEN
+			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+			VALUES(p_load_file_id_in,'PC',l_count, '# of records inserted into pending_contracts');
+		END IF;
+	
 	
 	CREATE TEMPORARY TABLE tmp_pc_update_latest_flag AS
 	SELECT contract_number, max(document_version) as document_version
