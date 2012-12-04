@@ -254,7 +254,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-					VALUES(p_load_file_id_in,'R',l_count,'# of records inserted into vendor');
+					VALUES(p_load_file_id_in,'V',l_count,'Number of records inserted into vendor');
 	END IF;
 
 
@@ -284,7 +284,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-					VALUES(p_load_file_id_in,'R',l_count,'# of records inserted into vendor_history');
+					VALUES(p_load_file_id_in,'V',l_count,'Number of records inserted into vendor_history');
 	END IF;
 	
 	INSERT INTO vendor_history(vendor_history_id, vendor_id, legal_name,alias_name,miscellaneous_vendor_flag ,vendor_sub_code,
@@ -298,7 +298,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-					VALUES(p_load_file_id_in,'R',l_count,'# of records inserted into vendor_history');
+					VALUES(p_load_file_id_in,'V',l_count,'Number of records inserted into vendor_history');
 	END IF;
 
 		
@@ -400,7 +400,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-					VALUES(p_load_file_id_in,'R',l_count,'# inserted into vendor_address');
+					VALUES(p_load_file_id_in,'V',l_count,'Number of records inserted into vendor_address');
 	END IF;
 
 	RAISE NOTICE 'VENDOR 8';
@@ -417,7 +417,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-					VALUES(p_load_file_id_in,'R',l_count,'# records inserted into vendor_business_type');
+					VALUES(p_load_file_id_in,'V',l_count,'Number of records inserted into vendor_business_type');
 	END IF;
 	
 	RETURN 1;
