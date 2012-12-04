@@ -10,7 +10,7 @@ Functions defined
 
 -- DROP FUNCTION etl.updateforeignkeysforrevenue(bigint);
 
-CREATE OR REPLACE FUNCTION etl.updateforeignkeysforrevenue(p_load_id_in bigint)
+CREATE OR REPLACE FUNCTION etl.updateforeignkeysforrevenue(p_load_file_id_in bigint,p_load_id_in bigint)
   RETURNS integer AS $$
 DECLARE
 l_count bigint;
@@ -830,7 +830,7 @@ DECLARE
 
 BEGIN
 		
-	l_fk_update := etl.updateForeignKeysForRevenue(p_load_id_in);
+	l_fk_update := etl.updateForeignKeysForRevenue(p_load_file_id_in,p_load_id_in);
 
 	RAISE NOTICE 'REVENUE 1';
 	
