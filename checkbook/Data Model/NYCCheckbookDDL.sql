@@ -93,12 +93,13 @@ CREATE SEQUENCE seq_revenue_revenue_id;
 ) distributed by (load_id);
 */
  
+/* 
 CREATE TABLE ref_data_source (
   data_source_code varchar(2) ,
   description varchar(40) ,
   created_date timestamp 
 ) DISTRIBUTED BY (data_source_code);
-
+*/
 CREATE TABLE ref_agency (
     agency_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_agency_agency_id'::regclass) NOT NULL,
     agency_code character varying(20),
