@@ -282,7 +282,7 @@ THEN 'Y' ELSE 'N' END) as modified_flag
 
 	IF l_count > 0 THEN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'D',l_count, 'Number of records inserted into ref_department');
+		VALUES(p_load_file_id_in,'D',l_count, '# of records inserted into ref_department');
 	END IF;
 	
 	RAISE NOTICE '3.3';
