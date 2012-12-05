@@ -842,7 +842,7 @@ BEGIN
 	
 	IF l_count > 0 THEN
 			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-			VALUES(p_load_file_id_in,'C','DO1',l_count,'# of records inserted  into history_agreement_accounting_line');
+			VALUES(p_load_file_id_in,'C','DO1',l_count,'# of records inserted into history_agreement_accounting_line');
 		END IF;	
 
 
@@ -894,9 +894,11 @@ BEGIN
 					     JOIN tmp_do1_acc_lines_actions e ON d.agreement_id = e.agreement_id AND b.doc_actg_ln_no = e.line_number AND b.doc_comm_ln_no = e.commodity_line_number
 	WHERE   d.action_flag = 'U' AND e.action_flag='I';
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	
 	IF l_count > 0 THEN
 				INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
-				VALUES(p_load_file_id_in,'C','DO1',l_count,'# of records inserted  into history_agreement_accounting_line');
+				VALUES(p_load_file_id_in,'C','DO1',l_count,'# of records inserted into history_agreement_accounting_line');
 			END IF;	
 
 		
@@ -948,6 +950,8 @@ BEGIN
 	       AND d.agreement_id = e.agreement_id AND b.uniq_id = e.uniq_id
 	       AND f.agreement_id = d.agreement_id AND f.line_number = e.line_number AND f.agreement_id = e.agreement_id AND f.commodity_line_number = e.commodity_line_number;	       
 
+	GET DIAGNOSTICS l_count = ROW_COUNT;
+	       
 	IF l_count > 0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,document_type,num_transactions,description)
 					VALUES(p_load_file_id_in,'C','DO1',l_count,'# of records updated in history_agreement_accounting_line');

@@ -383,10 +383,10 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
 	calendar_fiscal_year_id smallint,
 	calendar_fiscal_year smallint,
 	agreement_accounting_line_number integer,
-        agreement_commodity_line_number integer,
-       agreement_vendor_line_number integer, 
-       reference_document_number character varying,    
-       reference_document_code varchar(8),
+    agreement_commodity_line_number integer,
+   	agreement_vendor_line_number integer, 
+   	reference_document_number character varying,    
+   	reference_document_code varchar(8),
 	contract_document_code varchar(8),
 	master_contract_document_code varchar(8),
 	file_type char(1),
@@ -422,7 +422,7 @@ CREATE VIEW disbursement_line_item_details AS
     disbursement_line_item_details__0.spending_category_id,disbursement_line_item_details__0.spending_category_name,disbursement_line_item_details__0.calendar_fiscal_year_id,disbursement_line_item_details__0.calendar_fiscal_year,
     disbursement_line_item_details__0.agreement_accounting_line_number, disbursement_line_item_details__0.agreement_commodity_line_number, disbursement_line_item_details__0.agreement_vendor_line_number, 
     disbursement_line_item_details__0.reference_document_number,disbursement_line_item_details__0.reference_document_code,disbursement_line_item_details__0.contract_document_code,
-    disbursement_line_item_details__0.master_contract_document_code, disbursement_line_item_details__0.file_type,disbursement_line_item_details__0.load_id, disbursement_line_item_details__0.last_modified_date 
+    disbursement_line_item_details__0.master_contract_document_code, disbursement_line_item_details__0.file_type,disbursement_line_item_details__0.load_id, disbursement_line_item_details__0.last_modified_date, 
     disbursement_line_item_details__0.job_id
 FROM ONLY disbursement_line_item_details__0;
 
@@ -2681,9 +2681,9 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
 	   has_children character(1),
 	   original_version_flag character(1),
    	   latest_flag character(1),
-       	  load_id integer,
-          last_modified_date timestamp without time zone,
-          job_id bigint
+   	  load_id integer,
+      last_modified_date timestamp without time zone,
+      job_id bigint
 ) 
 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.agreement_snapshot to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')

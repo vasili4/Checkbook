@@ -1271,12 +1271,13 @@ BEGIN
 			RETURN 0;
 	END IF;	
 	
+	/*
 	IF l_status = 1 THEN 
 		l_status :=etl.updateagenciesdisplayflag(p_job_id_in);
 	ELSE 
 			RETURN 0;
 	END IF;	
-	
+	*/
 	
 		l_end_time := timeofday()::timestamp;
 	
