@@ -423,6 +423,7 @@ $BODY$
 DECLARE
 	l_count bigint;
 	l_fk_update smallint;
+	l_job_id bigint;
 	
 BEGIN
 	l_fk_update := etl.updateEmployees(p_load_id_in);
@@ -436,6 +437,10 @@ BEGIN
 	IF l_fk_update <> 1 THEN
 		RETURN -1;
 	END IF;
+	
+	SELECT b.job_id
+		FROM   etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id	       
+		WHERE  a.load_file_id = p_load_file_id_in  INTO  l_job_id;
 	
 	RAISE NOTICE 'PAYROLL 1.1';
 	INSERT INTO payroll(payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
@@ -451,7 +456,7 @@ BEGIN
 						  employee_id,employee_name,fiscal_year_id,pay_date,
 						  calendar_fiscal_year_id,calendar_fiscal_year,
 						  agency_short_name,department_short_name,
-						  created_date,created_load_id)
+						  created_date,created_load_id,job_id)
 	SELECT payroll_id, pay_cycle_code, pay_date_id, employee_history_id,
 	       payroll_number, job_sequence_number ,agency_history_id,fiscal_year,agency_start_date,
 	       orig_pay_cycle_code,orig_pay_date_id,pay_frequency,department_history_id,annual_salary as annual_salary_original,coalesce(annual_salary,0) as annual_salary,
@@ -465,7 +470,7 @@ BEGIN
 	       employee_id,employee_name,fiscal_year_id,pay_date,
 	       calendar_fiscal_year_id,calendar_fiscal_year,
 	       agency_short_name,department_short_name,
-	       now()::timestamp,p_load_id_in
+	       now()::timestamp,p_load_id_in,l_job_id
 	FROM   etl.stg_payroll
 	WHERE  action_flag = 'I';
 		
@@ -512,7 +517,8 @@ BEGIN
 	UPDATE payroll a
 	SET    gross_pay_ytd = b.gross_pay_ytd,
 	       updated_load_id = (CASE WHEN b.created_load_id <> a.created_load_id THEN p_load_id_in END),
-	       updated_date =  (CASE WHEN b.created_load_id <> a.created_load_id THEN now()::timestamp END)	
+	       updated_date =  (CASE WHEN b.created_load_id <> a.created_load_id THEN now()::timestamp END),
+	       job_id = l_job_id
 	FROM   tmp_employee_rec_gross_pay_1 b
 	WHERE	a.payroll_id = b.payroll_id;	
 	
@@ -556,7 +562,8 @@ BEGIN
 	UPDATE payroll a
 	SET    gross_pay_cytd = b.gross_pay_ytd,
 	       updated_load_id = (CASE WHEN b.created_load_id <> a.created_load_id THEN p_load_id_in END),
-	       updated_date =  (CASE WHEN b.created_load_id <> a.created_load_id THEN now()::timestamp END)	
+	       updated_date =  (CASE WHEN b.created_load_id <> a.created_load_id THEN now()::timestamp END),
+	       job_id = l_job_id	
 	FROM   tmp_employee_rec_gross_pay_1 b
 	WHERE	a.payroll_id = b.payroll_id;		
 	
