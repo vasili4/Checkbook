@@ -100,6 +100,7 @@ CREATE TABLE ref_data_source (
   created_date timestamp 
 ) DISTRIBUTED BY (data_source_code);
 */
+
 CREATE TABLE ref_agency (
     agency_id smallint PRIMARY KEY DEFAULT nextval('seq_ref_agency_agency_id'::regclass) NOT NULL,
     agency_code character varying(20),
@@ -1598,7 +1599,8 @@ CREATE TABLE payroll(
 	created_date timestamp,
 	created_load_id int,
 	updated_date timestamp,
-	updated_load_id int)
+	updated_load_id int,
+	job_id bigint)
 DISTRIBUTED BY (payroll_id);	
 
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_date foreign key (pay_date_id) references ref_date (date_id);
