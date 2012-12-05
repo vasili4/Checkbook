@@ -2066,7 +2066,8 @@ CREATE EXTERNAL WEB TABLE payroll__0(
 	created_date timestamp,
 	created_load_id int,
 	updated_date timestamp,
-	updated_load_id int)
+	updated_load_id int,
+	job_id bigint)
 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	
@@ -2082,7 +2083,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv
 		payroll__0.pay_date,payroll__0.gross_pay_ytd,payroll__0.calendar_fiscal_year_id,payroll__0.calendar_fiscal_year,payroll__0.gross_pay_cytd,
 		payroll__0.agency_short_name,payroll__0.department_short_name,
 		payroll__0.created_date,payroll__0.created_load_id,payroll__0.updated_date,
-		payroll__0.updated_load_id
+		payroll__0.updated_load_id,payroll__0.job_id
  	FROM	payroll__0;	
  	
 CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_agency__0(
