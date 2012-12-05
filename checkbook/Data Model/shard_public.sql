@@ -1439,7 +1439,8 @@ CREATE TABLE payroll(
 	created_date timestamp,
 	created_load_id int,
 	updated_date timestamp,
-	updated_load_id int)
+	updated_load_id int,
+	job_id bigint)
 DISTRIBUTED BY (fiscal_year);
 
 CREATE TABLE payroll_summary (
