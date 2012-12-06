@@ -226,6 +226,7 @@ CREATE EXTERNAL WEB TABLE disbursement__0 (
     agency_history_id smallint,
     document_id character varying,
     document_version integer,
+    disbursement_number character varying(40),
     record_date_id int,
     budget_fiscal_year smallint,
     document_fiscal_year smallint,
@@ -257,7 +258,7 @@ ENCODING 'UTF8';
 
 CREATE VIEW disbursement AS
     SELECT disbursement__0.disbursement_id, disbursement__0.document_code_id, disbursement__0.agency_history_id, disbursement__0.document_id, 
-    disbursement__0.document_version, disbursement__0.record_date_id, disbursement__0.budget_fiscal_year, disbursement__0.document_fiscal_year, 
+    disbursement__0.document_version,disbursement__0.disbursement_number, disbursement__0.record_date_id, disbursement__0.budget_fiscal_year, disbursement__0.document_fiscal_year, 
     disbursement__0.document_period, disbursement__0.check_eft_amount_original, disbursement__0.check_eft_amount, disbursement__0.check_eft_issued_date_id, disbursement__0.check_eft_record_date_id, 
     disbursement__0.expenditure_status_id, disbursement__0.expenditure_cancel_type_id, disbursement__0.expenditure_cancel_reason_id, 
     disbursement__0.total_accounting_line_amount_original, disbursement__0.total_accounting_line_amount, disbursement__0.vendor_history_id, disbursement__0.retainage_amount_original, disbursement__0.retainage_amount, 
@@ -271,6 +272,7 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item__0 (
     disbursement_line_item_id bigint,
     disbursement_id integer,
     line_number integer,
+    disbursement_number character varying(40),
     budget_fiscal_year smallint,
     fiscal_year smallint,
     fiscal_period bpchar,
@@ -307,7 +309,7 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW disbursement_line_item AS
-    SELECT disbursement_line_item__0.disbursement_line_item_id, disbursement_line_item__0.disbursement_id, disbursement_line_item__0.line_number, 
+    SELECT disbursement_line_item__0.disbursement_line_item_id, disbursement_line_item__0.disbursement_id, disbursement_line_item__0.line_number,disbursement_line_item__0.disbursement_number,
     disbursement_line_item__0.budget_fiscal_year, disbursement_line_item__0.fiscal_year, disbursement_line_item__0.fiscal_period, 
     disbursement_line_item__0.fund_class_id, disbursement_line_item__0.agency_history_id, disbursement_line_item__0.department_history_id, 
     disbursement_line_item__0.expenditure_object_history_id, disbursement_line_item__0.budget_code_id, disbursement_line_item__0.fund_code, 
@@ -326,6 +328,7 @@ CREATE EXTERNAL WEB TABLE disbursement_line_item_details__0 (
     disbursement_line_item_id bigint,
 	disbursement_id integer,
 	line_number integer,
+	disbursement_number character varying(40),
 	check_eft_issued_date_id int,
 	check_eft_issued_nyc_year_id smallint,
 	fiscal_year smallint,
@@ -402,7 +405,8 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW disbursement_line_item_details AS
-    SELECT disbursement_line_item_details__0.disbursement_line_item_id, disbursement_line_item_details__0.disbursement_id, disbursement_line_item_details__0.line_number, disbursement_line_item_details__0.check_eft_issued_date_id, 
+    SELECT disbursement_line_item_details__0.disbursement_line_item_id, disbursement_line_item_details__0.disbursement_id, disbursement_line_item_details__0.line_number,
+    disbursement_line_item_details__0.disbursement_number ,disbursement_line_item_details__0.check_eft_issued_date_id, 
     disbursement_line_item_details__0.check_eft_issued_nyc_year_id, disbursement_line_item_details__0.fiscal_year, disbursement_line_item_details__0.check_eft_issued_cal_month_id, disbursement_line_item_details__0.agreement_id,
     disbursement_line_item_details__0.master_agreement_id, disbursement_line_item_details__0.fund_class_id, disbursement_line_item_details__0.check_amount, disbursement_line_item_details__0.agency_id,
     disbursement_line_item_details__0.agency_history_id,disbursement_line_item_details__0.agency_code, disbursement_line_item_details__0.expenditure_object_id, disbursement_line_item_details__0.vendor_id, 
