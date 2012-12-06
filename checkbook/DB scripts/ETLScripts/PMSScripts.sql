@@ -1084,12 +1084,12 @@ BEGIN
 				spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
 				agency_short_name,department_short_name,load_id)
 	SELECT 	payroll_summary_id,pay_date_id,fiscal_year_id,calendar_month_id,
-		fund_class_id,coalesce(total_amt,0) as check_amount,agency_id,agency,expenditure_object_id,department_id,pay_date::date,
-		agency_name,department_name,uoa,expenditure_object_name,object,budget_code_id,
+		fund_class_id,coalesce(total_amt,0) as check_amount,agency_id,agency,b.expenditure_object_id,department_id,pay_date::date,
+		agency_name,department_name,uoa,b.expenditure_object_name,b.expenditure_object_code,budget_code_id,
 		bud_code,budget_code_name,'001',2 as spending_category_id,
-		'Payroll',calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
+		'Payroll',calendar_fiscal_year_id,calendar_fiscal_year,a.fiscal_year,
 		agency_short_name,department_short_name,p_load_id_in
-	FROM 	etl.stg_payroll_summary
+	FROM 	etl.stg_payroll_summary a JOIN (select * from ref_expenditure_object where expenditure_object_code = '!PS!') b ON  a.pms_fy = b.fiscal_year
 	WHERE  action_flag = 'I';
 	
 		
@@ -1123,7 +1123,7 @@ BEGIN
 	SET     check_amount = coalesce(b.total_amt,0),
 		agency_name = b.agency_name,
 		department_name = b.department_name,
-		expenditure_object_name = b.expenditure_object_name,
+		expenditure_object_name = 'Payroll Summary',
 		budget_name = b.budget_code_name,
 		agency_short_name = b.agency_short_name,
 		department_short_name = b.department_short_name,

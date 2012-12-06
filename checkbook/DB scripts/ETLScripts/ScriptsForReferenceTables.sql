@@ -291,6 +291,30 @@ UPDATE vendor_address a
 SET vendor_history_id = b.vendor_history_id
 FROM vendor_history b WHERE b.legal_name = 'N/A (PRIVACY/SECURITY)';
 
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2009, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2010, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2011, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2012, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2013, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2014, 'Payroll Summary', now()::timestamp, 0);
+
+
+INSERT INTO ref_expenditure_object(expenditure_object_history_id, expenditure_object_id, expenditure_object_name, fiscal_year, created_date, load_id)
+SELECT nextval('seq_ref_expenditure_object_history_id'), expenditure_object_id, expenditure_object_name, created_date, created_load_id
+FROM ref_expenditure_object WHERE expenditure_object_code = '!PS!' ;
+
+
 
 /*insert into ref_award_status(Award_status_name) select distinct cntrc_sta from etl.stg_con_ct_header where coalesce(cntrc_sta,0) <> 0;
 

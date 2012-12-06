@@ -34,7 +34,7 @@ CREATE AGGREGATE group_concat(text) (
 
 CREATE OR REPLACE FUNCTION etl.stageandarchivedata(p_load_file_id_in int) RETURNS INT AS $$
 DECLARE
-	l_data_source_code ref_data_source.data_source_code%TYPE;
+	l_data_source_code etl.ref_data_source.data_source_code%TYPE;
 	l_staging_table_array varchar ARRAY[15];
 	l_array_ctr smallint;
 	l_target_columns varchar;

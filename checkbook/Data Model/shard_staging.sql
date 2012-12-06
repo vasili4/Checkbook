@@ -1037,7 +1037,7 @@ CREATE VIEW ref_business_type_status AS
 --
 -- Name: ref_data_source__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
 --
-
+/*
 CREATE EXTERNAL WEB TABLE ref_data_source__0 (
     data_source_code character varying,
     description character varying,
@@ -1045,14 +1045,14 @@ CREATE EXTERNAL WEB TABLE ref_data_source__0 (
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_data_source to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
-
+*/
 --
 -- Name: ref_data_source; Type: VIEW; Schema: staging; Owner: gpadmin
 --
-
+/*
 CREATE VIEW ref_data_source AS
     SELECT ref_data_source__0.data_source_code, ref_data_source__0.description, ref_data_source__0.created_date FROM ONLY ref_data_source__0;
-
+*/
 --
 -- Name: ref_date__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
 --
@@ -2067,8 +2067,9 @@ CREATE EXTERNAL WEB TABLE payroll__0(
 	created_load_id int,
 	updated_date timestamp,
 	updated_load_id int,
-	job_id bigint)
-EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv"' ON SEGMENT 0 
+	job_id bigint
+	)
+	EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.payroll to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';	
   

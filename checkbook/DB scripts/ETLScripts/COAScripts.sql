@@ -765,7 +765,7 @@ CREATE OR REPLACE FUNCTION etl.processfundingclass(p_load_file_id_in integer, p_
   RETURNS integer AS
 $BODY$
 DECLARE
-		fc_data_source_code ref_data_source.data_source_code%TYPE;
+		fc_data_source_code etl.ref_data_source.data_source_code%TYPE;
 		fc_count int:=0;
 		fc_ins_count int:=0;
 		fc_update_count int:=0;
@@ -895,7 +895,7 @@ ALTER FUNCTION etl.processfundingclass(integer, bigint)
 CREATE OR REPLACE FUNCTION etl.processrevenuecategory(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
 DECLARE
 
-	ry_data_source_code ref_data_source.data_source_code%TYPE;
+	ry_data_source_code etl.ref_data_source.data_source_code%TYPE;
 	ry_count int:=0;
 	ry_ins_count int:=0;
 	ry_update_count int:=0;
@@ -997,7 +997,7 @@ $$ language plpgsql;
 CREATE OR REPLACE FUNCTION etl.processrevenueclass(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
 DECLARE
 
-	rc_data_source_code ref_data_source.data_source_code%TYPE;
+	rc_data_source_code etl.ref_data_source.data_source_code%TYPE;
 	rc_count int:=0;
 	rc_ins_count int:=0;
 	rc_update_count int:=0;
@@ -1098,7 +1098,7 @@ $$ language plpgsql;
 CREATE OR REPLACE FUNCTION etl.processrevenuesource(p_load_file_id_in integer, p_load_id_in bigint) RETURNS integer AS $$
 DECLARE
 
-	rs_data_source_code ref_data_source.data_source_code%TYPE;
+	rs_data_source_code etl.ref_data_source.data_source_code%TYPE;
 	rs_count int:=0;
 	rs_ins_count int:=0;
 	rs_update_count int:=0;
@@ -1363,7 +1363,7 @@ CREATE OR REPLACE FUNCTION etl.processbudgetcode(p_load_file_id_in integer, p_lo
 $BODY$
 DECLARE
 
-	bc_data_source_code ref_data_source.data_source_code%TYPE;
+	bc_data_source_code etl.ref_data_source.data_source_code%TYPE;
 	bc_count int:=0;
 	bc_ins_count int:=0;
 	bc_update_count int:=0;

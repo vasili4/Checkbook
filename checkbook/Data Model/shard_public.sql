@@ -763,13 +763,13 @@ CREATE TABLE ref_business_type_status (
 --
 -- Name: ref_data_source; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
-
+/*
 CREATE TABLE ref_data_source (
     data_source_code character varying(2),
     description character varying(40),
     created_date timestamp without time zone
 ) DISTRIBUTED BY (data_source_code);
-
+*/
 --
 -- Name: ref_date; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
@@ -1440,8 +1440,8 @@ CREATE TABLE payroll(
 	created_load_id int,
 	updated_date timestamp,
 	updated_load_id int,
-	job_id bigint)
-DISTRIBUTED BY (fiscal_year);
+	job_id bigint
+) DISTRIBUTED BY (fiscal_year);
 
 CREATE TABLE payroll_summary (
     payroll_summary_id bigint,

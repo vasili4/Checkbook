@@ -166,7 +166,7 @@ B,,,Missing key elements,,,"budget_fiscal_year,fund_class_code,agency_code,depar
 B,,,Duplicate,,,"budget_fiscal_year,fund_class_code,agency_code,department_code,budget_code,object_class_code",,,,,2
 R,,,Missing key elements,,,fy_dc,,,,,1
 P,,,Missing key elements,,,"employee_number,payroll_number,job_sequence_number,pay_date,fiscal_year,amount_basis",,,,,1
-PS,,,Missing key elements,,,"pay_cycle,pay_date,pyrl_no,uoa,pms_fy,object,agency,bud_code,total_amt",,,,,1
+PS,,,Missing key elements,,,"pay_cycle,pay_date,pyrl_no,uoa,pms_fy,agency,bud_code,total_amt",,,,,1
 PS,,,Duplicate,,,"pay_cycle,pay_date,pyrl_no,uoa,pms_fy,object,agency,bud_code",,,,,2
 FC,,,Missing key elements,,,"fy,funding_class_code,funding_class_name",,,,,1
 FC,,,Duplicate,,,"fy,funding_class_code",,,,,2
