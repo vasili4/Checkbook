@@ -310,8 +310,8 @@ INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_cod
 VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2014, 'Payroll Summary', now()::timestamp, 0);
 
 
-INSERT INTO ref_expenditure_object(expenditure_object_history_id, expenditure_object_id, expenditure_object_name, fiscal_year, created_date, load_id)
-SELECT nextval('seq_ref_expenditure_object_history_id'), expenditure_object_id, expenditure_object_name, created_date, created_load_id
+INSERT INTO ref_expenditure_object_history(expenditure_object_history_id, expenditure_object_id, expenditure_object_name, fiscal_year, created_date, load_id)
+SELECT nextval('seq_ref_expenditure_object_history_id'), expenditure_object_id, expenditure_object_name, fiscal_year, created_date, created_load_id
 FROM ref_expenditure_object WHERE expenditure_object_code = '!PS!' ;
 
 

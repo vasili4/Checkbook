@@ -939,7 +939,7 @@ BEGIN
 				 total_accounting_line_amount_original,total_accounting_line_amount,vendor_history_id,
 				 retainage_amount_original,retainage_amount,privacy_flag,created_load_id,created_date)
 	SELECT d.disbursement_id, a.document_code_id,a.agency_history_id,
-	       a.doc_id,a.doc_vers_no,a.doc_id||'-'||a.doc_vers_no||'-'|| a.doc_dept_cd || '-' || a.doc_cd
+	       a.doc_id,a.doc_vers_no,a.doc_id||'-'||a.doc_vers_no||'-'|| a.doc_dept_cd || '-' || a.doc_cd,
 	       a.record_date_id,
 	       a.doc_bfy,a.doc_fy_dc,a.doc_per_dc,
 	       a.chk_eft_am,coalesce(a.chk_eft_am,0) as check_eft_amount,a.check_eft_issued_date_id,a.check_eft_record_date_id,
@@ -1150,7 +1150,7 @@ BEGIN
                                   b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no,b.rqporf_comm_ln_no, b.rqporf_vend_ln_no, 
                                   (CASE WHEN b.rqporf_doc_cd = 'N/A' THEN NULL WHEN coalesce(b.rqporf_doc_cd, '') ='' THEN NULL ELSE b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id END) as reference_document_number, 
                                   (case when coalesce(b.rqporf_doc_cd, '') = '' then NULL else b.rqporf_doc_cd end) as reference_document_code, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id,b.file_type
-                                  ,a.doc_id||'-'||a.doc_vers_no||'-'|| a.doc_dept_cd || '-' || a.doc_cd as disbursement_number
+                                  ,b.doc_id||'-'||b.doc_vers_no||'-'|| b.doc_dept_cd || '-' || b.doc_cd as disbursement_number
                 FROM etl.stg_fms_header a, etl.stg_fms_accounting_line b,
                                 tmp_all_disbs d,tmp_disbs_lines_actions e
                 WHERE  d.action_flag = 'U' AND e.action_flag='U'
@@ -1164,7 +1164,7 @@ BEGIN
 	
 	UPDATE  disbursement_line_item f
 	SET budget_fiscal_year = b.bfy,
-	        disbursement_number = b.disbursement_number,
+	    disbursement_number = b.disbursement_number,
 		fiscal_year = b.fy_dc,
 		fiscal_period = b.per_dc,
 		fund_class_id = b.fund_class_id,
@@ -1262,7 +1262,7 @@ BEGIN
 						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,
 						agreement_accounting_line_number, agreement_commodity_line_number, agreement_vendor_line_number, reference_document_number,reference_document_code,
 						load_id,last_modified_date,file_type,job_id)
-	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,a.disbursement_number,a.check_eft_issued_date_id,
+	SELECT  b.disbursement_line_item_id,a.disbursement_id,b.line_number,b.disbursement_number,a.check_eft_issued_date_id,
 		f.nyc_year_id,l.year_value,f.calendar_month_id,
 		b.agreement_id,NULL as master_agreement_id,b.fund_class_id,
 		b.check_amount,c.agency_id,b.agency_history_id,m.agency_code,d.expenditure_object_id,
