@@ -16,9 +16,9 @@ BEGIN
 	
 	-- temp script which needs to be removed after we get the data for civil service title
 		
-	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE1' where agency_code = '127';
-	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE2' where agency_code = '131';
-	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE3' where agency_code = '15';
+	-- update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE1' where agency_code = '127';
+	-- update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE2' where agency_code = '131';
+	-- update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE3' where agency_code = '15';
 	
 	
 	
@@ -34,6 +34,9 @@ BEGIN
 	       a.last_name,
 	       a.initial,
 	       a.civil_service_title,
+	       a.civil_service_code,
+	       a.civil_service_level, 
+	       a.civil_service_suffix,
 	       (CASE WHEN b.employee_number IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
 	       (CASE WHEN b.employee_number IS NOT NULL AND (a.first_name <> b.first_name OR a.last_name <> b.last_name OR a.initial <> b.initial OR a.civil_service_title <> b.civil_service_title
 	       OR a.civil_service_code<>b.civil_service_code)  THEN 'Y' ELSE 'N' END) as modified_flag
@@ -46,7 +49,7 @@ BEGIN
 	FROM   tmp_ref_employee
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial,masked_name,civil_service_title
+	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial,masked_name,civil_service_title,
 	civil_service_code,civil_service_level,civil_service_suffix)
 	SELECT a.employee_id,b.employee_number,first_name,last_name,initial,now()::timestamp,p_load_id_in,first_name,last_name,initial,
 		coalesce(last_name,'') || (	CASE WHEN coalesce(first_name,'') <> '' AND  coalesce(initial,'') <> '' THEN

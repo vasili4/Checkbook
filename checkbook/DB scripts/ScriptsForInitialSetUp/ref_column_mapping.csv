@@ -1026,10 +1026,10 @@ etl.ext_stg_pms_data_feed,base_pay,varchar,etl.stg_payroll,base_pay,"numeric(16,
 etl.ext_stg_pms_data_feed,overtime_pay,varchar,etl.stg_payroll,overtime_pay,"numeric(16,2)",19
 etl.ext_stg_pms_data_feed,other_payments,varchar,etl.stg_payroll,other_payments,"numeric(16,2)",20
 etl.ext_stg_pms_data_feed,gross_pay,varchar,etl.stg_payroll,gross_pay,"numeric(16,2)",21
-etl.ext_stg_pms_data_feed,civil_service_title,varchar,etl.stg_payroll,civil_service_title,varchar,22
-etl.ext_stg_pms_data_feed,civil_service_code,varchar,etl.stg_payroll,civil_service_code,varchar,23
-etl.ext_stg_pms_data_feed,civil_service_level,varchar,etl.stg_payroll,civil_service_level,varchar,24
-etl.ext_stg_pms_data_feed,civil_service_suffix,varchar,etl.stg_payroll,civil_service_suffix,varchar,25
+etl.ext_stg_pms_data_feed,civil_service_code,varchar,etl.stg_payroll,civil_service_code,varchar,22
+etl.ext_stg_pms_data_feed,civil_service_level,varchar,etl.stg_payroll,civil_service_level,varchar,23
+etl.ext_stg_pms_data_feed,civil_service_suffix,varchar,etl.stg_payroll,civil_service_suffix,varchar,24
+etl.ext_stg_pms_data_feed,civil_service_title,varchar,etl.stg_payroll,civil_service_title,varchar,25
 etl.ext_stg_revenue,doc_rec_dt,varchar,etl.stg_revenue,doc_rec_dt,date,1
 etl.ext_stg_revenue,per_dc,bpchar,etl.stg_revenue,per_dc,bpchar,2
 etl.ext_stg_revenue,fy_dc,varchar,etl.stg_revenue,fy_dc,smallint,3
