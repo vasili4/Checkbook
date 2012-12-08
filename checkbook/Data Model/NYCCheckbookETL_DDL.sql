@@ -3993,7 +3993,10 @@ CREATE EXTERNAL TABLE ext_stg_pms_data_feed(
 	overtime_pay varchar,
 	other_payments varchar,
 	gross_pay  varchar,
-	civil_service_title varchar)
+	civil_service_title varchar,
+	civil_service_code varchar,
+	civil_service_level varchar,
+	civil_service_suffix varchar)
 LOCATION (
 	    'gpfdist://mdw1:8081/datafiles/PMS_feed.txt')
 	    FORMAT 'text' (delimiter '|' escape '~' fill missing fields)
@@ -4023,6 +4026,9 @@ CREATE TABLE stg_payroll
 	other_payments numeric(16,2),
 	gross_pay  numeric(16,2),
 	civil_service_title varchar,
+	civil_service_code varchar(5),
+	civil_service_level varchar(2),
+	civil_service_suffix varchar(2),
 	payroll_id bigint,	
 	pay_date_id int,
 	agency_history_id smallint,
