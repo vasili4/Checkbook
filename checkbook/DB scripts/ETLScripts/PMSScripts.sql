@@ -20,6 +20,11 @@ BEGIN
 	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE2' where agency_code = '131';
 	update etl.stg_payroll set civil_service_title = 'CIVIL SERVICE TITLE3' where agency_code = '15';
 	
+	
+	
+	UPDATE etl.stg_payroll SET agency_code = lpad(agency_code,3,'0');
+	
+	
 	-- For all records check if data is modified/new
 	
 	INSERT INTO tmp_ref_employee

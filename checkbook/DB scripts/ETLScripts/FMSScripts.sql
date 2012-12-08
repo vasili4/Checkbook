@@ -1040,7 +1040,7 @@ BEGIN
 						created_load_id,created_date,file_type)
 	SELECT  c.disbursement_line_item_id,d.disbursement_id,a.doc_actg_ln_no,a.doc_id||'-'||a.doc_vers_no||'-'|| a.doc_dept_cd || '-' || a.doc_cd,
 		a.bfy,a.fy_dc,a.per_dc,
-		a.fund_class_id,a.agency_history_id,a.department_history_id,
+		a.fund_class_id,coalesce(a.masked_agency_history_id,a.agency_history_id) as agency_history_id, coalesce(a.masked_department_history_id,a.department_history_id) as department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
 		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as check_amount_original,(CASE WHEN a.doc_vers_no > 1 THEN -1 * coalesce(a.chk_amt,0) ELSE coalesce(a.chk_amt,0) END) as check_amount,a.agreement_id,
 		(case when a.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_actg_ln_no end)::integer as rqporf_actg_ln_no,
@@ -1104,7 +1104,7 @@ BEGIN
 						created_load_id,created_date,file_type)
 	SELECT  d.disbursement_id,a.doc_actg_ln_no,a.doc_id||'-'||a.doc_vers_no||'-'|| a.doc_dept_cd || '-' || a.doc_cd,
 		a.bfy,a.fy_dc,a.per_dc,
-		a.fund_class_id,a.agency_history_id,a.department_history_id,
+		a.fund_class_id,coalesce(a.masked_agency_history_id,a.agency_history_id) as agency_history_id,coalesce(a.masked_department_history_id,a.department_history_id) as department_history_id,
 		a.expenditure_object_history_id,a.budget_code_id,a.fund_cd,
 		a.rpt_cd,(CASE WHEN a.doc_vers_no > 1 THEN -1 * a.chk_amt ELSE a.chk_amt END) as check_amount_original,(CASE WHEN a.doc_vers_no > 1 THEN -1 * coalesce(a.chk_amt,0) ELSE coalesce(a.chk_amt,0) END) as check_amount,a.agreement_id,
 		(case when a.rqporf_actg_ln_no ='N/A (PRIVACY/SECURITY)' then NULL else rqporf_actg_ln_no end)::integer as rqporf_actg_ln_no,
@@ -1146,7 +1146,7 @@ BEGIN
 	 
 	
         CREATE TEMPORARY TABLE tmp_disbs_line_items_update AS
-                SELECT e.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, b.agency_history_id, b.department_history_id, b.expenditure_object_history_id, b.budget_code_id,             
+                SELECT e.disbursement_line_item_id, b.bfy, b.fy_dc, b.per_dc, b.fund_class_id, coalesce(b.masked_agency_history_id,b.agency_history_id) as agency_history_id, coalesce(b.masked_department_history_id,b.department_history_id) as department_history_id, b.expenditure_object_history_id, b.budget_code_id,             
                                   b.fund_cd, b.rpt_cd, (CASE WHEN b.doc_vers_no > 1 THEN -1 * b.chk_amt ELSE b.chk_amt END) as chk_amt, b.agreement_id, b.rqporf_actg_ln_no,b.rqporf_comm_ln_no, b.rqporf_vend_ln_no, 
                                   (CASE WHEN b.rqporf_doc_cd = 'N/A' THEN NULL WHEN coalesce(b.rqporf_doc_cd, '') ='' THEN NULL ELSE b.rqporf_doc_cd || b.rqporf_doc_dept_cd || b.rqporf_doc_id END) as reference_document_number, 
                                   (case when coalesce(b.rqporf_doc_cd, '') = '' then NULL else b.rqporf_doc_cd end) as reference_document_code, b.location_history_id, b.rtg_ln_am, a.check_eft_issued_nyc_year_id,b.file_type
