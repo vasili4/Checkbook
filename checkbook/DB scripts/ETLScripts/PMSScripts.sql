@@ -11,7 +11,7 @@ DECLARE
 BEGIN
 
 	CREATE TEMPORARY TABLE tmp_ref_employee(employee_number varchar,first_name varchar, last_name varchar,initial varchar, civil_service_title varchar,
-						exists_flag char(1), modified_flag char(1))
+	civil_service_code varchar,civil_service_level varchar,civil_service_suffix varchar,exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (employee_number);
 	
 	-- temp script which needs to be removed after we get the data for civil service title
@@ -35,7 +35,8 @@ BEGIN
 	       a.initial,
 	       a.civil_service_title,
 	       (CASE WHEN b.employee_number IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.employee_number IS NOT NULL AND (a.first_name <> b.first_name OR a.last_name <> b.last_name OR a.initial <> b.initial OR a.civil_service_title <> b.civil_service_title) THEN 'Y' ELSE 'N' END) as modified_flag
+	       (CASE WHEN b.employee_number IS NOT NULL AND (a.first_name <> b.first_name OR a.last_name <> b.last_name OR a.initial <> b.initial OR a.civil_service_title <> b.civil_service_title
+	       OR a.civil_service_code<>b.civil_service_code)  THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM   etl.stg_payroll a LEFT JOIN employee b ON a.employee_number = b.employee_number;
 	
 	TRUNCATE etl.employee_id_seq;
@@ -45,7 +46,8 @@ BEGIN
 	FROM   tmp_ref_employee
 	WHERE  exists_flag ='N';
 	
-	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial,masked_name,civil_service_title)
+	INSERT INTO employee(employee_id,employee_number,first_name,last_name,initial,created_date,created_load_id,original_first_name,original_last_name,original_initial,masked_name,civil_service_title
+	civil_service_code,civil_service_level,civil_service_suffix)
 	SELECT a.employee_id,b.employee_number,first_name,last_name,initial,now()::timestamp,p_load_id_in,first_name,last_name,initial,
 		coalesce(last_name,'') || (	CASE WHEN coalesce(first_name,'') <> '' AND  coalesce(initial,'') <> '' THEN
 							' ' || first_name || ' ' || initial
@@ -53,7 +55,7 @@ BEGIN
 						     	' ' || first_name 
 						     WHEN coalesce(first_name,'') = '' AND  coalesce(initial,'') <> ''	THEN
 						     	' ' || initial 
-						     END)	as masked_name,civil_service_title
+						     END)	as masked_name,civil_service_title,civil_service_code,civil_service_level,civil_service_suffix
 	FROM   etl.employee_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number;
 	
 	
@@ -67,7 +69,7 @@ BEGIN
 
 
 	CREATE TEMPORARY TABLE tmp_ref_employee_1(employee_number varchar,first_name varchar, last_name varchar,initial varchar, civil_service_title varchar,
-						exists_flag char(1), modified_flag char(1), employee_id int)
+	civil_service_code varchar,civil_service_level varchar,civil_service_suffix varchar,exists_flag char(1), modified_flag char(1), employee_id int)
 	DISTRIBUTED BY (employee_id);
 
 	INSERT INTO tmp_ref_employee_1
@@ -88,12 +90,16 @@ BEGIN
 						     	' ' || b.initial 
 						     END) ,
 		civil_service_title = b.civil_service_title,
+		civil_service_code=b.civil_service_code,
+		civil_service_level=b.civil_service_level,
+		civil_service_suffix=b.civil_service_suffix,
 		updated_date = now()::timestamp,
 		updated_load_id = p_load_id_in
 	FROM	tmp_ref_employee_1 b		
 	WHERE	a.employee_id = b.employee_id;
 	
-	INSERT INTO employee_history(employee_history_id,employee_id,first_name,last_name,initial,masked_name,civil_service_title,created_date,created_load_id)
+	INSERT INTO employee_history(employee_history_id,employee_id,first_name,last_name,initial,masked_name,civil_service_title,
+	civil_service_code,civil_service_level,civil_service_suffix,created_date,created_load_id)
 	SELECT a.employee_history_id,c.employee_id,b.first_name,b.last_name,b.initial,
 	coalesce(b.last_name,'') || (	CASE WHEN coalesce(b.first_name,'') <> '' AND  coalesce(b.initial,'') <> '' THEN
 							' ' || b.first_name || ' ' || b.initial
@@ -101,7 +107,8 @@ BEGIN
 						     	' ' || b.first_name 
 						     WHEN coalesce(b.first_name,'') = '' AND  coalesce(b.initial,'') <> ''	THEN
 						     	' ' || b.initial 
-						     END) as masked_name,b.civil_service_title,now()::timestamp,p_load_id_in
+						     END) as masked_name,b.civil_service_title,b.civil_service_code,b.civil_service_level,b.civil_service_suffix,
+						     now()::timestamp,p_load_id_in
 	FROM   etl.employee_history_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number
 		JOIN employee c ON b.employee_number = c.employee_number
 	WHERE   exists_flag ='N'
