@@ -1988,6 +1988,9 @@ CREATE EXTERNAL WEB TABLE employee__0 (
   original_initial varchar,
   masked_name varchar,
   civil_service_title varchar,
+  civil_service_code varchar,
+  civil_service_level varchar,
+  civil_service_suffix varchar,
   created_date timestamp,
   updated_date timestamp,
   created_load_id int,
@@ -2000,7 +2003,8 @@ ENCODING 'UTF8';
  CREATE VIEW  employee AS
  	SELECT employee__0.employee_id , employee__0.employee_number , employee__0.first_name , employee__0.last_name , 
  		employee__0.initial , employee__0.original_first_name , employee__0.original_last_name , employee__0.original_initial , 
- 		employee__0.masked_name, employee__0.civil_service_title, employee__0.created_date , employee__0.updated_date , employee__0.created_load_id , employee__0.updated_load_id 
+ 		employee__0.masked_name, employee__0.civil_service_title,employee__0.civil_service_code,employee__0.civil_service_level,employee__0.civil_service_suffix,
+ 		employee__0.created_date , employee__0.updated_date , employee__0.created_load_id , employee__0.updated_load_id 
  FROM employee__0; 		
  		
 CREATE EXTERNAL WEB TABLE employee_history__0 (
@@ -2011,6 +2015,9 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
   initial varchar,
   masked_name varchar,
   civil_service_title varchar,
+  civil_service_code varchar,
+  civil_service_level varchar,
+  civil_service_suffix varchar,
   created_date timestamp,
   created_load_id int
   )
@@ -2020,7 +2027,9 @@ CREATE EXTERNAL WEB TABLE employee_history__0 (
 
  CREATE VIEW employee_history AS
  	SELECT employee_history__0.employee_history_id , employee_history__0.employee_id , employee_history__0.first_name , employee_history__0.last_name ,
- 		employee_history__0.initial , employee_history__0.masked_name, employee_history__0.civil_service_title, employee_history__0.created_date , employee_history__0.created_load_id 
+ 		employee_history__0.initial , employee_history__0.masked_name, 
+ 		employee_history__0.civil_service_title,employee_history__0.civil_service_code,employee_history__0.civil_service_level,employee_history__0.civil_service_suffix,
+ 		employee_history__0.created_date , employee_history__0.created_load_id 
  	FROM   employee_history__0;
  		
 CREATE EXTERNAL WEB TABLE payroll__0(
