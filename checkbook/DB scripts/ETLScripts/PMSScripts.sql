@@ -10,9 +10,7 @@ CREATE OR REPLACE FUNCTION etl.updateEmployees(p_load_id_in bigint) RETURNS INT 
 DECLARE
 BEGIN
 
-	CREATE TEMPORARY TABLE tmp_ref_employee(employee_number varchar,last_name varchar, civil_service_title varchar,
-	civil_service_code varchar,civil_service_level varchar,civil_service_suffix varchar,exists_flag char(1), modified_flag char(1))
-	DISTRIBUTED BY (employee_number);
+	
 	
 	-- temp script which needs to be removed after we get the data for civil service title
 		
@@ -25,44 +23,81 @@ BEGIN
 	UPDATE etl.stg_payroll SET agency_code = lpad(agency_code,3,'0');
 	
 	
+	
+	CREATE TEMPORARY TABLE tmp_ref_employee_prev(employee_number varchar,civil_service_code varchar,pay_date date,last_name varchar, civil_service_title varchar,
+	civil_service_level varchar,civil_service_suffix varchar,rank_value int)
+	DISTRIBUTED BY (employee_number);
+	
+	INSERT INTO tmp_ref_employee_prev
+	SELECT 	a.employee_number, a.civil_service_code, pay_date,
+	        max(a.last_name) as last_name,
+	        max(a.civil_service_title) as civil_service_title,	        
+	        max(a.civil_service_level), 
+	        max(a.civil_service_suffix) as civil_service_suffix,
+	        rank() over (partition by employee_number,civil_service_code order by pay_date DESC) as rank_value
+	FROM   etl.stg_payroll a GROUP BY 1,2,3;
+	
+	CREATE TEMPORARY TABLE tmp_ref_employee_prev1(employee_number varchar,civil_service_code varchar,last_name varchar, civil_service_title varchar,
+	civil_service_level varchar,civil_service_suffix varchar)
+	DISTRIBUTED BY (employee_number);
+	
+	INSERT INTO tmp_ref_employee_prev1
+	SELECT employee_number,civil_service_code,last_name, civil_service_title,civil_service_level ,civil_service_suffix
+	FROM tmp_ref_employee_prev
+	WHERE rank_value= 1;
+	
+	CREATE TEMPORARY TABLE tmp_ref_employee(employee_number varchar,last_name varchar, civil_service_title varchar,
+	civil_service_code varchar,civil_service_level varchar,civil_service_suffix varchar,exists_flag char(1), modified_flag char(1))
+	DISTRIBUTED BY (employee_number);
+	
+	
 	-- For all records check if data is modified/new
 	
 	INSERT INTO tmp_ref_employee
-	SELECT  DISTINCT
-		a.employee_number, 
-	       a.last_name,
-	       a.civil_service_title,
-	       a.civil_service_code,
-	       a.civil_service_level, 
-	       a.civil_service_suffix,
-	       (CASE WHEN b.employee_number IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.employee_number IS NOT NULL AND (a.last_name <> b.last_name  OR a.civil_service_title <> b.civil_service_title
-	       OR a.civil_service_code<>b.civil_service_code)  THEN 'Y' ELSE 'N' END) as modified_flag
-	FROM   etl.stg_payroll a LEFT JOIN employee b ON a.employee_number = b.employee_number;
+	SELECT DISTINCT
+			a.employee_number, 
+	        a.last_name,
+	        a.civil_service_title,
+	        a.civil_service_code,
+	        a.civil_service_level, 
+	        a.civil_service_suffix,
+	       (CASE WHEN b.employee_number IS NULL THEN 'N'  ELSE 'Y' END) as exists_flag,
+	       (CASE WHEN b.employee_number IS NOT NULL  AND (a.civil_service_title <> b.civil_service_title OR a.civil_service_suffix <> b.civil_service_suffix  OR a.civil_service_level <> b.civil_service_level)  THEN 'Y' ELSE 'N' END) as modified_flag
+	FROM   tmp_ref_employee_prev1 a LEFT JOIN employee b ON a.employee_number = b.employee_number AND a.civil_service_code = b.civil_service_code ;
+	
+	RAISE NOTICE 'PMS UE 1';
 	
 	TRUNCATE etl.employee_id_seq;
 	
-	INSERT INTO etl.employee_id_seq(employee_number)
-	SELECT employee_number
+	RAISE NOTICE 'PMS UE 2';
+	
+	INSERT INTO etl.employee_id_seq(employee_number,civil_service_code)
+	SELECT employee_number,civil_service_code
 	FROM   tmp_ref_employee
 	WHERE  exists_flag ='N';
+	
+	RAISE NOTICE 'PMS UE 3';
 	
 	INSERT INTO employee(employee_id,employee_number,last_name,created_date,created_load_id,original_last_name,masked_name,civil_service_title,
 	civil_service_code,civil_service_level,civil_service_suffix)
 	SELECT a.employee_id,b.employee_number,last_name,now()::timestamp,p_load_id_in,last_name,
-		coalesce(last_name,'') as masked_name,civil_service_title,civil_service_code,civil_service_level,civil_service_suffix
-	FROM   etl.employee_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number;
+		coalesce(last_name,'') as masked_name,civil_service_title,b.civil_service_code,civil_service_level,civil_service_suffix
+	FROM   etl.employee_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number AND a.civil_service_code = b.civil_service_code;
 	
+	RAISE NOTICE 'PMS UE 4';
 	
 	TRUNCATE etl.employee_history_id_seq;
 	
-	INSERT INTO etl.employee_history_id_seq(employee_number)
-	SELECT employee_number
+	RAISE NOTICE 'PMS UE 5';
+	
+	INSERT INTO etl.employee_history_id_seq(employee_number,civil_service_code)
+	SELECT employee_number,civil_service_code
 	FROM   tmp_ref_employee
 	WHERE  exists_flag ='N'
 		OR (exists_flag ='Y' and modified_flag='Y');
 
-
+	RAISE NOTICE 'PMS UE 6';
+	
 	CREATE TEMPORARY TABLE tmp_ref_employee_1(employee_number varchar,last_name varchar, civil_service_title varchar,
 	civil_service_code varchar,civil_service_level varchar,civil_service_suffix varchar,exists_flag char(1), modified_flag char(1), employee_id int)
 	DISTRIBUTED BY (employee_id);
@@ -71,7 +106,7 @@ BEGIN
 	SELECT a.*,b.employee_id FROM tmp_ref_employee a JOIN employee b ON a.employee_number = b.employee_number
 	WHERE exists_flag ='Y' and modified_flag='Y';
 
-	RAISE NOTICE '1';
+	RAISE NOTICE 'PMS UE 7';
 	
 	UPDATE employee a
 	SET	last_name = b.last_name,
@@ -85,16 +120,19 @@ BEGIN
 	FROM	tmp_ref_employee_1 b		
 	WHERE	a.employee_id = b.employee_id;
 	
+	RAISE NOTICE 'PMS UE 8';
+	
 	INSERT INTO employee_history(employee_history_id,employee_id,last_name,masked_name,civil_service_title,
 	civil_service_code,civil_service_level,civil_service_suffix,created_date,created_load_id)
 	SELECT a.employee_history_id,c.employee_id,b.last_name,
 	coalesce(b.last_name,'') as masked_name,b.civil_service_title,b.civil_service_code,b.civil_service_level,b.civil_service_suffix,
 						     now()::timestamp,p_load_id_in
-	FROM   etl.employee_history_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number
-		JOIN employee c ON b.employee_number = c.employee_number
+	FROM   etl.employee_history_id_seq a JOIN tmp_ref_employee b ON a.employee_number = b.employee_number AND a.civil_service_code = b.civil_service_code
+		JOIN employee c ON b.employee_number = c.employee_number AND b.civil_service_code = c.civil_service_code
 	WHERE   exists_flag ='N'
 		OR (exists_flag ='Y' and modified_flag='Y') ;
 
+	RAISE NOTICE 'PMS UE 9';
 	RETURN 1;
 	
 EXCEPTION
@@ -323,7 +361,7 @@ BEGIN
 	SELECT uniq_id, d.employee_history_id,d.employee_id, d.masked_name, d.civil_service_title
 	FROM
 		(SELECT a.uniq_id,max(c.employee_history_id) as employee_history_id
-		FROM	etl.stg_payroll a JOIN employee b ON a.employee_number = b.employee_number
+		FROM	etl.stg_payroll a JOIN employee b ON a.employee_number = b.employee_number AND a.civil_service_code = b.civil_service_code
 			JOIN employee_history c ON b.employee_id = c.employee_id
 		GROUP BY 1 )inner_tbl join employee_history d ON d.employee_history_id = inner_tbl.employee_history_id	;
 	
@@ -336,7 +374,7 @@ BEGIN
 	SELECT DISTINCT a.uniq_id
 	FROM 	etl.stg_payroll a; 
 	
-	RAISE NOTICE '1.8.1';
+	RAISE NOTICE '1.8';
 	
 	INSERT INTO tmp_fk_pms_values(uniq_id,payroll_id,action_flag)
 	SELECT uniq_id,payroll_id,'I' as action_flag

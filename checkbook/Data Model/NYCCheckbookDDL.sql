@@ -2039,3 +2039,9 @@ CREATE TABLE ref_award_size (
  
  CREATE INDEX idx_date_ref_date ON ref_date(date);
  
+ -- payroll indexes on 12/08/2012
+ 
+  CREATE INDEX idx_civil_service_code_employee ON employee(civil_service_code);
+  CREATE INDEX idx_civil_service_code_employee_history ON employee_history(civil_service_code);
+  CREATE INDEX idx_employee_id_employee_history ON employee_history(employee_id);
+ 
