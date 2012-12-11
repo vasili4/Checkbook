@@ -1505,6 +1505,14 @@ CREATE TABLE ref_fiscal_period(
 )
 DISTRIBUTED BY (fiscal_period);
 
+CREATE TABLE ref_pay_frequency(
+	pay_frequency_id smallint,
+	pay_frequency varchar
+)
+DISTRIBUTED BY (pay_frequency);
+
+
+
 CREATE TABLE aggregateon_revenue_category_funding_class(
 	revenue_category_id smallint,
 	funding_class_id smallint,
@@ -2044,4 +2052,5 @@ CREATE TABLE ref_award_size (
   CREATE INDEX idx_civil_service_code_employee ON employee(civil_service_code);
   CREATE INDEX idx_civil_service_code_employee_history ON employee_history(civil_service_code);
   CREATE INDEX idx_employee_id_employee_history ON employee_history(employee_id);
+   CREATE INDEX idx_employee_id_payroll ON payroll(employee_id);
  

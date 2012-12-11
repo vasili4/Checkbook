@@ -770,6 +770,7 @@ disb_contract_document_code  character varying(8),
 disb_master_agreement_id  bigint,
 disb_fiscal_year_id  smallint,
 disb_check_eft_issued_cal_month_id integer,
+disb_disbursement_number character varying(40),
 status_flag char(1),
 type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);	
@@ -808,6 +809,7 @@ SELECT 	d.disbursement_line_item_id,
 		d.master_agreement_id,
 		d.check_eft_issued_nyc_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'A' as status_flag,
 		'B' as type_of_year
 FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
@@ -847,6 +849,7 @@ SELECT 	d.disbursement_line_item_id,
 		d.master_agreement_id,
 		d.check_eft_issued_nyc_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'A' as status_flag,
 		'B' as type_of_year
 FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
@@ -886,6 +889,7 @@ UNION ALL
 		d.master_agreement_id,
 		d.check_eft_issued_nyc_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'R' as status_flag,
 		'B' as type_of_year
 FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
@@ -925,6 +929,7 @@ UNION ALL
 		d.master_agreement_id,
 		d.check_eft_issued_nyc_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'R' as status_flag,
 		'B' as type_of_year
 FROM   agreement_snapshot_expanded a, ref_year b, disbursement_line_item_details d
@@ -965,6 +970,7 @@ AND a.status_flag='R' AND a.master_agreement_yn = 'Y';
 		d.master_agreement_id,
 		d.calendar_fiscal_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'A' as status_flag,
 		'C' as type_of_year
 FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
@@ -1004,6 +1010,7 @@ UNION ALL
 		d.master_agreement_id,
 		d.calendar_fiscal_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'A' as status_flag,
 		'C' as type_of_year
 FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
@@ -1043,6 +1050,7 @@ SELECT 	d.disbursement_line_item_id,
 		d.master_agreement_id,
 		d.calendar_fiscal_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'R' as status_flag,
 		'C' as type_of_year
 FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d
@@ -1082,6 +1090,7 @@ SELECT 	d.disbursement_line_item_id,
 		d.master_agreement_id,
 		d.calendar_fiscal_year_id,
 		d.check_eft_issued_cal_month_id,
+		d.disbursement_number,
 		'R' as status_flag,
 		'C' as type_of_year
 FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_details d

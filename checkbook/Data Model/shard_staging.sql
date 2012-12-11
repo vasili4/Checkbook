@@ -1934,6 +1934,18 @@ CREATE VIEW ref_fiscal_period AS
 	
 
 
+CREATE EXTERNAL WEB TABLE ref_pay_frequency__0(
+	pay_frequency_id smallint,
+	pay_frequency varchar
+)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.ref_pay_frequency to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+
+CREATE VIEW ref_pay_frequency AS
+	SELECT ref_pay_frequency__0.pay_frequency_id, ref_pay_frequency__0.pay_frequency FROM ref_pay_frequency__0;
+	
+	
 
 CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_class__0(
 	revenue_category_id smallint,

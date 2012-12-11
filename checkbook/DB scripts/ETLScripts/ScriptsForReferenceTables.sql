@@ -250,6 +250,13 @@ INSERT INTO ref_fiscal_period VALUES (1,'July'),
 				      (13,'Post Adjustment Closing')
 				      ;
 
+INSERT INTO ref_pay_frequency VALUES (1,'BI-WEEKLY'), 
+				      (2, 'SEMI-MONTHLY'),
+				      (3, 'SUPPLEMENTAL'),
+				      (4, 'WEEKLY'),
+				      (5, 'DAILY'),
+				      (6, 'HOURLY');
+				      
 				      
 -- Contract by ondustry and contract by size
 

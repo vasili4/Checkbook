@@ -1250,6 +1250,12 @@ CREATE TABLE ref_fiscal_period(
 )
 DISTRIBUTED BY (fiscal_period);
 
+CREATE TABLE ref_pay_frequency(
+	pay_frequency_id smallint,
+	pay_frequency varchar
+)
+DISTRIBUTED BY (pay_frequency);
+
 
 CREATE TABLE aggregateon_revenue_category_funding_class(
 	revenue_category_id smallint,
@@ -1991,5 +1997,35 @@ CREATE TABLE ref_award_category_industry (
  CREATE INDEX idx_document_code_id_contracts_spending_transactions ON contracts_spending_transactions(document_code_id);
     
  
+ -- 12/11/2012
+ 
+ CREATE INDEX idx_employee_id_employee_history ON employee_history(employee_id);
+ CREATE INDEX idx_employee_id_payroll ON payroll(employee_id);
+ CREATE INDEX idx_agency_id_payroll ON payroll(agency_id);
+ CREATE INDEX idx_amount_basis_id_payroll ON payroll(amount_basis_id);
+ CREATE INDEX idx_fiscal_year_idpayroll ON payroll(fiscal_year_id);
+ CREATE INDEX idx_calendar_fiscal_year_id_payroll ON payroll(calendar_fiscal_year_id);
+ 
+ 
+ 
+ CREATE INDEX idx_agency_id_agg_payroll_employee_agency ON aggregateon_payroll_employee_agency(agency_id);
+ CREATE INDEX idx_fiscal_year_id_agg_payroll_employee_agency ON aggregateon_payroll_employee_agency(fiscal_year_id);
+ CREATE INDEX idx_type_of_employment_agg_payroll_employee_agency ON aggregateon_payroll_employee_agency(type_of_employment);
+   
+ CREATE INDEX idx_fiscal_year_id_agg_payroll_agency ON aggregateon_payroll_agency(fiscal_year_id);
+ 
+ CREATE INDEX idx_department_id_agg_payroll_coa_month ON aggregateon_payroll_coa_month(department_id);
+ CREATE INDEX idx_fiscal_year_id_agg_payroll_coa_month ON aggregateon_payroll_coa_month(fiscal_year_id);
+ 
+ 
+ CREATE INDEX idx_agency_id_agg_payroll_employee_agency_month ON aggregateon_payroll_employee_agency_month(agency_id);
+ CREATE INDEX idx_fiscal_year_id_agg_payroll_employee_agency_month ON aggregateon_payroll_employee_agency_month(fiscal_year_id);
+ CREATE INDEX idx_month_id_agg_payroll_employee_agency_month ON aggregateon_payroll_employee_agency_month(month_id);
+ CREATE INDEX idx_type_of_employment_agg_payroll_employee_agency_month ON aggregateon_payroll_employee_agency_month(type_of_employment);
+   
+ CREATE INDEX idx_fiscal_year_id_agg_payroll_agency_month ON aggregateon_payroll_agency_month(fiscal_year_id);
+ CREATE INDEX idx_month_id_agg_payroll_agency_month ON aggregateon_payroll_agency_month(month_id);
+ 
+ CREATE INDEX idx_month_id_agg_payroll_year_and_month ON aggregateon_payroll_year_and_month(month_id);
  
  
