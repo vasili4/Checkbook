@@ -1788,6 +1788,7 @@ CREATE TABLE contracts_spending_transactions(
 	disb_master_agreement_id  bigint,
 	disb_fiscal_year_id  smallint,
 	disb_check_eft_issued_cal_month_id integer,
+	disb_disbursement_number character varying(40),
 	status_flag char(1),
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id)
