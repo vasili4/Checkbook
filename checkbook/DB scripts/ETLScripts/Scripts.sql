@@ -317,7 +317,7 @@ BEGIN
 
 				l_select_str :=  ' select array_to_string( ' || 
 						 '	 array( ' || 
-						 '		select (case when staging_data_type =''varchar'' then '' coalesce(''||staging_column_name||'','''''''')='''''''' '' ' || 
+						 '		select (case when staging_data_type =''varchar'' or staging_data_type =''bpchar'' then '' coalesce(''||staging_column_name||'','''''''')='''''''' '' ' || 
 						 '			    when staging_data_type =''int'' or staging_data_type =''smallint'' then '' coalesce(''||staging_column_name||'',0)=0 '' ' || 
 						 '			    when staging_data_type like ''numeric%'' then  '' '' || staging_column_name ||'' IS NULL '' ' || 
 						 '			    when staging_data_type =''date'' then '' coalesce(''||staging_column_name||'',''''2000-01-01'''')=''''2000-01-01'''' '' ' || 
@@ -485,7 +485,7 @@ BEGIN
 
 				l_select_str :=  ' select array_to_string( ' || 
 						 '	 array( ' || 
-						 '		select (case when staging_data_type =''varchar'' then '' coalesce(a.''||staging_column_name||'','''''''') =coalesce(b.''||staging_column_name||'','''''''') '' ' || 
+						 '		select (case when staging_data_type =''varchar'' or staging_data_type =''bpchar'' then '' coalesce(a.''||staging_column_name||'','''''''') =coalesce(b.''||staging_column_name||'','''''''') '' ' || 
 						 '			    when staging_data_type =''int'' or staging_data_type like ''numeric%'' then '' coalesce(a.''||staging_column_name||'',0) = coalesce(b.''||staging_column_name||'',0) '' ' || 
 						 '			    when staging_data_type =''date'' then '' coalesce(a.''||staging_column_name||'',''''2000-01-01'''') = coalesce(b.''||staging_column_name||'',''''2000-01-01'''') '' ' || 
 						 '		       end) as sql_condition ' || 
