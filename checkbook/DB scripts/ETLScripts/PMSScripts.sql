@@ -103,7 +103,7 @@ BEGIN
 	DISTRIBUTED BY (employee_id);
 
 	INSERT INTO tmp_ref_employee_1
-	SELECT a.*,b.employee_id FROM tmp_ref_employee a JOIN employee b ON a.employee_number = b.employee_number
+	SELECT a.*,b.employee_id FROM tmp_ref_employee a JOIN employee b ON a.employee_number = b.employee_number AND a.civil_service_code = b.civil_service_code
 	WHERE exists_flag ='Y' and modified_flag='Y';
 
 	RAISE NOTICE 'PMS UE 7';
@@ -157,18 +157,19 @@ BEGIN
 					department_history_id integer,amount_basis_id smallint,payroll_id bigint, action_flag char(1),
 					agency_id smallint, agency_name varchar,department_id integer,
 					department_name varchar,expenditure_object_id integer,
-					fiscal_year_id smallint, employee_id bigint, employee_name varchar,civil_service_title varchar, 
+					fiscal_year smallint,fiscal_year_id smallint, employee_id bigint, employee_name varchar,civil_service_title varchar, 
 					calendar_fiscal_year_id smallint, calendar_fiscal_year smallint,
 					agency_short_name varchar,department_short_name varchar)
 	DISTRIBUTED BY (uniq_id);
 	
 	-- FK:pay_date_id
 	
-	INSERT INTO tmp_fk_pms_values(uniq_id,pay_date_id,calendar_fiscal_year_id,calendar_fiscal_year)
-	SELECT	a.uniq_id, b.date_id,c.year_id as calendar_fiscal_year_id, d.year_value
+	INSERT INTO tmp_fk_pms_values(uniq_id,pay_date_id,calendar_fiscal_year_id,calendar_fiscal_year, fiscal_year_id, fiscal_year)
+	SELECT	a.uniq_id, b.date_id,c.year_id as calendar_fiscal_year_id, d.year_value, b.nyc_year_id, e.year_value
 	FROM etl.stg_payroll a JOIN ref_date b ON a.pay_date = b.date
 		JOIN ref_month c ON b.calendar_month_id = c.month_id
-		JOIN ref_year d ON c.year_id = d.year_id;
+		JOIN ref_year d ON c.year_id = d.year_id
+		JOIN ref_year e ON b.nyc_year_id = e.year_id;
 	
 	-- FK:Agency_history_id
 	
@@ -344,11 +345,11 @@ BEGIN
 	RAISE NOTICE '1.7';
 	
 	-- FK: Fiscal Year
-	
+	/*
 	INSERT INTO tmp_fk_pms_values(uniq_id,fiscal_year_id)
 	SELECT a.uniq_id,b.year_id
 	FROM 	etl.stg_payroll a JOIN  ref_year b ON a.fiscal_year = b.year_value;
-	
+	*/
 	-- FK:amount_basis_id
 	
 	INSERT INTO tmp_fk_pms_values(uniq_id,amount_basis_id)
@@ -400,6 +401,7 @@ BEGIN
 		employee_name = ct_table.employee_name,
 		civil_service_title = ct_table.civil_service_title,
 		fiscal_year_id = ct_table.fiscal_year_id,
+		fiscal_year = ct_table.fiscal_year,
 		calendar_fiscal_year_id = ct_table.calendar_fiscal_year_id,
 		calendar_fiscal_year = ct_table.calendar_fiscal_year,
 		agency_short_name = ct_table.agency_short_name,
@@ -419,6 +421,7 @@ BEGIN
 			max(department_id) as department_id,
 			max(department_name ) as department_name ,
 			max(fiscal_year_id) as fiscal_year_id,
+			max(fiscal_year) as fiscal_year,
 			max(employee_id) as employee_id,
 			max(employee_name) as employee_name,
 			max(civil_service_title) as civil_service_title,

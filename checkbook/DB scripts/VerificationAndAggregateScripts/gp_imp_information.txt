@@ -1,0 +1,35 @@
+1) The "gang was disconnected" is a symptom which indicates one or more primary segments' worker processes abort abnormally.
+
+The possible causes vary. EG, max_connections are reached on one segment; primary segments down due to timeout; Postgresql Processes are killed; segment server NIC issue; File system is full on segments; etc.
+
+ 
+I suggest you open cases to GP support team with below info:
+
+1. master logs
+
+2. related segment logs
+
+3. gp_segment_configuration output
+
+4. select * from gp_configuration_history order by 1 desc;
+
+5. /var/log/messages on related segment servers
+
+6. df -h on segments
+
+7. Any change you may think related.
+
+
+2) 
+
+It seems gpperfmon lost connections to your segment servers.
+
+Could you use "ping"/"telnet" to segment servers to see if they are alive?
+
+For example:192.168.150.1:8888
+
+Ping 192.168.150.1
+
+Telnet 192.168.150.1 8888
+
+

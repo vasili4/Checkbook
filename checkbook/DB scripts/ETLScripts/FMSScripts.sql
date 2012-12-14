@@ -1564,7 +1564,11 @@ BEGIN
 		contract_vendor_id_cy  = b.contract_vendor_id_cy ,
 		master_contract_vendor_id_cy  = b.master_contract_vendor_id_cy,
 		contract_document_code = b.contract_document_code,
-		master_contract_document_code = b.master_contract_document_code
+		master_contract_document_code = b.master_contract_document_code,
+		master_child_contract_agency_id = coalesce(b.master_contract_agency_id,b.contract_agency_id),
+		master_child_contract_agency_id_cy = coalesce(b.master_contract_agency_id_cy,b.contract_agency_id_cy),
+		master_child_contract_vendor_id = coalesce(b.master_contract_vendor_id,b.contract_vendor_id),
+		master_child_contract_vendor_id_cy = coalesce(b.master_contract_vendor_id_cy,b.contract_vendor_id_cy)
 	FROM	tmp_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
 	

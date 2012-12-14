@@ -86,7 +86,7 @@ CREATE TABLE etl_data_load_file (
     processed_flag char(1),
     publish_start_time timestamp,
     publish_end_time timestamp)
-DISTRIBUTED BY (load_id);
+DISTRIBUTED BY (load_file_id);
     
 CREATE TABLE ref_column_mapping (
     data_feed_table_name character varying,
@@ -4308,4 +4308,4 @@ CREATE TABLE tmp_all_vendors(
 -- Create Indexes
  -- payroll indexes on 12/08/2012
 CREATE INDEX idx_civil_service_code_stg_payroll ON etl.stg_payroll(civil_service_code);
-
+CREATE INDEX idx_load_id_etl_data_load_file ON etl.etl_data_load_file(load_id);
