@@ -192,7 +192,7 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
 				JOIN (SELECT data_source_code, max(load_id) AS load_id
                   FROM    etl.etl_data_load c
                        JOIN  mwbe_last_job d
-                       ON c.job_id >= d.job_id
+                       ON c.job_id <= d.job_id
                        WHERE data_source_code in ('F','P')
                 GROUP BY 1) e
              ON e.load_id = a.load_id
