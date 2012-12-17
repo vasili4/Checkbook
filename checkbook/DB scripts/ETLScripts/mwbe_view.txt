@@ -193,7 +193,7 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
                   FROM    etl.etl_data_load c
                        JOIN  mwbe_last_job d
                        ON c.job_id <= d.job_id
-                       WHERE data_source_code in ('F','P')
+                       WHERE data_source_code in ('F','P','PS')
                 GROUP BY 1) e
              ON e.load_id = a.load_id
               join ref_date rd on a.check_eft_issued_date_id = rd.date_id;
