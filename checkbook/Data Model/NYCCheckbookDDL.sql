@@ -1631,6 +1631,58 @@ ALTER TABLE  payroll ADD constraint fk_payroll_ref_date_1 foreign key (orig_pay_
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_department_history foreign key (department_history_id) references ref_department_history (department_history_id);
 ALTER TABLE  payroll ADD constraint fk_payroll_ref_amount_basis foreign key (amount_basis_id) references ref_amount_basis (amount_basis_id);
 
+CREATE TABLE payroll_future_data(
+	payroll_id bigint NOT NULL,
+	pay_cycle_code CHAR(1),
+	pay_date_id int,
+	employee_history_id bigint,
+	payroll_number varchar,
+	job_sequence_number varchar,
+	agency_history_id smallint,
+	fiscal_year smallint,
+	agency_start_date date,
+	orig_pay_date_id int,
+	pay_frequency varchar,
+	department_history_id int,
+	annual_salary_original numeric(16,2),
+	annual_salary numeric(16,2),
+	amount_basis_id smallint,
+	base_pay_original numeric(16,2),
+	base_pay numeric(16,2),
+	overtime_pay_original numeric(16,2),
+	overtime_pay numeric(16,2),
+	other_payments_original numeric(16,2),
+	other_payments numeric(16,2),
+	gross_pay_original  numeric(16,2),
+	gross_pay  numeric(16,2),
+	civil_service_title varchar,
+	salaried_amount numeric(16,2),
+	non_salaried_amount numeric(16,2),
+	orig_pay_cycle_code CHAR(1),
+	agency_id smallint,
+	agency_code varchar,
+	agency_name varchar,
+	department_id integer,
+	department_code  varchar,
+	department_name varchar,
+	employee_id bigint,
+	employee_name varchar,
+	fiscal_year_id smallint,
+	pay_date date,
+	gross_pay_ytd numeric(16,2),
+	calendar_fiscal_year_id smallint,
+	calendar_fiscal_year smallint,
+	gross_pay_cytd numeric(16,2),
+	agency_short_name varchar,
+	department_short_name varchar,
+	created_date timestamp,
+	created_load_id int,
+	updated_date timestamp,
+	updated_load_id int,
+	job_id bigint)
+DISTRIBUTED BY (payroll_id);
+
+
 CREATE TABLE aggregateon_payroll_employee_agency(
 	employee_id bigint,
 	agency_id smallint,
@@ -2046,6 +2098,11 @@ CREATE TABLE ref_award_size (
 ) DISTRIBUTED BY (award_category_industry_id);
 
 
+CREATE TABLE invalid_records (
+load_file_id bigint,
+total_invalid_records bigint,
+invalid_reason varchar(255)
+) ;
 
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  -- creating indexes

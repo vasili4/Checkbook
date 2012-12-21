@@ -1460,7 +1460,10 @@ CREATE TABLE payroll(
 	updated_date timestamp,
 	updated_load_id int,
 	job_id bigint
-) DISTRIBUTED BY (fiscal_year);
+) DISTRIBUTED BY (payroll_id)
+PARTITION BY RANGE (calendar_fiscal_year) 
+(START (2010) END (2014) EVERY (1),
+DEFAULT PARTITION outlying_years);
 
 CREATE TABLE payroll_summary (
     payroll_summary_id bigint,
@@ -1797,7 +1800,7 @@ CREATE TABLE contracts_spending_transactions(
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id)
 PARTITION BY RANGE (fiscal_year) 
-(START (2010) END (2014) EVERY (1),
+(START (2010) END (2015) EVERY (1),
 DEFAULT PARTITION outlying_years);
 
 

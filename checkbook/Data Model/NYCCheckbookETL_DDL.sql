@@ -4128,7 +4128,9 @@ CREATE EXTERNAL TABLE ext_stg_pms_summary_data_feed(
  	department_short_name varchar,
  	uniq_id bigint default nextval('seq_stg_payroll_summary_uniq_id'),
 	invalid_flag char(1),
-	invalid_reason varchar		);
+	invalid_reason varchar		
+	)
+	DISTRIBUTED BY (uniq_id);
 
 
 CREATE TABLE archive_payroll_summary (LIKE stg_payroll_summary) DISTRIBUTED BY (uniq_id);

@@ -7,6 +7,7 @@
 	refreshaggregates
 	grantaccess
 	refreshfactandaggregatetables
+	insertInvalidRecords
 */
 
 CREATE OR REPLACE FUNCTION concat(text, text) RETURNS text
@@ -1279,6 +1280,8 @@ BEGIN
 	END IF;	
 	*/
 	
+	l_status :=etl.insertInvalidRecords(p_job_id_in);
+	
 		l_end_time := timeofday()::timestamp;
 	
 	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
@@ -1300,3 +1303,56 @@ EXCEPTION
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.insertInvalidRecords(p_job_id_in bigint) RETURNS integer AS $$
+
+DECLARE
+	l_start_time  timestamp;
+	l_end_time  timestamp;
+BEGIN
+	
+	l_start_time := timeofday()::timestamp;
+	
+	DROP TABLE IF EXISTS invalid_records ;
+
+
+create table invalid_records as 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_agency  group by 1,3 union  
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_department group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_expenditure_object group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_location group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_object_class group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_revenue_category group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_revenue_class group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_revenue_source group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_budget_code group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_funding_class group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_mag_header group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_mag_award_detail group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_fmsv_business_type group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_ct_header group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_ct_award_detail group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_ct_accounting_line group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_po_header group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_po_award_detail group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_po_vendor group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_po_accounting_line group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_do1_header group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_con_do1_accounting_line group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_fms_header group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_fms_vendor group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_fms_accounting_line group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_budget group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_revenue group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_revenue_budget group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_payroll group by 1,3 union 
+select load_file_id,count(*) as total_invalid_records,invalid_reason as invalid_reason from etl.invalid_payroll_summary group by 1,3 ;
+
+RETURN 1;	
+					
+	
+
+END;
+$$  LANGUAGE plpgsql ;
