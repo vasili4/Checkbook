@@ -1652,7 +1652,7 @@ BEGIN
 	RAISE NOTICE 'PCON5';
 	
 	INSERT INTO agreement_snapshot_deleted(agreement_id, original_agreement_id, starting_year, master_agreement_yn, load_id, deleted_date, job_id)
-	SELECT a.agreement_id, a.original_agreement_id, a.starting_year, a.master_agreement_yn, l_load_id, now()::timestamp, p_job_id_in
+	SELECT distinct a.agreement_id, a.original_agreement_id, a.starting_year, a.master_agreement_yn, l_load_id, now()::timestamp, p_job_id_in
 	FROM agreement_snapshot a , tmp_agreement_snapshot b
 	WHERE a.original_agreement_id = b.original_agreement_id;
 	
@@ -1794,7 +1794,7 @@ BEGIN
 	RAISE NOTICE 'PCON8';
 	
 	INSERT INTO agreement_snapshot_cy_deleted(agreement_id, original_agreement_id, starting_year, master_agreement_yn, load_id, deleted_date, job_id)
-	SELECT a.agreement_id, a.original_agreement_id, a.starting_year, a.master_agreement_yn, l_load_id, now()::timestamp, p_job_id_in
+	SELECT distinct a.agreement_id, a.original_agreement_id, a.starting_year, a.master_agreement_yn, l_load_id, now()::timestamp, p_job_id_in
 	FROM agreement_snapshot_cy a , tmp_agreement_snapshot b
 	WHERE a.original_agreement_id = b.original_agreement_id;
 	

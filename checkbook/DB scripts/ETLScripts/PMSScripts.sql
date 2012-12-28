@@ -1134,13 +1134,13 @@ BEGIN
 
 	INSERT INTO disbursement_line_item_details(disbursement_line_item_id,check_eft_issued_date_id,check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
 				fund_class_id,check_amount,agency_id,agency_code,expenditure_object_id,department_id,check_eft_issued_date,
-				agency_name,department_name,department_code,expenditure_object_name,expenditure_object_code,budget_code_id,
+				agency_name,department_name,vendor_name,department_code,expenditure_object_name,expenditure_object_code,budget_code_id,
 				budget_code,budget_name,fund_class_code,spending_category_id,
 				spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
 				agency_short_name,department_short_name,load_id)
 	SELECT 	payroll_summary_id,pay_date_id,fiscal_year_id,calendar_month_id,
 		fund_class_id,coalesce(total_amt,0) as check_amount,agency_id,agency,b.expenditure_object_id,department_id,pay_date::date,
-		agency_name,department_name,uoa,b.expenditure_object_name,b.expenditure_object_code,budget_code_id,
+		agency_name,department_name,department_name,uoa,b.expenditure_object_name,b.expenditure_object_code,budget_code_id,
 		bud_code,budget_code_name,'001',2 as spending_category_id,
 		'Payroll',calendar_fiscal_year_id,calendar_fiscal_year,a.fiscal_year,
 		agency_short_name,department_short_name,p_load_id_in
@@ -1178,6 +1178,7 @@ BEGIN
 	SET     check_amount = coalesce(b.total_amt,0),
 		agency_name = b.agency_name,
 		department_name = b.department_name,
+		vendor_name =  b.department_name,
 		expenditure_object_name = 'Payroll Summary',
 		budget_name = b.budget_code_name,
 		agency_short_name = b.agency_short_name,

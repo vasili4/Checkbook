@@ -110,7 +110,7 @@ SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,tota
           ON e.load_id = coalesce(a.created_load_id,a.updated_load_id)
        JOIN mwbe_last_job f
           ON e.job_id = f.job_id
-             where e.job_id <=f.job_id;
+             where e.job_id >= f.job_id;
           
 
 --disbursement
@@ -165,7 +165,7 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
 				JOIN etl.etl_data_load e ON e.load_id = a.load_id
                                 JOIN mwbe_last_job f ON e.job_id = f.job_id	
 				JOIN ref_date rd on a.check_eft_issued_date_id = rd.date_id
-				where e.job_id <=f.job_id;
+				where e.job_id >= f.job_id;
 ;
 
 
@@ -293,24 +293,22 @@ CREATE  VIEW disbursement_agreement_mwbe AS
 SELECT b.contract_number ::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode,b.document_id  AS AgreementDocID, b.effective_begin_date_id AS AgreementStartDate,
        b.effective_end_date_id AS AgreementEndDate,b.description AS AgreementPurpose,
        ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode 
-FROM (SELECT distinct agreement_id  FROM disbursement_line_item_details) a JOIN history_agreement b on a.agreement_id = b.original_agreement_id 
+FROM (SELECT distinct agreement_id  FROM disbursement_line_item_details  WHERE master_agreement_id is null) a JOIN history_agreement b on a.agreement_id = b.original_agreement_id 
                                       JOIN ref_date rb on  b.effective_begin_date_id =rb.date_id
                                       JOIN ref_date re on b.effective_end_date_id =re.date_id
                                       JOIN ref_document_code dc on b.document_code_id = dc.document_code_id
-				      JOIN ref_agency_history h on b.agency_history_id = h.agency_history_id
+				      				  JOIN ref_agency_history h on b.agency_history_id = h.agency_history_id
                                       JOIN ref_agency ag on h.agency_id = ag.agency_id
-                                      WHERE b.master_agreement_id is null
                                     UNION
 SELECT ma.contract_number ::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode, ma.document_id AS AgreementDocID,ma.effective_begin_date_id AS AgreementStartDate,
 	ma.effective_end_date_id AS AgreementEndDate,ma.description AS AgreementPurpose,
 	ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode 
-FROM (select distinct master_agreement_id  from disbursement_line_item_details) a JOIN history_master_agreement ma on a.master_agreement_id = ma.master_agreement_id	
+FROM (select distinct master_agreement_id  from disbursement_line_item_details WHERE master_agreement_id is not null) a JOIN history_master_agreement ma on a.master_agreement_id = ma.original_master_agreement_id	
                                       JOIN ref_date rb on  ma.effective_begin_date_id =rb.date_id
                                       JOIN ref_date re on ma.effective_end_date_id =re.date_id
                                       JOIN ref_document_code dc on ma.document_code_id = dc.document_code_id
                                       JOIN ref_agency_history h on ma.agency_history_id = h.agency_history_id
-                                      JOIN ref_agency ag on h.agency_id = ag.agency_id
-                                      WHERE ma.master_agreement_id is not null;
+                                      JOIN ref_agency ag on h.agency_id = ag.agency_id   ;
 
 
 
