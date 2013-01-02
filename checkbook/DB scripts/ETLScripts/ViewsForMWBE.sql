@@ -1,7 +1,12 @@
 
 --table for last job processed
 
-CREATE table mwbe_last_job (use char(10),job_id integer);
+DROP TABLE IF EXISTS mwbe_last_job CASCADE;
+
+CREATE table mwbe_last_job (
+use char(10),
+job_id integer 
+) DISTRIBUTED BY (job_id);
 
 -- This table should be given access to mwbe etl user to update etl job_id in order to get incremental files. The value is to be set to 0 if a complete load is needed
 
@@ -19,7 +24,7 @@ WHERE c.data_source_code::text = 'A'::text AND c.load_id = a.created_load_id AND
 
 -- Only agencies which are in fms and payroll summary are to be displayed
 
-   CREATE VIEW ref_agency_mwbe
+   CREATE OR REPLACE VIEW ref_agency_mwbe
 AS
    SELECT distinct c.agency_id as departmentId,
 	  c.agency_name as DeptName ,
@@ -41,7 +46,7 @@ e.agency_id;
 */
 
 
-CREATE VIEW ref_department_mwbe
+CREATE OR REPLACE VIEW ref_department_mwbe
 AS
    SELECT distinct a.department_id as AppropriationUnitID,b.department_code as AppropriationUnitCode,
                  b.department_name as AppropriationUnitName,c.agency_code as DeptCode, 
@@ -68,7 +73,7 @@ select  expenditure_object_code,expenditure_object_name,fiscal_year,original_exp
 ref_expenditure_object;*/
 
 
-CREATE VIEW ref_expenditure_mwbe
+CREATE OR REPLACE VIEW ref_expenditure_mwbe
 AS
    SELECT c.expenditure_object_id as ExpenditureObjID,c.expenditure_object_code as ExpenditureObjCode,
 	  c.expenditure_object_name as ExpenditureObjName,c.fiscal_year as FiscalYear,
@@ -95,9 +100,9 @@ AS
 	where a.created_load_id >=c.job_id or a.updated_load_id >= c.job_id;	
 */
 
-   CREATE VIEW  payroll_mwbe AS
+   CREATE OR REPLACE VIEW  payroll_mwbe AS
 SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,total_amount as LineItemAmount,6 AS CategoryID,
-'Non-MWBE (Ineligible)' as CategoryName,b.agency_id,b.agency_name,d.date,
+'Non-MWBE (Ineligible)'::varchar(50) as CategoryName,b.agency_id,b.agency_name,d.date,
        c.department_id,c.department_name,coalesce(a.updated_load_id,a.created_load_id)
   FROM payroll_summary a
        JOIN ref_agency_history b
@@ -134,7 +139,7 @@ AS
                 GROUP BY 1) b
              ON b.load_id = a.load_id;*/
 
-CREATE   VIEW  disbursement_mwbe
+CREATE   OR REPLACE VIEW  disbursement_mwbe
 AS
 select 
 document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDate,disbursement_line_item_id as LineItemNum,
@@ -142,7 +147,7 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
           agency_id  as DepartmentID,
           agency_name as DeptName,
           agency_code as DeptCode,
-          'D' as RecordType,
+          'D'::char(1) as RecordType,
           a.vendor_id as VendorId,b.vendor_customer_code as VendorCode,(case when b.miscellaneous_vendor_flag = '1' then b.vendor_id else 0 end) as vendor_sub_code ,b.legal_name::varchar(500) as VendorName,
 	  (case when c.business_type_id =2 then 6 
 	   when c.business_type_id = 5 then 1
@@ -213,7 +218,7 @@ AS
              ON f.address_id = a4.address_id;
 */
 
-CREATE VIEW vendor_mwbe as
+CREATE OR REPLACE VIEW vendor_mwbe as
 SELECT 
 a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as VendorName,a.miscellaneous_vendor_flag,
           a.created_load_id as LoadID,
@@ -265,7 +270,7 @@ FROM history_agreement a
 
 /*
 
-CREATE  VIEW disbursement_agreement_mwbe AS 
+CREATE  OR REPLACE VIEW disbursement_agreement_mwbe AS 
  SELECT COALESCE(a.contract_number,b.contract_number)::varchar(25) AS AgreementID, 
 	x.document_code as AgreementDocCode,
 	COALESCE(a.document_id, b.document_id) AS AgreementDocID,
@@ -289,7 +294,7 @@ FROM  history_agreement a
 */
 
 
-CREATE  VIEW disbursement_agreement_mwbe AS 
+CREATE  OR REPLACE VIEW disbursement_agreement_mwbe AS 
 SELECT b.contract_number ::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode,b.document_id  AS AgreementDocID, b.effective_begin_date_id AS AgreementStartDate,
        b.effective_end_date_id AS AgreementEndDate,b.description AS AgreementPurpose,
        ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode 
@@ -317,7 +322,7 @@ FROM (select distinct master_agreement_id  from disbursement_line_item_details W
 
 -- minority type
 
-create or replace view minoirty_mwbe
+CREATE OR REPLACE VIEW minoirty_mwbe
 as select * from ref_minority_type order by 1;
 
 
@@ -335,7 +340,7 @@ select * from ref_industry_type order by 1;
 --disbursement address
 
 
-create view disbursement_address_mwbe as
+CREATE OR REPLACE VIEW disbursement_address_mwbe as
 SELECT x.disbursement_id,a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as VendorName,
         f.address_line_1 as StreetAddrLine1,f.address_line_2 as StreetAddrLine2,f.city as City,f.state as StateProv,f.zip as PostalCode,f.country as Country,a.created_load_id as LoadID
           FROM disbursement_line_item_details x left join vendor a  on x.vendor_id = a.vendor_id join fmsv_business_type c on a.vendor_customer_code = c.vendor_customer_code  
@@ -366,7 +371,7 @@ SELECT x.disbursement_id,a.vendor_id as VendorID,a.vendor_customer_code as Vendo
 -- disbursement industry type
 
 
-create view  disbursement_industry_mwbe as 
+CREATE OR REPLACE VIEW  disbursement_industry_mwbe as 
 select disbursement_id as DisbursementID,disbursement_line_item_id as LineItemNum,b.industry_type_id,b.industry_type_name,a.created_load_id 
 from disbursement_line_item a join agreement_snapshot b on a.reference_document_number = b.contract_number ;
 
@@ -374,7 +379,7 @@ from disbursement_line_item a join agreement_snapshot b on a.reference_document_
 
 -- vendor address mwbe
 
-create view vendor_address_mwbe
+CREATE OR REPLACE VIEW vendor_address_mwbe
 as
 select  
 v.vendor_id,v.vendor_customer_code as VendorCode,v.legal_name as VendorName,v.miscellaneous_vendor_flag,
