@@ -1,4 +1,4 @@
-select 'history_agreement' as table_name , count(*) as num_records, 'contracts' as domain  from history_agreement UNION 
+COPY (select 'history_agreement' as table_name , count(*) as num_records, 'contracts' as domain  from history_agreement UNION 
 select 'history_agreement_accounting_line' as table_name , count(*) as num_records, 'contracts' as domain  from history_agreement_accounting_line UNION 
 select 'history_master_agreement' as table_name , count(*) as num_records, 'contracts' as domain  from history_master_agreement UNION 
 select 'agreement_snapshot' as table_name , count(*) as num_records, 'contracts' as domain  from agreement_snapshot UNION 
@@ -39,4 +39,4 @@ select 'ref_agency' as table_name , count(*) as num_records, 'refrence_data' as 
 select 'ref_department' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_department UNION 
 select 'ref_expenditure_object' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_expenditure_object UNION 
 select 'ref_minority_type' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_minority_type UNION 
-select 'ref_object_class' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_object_class order by domain, table_name
+select 'ref_object_class' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_object_class order by domain, table_name) TO '/vol2share/NYC/FEEDS/count_verification.csv' CSV HEADER QUOTE as '"';
