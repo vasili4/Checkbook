@@ -113,9 +113,7 @@ SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,tota
           ON a.pay_date_id = d.date_id
        JOIN etl.etl_data_load e
           ON e.load_id = coalesce(a.updated_load_id,a.created_load_id)
-       JOIN mwbe_last_job f
-          ON e.job_id = f.job_id
-             where e.job_id >= f.job_id;
+        where e.job_id > (select max(job_id) from mwbe_last_job);
           
 
 --disbursement
@@ -162,16 +160,15 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
           fiscal_year,a.load_id
  from disbursement_line_item_details a left join  vendor b on a.vendor_id =b.vendor_id 
 				left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
-				where status =2 and (business_type_id=2 or minority_type_id is not null or vendor_customer_code in 
+				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
 					(select distinct vendor_customer_code from fmsv_business_type 
-					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null))))c
+					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null)) AND business_type_id=5)))c
 				 on b.vendor_customer_code =c.vendor_customer_code
 				left join ref_minority_type d on c.minority_type_id = d.minority_type_id 
 				JOIN etl.etl_data_load e ON e.load_id = a.load_id
-                                JOIN mwbe_last_job f ON e.job_id = f.job_id	
 				JOIN ref_date rd on a.check_eft_issued_date_id = rd.date_id
-				where e.job_id >= f.job_id;
-;
+				where e.job_id > (select max(job_id) from mwbe_last_job);
+
 
 
 

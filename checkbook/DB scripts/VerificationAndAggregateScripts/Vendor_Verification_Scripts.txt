@@ -33,3 +33,17 @@ pending_contracts					document_agency_id
 revenue								document_agency_history_id
 revenue								agency_history_id
 revenue_budget						agency_history_id
+
+
+select b.file_name, a.load_file_id, a.num_transactions from etl.etl_data_load_verification a, etl.etl_data_load_file b , etl.etl_data_load c , etl.ref_data_source d
+WHERE a.load_file_id = b.load_file_id AND b.load_id = c.load_id AND c.data_source_code = d.data_source_code
+AND a.data_source_code = 'V' and a.description = 'Number of records inserted into vendor_history'  AND table_order=1
+order by d.data_source_order, b.file_timestamp,b.file_name
+
+
+copy (
+select * from etl.archive_payroll where employee_number like '%28266' and payroll_number = '015' and pay_date in ('2011-01-06','2011-01-07')
+UNION
+select * from etl.archive_payroll where employee_number like '%134830' and payroll_number = '015' and pay_date in ('2011-01-06','2011-01-07', '2011-01-20','2011-02-18','2011-02-04')
+UNION
+select * from etl.archive_payroll where employee_number like '%134880' and payroll_number = '015' and pay_date in ('2011-02-18','2011-02-04') order by employee_number, pay_date) TO '/home/gpadmin/TREDDY/payroll_data_from_source_for_highlighted.csv' CSV HEADER

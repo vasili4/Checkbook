@@ -102,8 +102,10 @@ BEGIN
 				'N' as is_new_vendor, 'N' as is_name_changed, 'N' as is_vendor_address_changed, 'N' as  is_address_new,'N' as is_bus_type_changed, lgl_nm, alias_nm,
 				ad_ln_1, ad_ln_2, ctry, st, zip, city, address_type_code		
 	FROM etl.tmp_stg_vendor a LEFT JOIN 
-	(SELECT b.vendor_id, c.vendor_history_id, b.vendor_customer_code FROM vendor b, vendor_history c
-	WHERE coalesce(b.miscellaneous_vendor_flag,0::bit) = 0::bit AND b.vendor_id = c.vendor_id) b
+	(SELECT max(b.vendor_id) as vendor_id, max(c.vendor_history_id) as vendor_history_id, b.vendor_customer_code 
+	FROM vendor b, vendor_history c
+	WHERE coalesce(b.miscellaneous_vendor_flag,0::bit) = 0::bit AND b.vendor_id = c.vendor_id
+	GROUP BY 3) b
 	ON a.vend_cust_cd = b.vendor_customer_code	
 	WHERE COALESCE(misc_acct_fl,0) = 0 
 	GROUP BY 2,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19;
@@ -132,9 +134,9 @@ BEGIN
 	SET is_name_changed = 'Y'
 	FROM
 	(SELECT uniq_id
-	FROM etl.tmp_all_vendors a JOIN vendor b
-	ON a.vendor_customer_code = b.vendor_customer_code
-	WHERE COALESCE(a.lgl_nm, '') <>  COALESCE(b.legal_name, '') OR COALESCE(a.alias_nm, '') <> COALESCE(b.alias_name, '')) b
+	FROM etl.tmp_all_vendors a , vendor b
+	WHERE a.vendor_customer_code = b.vendor_customer_code
+	AND a.is_new_vendor = 'N' AND (COALESCE(a.lgl_nm, '') <>  COALESCE(b.legal_name, '') OR COALESCE(a.alias_nm, '') <> COALESCE(b.alias_name, ''))) b
 	WHERE a.uniq_id = b.uniq_id AND a.is_new_vendor = 'N';
 
 	RAISE NOTICE 'VENDOR 1';
@@ -165,11 +167,10 @@ BEGIN
 	FROM etl.tmp_all_vendors m 
 			LEFT JOIN
 			          (SELECT  a.vendor_address_id,h.vendor_customer_code, h.uniq_id,b.address_type_code,c.address_line_1,c.address_line_2,c.city,c.state,c.zip,c.country					
-					FROM	vendor_address a JOIN ref_address_type b ON a.address_type_id = b.address_type_id
-					JOIN address c ON a.address_id = c.address_id					
-					JOIN vendor_history f ON a.vendor_history_id = f.vendor_history_id					
-					JOIN etl.tmp_all_vendors h ON f.vendor_history_id = h.vendor_history_id 
-					WHERE b.address_type_code = h.address_type_code
+					FROM	vendor_address a , ref_address_type b,  address c, vendor_history f, etl.tmp_all_vendors h
+					WHERE  a.address_type_id = b.address_type_id AND a.address_id = c.address_id
+					AND a.vendor_history_id = f.vendor_history_id AND f.vendor_history_id = h.vendor_history_id 
+					AND b.address_type_code = h.address_type_code AND h.is_new_vendor = 'N'	
 					) z on m.vendor_customer_code = z.vendor_customer_code 
 						AND COALESCE(m.ad_ln_1,'') = COALESCE(z.address_line_1,'')
 						AND COALESCE(m.ad_ln_2,'') = COALESCE(z.address_line_2,'')
@@ -177,6 +178,7 @@ BEGIN
 						AND COALESCE(m.st,'') = COALESCE(z.state,'')
 						AND COALESCE(m.zip,'') = COALESCE(z.zip,'')
 						AND COALESCE(m.ctry,'') = COALESCE(z.country,'')
+						WHERE m.is_new_vendor = 'N'
 						) b	
 	WHERE a.uniq_id = b.uniq_id
 	AND a.is_new_vendor = 'N' and b.vendor_address_id IS NULL;
@@ -190,19 +192,20 @@ BEGIN
 	UPDATE etl.tmp_all_vendors a
 	SET is_bus_type_changed = 'Y'
 	FROM
+	(SELECT distinct vendor_customer_code FROM
 	(SELECT coalesce(z.vendor_customer_code, a.vendor_customer_code) as vendor_customer_code,
 		(CASE WHEN vendor_business_type_id IS NOT NULL AND b.vendor_customer_code IS NOT NULL THEN 'N' 
 			WHEN vendor_business_type_id IS NOT NULL AND b.vendor_customer_code IS NULL  THEN 'Y'
 			WHEN vendor_business_type_id IS NULL AND b.vendor_customer_code IS NOT NULL  THEN 'Y'
 			ELSE NULL END) as modified_flag
-	FROM fmsv_business_type a JOIN (SELECT distinct vendor_customer_code FROM etl.tmp_all_vendors) b ON a.vendor_customer_code = b.vendor_customer_code
+	FROM fmsv_business_type a JOIN (SELECT distinct vendor_customer_code FROM etl.tmp_all_vendors WHERE is_new_vendor = 'N') b ON a.vendor_customer_code = b.vendor_customer_code
 		FULL OUTER JOIN (SELECT g.vendor_customer_code, g.uniq_id, d.vendor_business_type_id,b.business_type_id, status, minority_type_id
-		                 FROM vendor_business_type d JOIN ref_business_type b ON d.business_type_id = b.business_type_id
-		                 JOIN vendor_history e ON e.vendor_history_id = d.vendor_history_id
-		                 JOIN etl.tmp_all_vendors g ON g.vendor_history_id = e.vendor_history_id ) as z ON a.vendor_customer_code = z.vendor_customer_code AND a.business_type_id=z.business_type_id
-						AND a.status = z.status AND COALESCE(a.minority_type_id,0) = COALESCE(z.minority_type_id,0)) b
-	WHERE a.vendor_customer_code = b.vendor_customer_code
-	AND a.is_new_vendor = 'N' and b.modified_flag = 'Y'; 
+		                 FROM vendor_business_type d , ref_business_type b , vendor_history e, etl.tmp_all_vendors g
+						WHERE  d.business_type_id = b.business_type_id AND e.vendor_history_id = d.vendor_history_id
+						AND g.vendor_history_id = e.vendor_history_id AND g.is_new_vendor = 'N' ) as z ON a.vendor_customer_code = z.vendor_customer_code AND a.business_type_id=z.business_type_id
+						AND a.status = z.status AND COALESCE(a.minority_type_id,0) = COALESCE(z.minority_type_id,0)) b WHERE b.modified_flag = 'Y') c
+	WHERE a.vendor_customer_code = c.vendor_customer_code
+	AND a.is_new_vendor = 'N'; 
 	
 	RAISE NOTICE 'VENDOR 3';
 
@@ -289,7 +292,7 @@ BEGIN
 	
 	INSERT INTO vendor_history(vendor_history_id, vendor_id, legal_name,alias_name,miscellaneous_vendor_flag ,vendor_sub_code,
     		load_id ,created_date)
-	SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,a.alias_nm,coalesce(a.misc_acct_fl,0)::bit,
+	SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,a.alias_nm,coalesce(a.misc_acct_fl,1)::bit,
 		NULL as vendor_sub_code,p_load_id_in as load_id, now()::timestamp
 	FROM	etl.tmp_all_vendors a JOIN etl.vendor_history_id_seq b ON a.uniq_id = b.uniq_id
 		JOIN etl.vendor_id_seq c ON a.uniq_id = c.uniq_id
