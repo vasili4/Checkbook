@@ -645,6 +645,17 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO webuser1;
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA etl TO webuser1;
 GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO webuser1;
 
+
+CREATE USER datafeeduser WITH PASSWORD 'datafeeduser';
+GRANT ALL ON database checkbook TO datafeeduser;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO datafeeduser;
+
+CREATE USER datafeeduser1 WITH PASSWORD 'datafeeduser1';
+GRANT CONNECT ON database checkbook TO datafeeduser1;
+SELECT grantaccess('datafeeduser1','SELECT');
+
+
+
 INSERT INTO etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag) values(13,'OASIS_feed.txt','20120523195328','D','Y','Y','N');
 
 /*

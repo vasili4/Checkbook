@@ -130,13 +130,19 @@ BEGIN
 	RAISE NOTICE 'VENDOR 02';
 	-- Identifying existing vendors for which legal/alias name changed 
 	
+	TRUNCATE etl.tmp_all_vendors_uniq_id ;
+	
+	INSERT INTO etl.tmp_all_vendors_uniq_id
+	SELECT uniq_id
+	FROM etl.tmp_all_vendors a , vendor b
+	WHERE a.vendor_customer_code = b.vendor_customer_code
+	AND a.is_new_vendor = 'N' AND (COALESCE(a.lgl_nm, '') <>  COALESCE(b.legal_name, '') OR COALESCE(a.alias_nm, '') <> COALESCE(b.alias_name, ''));
+	
+	
 	UPDATE etl.tmp_all_vendors a
 	SET is_name_changed = 'Y'
 	FROM
-	(SELECT uniq_id
-	FROM etl.tmp_all_vendors a , vendor b
-	WHERE a.vendor_customer_code = b.vendor_customer_code
-	AND a.is_new_vendor = 'N' AND (COALESCE(a.lgl_nm, '') <>  COALESCE(b.legal_name, '') OR COALESCE(a.alias_nm, '') <> COALESCE(b.alias_name, ''))) b
+	etl.tmp_all_vendors_uniq_id b
 	WHERE a.uniq_id = b.uniq_id AND a.is_new_vendor = 'N';
 
 	RAISE NOTICE 'VENDOR 1';
@@ -144,10 +150,10 @@ BEGIN
 
 	-- Identifying new addresses
 	
-	UPDATE etl.tmp_all_vendors a
-	SET is_address_new = 'Y'
-	FROM
-	(SELECT uniq_id
+	TRUNCATE etl.tmp_all_vendors_uniq_id ;
+	
+	INSERT INTO etl.tmp_all_vendors_uniq_id
+	SELECT uniq_id
 	FROM etl.tmp_all_vendors a LEFT JOIN address b
 	ON COALESCE(a.ad_ln_1,'') = COALESCE(b.address_line_1,'')
 	AND COALESCE(a.ad_ln_2,'') = COALESCE(b.address_line_2,'')
@@ -155,13 +161,20 @@ BEGIN
 	AND COALESCE(a.st,'') = COALESCE(b.state,'')
 	AND COALESCE(a.zip,'') = COALESCE(b.zip,'')
 	AND COALESCE(a.ctry,'') = COALESCE(b.country,'')
-	WHERE b.address_id IS NULL) b
+	WHERE b.address_id IS NULL ;
+	
+	UPDATE etl.tmp_all_vendors a
+	SET is_address_new = 'Y'
+	FROM
+	etl.tmp_all_vendors_uniq_id b
 	WHERE a.uniq_id = b.uniq_id ;
 	
 	-- Identifying existing vendors for which address information changed 
 	
-	UPDATE etl.tmp_all_vendors a
-	SET is_vendor_address_changed = 'Y'
+	TRUNCATE etl.tmp_all_vendors_uniq_id ;
+	
+	INSERT INTO etl.tmp_all_vendors_uniq_id
+	SELECT b.uniq_id
 	FROM
 	(SELECT m.uniq_id,vendor_address_id
 	FROM etl.tmp_all_vendors m 
@@ -179,9 +192,15 @@ BEGIN
 						AND COALESCE(m.zip,'') = COALESCE(z.zip,'')
 						AND COALESCE(m.ctry,'') = COALESCE(z.country,'')
 						WHERE m.is_new_vendor = 'N'
-						) b	
+						) b
+	WHERE b.vendor_address_id IS NULL;
+	
+	UPDATE etl.tmp_all_vendors a
+	SET is_vendor_address_changed = 'Y'
+	FROM
+	etl.tmp_all_vendors_uniq_id b
 	WHERE a.uniq_id = b.uniq_id
-	AND a.is_new_vendor = 'N' and b.vendor_address_id IS NULL;
+	AND a.is_new_vendor = 'N' ;
 
 	
 	
@@ -189,9 +208,11 @@ BEGIN
 
 	-- Identifying existing vendors for which vendor business type information changed 
 
-	UPDATE etl.tmp_all_vendors a
-	SET is_bus_type_changed = 'Y'
-	FROM
+	TRUNCATE etl.tmp_all_vendors_uniq_id ;
+	
+	INSERT INTO etl.tmp_all_vendors_uniq_id
+	SELECT distinct a.uniq_id
+	FROM etl.tmp_all_vendors a JOIN
 	(SELECT distinct vendor_customer_code FROM
 	(SELECT coalesce(z.vendor_customer_code, a.vendor_customer_code) as vendor_customer_code,
 		(CASE WHEN vendor_business_type_id IS NOT NULL AND b.vendor_customer_code IS NOT NULL THEN 'N' 
@@ -204,7 +225,13 @@ BEGIN
 						WHERE  d.business_type_id = b.business_type_id AND e.vendor_history_id = d.vendor_history_id
 						AND g.vendor_history_id = e.vendor_history_id AND g.is_new_vendor = 'N' ) as z ON a.vendor_customer_code = z.vendor_customer_code AND a.business_type_id=z.business_type_id
 						AND a.status = z.status AND COALESCE(a.minority_type_id,0) = COALESCE(z.minority_type_id,0)) b WHERE b.modified_flag = 'Y') c
-	WHERE a.vendor_customer_code = c.vendor_customer_code
+	ON a.vendor_customer_code = c.vendor_customer_code;
+	
+	
+	UPDATE etl.tmp_all_vendors a
+	SET is_bus_type_changed = 'Y'
+	FROM etl.tmp_all_vendors_uniq_id b	
+	WHERE a.uniq_id = b.uniq_id
 	AND a.is_new_vendor = 'N'; 
 	
 	RAISE NOTICE 'VENDOR 3';
@@ -309,17 +336,21 @@ BEGIN
 	
 	-- Updating vendor records which have been modified
 	
+	TRUNCATE etl.tmp_vendor_update ;
+	
+	INSERT INTO etl.tmp_vendor_update (vendor_id, legal_name, alias_name)
+	SELECT vendor_id, x.lgl_nm as legal_name , x.alias_nm as alias_name
+	FROM etl.tmp_all_vendors x, etl.vendor_history_id_seq y
+	WHERE	x.uniq_id = y.uniq_id AND x.is_new_vendor ='N' 
+	AND (x.is_name_changed='Y' OR x.is_vendor_address_changed = 'Y' OR x.is_bus_type_changed = 'Y') ;
+	
 	UPDATE vendor a
 	SET    	legal_name = b.legal_name,
 		alias_name = b.alias_name,
 		updated_load_id = p_load_id_in,
 		updated_date = now()::timestamp
 	FROM	
-	(SELECT vendor_id, x.lgl_nm as legal_name , x.alias_nm as alias_name
-	FROM etl.tmp_all_vendors x, etl.vendor_history_id_seq y
-	WHERE	x.uniq_id = y.uniq_id AND x.is_new_vendor ='N' 
-	AND (x.is_name_changed='Y' OR x.is_vendor_address_changed = 'Y' OR x.is_bus_type_changed = 'Y')
-	) b
+	etl.tmp_vendor_update b
 	WHERE a.vendor_id = b.vendor_id;
 
 	RAISE NOTICE 'VENDOR 7';

@@ -4297,7 +4297,16 @@ CREATE TABLE tmp_all_vendors(
 	address_type_code varchar(2)
 	)	DISTRIBUTED BY (uniq_id);
 	
+CREATE TABLE tmp_all_vendors_uniq_id(
+	uniq_id bigint
+	)	DISTRIBUTED BY (uniq_id);
 
+CREATE TABLE tmp_vendor_update (
+     	vendor_id integer,
+     	legal_name varchar(60), 
+		alias_name varchar(60)
+		)	DISTRIBUTED BY (vendor_id);	
+		
 	-- for contracts by indutry and size
 	
  CREATE TABLE stg_award_category_industry (

@@ -435,6 +435,19 @@ select  c.document_code as DOC_CD, e.agency_code  as DOC_DEPT_CD, b.document_cod
 select  c.document_code as DOC_CD, e.agency_code  as DOC_DEPT_CD, b.document_code_id as DOC_ID, b.document_version as DOC_VERS_NO, a.line_number as DOC_ACTG_LN_NO, a.check_amount as CHK_AM, a.agreement_accounting_line_number as RQPORF_ACTG_LN_NO, a.agreement_commodity_line_number as RQPORF_COMM_LN_NO, a.agreement_vendor_line_number as RQPORF_VEND_LN_NO from disbursement_line_item_details a , disbursement b, ref_document_code c, ref_agency_history d, ref_agency e where a.disbursement_id = b.disbursement_id  AND b.document_code_id = c.document_code_id AND b.agency_history_id = d.agency_history_id AND d.agency_id = e.agency_id AND  check_amount < 0 and b.document_version = 1 and agreement_id IS NOT NULL  AND (agreement_accounting_line_number = 0 OR agreement_commodity_line_number = 0) 
 
 
+Below is the criteria used to calculate the rfed amount for master agreements.
 
-		   
-		   
+For status Active :  The rfed_amount of master agreement is sum of  rfed_amount of all the latest contracts that were active until the fiscal year of master agreement.
+e.g.  If we are calculating the rfed amount of master agreement that is active in 2013 FY,  then we will consider sum of rfed_amount of latest child contracts that are active in or before 2013.
+
+For Status Registered:  The rfed_amount is master_agreement is the sum of rfed_amount all the original children contracts(first version).
+
+
+select * from etl.archive_fms_accounting_line where coalesce(rqporf_doc_dept_cd, '') <> '' AND coalesce(rqporf_doc_dept_cd, '') <> coalesce(rfed_doc_dept_cd, '') and file_type = 'F' and dept_cd ='098' AND obj_cd IN ('4000','4140','6000','6130','6150','6220','6650','6710','6780','6810','6820','6830','6860')
+
+select disbursement_number, agency_history_id
+from disbursement_line_item a
+WHERE disbursement_id in
+(select disbursement_id from disbursement where document_id in ('20110097082','20130221305','20120404596','20110251391','20130059701','20120173994','20120281705','20120196310','20120222794','20130079607','20100118971','20110088684','20120168349','20130151336','20120002794','20130186403','20100147973','20100182110','20110129683','20110163861','20120174680') and document_version = 1 and document_code_id = 17 and agency_history_id = 153)
+
+ 
