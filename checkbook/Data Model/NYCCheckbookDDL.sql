@@ -1538,6 +1538,7 @@ CREATE TABLE ref_amount_basis (
 CREATE TABLE employee (
   employee_id bigint PRIMARY KEY DEFAULT nextval('seq_employee_employee_id'::regclass) NOT NULL,
   employee_number varchar,
+  agency_id smallint,
   first_name varchar,
   last_name varchar,
   initial varchar,
@@ -1578,6 +1579,7 @@ CREATE TABLE payroll(
 	pay_cycle_code CHAR(1),
 	pay_date_id int,
 	employee_history_id bigint,
+	employee_number varchar(10),
 	payroll_number varchar,
 	job_sequence_number varchar,
 	agency_history_id smallint,
@@ -1636,6 +1638,7 @@ CREATE TABLE payroll_future_data(
 	pay_cycle_code CHAR(1),
 	pay_date_id int,
 	employee_history_id bigint,
+	employee_number varchar(10),
 	payroll_number varchar,
 	job_sequence_number varchar,
 	agency_history_id smallint,
@@ -1690,6 +1693,7 @@ CREATE TABLE aggregateon_payroll_employee_agency(
 	type_of_year char(1),
 	pay_frequency varchar,
 	type_of_employment varchar,
+	employee_number varchar(10),
 	start_date date,	
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
@@ -1747,6 +1751,7 @@ CREATE TABLE aggregateon_payroll_employee_agency_month(
 	month_id int,
 	pay_frequency varchar,
 	type_of_employment varchar,
+	employee_number varchar(10),
 	start_date date,	
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
@@ -2111,8 +2116,10 @@ invalid_reason varchar(255)
  
  -- payroll indexes on 12/08/2012
  
-  CREATE INDEX idx_civil_service_code_employee ON employee(civil_service_code);
-  CREATE INDEX idx_civil_service_code_employee_history ON employee_history(civil_service_code);
+  CREATE INDEX idx_agency_id_employee ON employee(agency_id);
+  CREATE INDEX idx_employee_number_employee ON employee(employee_number);
   CREATE INDEX idx_employee_id_employee_history ON employee_history(employee_id);
-   CREATE INDEX idx_employee_id_payroll ON payroll(employee_id);
+  CREATE INDEX idx_employee_id_payroll ON payroll(employee_id);
+  CREATE INDEX idx_agency_id_payroll ON payroll(agency_id);
+  CREATE INDEX idx_employee_number_payroll ON payroll(employee_number);
  

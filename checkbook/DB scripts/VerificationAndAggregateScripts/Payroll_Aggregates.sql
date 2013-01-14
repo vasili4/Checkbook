@@ -6,7 +6,8 @@ CREATE TABLE aggregateon_payroll_employee_agency(
 	fiscal_year_id smallint,
 	type_of_year char(1),
 	pay_frequency varchar,
-	type_of_employment varchar,
+	type_of_employment varchar,	
+	employee_number varchar(10),
 	start_date date,	
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
@@ -20,6 +21,7 @@ INSERT INTO aggregateon_payroll_employee_agency
 SELECT e.employee_id,e.agency_id,e.fiscal_year_id,'B' as type_of_year,
 	e.pay_frequency,
 	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,
+	min(e.employee_number) as employee_number,
 	min(e.agency_start_date) as agency_start_date,
 	max(annual_sal_table.annual_salary) as annual_salary,
 	SUM(base_pay) as base_pay,
@@ -43,7 +45,7 @@ FROM payroll e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number
 						AND e.agency_id = annual_sal_table.agency_id
 						AND e.amount_basis_id = annual_sal_table.amount_basis_id
 						AND e.pay_frequency = annual_sal_table.pay_frequency
-	JOIN ref_amount_basis z ON e.amount_basis_id = z.amount_basis_id	
+	JOIN ref_amount_basis z ON e.amount_basis_id = z.amount_basis_id
 GROUP BY 1,2,3,4,5,6;
 
 
@@ -51,6 +53,7 @@ INSERT INTO aggregateon_payroll_employee_agency
 SELECT e.employee_id,e.agency_id,e.calendar_fiscal_year_id,'C' as type_of_year,
 	e.pay_frequency,
 	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,	
+	min(e.employee_number) as employee_number,
 	min(e.agency_start_date) as agency_start_date,	
 	max(annual_sal_table.annual_salary) as annual_salary,
 	SUM(base_pay) as base_pay,
@@ -112,11 +115,11 @@ FROM
 	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 GROUP BY 1,2,3) X
 JOIN (SELECT employee_id, agency_id, fiscal_year_id, type_of_year, max(coalesce(annual_salary,0)) as  annual_salary
@@ -142,11 +145,11 @@ FROM
 	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 GROUP BY 1,2,3) X
 JOIN (SELECT employee_id, agency_id, fiscal_year_id, type_of_year, max(coalesce(annual_salary,0)) as  annual_salary
@@ -335,22 +338,22 @@ DISTRIBUTED BY (fiscal_year_id);
 
 INSERT INTO aggregateon_payroll_year
 SELECT fiscal_year_id,'B' as type_of_year,
-	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 	GROUP BY 1,2;
 
 
 INSERT INTO aggregateon_payroll_year
 SELECT calendar_fiscal_year_id,'C' as type_of_year,
-	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 	GROUP BY 1,2;
 	
@@ -368,6 +371,7 @@ CREATE TABLE aggregateon_payroll_employee_agency_month(
 	month_id int,
 	pay_frequency varchar,
 	type_of_employment varchar,
+	employee_number varchar(10),
 	start_date date,	
 	annual_salary numeric(16,2),
 	base_pay numeric(16,2),
@@ -382,6 +386,7 @@ INSERT INTO aggregateon_payroll_employee_agency_month
 SELECT e.employee_id,e.agency_id,e.fiscal_year_id,'B' as type_of_year,b.calendar_month_id,
 	e.pay_frequency,
 	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,	
+	min(e.employee_number) as employee_number,
 	min(e.agency_start_date) as agency_start_date,	
 	max(e.annual_salary) as annual_salary,
 	SUM(base_pay) as base_pay,
@@ -409,6 +414,7 @@ INSERT INTO aggregateon_payroll_employee_agency_month
 SELECT e.employee_id,e.agency_id,e.calendar_fiscal_year_id,'C' as type_of_year,b.calendar_month_id,
 	e.pay_frequency,
 	(CASE WHEN amount_basis_name='ANNUAL' THEN 'Salaried' ELSE 'Non-Salaried' END) as type_of_employment,	
+	min(e.employee_number) as employee_number,
 	min(e.agency_start_date) as agency_start_date,	
 	max(e.annual_salary) as annual_salary,
 	SUM(base_pay) as base_pay,
@@ -466,11 +472,11 @@ FROM
 	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 JOIN ref_date c ON a.pay_date_id = c.date_id
 GROUP BY 1,2,3,4) X
@@ -498,11 +504,11 @@ FROM
 	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay,
        SUM(overtime_pay) as overtime_pay,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 JOIN ref_date c ON a.pay_date_id = c.date_id
 GROUP BY 1,2,3,4) X
@@ -528,11 +534,11 @@ DISTRIBUTED BY (fiscal_year_id);
 
 INSERT INTO aggregateon_payroll_year_and_month
 SELECT fiscal_year_id,'B' as type_of_year,calendar_month_id,
-	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 	JOIN ref_date c ON a.pay_date_id = c.date_id
 	GROUP BY 1,2,3;
@@ -540,11 +546,11 @@ SELECT fiscal_year_id,'B' as type_of_year,calendar_month_id,
 
 INSERT INTO aggregateon_payroll_year_and_month
 SELECT calendar_fiscal_year_id,'C' as type_of_year,calendar_month_id,
-	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) +
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as total_employees,
-	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_id END)) as salaried_employees,
-	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_id END)) )::DECIMAL /2) as hourly_employees,
-	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_id END)) as total_overtime_employees
+	COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) +
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as total_employees,
+	       COUNT(DISTINCT (CASE WHEN  amount_basis_name='ANNUAL' THEN employee_number END)) as salaried_employees,
+	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
+	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 	JOIN ref_date c ON a.pay_date_id = c.date_id
 	GROUP BY 1,2,3;

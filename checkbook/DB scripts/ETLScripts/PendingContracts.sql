@@ -356,7 +356,7 @@ BEGIN
 	SELECT document_code_id,document_agency_id,con_no,parent_document_code_id,
 	      parent_document_agency_id,con_par_reg_num,con_cur_encumbrance as encumbrance_amount_original,(CASE WHEN con_cur_encumbrance IS NULL THEN 0 ELSE con_cur_encumbrance END) as encumbrance_amount, 
 	      con_original_max as original_maximum_amount_original, (CASE WHEN con_original_max IS NULL THEN 0 ELSE con_original_max END) as  original_maximum_amount, 
-	      con_rev_max as revised_maximum_amount_original, (CASE WHEN con_rev_max IS NULL THEN 0 ELSE con_rev_max END) as revised_maximum_amount,vc_legal_name,con_vc_code,con_purpose,
+	      con_rev_max as revised_maximum_amount_original, (CASE WHEN con_rev_max IS NULL THEN con_original_max ELSE con_rev_max END) as revised_maximum_amount,vc_legal_name,con_vc_code,con_purpose,
 	      submitting_agency_id,submitting_agency_desc,submitting_agency_code,awarding_agency_id,
 	      awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,
 	      am_desc,am_code,b.award_method_id,con_term_from,con_term_to,con_rev_start_dt,
@@ -366,13 +366,13 @@ BEGIN
 	      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,
 	      cif_received_date_id,con_trans_ad_code,document_agency_name,document_agency_short_name,
 	      original_agreement_id, funding_agency_id, funding_agency_code, funding_agency_name, funding_agency_short_name,
-	      coalesce(con_rev_max,0) - coalesce(con_original_max,0) as dollar_difference,
+	      coalesce(con_rev_max,con_original_max) - coalesce(con_original_max,0) as dollar_difference,
 		(CASE WHEN coalesce(con_original_max,0) = 0 THEN 0 ELSE 
-		ROUND((( coalesce(con_rev_max,0) - coalesce(con_original_max,0)) * 100 )::decimal / coalesce(con_original_max,0),2) END) as percent_difference,
+		ROUND((( coalesce(con_rev_max,con_original_max) - coalesce(con_original_max,0)) * 100 )::decimal / coalesce(con_original_max,0),2) END) as percent_difference,
 		original_or_modified, (CASE WHEN original_or_modified = 'M' THEN 'Modified' ELSE 'Original' END) as original_or_modified_desc,
-		(CASE WHEN con_rev_max IS NULL THEN 5 WHEN con_rev_max <= 5000 THEN 4 WHEN con_rev_max  > 5000 
-		            AND con_rev_max  <= 100000 THEN 3 WHEN  con_rev_max > 100000 AND con_rev_max <= 1000000 THEN 2 WHEN con_rev_max > 1000000 THEN 1 
-            ELSE 5 END) as award_size_id, award_category_id, (CASE WHEN lpad(a.cont_code,2,'0') = '05' THEN 1 ELSE c.industry_type_id END) as industry_type_id,
+		(CASE WHEN coalesce(con_rev_max,con_original_max) <= 5000 THEN 4 WHEN coalesce(con_rev_max,con_original_max)  > 5000 
+		            AND coalesce(con_rev_max,con_original_max)  <= 100000 THEN 3 WHEN  coalesce(con_rev_max,con_original_max) > 100000 AND coalesce(con_rev_max,con_original_max) <= 1000000 THEN 2 
+		            WHEN coalesce(con_rev_max,con_original_max) > 1000000 THEN 1 ELSE 5 END) as award_size_id, award_category_id, (CASE WHEN lpad(a.cont_code,2,'0') = '05' THEN 1 ELSE c.industry_type_id END) as industry_type_id,
             (CASE WHEN con_version = '' THEN 0 ELSE con_version::int END) as document_version, 'N' as latest_flag
 	FROM  etl.stg_pending_contracts a 
 	LEFT JOIN ref_award_method b ON (case when length(a.am_code)= 1 THEN lpad(a.am_code,2,'0') ELSE a.am_code END) = b.award_method_code

@@ -66,4 +66,17 @@ select count(*) from aggregateon_payroll_year ;
 select * from aggregateon_payroll_year limit 100;
 
 
+-- 2013/01/11
+
+
+select count(*) from etl.archive_payroll 
+
+select * from etl.archive_payroll limit 10
+
+select employee_number, count(distinct agency_code), group_concat(distinct agency_code) from etl.archive_payroll group by 1 having count(distinct agency_code) > 3
+
+select employee_number, civil_service_code, count(distinct agency_code) from etl.archive_payroll group by 1,2 having count(distinct agency_code) > 1
+
+
+select * from etl.archive_payroll where employee_number = '0991465' and fiscal_year = 2012 order by agency_code
 

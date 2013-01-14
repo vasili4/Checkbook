@@ -4058,10 +4058,10 @@ CREATE TABLE invalid_payroll (LIKE archive_payroll) DISTRIBUTED BY (uniq_id);
 CREATE TABLE payroll_id_seq(uniq_id bigint,payroll_id bigint default nextval('public.seq_payroll_payroll_id'))
 DISTRIBUTED BY (uniq_id);
 
-CREATE TABLE employee_id_seq(employee_number varchar,civil_service_code varchar,employee_id bigint default nextval('public.seq_employee_employee_id'))
+CREATE TABLE employee_id_seq(employee_number varchar,agency_id smallint,employee_id bigint default nextval('public.seq_employee_employee_id'))
 DISTRIBUTED BY (employee_number);
 
-CREATE TABLE employee_history_id_seq(employee_number varchar,civil_service_code varchar,employee_history_id bigint default nextval('public.seq_employee_history_employee_history_id'))
+CREATE TABLE employee_history_id_seq(employee_number varchar,agency_id smallint,employee_history_id bigint default nextval('public.seq_employee_history_employee_history_id'))
 DISTRIBUTED BY (employee_number);
 
 --------------------------------------------------------------------------------
@@ -4318,5 +4318,6 @@ CREATE TABLE tmp_vendor_update (
 
 -- Create Indexes
  -- payroll indexes on 12/08/2012
-CREATE INDEX idx_civil_service_code_stg_payroll ON etl.stg_payroll(civil_service_code);
+CREATE INDEX idx_agency_id_stg_payroll ON etl.stg_payroll(agency_id);
+CREATE INDEX idx_employee_number_stg_payroll ON etl.stg_payroll(employee_number);
 CREATE INDEX idx_load_id_etl_data_load_file ON etl.etl_data_load_file(load_id);
