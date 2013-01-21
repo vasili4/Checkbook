@@ -24,6 +24,7 @@ BEGIN
 	UPDATE etl.stg_payroll SET agency_code = lpad(agency_code,3,'0');
 	
 	
+	
 	CREATE TEMPORARY TABLE tmp_fk_emp_pms_values(uniq_id bigint,agency_history_id smallint,	agency_id smallint, agency_name varchar, agency_short_name varchar)
 	DISTRIBUTED BY (uniq_id);
 	

@@ -33,8 +33,6 @@ select 'aggregateon_spending_contract' as table_name , count(*) as num_records, 
 select 'aggregateon_spending_vendor' as table_name , count(*) as num_records, 'spending' as domain  from aggregateon_spending_vendor UNION 
 select 'aggregateon_spending_vendor_exp_object' as table_name , count(*) as num_records, 'spending' as domain  from aggregateon_spending_vendor_exp_object UNION
 select 'vendor' as table_name , count(*) as num_records, 'vendor' as domain  from vendor UNION 
-select 'vendor_address' as table_name , count(*) as num_records, 'vendor' as domain  from vendor_address UNION 
-select 'vendor_business_type' as table_name , count(*) as num_records, 'vendor' as domain  from vendor_business_type UNION 
 select 'ref_agency' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_agency UNION 
 select 'ref_department' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_department UNION 
 select 'ref_expenditure_object' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_expenditure_object UNION 
