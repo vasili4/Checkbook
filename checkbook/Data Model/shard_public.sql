@@ -1925,6 +1925,7 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
  	oca_number varchar(10),
 	version_number varchar(5),
 	contract_number varchar,
+	pending_contract_number varchar,
 	fms_parent_contract_number varchar,
 	submitting_agency_name varchar,
 	submitting_agency_short_name varchar,

@@ -4244,7 +4244,7 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
  	uniq_id bigint default nextval('seq_stg_pending_contracts_uniq_id'),
 	invalid_flag char(1),
 	invalid_reason varchar	
- );
+ ) DISTRIBUTED BY (uniq_id);
  
  CREATE TABLE archive_pending_contracts (LIKE stg_pending_contracts) DISTRIBUTED BY (uniq_id);
  ALTER TABLE archive_pending_contracts ADD COLUMN load_file_id bigint;

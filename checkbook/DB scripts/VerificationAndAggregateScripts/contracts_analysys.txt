@@ -450,4 +450,18 @@ from disbursement_line_item a
 WHERE disbursement_id in
 (select disbursement_id from disbursement where document_id in ('20110097082','20130221305','20120404596','20110251391','20130059701','20120173994','20120281705','20120196310','20120222794','20130079607','20100118971','20110088684','20120168349','20130151336','20120002794','20130186403','20100147973','20100182110','20110129683','20110163861','20120174680') and document_version = 1 and document_code_id = 17 and agency_history_id = 153)
 
+
+Data Correction:
+
+-- For development
  
+UPDATE history_agreement_accounting_line SET expenditure_object_history_id = 15720 WHERE expenditure_object_history_id = 17493 ;
+UPDATE history_agreement_accounting_line SET expenditure_object_history_id = 15050 WHERE expenditure_object_history_id = 17492 ;
+UPDATE history_agreement_accounting_line SET expenditure_object_history_id = 16786 WHERE expenditure_object_history_id = 17491 ;
+
+
+-- For production
+
+UPDATE history_agreement_accounting_line SET expenditure_object_history_id = 9855 WHERE expenditure_object_history_id = 17493 ;
+UPDATE history_agreement_accounting_line SET expenditure_object_history_id = 10110 WHERE expenditure_object_history_id = 17492 ;
+UPDATE history_agreement_accounting_line SET expenditure_object_history_id = 12681 WHERE expenditure_object_history_id = 17491 ;
