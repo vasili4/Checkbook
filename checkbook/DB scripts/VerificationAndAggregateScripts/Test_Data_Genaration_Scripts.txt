@@ -1,6 +1,6 @@
 -- Latest Scripts as of 2013-02-20
 
-
+/*
 Preliminary Requirements:
 Sample data would contain data only for Ten agencies.
 The data would span across multiple years-2010,2011 and 2012,2013.
@@ -36,7 +36,7 @@ Tables to be modified:
   Agency  Name
   Department Name
   
-  
+  */
 --  Reference Tables
 
 -- COA Agency
@@ -530,12 +530,105 @@ UPDATE etl.stg_con_po_vendor SET lgl_nm = 'VENDOR ' || vend_cust_cd, alias_nm = 
 DELETE FROM etl.stg_fms_accounting_line WHERE  rqporf_doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') ;
 
 
-select count(*), doc_dept_cd,  rqporf_doc_dept_cd from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819')  group by 2,3 order by 2 ;
+DROP TABLE IF EXISTS etl.stg_fms_header_mtr;
 
-select distinct a.* from etl.stg_fms_header a,
-(select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
-WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no  ;
+CREATE TABLE etl.stg_fms_header_mtr as SELECT distinct  a.* FROM etl.stg_fms_header a , (select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line) b WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no ;
 
-select distinct a.* from etl.stg_fms_vendor  a,
-(select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
-WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no ;
+DELETE FROM etl.stg_fms_header WHERE uniq_id NOT IN (select distinct uniq_id FROM etl.stg_fms_header_mtr);
+
+
+DROP TABLE IF EXISTS etl.stg_fms_vendor_mtr;
+
+CREATE TABLE etl.stg_fms_vendor_mtr as SELECT distinct  a.* FROM etl.stg_fms_vendor a , (select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line) b WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no ;
+
+DELETE FROM etl.stg_fms_vendor WHERE uniq_id NOT IN (select distinct uniq_id FROM etl.stg_fms_vendor_mtr);
+
+
+-- FMS Header
+
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'0','Y')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'2','T')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'3','I')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'4','S')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'5','H')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'6','R')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'7','E')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'8','D')  ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'9','M')  ;
+
+-- FMS Accounting Line
+
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'0','Y')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'2','T')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'3','I')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'4','S')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'5','H')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'6','R')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'7','E')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'8','D')  ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'9','M')  ;
+
+
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'0','M') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'1','A') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'2','N') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'3','Y') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'4','T') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'5','R') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'6','U') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'7','E') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'8','J') ;
+UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'9','D') ;
+
+-- FMS Vendor
+
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'0','Y')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'2','T')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'3','I')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'4','S')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'5','H')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'6','R')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'7','E')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'8','D')  ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'9','M')  ;
+
+
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'0','M') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'1','W') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'2','A') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'3','F') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'4','K') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'5','T') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'6','R') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'7','U') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'8','N') ;
+UPDATE etl.stg_fms_vendor SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
+
+
+UPDATE etl.stg_fms_vendor SET lgl_nm = 'VENDOR ' || vend_cust_cd, alias_nm = '', ad_ln_1 = 'Address Line 1' , ad_ln_2 = '' ;
+
+
+-- PAYROL Domain
+
+-- Payroll Detail file
+
+DROP TABLE IF EXISTS etl.stg_payroll_mtr;
+
+CREATE TABLE etl.stg_payroll_mtr as SELECT * from etl.archive_payroll where agency_code in ('781','003','102','130','810','836','126','127','819');
+
+TRUNCATE TABLE etl.stg_payroll ;
+
+ALTER TABLE etl.stg_payroll_mtr DROP COLUMN load_file_id;
+
+INSERT INTO etl.stg_payroll SELECT * FROM etl.stg_payroll_mtr;
+
+
+
+
+
+Payroll Summary:
+
+DELETE from etl.stg_payroll_summary  where agency NOT IN ('781','003','102','130','810','836','126','127','819') ;
