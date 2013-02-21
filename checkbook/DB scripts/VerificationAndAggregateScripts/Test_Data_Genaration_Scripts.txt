@@ -1,0 +1,541 @@
+-- Latest Scripts as of 2013-02-20
+
+
+Preliminary Requirements:
+Sample data would contain data only for Ten agencies.
+The data would span across multiple years-2010,2011 and 2012,2013.
+The data for few columns for spending, payroll and contracts domain would be changed to use sample data. 
+We will not be modifying the amounts  within contracts and spending domain as we have to match both these amounts as we include contracts and spending data within each domain.
+ 
+Note: We have identified few fields which are most commonly used within these three domains throughout the application to be updated to use sample data as listed below. Please let us know if there are any other fields that need to be masked for sample data.
+ 
+Sample Data Approach:
+1.       COA Elements :
+Tables to be modified:
+1.       Department(Agency)
+2.       Appropriation(Department)
+3.       Expenditure Object
+
+2.       Contracts Domain: Will be modifying contracts data for Ten Agencies. Fields to be modified are:-
+ Contract Number -  Make sure the relationships between child contracts and parent contracts are not broken as you rename both. 
+ Agency Name
+ Department Name
+ Vendor Name
+ Award Method Name
+ Contract Purpose
+ Contract Industry Name
+3.       Spending Domain : Will be modifying contracts data for Ten Agencies. Fields to be modified are:-
+  Disbursement Number
+  Vendor Name
+  Agency Name
+  Department Name
+  Expense Category Name
+4.       Payroll Domain: Will be modifying contracts data for Ten Agencies. Fields to be modified are:-
+ Civil Service Title. 
+  Employee Number
+  Agency  Name
+  Department Name
+  
+  
+--  Reference Tables
+
+-- COA Agency
+
+DELETE FROM etl.stg_agency WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB');
+
+UPDATE etl.stg_agency SET  agency_name = 'Accounting Department', agency_short_name = 'ACD'  where agency_code = '003' ;
+UPDATE etl.stg_agency SET  agency_name = 'Advertising Department', agency_short_name = 'ADD'  where agency_code = '042' ;
+UPDATE etl.stg_agency SET  agency_name = 'Asset Management', agency_short_name = 'ASM'  where agency_code = '102' ;
+UPDATE etl.stg_agency SET  agency_name = 'Customer Relations Department', agency_short_name = 'CRD'  where agency_code = '126' ;
+UPDATE etl.stg_agency SET  agency_name = 'Customer Service Department', agency_short_name = 'CSD'  where agency_code = '127' ;
+UPDATE etl.stg_agency SET  agency_name = 'Finance Department', agency_short_name = 'FID'  where agency_code = '130' ;
+UPDATE etl.stg_agency SET  agency_name = 'Human resources', agency_short_name = 'HRD'  where agency_code = '781' ;
+UPDATE etl.stg_agency SET  agency_name = 'Research And Development', agency_short_name = 'RAD'  where agency_code = '810' ;
+UPDATE etl.stg_agency SET  agency_name = 'Sales And Marketing', agency_short_name = 'SAM'  where agency_code = '819' ;
+UPDATE etl.stg_agency SET  agency_name = 'Public Relations', agency_short_name = 'PUR'  where agency_code = '836' ;
+
+-- COA Department
+
+DELETE FROM etl.stg_department WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB');
+
+DROP SEQUENCE IF EXISTS mtr_seq_temp_stg_ref_dept_name;
+
+CREATE SEQUENCE mtr_seq_temp_stg_ref_dept_name;
+
+DROP TABLE IF EXISTS mtr_change_deptname;
+
+CREATE TABLE mtr_change_deptname(
+	dept_id int PRIMARY KEY default nextval('mtr_seq_temp_stg_ref_dept_name'),
+	agency_code varchar(3),
+	department_code varchar(3),
+	agency_short_name varchar(5)
+	)
+DISTRIBUTED BY (dept_id);
+
+INSERT INTO mtr_change_deptname(agency_code, department_code, agency_short_name) SELECT distinct b.agency_code, b.department_code, a.agency_short_name from etl.stg_agency a, etl.stg_department b  WHERE a.agency_code = b.agency_code ;
+
+UPDATE etl.stg_department a 
+SET department_name = b.agency_short_name || ' DEPARTMENT ' || b.dept_id, 
+    department_short_name = b.agency_short_name || '_DEPT_' || b.dept_id
+FROM mtr_change_deptname b
+WHERE a.agency_code = b.agency_code AND a.department_code = b.department_code;
+
+-- COA Expenditure Object
+
+DROP SEQUENCE IF EXISTS mtr_seq_temp_stg_ref_exp_object_name;
+
+CREATE SEQUENCE mtr_seq_temp_stg_ref_exp_object_name;
+
+DROP TABLE IF EXISTS etl.stg_expenditure_object_mtr;
+
+
+CREATE TABLE etl.stg_expenditure_object_mtr(
+	exp_obj_id int PRIMARY KEY default nextval('mtr_seq_temp_stg_ref_exp_object_name'),
+	expenditure_object_code varchar(4)
+	)
+DISTRIBUTED BY (exp_obj_id);
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'AIR FARE ' || b.exp_obj_id , col5 = 'AF_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^0[0-4][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'CAR RENTAL ' || b.exp_obj_id , col5 = 'CR_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^0[5-6][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'ACCOMMODATION ' || b.exp_obj_id , col5 = 'AC_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^0[7-9][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'REAL PROPERTY LEASE ' || b.exp_obj_id , col5 = 'RPL_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^1[0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'BUILDING REPAIRS ' || b.exp_obj_id , col5 = 'BR_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^2[0-1][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'NATURAL GAS ' || b.exp_obj_id , col5 = 'NG_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^2[2-3][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'ELECTRICITY ' || b.exp_obj_id , col5 = 'EL_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^2[4-9][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'STOCKS ' || b.exp_obj_id , col5 = 'ST_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^3[0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'OFT TELECOMMUNICATIONS ' || b.exp_obj_id , col5 = 'OTC_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^40[0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'OFT COMPUTER SERVICES ' || b.exp_obj_id , col5 = 'OCS_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^4[1-2][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'TELEPHONE SERVICES ' || b.exp_obj_id , col5 = 'TS_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^4[3-5][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'IT TELECOMMUNICATION SERVICES ' || b.exp_obj_id , col5 = 'ITTS_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^4[6-8][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'IT SERVICES ' || b.exp_obj_id , col5 = 'ITS_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^49[0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'JURY SERVICES ' || b.exp_obj_id , col5 = 'JS_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^5[0-1][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'PRINTING ' || b.exp_obj_id , col5 = 'PR_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^5[2-9][0-9a-zA-Z]*$ ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'ADVERTISING ' || b.exp_obj_id , col5 = 'AD_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^6[0-3][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'VEHICLES ' || b.exp_obj_id , col5 = 'VH_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^6[4-5][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'STUDENT FEES ' || b.exp_obj_id , col5 = 'SF_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* ^6[6-9][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'MEDICAL EQUIPMENT ' || b.exp_obj_id , col5 = 'ME_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^7[0-1][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'HEALTH INSURANCE ' || b.exp_obj_id , col5 = 'HI_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^7[2-5][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'HOSPITAL MEDICARE ' || b.exp_obj_id , col5 = 'HM_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^7[6-9][0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'COMISSIONS ' || b.exp_obj_id , col5 = 'CO_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^8[0-9a-zA-Z]*$' ;
+
+UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'DIVIDENDS ' || b.exp_obj_id , col5 = 'DI_' || b.exp_obj_id
+FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^[9|[A-Za-z][0-9a-zA-Z]*$' ;
+
+
+-- COA LOCATION
+
+DELETE from etl.stg_location where agency_code NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB');
+
+-- COA Budget Code
+
+DELETE from etl.stg_budget_code where dept_cd NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB');
+
+-- COA Vendor
+
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'0','M') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'1','W') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'2','A') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'3','F') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'4','K') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'5','T') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'6','R') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'7','U') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'8','N') ;
+UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
+
+
+-- Contracts Domain
+
+ 
+
+-- Master Agreements
+
+
+DELETE from etl.stg_mag_header where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_mag_award_detail where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_mag_vendor where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+
+-- MAG header changes
+
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'0','M')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'2','N')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'3','Y')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'4','T')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'5','R')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'6','U')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'7','E')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'8','J')  ;
+UPDATE etl.stg_mag_header SET doc_id = replace(doc_id,'9','D')  ;
+
+UPDATE etl.stg_mag_header a 
+SET doc_dscr =  doc_cd || doc_dept_cd || doc_id || ' contract is for ' || b.agency_name 
+FROM etl.stg_agency b WHERE a.doc_dept_cd = b.agency_code;
+
+-- MAG Award Detail Changes
+
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_mag_award_detail SET doc_id = replace(doc_id,'9','D') ;
+
+
+-- MAG Vendor
+
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_mag_vendor SET doc_id = replace(doc_id,'9','D') ;
+
+
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'0','M') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'1','W') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'2','A') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'3','F') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'4','K') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'5','T') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'6','R') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'7','U') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'8','N') ;
+UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
+
+
+UPDATE etl.stg_mag_vendor SET lgl_nm = 'VENDOR ' || vend_cust_cd, alias_nm = '', ad_ln_1 = 'Address Line 1' , ad_ln_2 = '' ;
+
+
+Contracts :
+
+DELETE from etl.stg_con_ct_header where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_ct_accounting_line where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_ct_award_detail where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_ct_vendor where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+
+
+DELETE from etl.stg_con_do1_header where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_do1_accounting_line where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_do1_vendor where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+
+DELETE from etl.stg_con_po_header where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_po_accounting_line where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_po_award_detail where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_con_po_vendor where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+
+-- CT header changes
+
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'0','M'), oca_no = replace(oca_no,'0','M') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'1','A'), oca_no = replace(oca_no,'1','A') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'2','N'), oca_no = replace(oca_no,'2','N') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'3','Y'), oca_no = replace(oca_no,'3','Y') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'4','T'), oca_no = replace(oca_no,'4','T') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'5','R'), oca_no = replace(oca_no,'5','R') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'6','U'), oca_no = replace(oca_no,'6','U') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'7','E'), oca_no = replace(oca_no,'7','E') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'8','J'), oca_no = replace(oca_no,'8','J') ;
+UPDATE etl.stg_con_ct_header SET doc_id = replace(doc_id,'9','D'), oca_no = replace(oca_no,'9','D') ;
+
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'0','M')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'1','A')) ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'2','N')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'3','Y')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'4','T')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'5','R')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'6','U')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'7','E')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'8','J')  ;
+UPDATE etl.stg_con_ct_header SET agree_doc_id = replace(agree_doc_id,'9','D')  ;
+
+
+
+UPDATE etl.stg_con_ct_header a 
+SET doc_dscr =  a.doc_cd || a.doc_dept_cd || a.doc_id || ' contract is for ' || b.agency_name 
+FROM etl.stg_agency b WHERE a.doc_dept_cd = b.agency_code;
+
+UPDATE etl.stg_con_ct_header SET agree_doc_dept_cd = doc_dept_cd ;
+
+-- CT accounting line changes
+
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_ct_accounting_line SET doc_id = replace(doc_id,'9','D') ;
+
+-- CT Award Detail Changes
+
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_ct_award_detail SET doc_id = replace(doc_id,'9','D') ;
+
+
+-- CT Vendor
+
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_ct_vendor SET doc_id = replace(doc_id,'9','D') ;
+
+
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'0','M') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'1','W') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'2','A') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'3','F') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'4','K') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'5','T') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'6','R') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'7','U') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'8','N') ;
+UPDATE etl.stg_con_ct_vendor SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
+
+
+UPDATE etl.stg_con_ct_vendor SET lgl_nm = 'VENDOR ' || vend_cust_cd, alias_nm = '', ad_ln_1 = 'Address Line 1' , ad_ln_2 = '' ;
+
+
+-- DO header changes
+
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'0','M')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'2','N')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'3','Y')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'4','T')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'5','R')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'6','U')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'7','E')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'8','J')  ;
+UPDATE etl.stg_con_do1_header SET doc_id = replace(doc_id,'9','D')  ;
+
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'0','M')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'1','A')) ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'2','N')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'3','Y')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'4','T')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'5','R')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'6','U')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'7','E')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'8','J')  ;
+UPDATE etl.stg_con_do1_header SET agree_doc_id = replace(agree_doc_id,'9','D')  ;
+
+
+UPDATE etl.stg_con_do1_header a 
+SET doc_dscr =  a.doc_cd || a.doc_dept_cd || a.doc_id || ' contract is for ' || b.agency_name 
+FROM etl.stg_agency b WHERE a.doc_dept_cd = b.agency_code;
+
+UPDATE etl.stg_con_do1_header SET agree_doc_dept_cd = doc_dept_cd ;
+
+-- DO accounting line changes
+
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_do1_accounting_line SET doc_id = replace(doc_id,'9','D') ;
+
+
+-- DO Vendor
+
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_do1_vendor SET doc_id = replace(doc_id,'9','D') ;
+
+
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'0','M') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'1','W') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'2','A') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'3','F') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'4','K') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'5','T') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'6','R') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'7','U') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'8','N') ;
+UPDATE etl.stg_con_do1_vendor SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
+
+
+UPDATE etl.stg_con_do1_vendor SET lgl_nm = 'VENDOR ' || vend_cust_cd, alias_nm = '', ad_ln_1 = 'Address Line 1' , ad_ln_2 = '' ;
+
+
+-- PO header changes
+
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'0','M')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'2','N')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'3','Y')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'4','T')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'5','R')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'6','U')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'7','E')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'8','J')  ;
+UPDATE etl.stg_con_po_header SET doc_id = replace(doc_id,'9','D')  ;
+
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'0','M')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'1','A')) ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'2','N')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'3','Y')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'4','T')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'5','R')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'6','U')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'7','E')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'8','J')  ;
+UPDATE etl.stg_con_po_header SET agree_doc_id = replace(agree_doc_id,'9','D')  ;
+
+UPDATE etl.stg_con_po_header a 
+SET doc_dscr =  a.doc_cd || a.doc_dept_cd || a.doc_id || ' contract is for ' || b.agency_name 
+FROM etl.stg_agency b WHERE a.doc_dept_cd = b.agency_code;
+
+UPDATE etl.stg_con_po_header SET agree_doc_dept_cd = doc_dept_cd ;
+
+-- PO accounting line changes
+
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_po_accounting_line SET doc_id = replace(doc_id,'9','D') ;
+
+-- PO Award Detail Changes
+
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_po_award_detail SET doc_id = replace(doc_id,'9','D') ;
+
+
+-- PO Vendor
+
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'0','M') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'1','A') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'2','N') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'3','Y') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'4','T') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'5','R') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'6','U') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'7','E') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'8','J') ;
+UPDATE etl.stg_con_po_vendor SET doc_id = replace(doc_id,'9','D') ;
+
+
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'0','M') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'1','W') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'2','A') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'3','F') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'4','K') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'5','T') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'6','R') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'7','U') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'8','N') ;
+UPDATE etl.stg_con_po_vendor SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
+
+
+UPDATE etl.stg_con_po_vendor SET lgl_nm = 'VENDOR ' || vend_cust_cd, alias_nm = '', ad_ln_1 = 'Address Line 1' , ad_ln_2 = '' ;
+
+
+
+-- Spending Domain
+
+
+DELETE FROM etl.stg_fms_accounting_line WHERE  rqporf_doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') ;
+
+
+select count(*), doc_dept_cd,  rqporf_doc_dept_cd from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819')  group by 2,3 order by 2 ;
+
+select distinct a.* from etl.stg_fms_header a,
+(select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
+WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no  ;
+
+select distinct a.* from etl.stg_fms_vendor  a,
+(select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
+WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no ;

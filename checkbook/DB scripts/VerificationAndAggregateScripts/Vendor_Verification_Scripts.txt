@@ -47,3 +47,39 @@ UNION
 select * from etl.archive_payroll where employee_number like '%134830' and payroll_number = '015' and pay_date in ('2011-01-06','2011-01-07', '2011-01-20','2011-02-18','2011-02-04')
 UNION
 select * from etl.archive_payroll where employee_number like '%134880' and payroll_number = '015' and pay_date in ('2011-02-18','2011-02-04') order by employee_number, pay_date) TO '/home/gpadmin/TREDDY/payroll_data_from_source_for_highlighted.csv' CSV HEADER
+
+
+
+
+-- 02/12/2013
+
+
+select * from vendor where legal_name ilike '%PRO_METAL%'  -- 8343
+
+select * from vendor_history where vendor_id = 8343
+
+select * from vendor_business_type where vendor_history_id in (179398, 5798, 143699, 171630) order by vendor_history_id
+
+select * from ref_business_type 
+
+select * from ref_minority_type order by minority_type_id
+
+select * from vendor where legal_name ilike '%EXCELLENT CONS%'  -- 11206
+select * from vendor_history where vendor_id = 11206
+select * from vendor_business_type where vendor_history_id in (16906, 119724) order by vendor_history_id
+
+select * from fmsv_business_type where vendor_customer_code in ('0002499381','0002840820')
+
+select * from etl.stg_fmsv_business_type where vend_cust_cd in ('0002499381','0002840820')
+
+select * from etl.stg_fmsv_business_type where bus_typ = 'WMNO'
+
+select count(*), bus_typ from etl.stg_fmsv_business_type where min_typ IS NULL AND bus_typ_sta = 2 group by 2
+
+88;"LOCB"
+3;"EENT"
+1939;"WMNO"
+138;"EXMP"
+
+
+select count(*), bus_typ from etl.stg_fmsv_business_type where bus_typ_sta = 2 group by 2

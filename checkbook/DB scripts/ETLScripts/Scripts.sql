@@ -186,7 +186,7 @@ BEGIN
 		END LOOP; 
 
 	-- Copying the malformed records to the respective malformed tables
-	CREATE TEMPORARY TABLE tmp_malformed(col1 varchar);
+	CREATE TEMPORARY TABLE tmp_malformed(col1 varchar) DISTRIBUTED BY (col1);
 	
 	copy tmp_malformed from '/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/PreProcessing_DataFiles/badfile.txt';
 	

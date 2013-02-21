@@ -607,7 +607,8 @@ BEGIN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'P',l_count,'# of records inserted into payroll');
 	
-		
+	/*	
+	 
 	INSERT INTO payroll_future_data 
 	SELECT * FROM payroll
 	WHERE job_id =  l_job_id AND pay_date > CURRENT_DATE ;
@@ -626,6 +627,20 @@ BEGIN
 	
 	DELETE FROM payroll_future_data
 	WHERE job_id = l_job_id AND pay_date <= CURRENT_DATE ;
+	
+	*/
+	
+	UPDATE payroll_future_data
+	SET job_id = l_job_id ;
+	
+	INSERT INTO payroll
+	SELECT * FROM payroll_future_data
+	WHERE job_id = l_job_id ;
+	
+	
+	DELETE FROM payroll_future_data
+	WHERE job_id = l_job_id  ;
+	
 	
 	
 	-- Updating the gross pay YTD based on budget fiscal year

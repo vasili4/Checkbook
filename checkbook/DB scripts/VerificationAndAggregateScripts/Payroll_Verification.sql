@@ -173,3 +173,30 @@ INSERT INTO etl.etl_data_load_file(load_file_id, load_id, file_name, file_timest
 
 
 select count(*) from etl.ext_stg_pms_data_feed
+
+
+-- 2013-02-15
+
+select count(*), pay_date, pay_cycle_code from payroll where gross_pay_ytd IS NULL  group by 2,3 order by 2 
+7526;"2013-02-08";"A"
+245;"2013-02-14";"Y"
+17491;"2013-02-14";"E"
+964;"2013-02-14";"R"
+7519;"2013-02-15";"A"
+172282;"2013-02-15";"D"
+111065;"2013-02-15";"Q"
+
+
+
+select count(*), pay_date, pay_cycle_code from payroll where pay_date > '2013-02-01' group by 2,3 order by pay_date
+
+18;"2013-02-06";"X"
+7526;"2013-02-08";"A"
+587;"2013-02-14";"X"
+245;"2013-02-14";"Y"
+17491;"2013-02-14";"E"
+964;"2013-02-14";"R"
+172571;"2013-02-15";"D"
+7519;"2013-02-15";"A"
+111065;"2013-02-15";"Q"
+37441;"2013-02-20";"T"
