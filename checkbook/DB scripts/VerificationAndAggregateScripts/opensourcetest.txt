@@ -1,0 +1,86 @@
+--ct contracts
+
+create table etl.stg_con_ct_header_td as select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,max_cntrc_am,open_acrl_am,amend_no,cntrc_sta,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cntrct_strt_dt,cntrct_end_dt,hear_dt,psr_req_dt,proc_ini_dt,cited_auth,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,clsd_am,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,pc_chng_max_am,wf_pc_chng_max_am,wf_tot_max_am,orig_max_am,enc_am,out_am,rfed_am,rfed_lqd_am,oca_no,orig_cntrc_strt_dt,orig_cntrc_end_dt,reg_dt,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,issr_id,issr_nm,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_ph_ext,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,cmr_doc_cd,cmr_doc_dept_cd,cmr_doc_id,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd from etl.stg_con_ct_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_ct_accounting_line_td as select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rel_actg_ln,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,sp_inst_cd,rl_fl_1,rl_fl_2 from etl.stg_con_ct_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_ct_award_detail_td as select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,clsd_typ_cd,ctcat_cd_1,multi_cat_fl,ctcat_cd_2,ctcat_cd_3,ctcat_cd_4,ctcat_cd_5,resp_ct,out_of_no_so,loc_serv,loc_zip,brgh_cd,blck_cd,lot_cd,coun_dist_cd,rnew_cd,cntrc_mwbe_fl,tar_utl_pc,tar_utl_am,comp_crt_cd_1,comp_cri_resp_1,comp_crt_cd_2,comp_cri_resp_2,comp_crt_cd_3,comp_cri_resp_3,comp_crt_cd_4,comp_cri_resp_4,comp_crt_cd_5,comp_cri_resp_5,non_comp_reas,cons_reas_cd_1,cons_reas_cd_2,red_adv,constr_rel_fl,extrn_so_no,liq_dmg_chrg,req_prf_pay_bnd_fl,res_no_per_bnd,cnt_req_ins_pol_fl,wk_site_cd_01,wk_site_cd_02,wk_site_cd_03,wk_site_cd_04,wk_site_cd_05,wk_site_cd_06,wk_site_cd_07,wk_site_cd_08,wk_site_cd_09,wk_site_cd_10,percent_01,percent_02,percent_03,percent_04,percent_05,percent_06,percent_07,percent_08,percent_09,percent_10 from etl.stg_con_ct_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_ct_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,web_ad,cntac_id,vend_pref_lvl,alias_nm,lgl_nm,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,tin_ein,tin_ssn,mod_fl,disc_1_dy,disc_2_dy,disc_3_dy,disc_4_dy,disc_1_pc,disc_2_pc,disc_3_pc,disc_4_pc,disc_alw_1_fl,disc_alw_2_fl,disc_alw_3_fl,disc_alw_4_fl from etl.stg_con_ct_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+
+select * from etl.stg_con_ct_header_td;
+select * from etl.stg_con_ct_accounting_line_td;
+select * from etl.stg_con_ct_award_detail_td;
+select * from etl.stg_con_ct_vendor_td;
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--do1 contracts
+
+create table etl.stg_con_do1_header_td as select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,amend_no,pcard_rec_id,pcard_expr_dt,actg_prfl_id,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cnfrm_ord,blkt_agr_fl,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd from etl.stg_con_do1_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_do1_accounting_line_td as select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2 from etl.stg_con_do1_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_do1_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl from etl.stg_con_do1_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+
+select * from etl.stg_con_do1_header_td;
+select * from etl.stg_con_do1_accounting_line_td;
+select * from etl.stg_con_do1_vendor_td;
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- po contracts
+
+create table etl.stg_con_po_header_td as select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,max_cntrc_am,amend_no,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cntrct_strt_dt,cntrct_end_dt,psr_req_dt,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,trkg_no,brd_awd_no,brd_awd_dt,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_ph_ext,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd from etl.stg_con_po_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_po_accounting_line_td as select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2 from etl.stg_con_po_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_po_award_detail_td as select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,ctcat_cd_1,resp_ct,out_of_no_so,constr_rel_fl,extrn_so_no,wk_site_cd_01,percent_01,wk_site_cd_02,percent_02,wk_site_cd_03,percent_03,wk_site_cd_04,percent_04,wk_site_cd_05,percent_05,wk_site_cd_06,percent_06,wk_site_cd_07,percent_07,wk_site_cd_08,percent_08,wk_site_cd_09,percent_09,wk_site_cd_10,percent_10 from etl.stg_con_po_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+create table etl.stg_con_po_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,alias_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl from etl.stg_con_po_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+
+
+select * from etl.stg_con_po_header_td;
+select * from etl.stg_con_po_accounting_line_td;
+select * from etl.stg_con_po_award_detail_td;
+select * from etl.stg_con_po_vendor_td;
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--spending
+
+
+create table etl.stg_fms_header_td as select 'H' as line_rec, a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_rec_dt_dc,a.doc_bfy,a.doc_fy_dc,a.doc_per_dc,a.chk_eft_am,a.chk_eft_iss_dt,
+a.chk_eft_rec_dt,a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,a.ln_am,a.disc_am,a.intr_am,a.bkup_whld_am,a.inct_am,a.rtg_am
+ from etl.stg_fms_header a,
+(select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
+WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no;
+
+create table etl.stg_fms_accounting_line_td as select 'A' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.doc_actg_ln_no,a.dept_cd,a.bfy,a.fy_dc,a.per_dc,a.rfed_doc_cd,a.rfed_doc_dept_cd,a.rfed_doc_id,a.rfed_doc_vers_no,a.rfed_vend_ln_no,a.rfed_comm_ln_no,a.rfed_actg_ln_no,a.rqporf_doc_cd,a.rqporf_doc_dept_cd,a.rqporf_doc_id,a.rqporf_vend_ln_no,a.rqporf_comm_ln_no,a.rqporf_actg_ln_no,a.disc_ln_am,a.intr_ln_am,a.bkup_whld_ln_am,a.inct_ln_am,a.rtg_ln_am,a.chk_amt,a.fcls_cd,a.fund_cd,a.sfund_cd,a.unit_cd,a.sunit_cd,a.appr_cd,a.obj_cd,a.sobj_cd,a.rsrc_cd,a.srsrc_cd,a.bsa_cd,a.dobj_cd,a.drsrc_cd,a.loc_cd,a.sloc_cd,a.actv_cd,a.func_cd,a.rpt_cd from etl.stg_fms_accounting_line a where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+
+create table etl.stg_fms_vendor_td as  select 'V' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.vend_cust_cd,a.lgl_nm,a.alias_nm,a.ad_id,a.org_cls,a.misc_acct_fl,a.ad_ln_1,a.ad_ln_2,a.ctry,a.st,a.zip,a.city from etl.stg_fms_vendor  a,
+(select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
+WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no ;
+
+
+
+select * from  etl.stg_fms_header_td;
+select * from  etl.stg_fms_accounting_line_td;
+select * from  etl.stg_fms_vendor_td
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--payroll
+
+create table etl.payroll_td as select pay_cycle_code,pay_date,employee_number,payroll_number,job_sequence_number,agency_code,agency_start_date,fiscal_year,
+orig_pay_cycle_code,orig_pay_date,pay_frequency,last_name,department_code,annual_salary,amount_basis,base_pay,overtime_pay,other_payments,gross_pay,
+civil_service_code,civil_service_level,civil_service_suffix,civil_service_title
+ from etl.archive_payroll where agency_code in ('781','003','102','130','810','836','126','127','819') ;
+ 
+ 
+ select * from etl.payroll_td;
+ 
+ --payroll summary
+ 
+ create table etl.payroll_summary_td as select pay_cycle,pay_date,pyrl_no,pyrl_desc,uoa,uoa_name,pms_fy,object,object_desc,agency,pms_agency_name,bud_code,bud_code_desc,total_amt 
+ from etl.archive_payroll_summary  where agency in ('781','003','102','130','810','836','126','127','819') ;
+
+ select * from etl.payroll_summary_td 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
