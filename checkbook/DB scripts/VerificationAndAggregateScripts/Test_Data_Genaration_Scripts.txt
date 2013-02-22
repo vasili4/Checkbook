@@ -194,9 +194,9 @@ UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'9','E
 -- Master Agreements
 
 
-DELETE from etl.stg_mag_header where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
-DELETE from etl.stg_mag_award_detail where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
-DELETE from etl.stg_mag_vendor where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') group by 2 order by 1 asc ;
+DELETE from etl.stg_mag_header where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') ;
+DELETE from etl.stg_mag_award_detail where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819')  ;
+DELETE from etl.stg_mag_vendor where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819') ;
 
 -- MAG header changes
 
@@ -258,7 +258,7 @@ UPDATE etl.stg_mag_vendor SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
 UPDATE etl.stg_mag_vendor SET lgl_nm = 'VENDOR ' || vend_cust_cd, alias_nm = '', ad_ln_1 = 'Address Line 1' , ad_ln_2 = '' ;
 
 
-Contracts :
+--Contracts :
 
 DELETE from etl.stg_con_ct_header where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819');
 DELETE from etl.stg_con_ct_accounting_line where doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819');
@@ -547,7 +547,7 @@ DELETE FROM etl.stg_fms_vendor WHERE uniq_id NOT IN (select distinct uniq_id FRO
 -- FMS Header
 
 UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'0','Y')  ;
-UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'1','A') ;
 UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'2','T')  ;
 UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'3','I')  ;
 UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'4','S')  ;
@@ -560,7 +560,7 @@ UPDATE etl.stg_fms_header SET doc_id = replace(doc_id,'9','M')  ;
 -- FMS Accounting Line
 
 UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'0','Y')  ;
-UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'1','A') ;
 UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'2','T')  ;
 UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'3','I')  ;
 UPDATE etl.stg_fms_accounting_line SET doc_id = replace(doc_id,'4','S')  ;
@@ -585,7 +585,7 @@ UPDATE etl.stg_fms_accounting_line SET rqporf_doc_id = replace(rqporf_doc_id,'9'
 -- FMS Vendor
 
 UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'0','Y')  ;
-UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'1','A')) ;
+UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'1','A') ;
 UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'2','T')  ;
 UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'3','I')  ;
 UPDATE etl.stg_fms_vendor SET doc_id = replace(doc_id,'4','S')  ;
@@ -629,6 +629,6 @@ INSERT INTO etl.stg_payroll SELECT * FROM etl.stg_payroll_mtr;
 
 
 
-Payroll Summary:
+--Payroll Summary:
 
 DELETE from etl.stg_payroll_summary  where agency NOT IN ('781','003','102','130','810','836','126','127','819') ;
