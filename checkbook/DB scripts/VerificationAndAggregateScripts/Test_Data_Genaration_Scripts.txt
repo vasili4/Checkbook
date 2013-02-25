@@ -86,7 +86,7 @@ UPDATE etl.stg_agency SET  agency_name = 'Misc Department5', agency_short_name =
 
 -- COA Department
 
-DELETE FROM etl.stg_department WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820',,'806','131','826','801','072');
+DELETE FROM etl.stg_department WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820','806','131','826','801','072');
 
 DROP SEQUENCE IF EXISTS mtr_seq_temp_stg_ref_dept_name cascade;
 
@@ -199,11 +199,11 @@ FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expe
 
 -- COA LOCATION
 
-DELETE from etl.stg_location where agency_code NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820',,'806','131','826','801','072');
+DELETE from etl.stg_location where agency_code NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820','806','131','826','801','072');
 
 -- COA Budget Code
 
-DELETE from etl.stg_budget_code where dept_cd NOT IN (('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820',,'806','131','826','801','072');
+DELETE from etl.stg_budget_code where dept_cd NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820','806','131','826','801','072');
 
 -- COA Vendor
 
