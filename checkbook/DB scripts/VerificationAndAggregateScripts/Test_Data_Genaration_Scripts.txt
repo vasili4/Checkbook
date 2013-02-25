@@ -733,4 +733,56 @@ FROM mtr_change_deptname b
 WHERE a.agency = b.agency_code AND a.uoa = b.department_code;
 
 
+-- PENDING Contracts
+
+
+DELETE from etl.stg_pending_contracts where con_trans_ad_code in ('781','003','102','042','130','810','836','126','127','819') ;
+
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'0','M') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'1','A') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'2','N') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'3','Y') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'4','T') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'5','R') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'6','U') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'7','E') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'8','J') ;
+UPDATE etl.stg_pending_contracts SET con_no = replace(con_no,'9','D') ;
+
+
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'0','M') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'1','A') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'2','N') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'3','Y') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'4','T') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'5','R') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'6','U') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'7','E') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'8','J') ;
+UPDATE etl.stg_pending_contracts SET con_par_reg_num = replace(con_par_reg_num,'9','D') ;
+
+
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'0','M') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'1','W') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'2','A') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'3','F') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'4','K') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'5','T') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'6','R') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'7','U') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'8','N') ;
+UPDATE etl.stg_pending_contracts SET con_vc_code = replace(con_vc_code,'9','E') ;
+
+UPDATE etl.stg_pending_contracts SET vc_legal_name = 'VENDOR ' || con_vc_code ;
+
+UPDATE etl.stg_pending_contracts a 
+SET submitting_agency_desc = b.agency_name 
+FROM etl.stg_agency b 
+WHERE a.submitting_agency_code = b.agency_code;
+
+
+UPDATE etl.stg_pending_contracts a 
+SET awarding_agency_desc = b.agency_name 
+FROM etl.stg_agency b 
+WHERE a.awarding_agency_code = b.agency_code;
 
