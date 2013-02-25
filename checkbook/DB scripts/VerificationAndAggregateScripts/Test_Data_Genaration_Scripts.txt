@@ -1,5 +1,7 @@
 -- Latest Scripts as of 2013-02-20
 
+
+-- Accounting|Advertising|Asset Management|Customer Relations|Customer Service|Finances|Human Resources|Legal Department|Media Relations|Payroll|Public Relations|Quality Assurance|Sales and Marketing|Research and Development|Tech Support
 /*
 Preliminary Requirements:
 Sample data would contain data only for Ten agencies.
@@ -37,11 +39,18 @@ Tables to be modified:
   Department Name
   
   */
+  
+  
+  -- needs to add agencies with the codes (added)  '057','068','072','095','103','131','156','801','806','816','820','826','827','841','856','858'
+  
+  
+
+
 --  Reference Tables
 
 -- COA Agency
 
-DELETE FROM etl.stg_agency WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB');
+DELETE FROM etl.stg_agency WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820','806','131','826','801','072');
 
 UPDATE etl.stg_agency SET  agency_name = 'Accounting Department', agency_short_name = 'ACD'  where agency_code = '003' ;
 UPDATE etl.stg_agency SET  agency_name = 'Advertising Department', agency_short_name = 'ADD'  where agency_code = '042' ;
@@ -54,9 +63,30 @@ UPDATE etl.stg_agency SET  agency_name = 'Research And Development', agency_shor
 UPDATE etl.stg_agency SET  agency_name = 'Sales And Marketing', agency_short_name = 'SAM'  where agency_code = '819' ;
 UPDATE etl.stg_agency SET  agency_name = 'Public Relations', agency_short_name = 'PUR'  where agency_code = '836' ;
 
+UPDATE etl.stg_agency SET  agency_name = 'Quality Assurance', agency_short_name = 'QAD'  where agency_code = '856' ;
+UPDATE etl.stg_agency SET  agency_name = 'Legal Department', agency_short_name = 'LED'  where agency_code = '827' ;
+UPDATE etl.stg_agency SET  agency_name = 'Media Relations', agency_short_name = 'MRD'  where agency_code = '858' ;
+UPDATE etl.stg_agency SET  agency_name = 'IT Department', agency_short_name = 'ITD'  where agency_code = '156' ;
+UPDATE etl.stg_agency SET  agency_name = 'Technology Support', agency_short_name = 'TSD'  where agency_code = '068' ;
+
+UPDATE etl.stg_agency SET  agency_name = 'Fire Department', agency_short_name = 'FID'  where agency_code = '095' ;
+UPDATE etl.stg_agency SET  agency_name = 'Development Board', agency_short_name = 'DEB'  where agency_code = '816' ;
+UPDATE etl.stg_agency SET  agency_name = 'Manufacture Department', agency_short_name = 'MAD'  where agency_code = '103' ;
+UPDATE etl.stg_agency SET  agency_name = 'TeleCommunications Department', agency_short_name = 'TCD'  where agency_code = '841' ;
+UPDATE etl.stg_agency SET  agency_name = 'Airport Development', agency_short_name = 'AID'  where agency_code = '820' ;
+
+UPDATE etl.stg_agency SET  agency_name = 'Misc Department1', agency_short_name = 'MID1'  where agency_code = '806' ;
+UPDATE etl.stg_agency SET  agency_name = 'Misc Department2', agency_short_name = 'MID2'  where agency_code = '131' ;
+UPDATE etl.stg_agency SET  agency_name = 'Misc Department3', agency_short_name = 'MID3'  where agency_code = '826' ;
+UPDATE etl.stg_agency SET  agency_name = 'Misc Department4', agency_short_name = 'MID4'  where agency_code = '801' ;
+UPDATE etl.stg_agency SET  agency_name = 'Misc Department5', agency_short_name = 'MID5'  where agency_code = '072' ;
+
+
+
+
 -- COA Department
 
-DELETE FROM etl.stg_department WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB');
+DELETE FROM etl.stg_department WHERE agency_code NOT IN  ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820',,'806','131','826','801','072');
 
 DROP SEQUENCE IF EXISTS mtr_seq_temp_stg_ref_dept_name cascade;
 
@@ -94,6 +124,8 @@ CREATE TABLE etl.stg_expenditure_object_mtr(
 	expenditure_object_code varchar(4)
 	)
 DISTRIBUTED BY (exp_obj_id);
+
+INSERT INTO etl.stg_expenditure_object_mtr(expenditure_object_code) select distinct expenditure_object_code from etl.stg_expenditure_object;
 
 UPDATE etl.stg_expenditure_object a set expenditure_object_name = 'AIR FARE ' || b.exp_obj_id , col5 = 'AF_' || b.exp_obj_id
 FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expenditure_object_code AND a.expenditure_object_code ~* '^0[0-4][0-9a-zA-Z]*$' ;
@@ -167,11 +199,11 @@ FROM   etl.stg_expenditure_object_mtr b where a.expenditure_object_code = b.expe
 
 -- COA LOCATION
 
-DELETE from etl.stg_location where agency_code NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB');
+DELETE from etl.stg_location where agency_code NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820',,'806','131','826','801','072');
 
 -- COA Budget Code
 
-DELETE from etl.stg_budget_code where dept_cd NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB');
+DELETE from etl.stg_budget_code where dept_cd NOT IN (('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820',,'806','131','826','801','072');
 
 -- COA Vendor
 
@@ -305,7 +337,7 @@ UPDATE etl.stg_con_ct_header a
 SET doc_dscr =  a.doc_cd || a.doc_dept_cd || a.doc_id || ' contract is for ' || b.agency_short_name 
 FROM etl.stg_agency b WHERE a.doc_dept_cd = b.agency_code;
 
-UPDATE etl.stg_con_ct_header SET agree_doc_dept_cd = doc_dept_cd ;
+-- UPDATE etl.stg_con_ct_header SET agree_doc_dept_cd = doc_dept_cd ;
 
 -- CT accounting line changes
 
@@ -392,7 +424,7 @@ UPDATE etl.stg_con_do1_header a
 SET doc_dscr =  a.doc_cd || a.doc_dept_cd || a.doc_id || ' contract is for ' || b.agency_short_name 
 FROM etl.stg_agency b WHERE a.doc_dept_cd = b.agency_code;
 
-UPDATE etl.stg_con_do1_header SET agree_doc_dept_cd = doc_dept_cd ;
+-- UPDATE etl.stg_con_do1_header SET agree_doc_dept_cd = doc_dept_cd ;
 
 -- DO accounting line changes
 
@@ -465,7 +497,7 @@ UPDATE etl.stg_con_po_header a
 SET doc_dscr =  a.doc_cd || a.doc_dept_cd || a.doc_id || ' contract is for ' || b.agency_short_name 
 FROM etl.stg_agency b WHERE a.doc_dept_cd = b.agency_code;
 
-UPDATE etl.stg_con_po_header SET agree_doc_dept_cd = doc_dept_cd ;
+-- UPDATE etl.stg_con_po_header SET agree_doc_dept_cd = doc_dept_cd ;
 
 -- PO accounting line changes
 
@@ -627,8 +659,72 @@ INSERT INTO etl.stg_payroll SELECT * FROM etl.stg_payroll_mtr;
 
 
 
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'0','M') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'1','V') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'2','S') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'3','U') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'4','B') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'5','B') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'6','A') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'7','R') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'8','E') ;
+UPDATE etl.stg_payroll SET employee_number = replace(employee_number,'9','D') ;
 
 
---Payroll Summary:
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'0','M') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'1','T') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'2','A') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'3','R') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'4','U') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'5','N') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'6','T') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'7','E') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'8','J') ;
+UPDATE etl.stg_payroll SET payroll_number = replace(payroll_number,'9','R') ;
+
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'0','M') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'1','Y') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'2','A') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'3','T') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'4','I') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'5','S') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'6','H') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'7','R') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'8','E') ;
+UPDATE etl.stg_payroll SET civil_service_code = replace(civil_service_code,'9','D') ;
+
+UPDATE etl.stg_payroll SET civil_service_title = 'CIVIL SERVICE TITLE ' || payroll_number || civil_service_code ;
+
+-- PAYROL SUMMARY FILE
 
 DELETE from etl.stg_payroll_summary  where agency NOT IN ('781','003','102','130','810','836','126','127','819') ;
+
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'0','M') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'1','T') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'2','A') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'3','R') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'4','U') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'5','N') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'6','T') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'7','E') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'8','J') ;
+UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'9','R') ;
+
+
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Accounting Department'  where agency_code = '003' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Advertising Department'  where agency_code = '042' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Asset Management'  where agency_code = '102' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Customer Relations Department' where agency_code = '126' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Customer Service Department'  where agency_code = '127' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Finance Department' where agency_code = '130' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Human resources'  where agency_code = '781' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Research And Development'  where agency_code = '810' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Sales And Marketing' where agency_code = '819' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Public Relations'  where agency_code = '836' ;
+
+
+UPDATE etl.stg_payroll_summary a 
+SET   uoa_name = b.agency_short_name || ' DEPARTMENT ' || b.dept_id
+FROM mtr_change_deptname b
+WHERE a.agency = b.agency_code AND a.uoa = b.department_code;
+
