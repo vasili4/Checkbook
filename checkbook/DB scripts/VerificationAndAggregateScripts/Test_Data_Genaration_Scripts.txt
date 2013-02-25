@@ -102,6 +102,7 @@ CREATE TABLE mtr_change_deptname(
 	)
 DISTRIBUTED BY (dept_id);
 
+
 INSERT INTO mtr_change_deptname(agency_code, department_code, agency_short_name) SELECT distinct b.agency_code, b.department_code, a.agency_short_name from etl.stg_agency a, etl.stg_department b  WHERE a.agency_code = b.agency_code ;
 
 UPDATE etl.stg_department a 
@@ -711,20 +712,25 @@ UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'8','J') ;
 UPDATE etl.stg_payroll_summary SET pyrl_no = replace(pyrl_no,'9','R') ;
 
 
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Accounting Department'  where agency_code = '003' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Advertising Department'  where agency_code = '042' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Asset Management'  where agency_code = '102' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Customer Relations Department' where agency_code = '126' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Customer Service Department'  where agency_code = '127' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Finance Department' where agency_code = '130' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Human resources'  where agency_code = '781' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Research And Development'  where agency_code = '810' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Sales And Marketing' where agency_code = '819' ;
-UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Public Relations'  where agency_code = '836' ;
+
+
+
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Accounting Department'  where agency = '003' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Advertising Department'  where agency = '042' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Asset Management'  where agency = '102' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Customer Relations Department' where agency = '126' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Customer Service Department'  where agency = '127' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Finance Department' where agency = '130' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Human resources'  where agency = '781' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Research And Development'  where agency = '810' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Sales And Marketing' where agency = '819' ;
+UPDATE etl.stg_payroll_summary SET  pms_agency_name = 'Public Relations'  where agency = '836' ;
 
 
 UPDATE etl.stg_payroll_summary a 
 SET   uoa_name = b.agency_short_name || ' DEPARTMENT ' || b.dept_id
 FROM mtr_change_deptname b
 WHERE a.agency = b.agency_code AND a.uoa = b.department_code;
+
+
 
