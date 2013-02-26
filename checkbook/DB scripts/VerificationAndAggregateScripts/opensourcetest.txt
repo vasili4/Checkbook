@@ -1,18 +1,20 @@
 --ct contracts
 
-create table etl.stg_con_ct_header_td as select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,max_cntrc_am,open_acrl_am,amend_no,cntrc_sta,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cntrct_strt_dt,cntrct_end_dt,hear_dt,psr_req_dt,proc_ini_dt,cited_auth,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,clsd_am,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,pc_chng_max_am,wf_pc_chng_max_am,wf_tot_max_am,orig_max_am,enc_am,out_am,rfed_am,rfed_lqd_am,oca_no,orig_cntrc_strt_dt,orig_cntrc_end_dt,reg_dt,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,issr_id,issr_nm,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_ph_ext,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,cmr_doc_cd,cmr_doc_dept_cd,cmr_doc_id,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd from etl.stg_con_ct_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_ct_accounting_line_td as select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rel_actg_ln,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,sp_inst_cd,rl_fl_1,rl_fl_2 from etl.stg_con_ct_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_ct_award_detail_td as select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,clsd_typ_cd,ctcat_cd_1,multi_cat_fl,ctcat_cd_2,ctcat_cd_3,ctcat_cd_4,ctcat_cd_5,resp_ct,out_of_no_so,loc_serv,loc_zip,brgh_cd,blck_cd,lot_cd,coun_dist_cd,rnew_cd,cntrc_mwbe_fl,tar_utl_pc,tar_utl_am,comp_crt_cd_1,comp_cri_resp_1,comp_crt_cd_2,comp_cri_resp_2,comp_crt_cd_3,comp_cri_resp_3,comp_crt_cd_4,comp_cri_resp_4,comp_crt_cd_5,comp_cri_resp_5,non_comp_reas,cons_reas_cd_1,cons_reas_cd_2,red_adv,constr_rel_fl,extrn_so_no,liq_dmg_chrg,req_prf_pay_bnd_fl,res_no_per_bnd,cnt_req_ins_pol_fl,wk_site_cd_01,wk_site_cd_02,wk_site_cd_03,wk_site_cd_04,wk_site_cd_05,wk_site_cd_06,wk_site_cd_07,wk_site_cd_08,wk_site_cd_09,wk_site_cd_10,percent_01,percent_02,percent_03,percent_04,percent_05,percent_06,percent_07,percent_08,percent_09,percent_10 from etl.stg_con_ct_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_ct_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,web_ad,cntac_id,vend_pref_lvl,alias_nm,lgl_nm,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,tin_ein,tin_ssn,mod_fl,disc_1_dy,disc_2_dy,disc_3_dy,disc_4_dy,disc_1_pc,disc_2_pc,disc_3_pc,disc_4_pc,disc_alw_1_fl,disc_alw_2_fl,disc_alw_3_fl,disc_alw_4_fl from etl.stg_con_ct_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,max_cntrc_am,open_acrl_am,amend_no,cntrc_sta,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cntrct_strt_dt,cntrct_end_dt,hear_dt,psr_req_dt,proc_ini_dt,cited_auth,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,clsd_am,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,pc_chng_max_am,wf_pc_chng_max_am,wf_tot_max_am,orig_max_am,enc_am,out_am,rfed_am,rfed_lqd_am,oca_no,orig_cntrc_strt_dt,orig_cntrc_end_dt,reg_dt,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,issr_id,issr_nm,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_ph_ext,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,cmr_doc_cd,cmr_doc_dept_cd,cmr_doc_id,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd,'' as col113 from etl.stg_con_ct_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_ct_header.txt' DELIMITER '|';
+
+copy(select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rel_actg_ln,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,sp_inst_cd,rl_fl_1,rl_fl_2,'' as col71 from etl.stg_con_ct_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_ct_accounting_line.txt' DELIMITER '|';
+
+copy(select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,clsd_typ_cd,ctcat_cd_1,multi_cat_fl,ctcat_cd_2,ctcat_cd_3,ctcat_cd_4,ctcat_cd_5,resp_ct,out_of_no_so,loc_serv,loc_zip,brgh_cd,blck_cd,lot_cd,coun_dist_cd,rnew_cd,cntrc_mwbe_fl,tar_utl_pc,tar_utl_am,comp_crt_cd_1,comp_cri_resp_1,comp_crt_cd_2,comp_cri_resp_2,comp_crt_cd_3,comp_cri_resp_3,comp_crt_cd_4,comp_cri_resp_4,comp_crt_cd_5,comp_cri_resp_5,non_comp_reas,cons_reas_cd_1,cons_reas_cd_2,red_adv,constr_rel_fl,extrn_so_no,liq_dmg_chrg,req_prf_pay_bnd_fl,res_no_per_bnd,cnt_req_ins_pol_fl,wk_site_cd_01,wk_site_cd_02,wk_site_cd_03,wk_site_cd_04,wk_site_cd_05,wk_site_cd_06,wk_site_cd_07,wk_site_cd_08,wk_site_cd_09,wk_site_cd_10,percent_01,percent_02,percent_03,percent_04,percent_05,percent_06,percent_07,percent_08,percent_09,percent_10, '' as col69 from etl.stg_con_ct_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_ct_award_detail.txt' DELIMITER '|';
+
+copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,web_ad,cntac_id,vend_pref_lvl,alias_nm,lgl_nm,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,tin_ein,tin_ssn,mod_fl,disc_1_dy,disc_2_dy,disc_3_dy,disc_4_dy,disc_1_pc,disc_2_pc,disc_3_pc,disc_4_pc,disc_alw_1_fl,disc_alw_2_fl,disc_alw_3_fl,disc_alw_4_fl,'' as col40 from etl.stg_con_ct_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_ct_vendor.txt' DELIMITER '|';
 
 
 
 
-
-select * from etl.stg_con_ct_header_td;
-select * from etl.stg_con_ct_accounting_line_td;
-select * from etl.stg_con_ct_award_detail_td;
-select * from etl.stg_con_ct_vendor_td;
 
 
 
@@ -21,110 +23,120 @@ select * from etl.stg_con_ct_vendor_td;
 
 --do1 contracts
 
-create table etl.stg_con_do1_header_td as select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,amend_no,pcard_rec_id,pcard_expr_dt,actg_prfl_id,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cnfrm_ord,blkt_agr_fl,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd from etl.stg_con_do1_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_do1_accounting_line_td as select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2 from etl.stg_con_do1_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_do1_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl from etl.stg_con_do1_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,amend_no,pcard_rec_id,pcard_expr_dt,actg_prfl_id,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cnfrm_ord,blkt_agr_fl,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd,'' as col90 from etl.stg_con_do1_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_do1_header.txt' DELIMITER '|';
 
-select * from etl.stg_con_do1_header_td;
-select * from etl.stg_con_do1_accounting_line_td;
-select * from etl.stg_con_do1_vendor_td;
+copy(select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2,'' as col69 from etl.stg_con_do1_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_do1_accounting_line.txt' DELIMITER '|';
+
+copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl,'' as col37 from etl.stg_con_do1_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_do1_vendor.txt' DELIMITER '|';
+
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- po contracts
 
-create table etl.stg_con_po_header_td as select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,max_cntrc_am,amend_no,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cntrct_strt_dt,cntrct_end_dt,psr_req_dt,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,trkg_no,brd_awd_no,brd_awd_dt,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_ph_ext,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd from etl.stg_con_po_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_po_accounting_line_td as select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2 from etl.stg_con_po_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_po_award_detail_td as select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,ctcat_cd_1,resp_ct,out_of_no_so,constr_rel_fl,extrn_so_no,wk_site_cd_01,percent_01,wk_site_cd_02,percent_02,wk_site_cd_03,percent_03,wk_site_cd_04,percent_04,wk_site_cd_05,percent_05,wk_site_cd_06,percent_06,wk_site_cd_07,percent_07,wk_site_cd_08,percent_08,wk_site_cd_09,percent_09,wk_site_cd_10,percent_10 from etl.stg_con_po_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_con_po_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,alias_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl from etl.stg_con_po_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,max_cntrc_am,amend_no,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cntrct_strt_dt,cntrct_end_dt,psr_req_dt,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,trkg_no,brd_awd_no,brd_awd_dt,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_ph_ext,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd,'' as col95 from etl.stg_con_po_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_po_header.txt' DELIMITER '|';
+
+copy(select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2, '' as col71 from etl.stg_con_po_accounting_line where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_po_accounting_line.txt' DELIMITER '|';
+
+copy(select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,ctcat_cd_1,resp_ct,out_of_no_so,constr_rel_fl,extrn_so_no,wk_site_cd_01,percent_01,wk_site_cd_02,percent_02,wk_site_cd_03,percent_03,wk_site_cd_04,percent_04,wk_site_cd_05,percent_05,wk_site_cd_06,percent_06,wk_site_cd_07,percent_07,wk_site_cd_08,percent_08,wk_site_cd_09,percent_09,wk_site_cd_10,percent_10,'' as col35 from etl.stg_con_po_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_po_award_detail.txt' DELIMITER '|';
+
+copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,alias_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl,'' as col38 from etl.stg_con_po_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/con_po_vendor.txt' DELIMITER '|';
 
 
-select * from etl.stg_con_po_header_td;
-select * from etl.stg_con_po_accounting_line_td;
-select * from etl.stg_con_po_award_detail_td;
-select * from etl.stg_con_po_vendor_td;
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 --spending
 
 
-create table etl.stg_fms_header_td as select 'H' as line_rec, a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_rec_dt_dc,a.doc_bfy,a.doc_fy_dc,a.doc_per_dc,a.chk_eft_am,a.chk_eft_iss_dt,
-a.chk_eft_rec_dt,a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,a.ln_am,a.disc_am,a.intr_am,a.bkup_whld_am,a.inct_am,a.rtg_am
+copy(select 'H' as line_rec, a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_rec_dt_dc,a.doc_bfy,a.doc_fy_dc,a.doc_per_dc,a.chk_eft_am,a.chk_eft_iss_dt,
+a.chk_eft_rec_dt,a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,a.ln_am,a.disc_am,a.intr_am,a.bkup_whld_am,a.inct_am,a.rtg_am, '' as col22
  from etl.stg_fms_header a,
 (select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
-WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no;
+WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no)
+to '/home/gpadmin/pvarma/testdata_open/fms_header.txt' DELIMITER '|';
 
-create table etl.stg_fms_accounting_line_td as select 'A' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.doc_actg_ln_no,a.dept_cd,a.bfy,a.fy_dc,a.per_dc,a.rfed_doc_cd,a.rfed_doc_dept_cd,a.rfed_doc_id,a.rfed_doc_vers_no,a.rfed_vend_ln_no,a.rfed_comm_ln_no,a.rfed_actg_ln_no,a.rqporf_doc_cd,a.rqporf_doc_dept_cd,a.rqporf_doc_id,a.rqporf_vend_ln_no,a.rqporf_comm_ln_no,a.rqporf_actg_ln_no,a.disc_ln_am,a.intr_ln_am,a.bkup_whld_ln_am,a.inct_ln_am,a.rtg_ln_am,a.chk_amt,a.fcls_cd,a.fund_cd,a.sfund_cd,a.unit_cd,a.sunit_cd,a.appr_cd,a.obj_cd,a.sobj_cd,a.rsrc_cd,a.srsrc_cd,a.bsa_cd,a.dobj_cd,a.drsrc_cd,a.loc_cd,a.sloc_cd,a.actv_cd,a.func_cd,a.rpt_cd from etl.stg_fms_accounting_line a where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+copy(select 'A' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.doc_actg_ln_no,a.dept_cd,a.bfy,a.fy_dc,a.per_dc,a.rfed_doc_cd,a.rfed_doc_dept_cd,a.rfed_doc_id,a.rfed_doc_vers_no,a.rfed_vend_ln_no,a.rfed_comm_ln_no,a.rfed_actg_ln_no,a.rqporf_doc_cd,a.rqporf_doc_dept_cd,a.rqporf_doc_id,a.rqporf_vend_ln_no,a.rqporf_comm_ln_no,a.rqporf_actg_ln_no,a.disc_ln_am,a.intr_ln_am,a.bkup_whld_ln_am,a.inct_ln_am,a.rtg_ln_am,a.chk_amt,a.fcls_cd,a.fund_cd,a.sfund_cd,a.unit_cd,a.sunit_cd,a.appr_cd,a.obj_cd,a.sobj_cd,a.rsrc_cd,a.srsrc_cd,a.bsa_cd,a.dobj_cd,a.drsrc_cd,a.loc_cd,a.sloc_cd,a.actv_cd,a.func_cd,a.rpt_cd,'' as col49 from etl.stg_fms_accounting_line a where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/fms_accounting.txt' DELIMITER '|';
 
-create table etl.stg_fms_vendor_td as  select 'V' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.vend_cust_cd,a.lgl_nm,a.alias_nm,a.ad_id,a.org_cls,a.misc_acct_fl,a.ad_ln_1,a.ad_ln_2,a.ctry,a.st,a.zip,a.city from etl.stg_fms_vendor  a,
+copy(select 'V' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.vend_cust_cd,a.lgl_nm,a.alias_nm,a.ad_id,a.org_cls,a.misc_acct_fl,a.ad_ln_1,a.ad_ln_2,a.ctry,a.st,a.zip,a.city,'' as col19 from etl.stg_fms_vendor  a,
 (select distinct doc_cd, doc_id, doc_dept_cd, doc_vers_no from etl.stg_fms_accounting_line where rqporf_doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819') ) b 
-WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no ;
+WHERE a.doc_cd=b.doc_cd AND a.doc_id =b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_vers_no = b.doc_vers_no)
+to '/home/gpadmin/pvarma/testdata_open/fms_vendor.txt' DELIMITER '|';
 
 
-
-select * from  etl.stg_fms_header_td;
-select * from  etl.stg_fms_accounting_line_td;
-select * from  etl.stg_fms_vendor_td;
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 --payroll
 
-create table etl.payroll_td as select pay_cycle_code,pay_date,employee_number,payroll_number,job_sequence_number,agency_code,agency_start_date,fiscal_year,
+copy(select pay_cycle_code,pay_date,employee_number,payroll_number,job_sequence_number,agency_code,agency_start_date,fiscal_year,
 orig_pay_cycle_code,orig_pay_date,pay_frequency,last_name,department_code,annual_salary,amount_basis,base_pay,overtime_pay,other_payments,gross_pay,
 civil_service_code,civil_service_level,civil_service_suffix,civil_service_title
- from etl.archive_payroll where agency_code in ('781','003','102','130','810','836','126','127','819') ;
+ from etl.archive_payroll where agency_code in ('781','003','102','130','810','836','126','127','819'))
+ to '/home/gpadmin/pvarma/testdata_open/payroll.txt' DELIMITER '|';
  
  
- select * from etl.payroll_td;
- 
+  
  --payroll summary
  
- create table etl.payroll_summary_td as select pay_cycle,pay_date,pyrl_no,pyrl_desc,uoa,uoa_name,pms_fy,object,object_desc,agency,pms_agency_name,bud_code,bud_code_desc,total_amt 
- from etl.archive_payroll_summary  where agency in ('781','003','102','130','810','836','126','127','819') ;
+ copy(select pay_cycle,pay_date,pyrl_no,pyrl_desc,uoa,uoa_name,pms_fy,object,object_desc,agency,pms_agency_name,bud_code,bud_code_desc,total_amt,'' as col15 
+ from etl.archive_payroll_summary  where agency in ('781','003','102','130','810','836','126','127','819')) 
+ to '/home/gpadmin/pvarma/testdata_open/payroll_summary.txt' DELIMITER '|';
 
- select * from etl.payroll_summary_td 
+ 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 --MAG
-create table etl.stg_mag_header_td as select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,trkg_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,ord_tot_am,doc_clsd_am,po_repl_doc_cd,po_repl_id,po_repl_by_dept_cd,po_repl_by_id,cntrc_sta,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,efbgn_dt,efend_dt,hear_dt,psr_req_dt,proc_ini_dt,brd_awd_no,brd_awd_dt,tc_tmpl,part_pymt_inv_alwd,part_rect_alw_fl,prnt_job_cd,obj_att_sg_tot,obj_att_pg_tot,pc_chng_max_am,wf_pc_chng_max_am,wf_tot_max_am,orig_max_ct_amt,oca_no,orig_strt_dt,orig_end_dt,reg_dt,reas_mod_dc,issr_id,issr_nm,issr_ph_no,issr_ph_ext,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_ph_ext,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_nm,buyr_ph_no,buyr_ph_ext,ofcr_nm,ofcr_ph_no,ofcr_ph_ext,ofcr_email_ad,ord_min_am,ord_max_am,ma_prch_lmt_am,ord_min_fl,ord_max_fl,ma_prch_lmt_fl,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_typ,dlvr_dy,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,dept_report_1,dept_report_2,dept_report_3,dept_report_4,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,po_repl_dept_cd,po_repl_by_doc_cd,doc_func_cd from etl.stg_mag_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_mag_award_detail_td as select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_awddet_ln_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,clsd_typ_cd,ctcat_cd_1,multi_cat_fl,ctcat_cd_2,ctcat_cd_3,ctcat_cd_4,ctcat_cd_5,resp_no,out_of_no_so,loc_serv,loc_zip,brgh_cd,blck_cd,lot_cd,coun_dist_cd,rnew_cd,cntrc_mwbe_fl,tar_utl_pc,tar_utl_am,comp_crt_cd_1,comp_cri_resp_1,comp_crt_cd_2,comp_cri_resp_2,comp_crt_cd_3,comp_cri_resp_3,comp_crt_cd_4,comp_cri_resp_4,comp_crt_cd_5,comp_cri_resp_5,non_comp_reas,cons_reas_cd_1,cons_reas_cd_2,red_adv,constr_rel_fl,extrn_so_no,liq_dmg_chrg,req_perf_py_bnd_fl,reas_no_perf_bnd,wk_site_cd_01,wk_site_cd_02,wk_site_cd_03,wk_site_cd_04,wk_site_cd_05,wk_site_cd_06,wk_site_cd_07,wk_site_cd_08,wk_site_cd_09,wk_site_cd_10,percent_01,percent_02,percent_03,percent_04,percent_05,percent_06,percent_07,percent_08,percent_09,percent_10 from etl.stg_mag_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
-create table etl.stg_mag_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,alias_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,ma_vend_typ,ma_doc_cd,ma_doc_dept_cd,ma_doc_id,email_ad_dup,tin_ein,tin_ssn,disc_1_dy,disc_2_dy,disc_3_dy,disc_4_dy,disc_1_pc,disc_2_pc,disc_3_pc,disc_4_pc,disc_alw_1_fl,disc_alw_2_fl,disc_alw_3_fl,disc_alw_4_fl from etl.stg_mag_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819');
+copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,trkg_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,ord_tot_am,doc_clsd_am,po_repl_doc_cd,po_repl_id,po_repl_by_dept_cd,po_repl_by_id,cntrc_sta,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,efbgn_dt,efend_dt,hear_dt,psr_req_dt,proc_ini_dt,brd_awd_no,brd_awd_dt,tc_tmpl,part_pymt_inv_alwd,part_rect_alw_fl,prnt_job_cd,obj_att_sg_tot,obj_att_pg_tot,pc_chng_max_am,wf_pc_chng_max_am,wf_tot_max_am,orig_max_ct_amt,oca_no,orig_strt_dt,orig_end_dt,reg_dt,reas_mod_dc,issr_id,issr_nm,issr_ph_no,issr_ph_ext,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_ph_ext,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_nm,buyr_ph_no,buyr_ph_ext,ofcr_nm,ofcr_ph_no,ofcr_ph_ext,ofcr_email_ad,ord_min_am,ord_max_am,ma_prch_lmt_am,ord_min_fl,ord_max_fl,ma_prch_lmt_fl,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_typ,dlvr_dy,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,dept_report_1,dept_report_2,dept_report_3,dept_report_4,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,po_repl_dept_cd,po_repl_by_doc_cd,doc_func_cd,'' as col95 from etl.stg_mag_header where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/mag_header.txt' DELIMITER '|';
+
+copy(select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_awddet_ln_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,clsd_typ_cd,ctcat_cd_1,multi_cat_fl,ctcat_cd_2,ctcat_cd_3,ctcat_cd_4,ctcat_cd_5,resp_no,out_of_no_so,loc_serv,loc_zip,brgh_cd,blck_cd,lot_cd,coun_dist_cd,rnew_cd,cntrc_mwbe_fl,tar_utl_pc,tar_utl_am,comp_crt_cd_1,comp_cri_resp_1,comp_crt_cd_2,comp_cri_resp_2,comp_crt_cd_3,comp_cri_resp_3,comp_crt_cd_4,comp_cri_resp_4,comp_crt_cd_5,comp_cri_resp_5,non_comp_reas,cons_reas_cd_1,cons_reas_cd_2,red_adv,constr_rel_fl,extrn_so_no,liq_dmg_chrg,req_perf_py_bnd_fl,reas_no_perf_bnd,wk_site_cd_01,wk_site_cd_02,wk_site_cd_03,wk_site_cd_04,wk_site_cd_05,wk_site_cd_06,wk_site_cd_07,wk_site_cd_08,wk_site_cd_09,wk_site_cd_10,percent_01,percent_02,percent_03,percent_04,percent_05,percent_06,percent_07,percent_08,percent_09,percent_10,'' as col69 from etl.stg_mag_award_detail where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/mag_award_detail.txt' DELIMITER '|';
+
+copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,alias_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,ma_vend_typ,ma_doc_cd,ma_doc_dept_cd,ma_doc_id,email_ad_dup,tin_ein,tin_ssn,disc_1_dy,disc_2_dy,disc_3_dy,disc_4_dy,disc_1_pc,disc_2_pc,disc_3_pc,disc_4_pc,disc_alw_1_fl,disc_alw_2_fl,disc_alw_3_fl,disc_alw_4_fl,'' as col42 from etl.stg_mag_vendor where doc_dept_cd in ('781','003','102','042','130','810','836','126','127','819'))
+to '/home/gpadmin/pvarma/testdata_open/mag_vendor.txt' DELIMITER '|';
 
 
-
-select * from etl.stg_mag_header_td;
-select * from etl.stg_mag_vendor_td ;
-select * from etl.stg_mag_award_detail_td ;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-select * from etl.ext_stg_coa_agency_feed 
 
 
-create table etl.stg_agency_td as select agency_code,agency_name,'' as col3,agency_short_name,'' as col5 ,'' as col6 ,'' as col7 ,'' as col8 ,'' as col9 , '' as col10 , '' as col11 , '' as col12 , '' as col13 , '' as col14 , '' as col15 , '' as col16 , '' as col17 , '' as col18 , '' as col19 , '' as col20 , '' as col21 , '' as col22 , '' as col23 , '' as col24 , '' as col25 , '' as col26  from etl.stg_agency ;
-create table etl.stg_department_td as select agency_code,fund_class_code,fiscal_year,department_code,department_name,'' as col6,'' as col7,department_short_name,'' as col9 ,'' as col10 ,'' as col11 ,'' as col12 ,'' as col13 ,'' as col14 ,'' as col15 ,'' as col16 ,'' as col17 ,'' as col18 ,'' as col19 ,'' as col20 ,'' as col21  from etl.stg_department ;
-create table etl.stg_expenditure_object_td as select col1,fiscal_year,expenditure_object_code,expenditure_object_name,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35,col36,col37,col38,col39,col40,col41,col42 from etl.stg_expenditure_object;
-create table etl.stg_budget_code_td as select fy,fcls_cd,fcls_nm,dept_cd,dept_nm,func_cd,func_nm,func_attr_nm,func_attr_sh_nm,resp_ctr,func_anlys_unit,cntrl_cat,local_svc_dist,ua_fund_fl,pyrl_dflt_fl,bud_cat_a,bud_cat_b,bud_func,dscr_ext,tbl_last_dt,func_attr_nm_up,fin_plan_sav_fl from etl.stg_budget_code ;
-create table etl.stg_location_td as select agency_code,location_code,location_name,location_short_name,upper_case_name,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16 from etl.stg_location;
+copy(select agency_code,agency_name,'' as col3,agency_short_name,'' as col5 ,'' as col6 ,'' as col7 ,'' as col8 ,'' as col9 , '' as col10 , '' as col11 , '' as col12 , '' as col13 , '' as col14 , '' as col15 , '' as col16 , '' as col17 , '' as col18 , '' as col19 , '' as col20 , '' as col21 , '' as col22 , '' as col23 , '' as col24 , '' as col25 , '' as col26  from etl.stg_agency)
+to '/home/gpadmin/pvarma/testdata_open/coa_agency.txt' DELIMITER '|';
+
+copy(select agency_code,fund_class_code,fiscal_year,department_code,department_name,'' as col6,'' as col7,department_short_name,'' as col9 ,'' as col10 ,'' as col11 ,'' as col12 ,'' as col13 ,'' as col14 ,'' as col15 ,'' as col16 ,'' as col17 ,'' as col18 ,'' as col19 ,'' as col20 ,'' as col21  from etl.stg_department)
+to '/home/gpadmin/pvarma/testdata_open/coa_department.txt' DELIMITER '|';
+
+copy(select col1,fiscal_year,expenditure_object_code,expenditure_object_name,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35,col36,col37,col38,col39,col40,col41,col42 from etl.stg_expenditure_object)
+to '/home/gpadmin/pvarma/testdata_open/coa_expenditure_object.txt' DELIMITER '|';
+
+copy(select fy,fcls_cd,fcls_nm,dept_cd,dept_nm,func_cd,func_nm,func_attr_nm,func_attr_sh_nm,resp_ctr,func_anlys_unit,cntrl_cat,local_svc_dist,ua_fund_fl,pyrl_dflt_fl,bud_cat_a,bud_cat_b,bud_func,dscr_ext,tbl_last_dt,func_attr_nm_up,fin_plan_sav_fl,'' as col23 from etl.stg_budget_code)
+to '/home/gpadmin/pvarma/testdata_open/coa_budget_code.txt' DELIMITER '|';
+
+copy(select agency_code,location_code,location_name,location_short_name,upper_case_name,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,'' as col17 from etl.stg_location)
+to '/home/gpadmin/pvarma/testdata_open/coa_location.txt' DELIMITER '|';
 
 
-select * from etl.stg_agency_td;
-select * from etl.stg_department_td;
-select * from etl.stg_expenditure_object_td;
-select * from etl.stg_budget_code_td;
-select * from etl.stg_location_td;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- pending contracts
 
- Create table etl.stg_pending_contracts_td as select con_trans_code,con_trans_ad_code,con_no,con_par_trans_code,con_par_ad_code,con_par_reg_num,con_cur_encumbrance,con_original_max,con_rev_max,vc_legal_name,con_vc_code,con_purpose,submitting_agency_desc
+copy(select con_trans_code,con_trans_ad_code,con_no,con_par_trans_code,con_par_ad_code,con_par_reg_num,con_cur_encumbrance,con_original_max,con_rev_max,vc_legal_name,con_vc_code,con_purpose,submitting_agency_desc
 submitting_agency_code,awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,am_desc,am_code,con_term_from,con_term_to,con_rev_start_dt,con_rev_end_dt,con_cif_received_date,con_pin,con_internal_pin,
-con_batch_suffix,con_version,original_or_modified,award_category_code from etl.stg_pending_contracts ;
+con_batch_suffix,con_version,original_or_modified,award_category_code from etl.stg_pending_contracts)
+to '/home/gpadmin/pvarma/testdata_open/pending_contracts.txt' DELIMITER '|';
 
 
 
-select * from etl.stg_pending_contracts_td;
