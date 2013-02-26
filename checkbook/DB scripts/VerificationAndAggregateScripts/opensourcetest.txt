@@ -95,9 +95,9 @@ create table etl.stg_mag_vendor_td as select 'V' as line_rec,doc_cd,doc_dept_cd,
 
 
 
-select * from etl.stg_mag_header;
-select * from etl.stg_mag_vendor ;
-select * from etl.stg_mag_award_detail ;
+select * from etl.stg_mag_header_td;
+select * from etl.stg_mag_vendor_td ;
+select * from etl.stg_mag_award_detail_td ;
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -109,3 +109,22 @@ create table etl.stg_department_td as select agency_code,fund_class_code,fiscal_
 create table etl.stg_expenditure_object_td as select col1,fiscal_year,expenditure_object_code,expenditure_object_name,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35,col36,col37,col38,col39,col40,col41,col42 from etl.stg_expenditure_object;
 create table etl.stg_budget_code_td as select fy,fcls_cd,fcls_nm,dept_cd,dept_nm,func_cd,func_nm,func_attr_nm,func_attr_sh_nm,resp_ctr,func_anlys_unit,cntrl_cat,local_svc_dist,ua_fund_fl,pyrl_dflt_fl,bud_cat_a,bud_cat_b,bud_func,dscr_ext,tbl_last_dt,func_attr_nm_up,fin_plan_sav_fl from etl.stg_budget_code ;
 create table etl.stg_location_td as select agency_code,location_code,location_name,location_short_name,upper_case_name,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16 from etl.stg_location;
+
+
+select * from etl.stg_agency_td;
+select * from etl.stg_department_td;
+select * from etl.stg_expenditure_object_td;
+select * from etl.stg_budget_code_td;
+select * from etl.stg_location_td;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- pending contracts
+
+ Create table etl.stg_pending_contracts_td as select con_trans_code,con_trans_ad_code,con_no,con_par_trans_code,con_par_ad_code,con_par_reg_num,con_cur_encumbrance,con_original_max,con_rev_max,vc_legal_name,con_vc_code,con_purpose,submitting_agency_desc
+submitting_agency_code,awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,am_desc,am_code,con_term_from,con_term_to,con_rev_start_dt,con_rev_end_dt,con_cif_received_date,con_pin,con_internal_pin,
+con_batch_suffix,con_version,original_or_modified,award_category_code from etl.stg_pending_contracts ;
+
+
+
+select * from etl.stg_pending_contracts_td;
