@@ -795,6 +795,7 @@ WHERE a.awarding_agency_code = b.agency_code;
 
 -- Scripts after creating demo database
 
+/*
 UPDATE ref_agency SET is_display = 'N';
 
 UPDATE ref_agency SET is_display = 'Y' WHERE agency_code IN ('781','003','102','042','130','810','836','126','127','819');
@@ -805,3 +806,6 @@ UPDATE ref_industry_type SET industry_type_name = 'Infrastructure Services' WHER
 UPDATE ref_industry_type SET industry_type_name = 'Automobiles' WHERE industry_type_id = 4;
 
 UPDATE ref_award_method SET award_method_name = 'AWARD METHOD' || award_method_id;
+
+
+*/
