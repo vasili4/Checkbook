@@ -807,5 +807,87 @@ UPDATE ref_industry_type SET industry_type_name = 'Automobiles' WHERE industry_t
 
 UPDATE ref_award_method SET award_method_name = 'AWARD METHOD' || award_method_id;
 
+-- ADD Primary keys
 
-*/
+ALTER TABLE history_agreement ADD PRIMARY KEY (agreement_id);
+ALTER TABLE history_master_agreement ADD PRIMARY KEY (master_agreement_id);
+ALTER TABLE history_agreement_accounting_line ADD PRIMARY KEY (agreement_accounting_line_id);
+
+ALTER TABLE employee ADD PRIMARY KEY (employee_id);
+ALTER TABLE payroll ADD PRIMARY KEY (payroll_id);
+ALTER TABLE payroll_summary ADD PRIMARY KEY (payroll_summary_id);
+ALTER TABLE disbursement ADD PRIMARY KEY (disbursement_id);
+ALTER TABLE disbursement_line_item ADD PRIMARY KEY (disbursement_line_item_id);
+ALTER TABLE disbursement_line_item_details ADD PRIMARY KEY (disbursement_line_item_id);
+ALTER TABLE vendor ADD PRIMARY KEY (vendor_id);
+ALTER TABLE ref_agency ADD PRIMARY KEY (agency_id);
+ALTER TABLE ref_department ADD PRIMARY KEY (department_id);
+ALTER TABLE ref_expenditure_object ADD PRIMARY KEY (expenditure_object_id);
+ALTER TABLE ref_budget_code ADD PRIMARY KEY (budget_code_id);
+ALTER TABLE ref_location ADD PRIMARY KEY (location_id);
+ALTER TABLE ref_industry_type ADD PRIMARY KEY (industry_type_id);
+ALTER TABLE ref_award_method ADD PRIMARY KEY (award_method_id);
+
+-- ADD indexes for distributed by columns that are not primary keys
+
+CREATE INDEX idx_original_agreement_id_agreement_snapshot ON agreement_snapshot(original_agreement_id);
+CREATE INDEX idx_original_agreement_id_agreement_snapshot_cy ON agreement_snapshot_cy(original_agreement_id);
+CREATE INDEX idx_vendor_id_agg_contracts_cum_spending ON aggregateon_contracts_cumulative_spending(vendor_id);
+CREATE INDEX idx_department_id_agg_contracts_department ON aggregateon_contracts_department(department_id);
+CREATE INDEX idx_original_agreement_id_agg_contracts_expense ON aggregateon_contracts_expense(original_agreement_id);
+CREATE INDEX idx_vendor_id_agg_contracts_spend_by_month ON aggregateon_contracts_spending_by_month(vendor_id);
+CREATE INDEX idx_fiscal_year_agg_total_contracts ON aggregateon_total_contracts(fiscal_year);
+
+CREATE INDEX idx_disbursement_line_item_id_cont_spen_transactions ON contracts_spending_transactions(disbursement_line_item_id);
+CREATE INDEX idx_agency_id_agg_payroll_agency ON aggregateon_payroll_agency(agency_id);
+CREATE INDEX idx_agency_id_agg_payroll_agency_month ON aggregateon_payroll_agency_month(agency_id);
+CREATE INDEX idx_agency_id_agg_payroll_coa_month ON aggregateon_payroll_coa_month(agency_id);
+CREATE INDEX idx_employee_id_agg_payroll_employee_agency ON aggregateon_payroll_employee_agency(employee_id);
+CREATE INDEX idx_employee_id_agg_payroll_employee_agency_month ON aggregateon_payroll_employee_agency_month(employee_id);
+
+CREATE INDEX idx_department_id_agg_spen_coa_entities ON aggregateon_spending_coa_entities(department_id);
+CREATE INDEX idx_agreement_id_agg_spen_contract ON aggregateon_spending_contract(agreement_id);
+CREATE INDEX idx_vendor_id_agg_spen_vendor ON aggregateon_spending_vendor(vendor_id);
+CREATE INDEX idx_expenditure_object_id_agg_spen_vendor_exp_object ON aggregateon_spending_vendor_exp_object(expenditure_object_id);
+	
+vacuum analyze	history_agreement;
+vacuum analyze	history_master_agreement;
+vacuum analyze history_agreement_accounting_line;
+vacuum analyze	employee;
+vacuum analyze	payroll;
+vacuum analyze	payroll_summary;
+vacuum analyze	disbursement;
+vacuum analyze	disbursement_line_item;
+vacuum analyze	disbursement_line_item_details;
+vacuum analyze	vendor;
+vacuum analyze	ref_agency;
+vacuum analyze	ref_department;
+vacuum analyze	ref_expenditure_object;
+vacuum analyze	ref_budget_code;
+vacuum analyze	ref_location;
+vacuum analyze	ref_industry_type;
+vacuum analyze	ref_award_method;
+	
+vacuum analyze	agreement_snapshot;
+vacuum analyze	agreement_snapshot_cy;
+vacuum analyze	aggregateon_contracts_cumulative_spending;
+vacuum analyze	aggregateon_contracts_department;
+vacuum analyze	aggregateon_contracts_expense;
+vacuum analyze	aggregateon_contracts_spending_by_month;
+vacuum analyze	aggregateon_total_contracts;
+	
+vacuum analyze	contracts_spending_transactions;
+vacuum analyze	aggregateon_payroll_agency;
+vacuum analyze	aggregateon_payroll_agency_month;
+vacuum analyze	aggregateon_payroll_coa_month;
+vacuum analyze	aggregateon_payroll_employee_agency;
+vacuum analyze	aggregateon_payroll_employee_agency_month;
+	
+vacuum analyze	aggregateon_spending_coa_entities;
+vacuum analyze	aggregateon_spending_contract;
+vacuum analyze	aggregateon_spending_vendor;
+vacuum analyze	aggregateon_spending_vendor_exp_object;
+	
+*/	
+-- pg_dump  -Upostgres  checkbook_demo_from_dump 1>C:\Users\treddy\Desktop\DEMO_SITE\checkbook_demo_database_postgres_db_03_05.sql 2>C:\Users\treddy\Desktop\DEMO_SITE\2.err	
+
