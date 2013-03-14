@@ -38,3 +38,53 @@ select 'ref_department' as table_name , count(*) as num_records, 'refrence_data'
 select 'ref_expenditure_object' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_expenditure_object UNION 
 select 'ref_minority_type' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_minority_type UNION 
 select 'ref_object_class' as table_name , count(*) as num_records, 'refrence_data' as domain  from ref_object_class order by domain, table_name) TO '/vol2share/NYC/FEEDS/count_verification.csv' CSV HEADER QUOTE as '"';
+
+
+select * from ref_agency where agency_name ilike '%unknown%'   ;
+select * from ref_agency where agency_name ilike '%non-appli%'  ;
+
+select * from ref_department where department_name ilike '%unknown%' ;
+select * from ref_department where department_name ilike '%non-appli%' ;
+
+select * from ref_location  where location_name ilike '%unknown%' ;
+select * from ref_location  where location_name ilike '%non-appli%' ;
+
+select * from ref_expenditure_object   where expenditure_object_name  ilike '%unknown%' ;
+select * from ref_expenditure_object   where expenditure_object_name  ilike  '%non-appli%' ;
+
+select count(*) from history_agreement; -- 19504
+
+select count(*) from history_master_agreement;  -- 196
+
+select count(*) from history_agreement_accounting_line ;-- 46983
+
+select count(*) from disbursement; -- 69972
+
+
+select count(*) from disbursement_line_item ; -- 133499
+
+select count(*) from payroll_summary; -- 1558
+
+select count(*) from disbursement_line_item_details; -- 135057
+
+select 133499 + 1558 ; -- 135057
+
+select count(*) from pending_contracts ;  -- 16
+
+select count(*) from payroll ; -- 744026
+
+
+select count(*) from employee ; -- 58796
+
+select count(*) from vendor -- 6932
+
+select count(*) from agreement_snapshot; -- 15389
+select count(*) from agreement_snapshot_cy;  -- 15865
+
+select count(*) from aggregateon_contracts_cumulative_spending ; -- 20737
+
+select count(*) from aggregateon_contracts_department ; --19343
+
+select count(*) from aggregateon_spending_coa_entities; -- 99058
+
+select count(*) from aggregateon_spending_contract; --20164

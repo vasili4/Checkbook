@@ -4237,7 +4237,7 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
 	original_agreement_id bigint,
 	dollar_difference numeric(16,2),
   	percent_difference numeric(17,4),
-  	contract_number varchar,
+  	fms_contract_number varchar,
   	original_or_modified varchar,
   	award_category_code varchar(3),
   	award_category_id smallint,

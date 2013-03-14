@@ -263,7 +263,7 @@ BEGIN
 	
 	
 	UPDATE etl.stg_pending_contracts
-	SET contract_number = con_trans_code||con_trans_ad_code||con_no ;
+	SET fms_contract_number = con_trans_code||con_trans_ad_code||con_no ;
 	
 	CREATE TEMPORARY TABLE tmp_pc_ctr_mar_document_code(con_no varchar, con_trans_ad_code varchar, document_code varchar, document_code_id smallint) DISTRIBUTED BY (con_no);
 	
@@ -276,7 +276,7 @@ BEGIN
 	
 	
 	UPDATE etl.stg_pending_contracts a
-	SET contract_number = b.document_code||b.con_trans_ad_code||b.con_no,
+	SET fms_contract_number = b.document_code||b.con_trans_ad_code||b.con_no,
 	document_code_id = b.document_code_id
 	FROM tmp_pc_ctr_mar_document_code b 
 	WHERE a.con_no = b.con_no AND a.con_trans_ad_code = b.con_trans_ad_code
@@ -293,7 +293,7 @@ BEGIN
 	
 	
 	UPDATE etl.stg_pending_contracts a
-	SET contract_number = b.document_code||b.con_trans_ad_code||b.con_no,
+	SET fms_contract_number = b.document_code||b.con_trans_ad_code||b.con_no,
 	document_code_id = b.document_code_id
 	FROM tmp_pc_ctr_mar_document_code b 
 	WHERE a.con_no = b.con_no AND a.con_trans_ad_code = b.con_trans_ad_code
@@ -303,13 +303,13 @@ BEGIN
 	UPDATE etl.stg_pending_contracts a
 	SET original_agreement_id = b.original_agreement_id
 	FROM history_agreement b
-	WHERE a.contract_number = b.contract_number
+	WHERE a.fms_contract_number = b.contract_number
 	AND b.original_version_flag = 'Y';
 	
 	UPDATE etl.stg_pending_contracts a
 	SET original_agreement_id = b.original_master_agreement_id
 	FROM history_master_agreement b
-	WHERE a.contract_number = b.contract_number
+	WHERE a.fms_contract_number = b.contract_number
 	AND b.original_version_flag = 'Y';
 	
 	RAISE NOTICE '10';
@@ -347,7 +347,7 @@ BEGIN
 				      oaisis_awarding_agency_desc,awarding_agency_code,contract_type_name,cont_type_code,
 				      award_method_name,award_method_code,award_method_id,start_date,end_date,revised_start_date,
 				      revised_end_date,cif_received_date,cif_fiscal_year, cif_fiscal_year_id, tracking_number,board_award_number,
-				      oca_number,version_number,contract_number,pending_contract_number,fms_parent_contract_number,
+				      oca_number,version_number,fms_contract_number,contract_number,fms_parent_contract_number,
 				      submitting_agency_name,submitting_agency_short_name,awarding_agency_name,awarding_agency_short_name,
 				      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,
 				      cif_received_date_id,document_agency_code,document_agency_name,document_agency_short_name,  
@@ -361,7 +361,7 @@ BEGIN
 	      awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,
 	      am_desc,am_code,b.award_method_id,con_term_from,con_term_to,con_rev_start_dt,
 	      con_rev_end_dt,con_cif_received_date,cif_fiscal_year, cif_fiscal_year_id, con_pin,con_internal_pin,
-	      con_batch_suffix,con_version,contract_number,con_trans_code||con_trans_ad_code||con_no as pending_contract_number, con_par_trans_code || con_par_ad_code || con_par_reg_num as fms_parent_contract_number,
+	      con_batch_suffix,con_version,fms_contract_number,con_trans_code||con_trans_ad_code||con_no as contract_number, con_par_trans_code || con_par_ad_code || con_par_reg_num as fms_parent_contract_number,
 	      submitting_agency_name,submitting_agency_short_name,awarding_agency_name,awarding_agency_short_name,
 	      start_date_id,end_date_id,revised_start_date_id,revised_end_date_id,
 	      cif_received_date_id,con_trans_ad_code,document_agency_name,document_agency_short_name,
@@ -395,6 +395,35 @@ BEGIN
 	SET latest_flag = 'Y'
 	FROM tmp_pc_update_latest_flag b
 	WHERE a.contract_number = b.contract_number AND a.document_version = b.document_version;
+	
+	
+	UPDATE pending_contracts SET registered_contract_max_amount = 0 ;
+	
+	CREATE TEMPORARY TABLE tmp_pc_child_reg_contract_amount AS
+	SELECT b.original_agreement_id, maximum_contract_amount 
+	FROM history_agreement a , pending_contracts b, ref_document_code c  
+	WHERE a.original_agreement_id = b.original_agreement_id  and b.document_code_id = c.document_code_id and a.latest_flag = 'Y' and b.latest_flag = 'Y' and c.document_code in ('CT1','CTA1') ;
+	
+	UPDATE pending_contracts a
+	SET registered_contract_max_amount = b.maximum_contract_amount
+	FROM tmp_pc_child_reg_contract_amount b , ref_document_code c
+	WHERE a.original_agreement_id = b.original_agreement_id  and a.document_code_id = c.document_code_id and c.document_code in ('CT1','CTA1');
+	
+	
+	CREATE TEMPORARY TABLE tmp_pc_master_reg_contract_amount AS
+	SELECT b.original_agreement_id, maximum_spending_limit 
+	FROM history_master_agreement a , pending_contracts b, ref_document_code c  
+	WHERE a.original_master_agreement_id = b.original_agreement_id  and b.document_code_id = c.document_code_id and a.latest_flag = 'Y' and b.latest_flag = 'Y' and c.document_code in ('MA1','MMA1','RCT1') ;
+	
+	UPDATE pending_contracts a
+	SET registered_contract_max_amount = b.maximum_spending_limit
+	FROM tmp_pc_master_reg_contract_amount b , ref_document_code c
+	WHERE a.original_agreement_id = b.original_agreement_id  and a.document_code_id = c.document_code_id  and c.document_code in ('MA1','MMA1','RCT1');
+	
+	UPDATE pending_contracts a
+	SET original_master_agreement_id = b.original_master_agreement_id
+	FROM history_master_agreement b
+	WHERE a.fms_parent_contract_number = b.contract_number AND b.original_version_flag = 'Y' ;
 	
 	
 	RETURN 1;
