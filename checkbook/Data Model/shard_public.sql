@@ -103,7 +103,8 @@ CREATE TABLE aggregateon_spending_coa_entities (
     type_of_year char(1),
     total_spending_amount numeric(16,2),
     total_disbursements integer
-) DISTRIBUTED BY (department_id);
+)WITH(appendonly=true)
+DISTRIBUTED BY (department_id);
 
 --
 -- Name: aggregateon_spending_contract; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -228,7 +229,8 @@ CREATE TABLE disbursement (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (disbursement_id);
+)WITH(appendonly=true)
+distributed by (disbursement_id);
 
 
 --
@@ -267,7 +269,8 @@ CREATE TABLE disbursement_line_item (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (disbursement_line_item_id);
+) WITH (appendonly=true,orientation=column)
+distributed by (disbursement_line_item_id);
 
 --
 -- Name: disbursement_line_item_details; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -349,7 +352,7 @@ CREATE TABLE disbursement_line_item_details(
 	load_id integer,
     last_modified_date timestamp without time zone,
     job_id bigint
-	)
+	)WITH(appendonly=true,orientation=column)
 DISTRIBUTED BY (disbursement_line_item_id);
 
 
@@ -482,7 +485,8 @@ CREATE TABLE history_agreement (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (agreement_id);
+)WITH(appendonly=true and orientation=column)
+distributed by (agreement_id);
 
 --
 -- Name: history_agreement_accounting_line; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -514,7 +518,8 @@ CREATE TABLE history_agreement_accounting_line (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (agreement_id);
+)WITH(appendonly=true) 
+distributed by (agreement_id);
 
 --
 -- Name: history_agreement_commodity; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -805,7 +810,8 @@ CREATE TABLE ref_department (
     updated_date timestamp without time zone,
     created_load_id integer,
     updated_load_id integer
-) DISTRIBUTED BY (department_id);
+)WITH(appendonly=true) 
+DISTRIBUTED BY (department_id);
 
 --
 -- Name: ref_department_history; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
@@ -1462,7 +1468,8 @@ CREATE TABLE payroll(
 	updated_date timestamp,
 	updated_load_id int,
 	job_id bigint
-) DISTRIBUTED BY (payroll_id)
+) WITH (appendonly=true,orientation=column)
+DISTRIBUTED BY (payroll_id)
 PARTITION BY RANGE (calendar_fiscal_year) 
 (START (2010) END (2014) EVERY (1),
 DEFAULT PARTITION outlying_years);
@@ -1503,7 +1510,8 @@ CREATE TABLE aggregateon_payroll_employee_agency(
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
-	gross_pay numeric(16,2))
+	gross_pay numeric(16,2)
+	)WITH(appendonly=true)
 DISTRIBUTED BY (employee_id);
 
 CREATE TABLE aggregateon_payroll_agency(	
@@ -1560,7 +1568,8 @@ CREATE TABLE aggregateon_payroll_employee_agency_month(
 	base_pay numeric(16,2),
 	overtime_pay numeric(16,2),
 	other_payments numeric(16,2),
-	gross_pay numeric(16,2))
+	gross_pay numeric(16,2)
+	)WITH (appendonly=true,orientation=column)
 DISTRIBUTED BY (employee_id);
 
 CREATE TABLE aggregateon_payroll_agency_month(	
@@ -1652,7 +1661,7 @@ DISTRIBUTED BY (budget_id);
 	master_agreement_id bigint,
 	master_agreement_yn character(1),
 	status_flag char(1)
-	)
+	)WITH(appendonly=true)
 DISTRIBUTED BY (original_agreement_id);	
 
 
@@ -1802,7 +1811,8 @@ CREATE TABLE contracts_spending_transactions(
 	disb_disbursement_number character varying(40),
 	status_flag char(1),
 	type_of_year char(1)
-) DISTRIBUTED BY (disbursement_line_item_id)
+)WITH (appendonly=true,orientation=column)
+DISTRIBUTED BY (disbursement_line_item_id)
 PARTITION BY RANGE (fiscal_year) 
 (START (2010) END (2015) EVERY (1),
 DEFAULT PARTITION outlying_years);
@@ -1882,7 +1892,8 @@ CREATE TABLE agreement_snapshot(
   	  load_id integer,
           last_modified_date timestamp without time zone,
           job_id bigint
-) DISTRIBUTED BY (original_agreement_id);
+)WITH(appendonly=true,orientaion=column) 
+DISTRIBUTED BY (original_agreement_id);
 
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
 
