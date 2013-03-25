@@ -153,8 +153,8 @@ $BODY$
   		now()::timestamp,p_load_id_in
   	FROM	etl.ref_budget_code_id_seq a JOIN tmp_fk_values_bdgt_new_budget_code b ON a.uniq_id = b.uniq_id;
   	
-  	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,budget_code_id)
-  	SELECT	a.uniq_id, f.budget_code_id 
+  	INSERT INTO tmp_fk_revenue_budget_values(uniq_id,budget_code_id,budget_code,budget_code_name)
+  	SELECT	a.uniq_id, f.budget_code_id,b.budget_code,b.attribute_name 
   	FROM etl.stg_revenue_budget a JOIN ref_budget_code b ON a.budget_code = b.budget_code and a.budget_fiscal_year = b.fiscal_year
   		JOIN ref_agency d ON a.agency_code = d.agency_code AND b.agency_id = d.agency_id
   		JOIN ref_fund_class e ON a.fund_class_code = e.fund_class_code AND e.fund_class_id = b.fund_class_id
@@ -330,53 +330,42 @@ Raise NOTICE 'Revenue Budget 1.1';
 	VALUES(p_load_file_id_in,'RB',l_count,'# of records updated in revenue_budget ');
 	
 	
-	--To popluate revenue_category_id,code and name
-	CREATE TEMPORARY TABLE tmp_revenue_category(uniq_id int,revenue_source_id int,revenue_category_id smallint,revenue_category_code varchar,revenue_category_name varchar) 
-	DISTRIBUTED BY (uniq_id);
-	
-	INSERT INTO tmp_revenue_category 
-	SELECT a.uniq_id,a.revenue_source_id,b.revenue_category_id,c.revenue_category_code,c.revenue_category_name  
-	FROM etl.stg_revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id 
-	                              JOIN ref_revenue_category c ON b.revenue_category_id = c.revenue_category_id;
-	
-	
-	--To populate funding_class_id,code and name
-	CREATE TEMPORARY TABLE tmp_funding_class(uniq_id int,revenue_source_id int,funding_class_id smallint,funding_class_code varchar,funding_class_name varchar)
-	DISTRIBUTED BY (uniq_id);
-	
-	INSERT INTO tmp_funding_class 
-	SELECT a.uniq_id,a.revenue_source_id,b.funding_class_id,c.funding_class_code,c.funding_class_name 
-	FROM etl.stg_revenue_budget a JOIN ref_revenue_source b ON a.revenue_source_id = b.revenue_source_id 
-				      JOIN ref_funding_class c ON b.funding_class_id = c.funding_class_id;
-	
-	
-
-	
-	
 	INSERT INTO revenue_budget(budget_fiscal_year, fund_class_id, agency_history_id,  budget_code_id, 
-			    adopted_amount_original, adopted_amount, current_modified_budget_amount_original,   current_modified_budget_amount, 
-			 created_load_id,created_date,
-			 budget_fiscal_year_id,agency_id,
-			   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
-			   agency_short_name,revenue_category_id,revenue_category_code,revenue_category_name,
-			   funding_class_id,funding_class_code,funding_class_name,budget_code_name)				      
-	   SELECT a.budget_fiscal_year, a.fund_class_id, a.agency_history_id, a.budget_code_id, 
-					 a.adopted_amount as adopted_amount_original, coalesce(a.adopted_amount,0) as adopted_amount, a.current_budget_amount as current_modified_budget_amount_original, coalesce(a.current_budget_amount,0) as current_modified_budget_amount,
-					 p_load_id_in,now()::timestamp,
-					 a.budget_fiscal_year_id,a.agency_id,
-					a.agency_name,a.budget_code,a.agency_code,a.revenue_source_code,a.revenue_source_name,a.revenue_source_id,
-					a.agency_short_name,b.revenue_category_id,b.revenue_category_code,b.revenue_category_name,
-					c.funding_class_id,c.funding_class_code,c.funding_class_name,a.budget_code_name
-	   FROM  etl.stg_revenue_budget a JOIN tmp_revenue_category b ON a.uniq_id = b.uniq_id
-		          		  JOIN tmp_funding_class c ON a.uniq_id = c.uniq_id
-	   WHERE a.action_flag = 'I' AND a.budget_id IS NULL;		
-   
-	GET DIAGNOSTICS l_count = ROW_COUNT;
-	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-	VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted into revenue_budget ');
+				    adopted_amount_original, adopted_amount, current_modified_budget_amount_original,   current_modified_budget_amount, 
+				 created_load_id,created_date,
+				 budget_fiscal_year_id,agency_id,
+				   agency_name,budget_code,agency_code,revenue_source_code,revenue_source_name,revenue_source_id,
+				   agency_short_name,budget_code_name)				      
+		   SELECT a.budget_fiscal_year, a.fund_class_id, a.agency_history_id, a.budget_code_id, 
+						 a.adopted_amount as adopted_amount_original, coalesce(a.adopted_amount,0) as adopted_amount, a.current_budget_amount as current_modified_budget_amount_original, coalesce(a.current_budget_amount,0) as current_modified_budget_amount,
+						 p_load_id_in,now()::timestamp,
+						 a.budget_fiscal_year_id,a.agency_id,
+						a.agency_name,a.budget_code,a.agency_code,a.revenue_source_code,a.revenue_source_name,a.revenue_source_id,
+						a.agency_short_name,a.budget_code_name
+		   FROM  etl.stg_revenue_budget a 
+		   WHERE a.action_flag = 'I' AND a.budget_id IS NULL;		
 	
-	RAISE NOTICE 'BUDGET 2';
-
+	
+	-- Updating revenue catgeory details
+		UPDATE revenue_budget a SET revenue_category_code = c.revenue_category_code,
+					    revenue_category_id = c.revenue_category_id,	
+					    revenue_category_name = c.revenue_category_name
+		FROM ref_revenue_source b,ref_revenue_category c WHERE a.revenue_source_id =b.revenue_source_id
+		AND b.revenue_category_id = c.revenue_category_id;
+	
+	--Updating funding class details	
+		UPDATE revenue_budget a SET funding_class_code = c.funding_class_code,
+					funding_class_name =c.funding_class_name,
+					funding_class_id =c.funding_class_id				
+		FROM ref_revenue_source b,ref_funding_class c WHERE a.revenue_source_id =b.revenue_source_id
+		AND b.funding_class_id = c.funding_class_id;
+	
+	
+		GET DIAGNOSTICS l_count = ROW_COUNT;
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted into revenue_budget ');
+		
+	RAISE NOTICE 'REVENUE BUDGET 2';
 	
 	RETURN 1;
 	
