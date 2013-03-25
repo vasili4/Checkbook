@@ -1493,6 +1493,6 @@ etl.ext_stg_revenue_budget,bfy,varchar,etl.stg_revenue_budget,budget_fiscal_year
 etl.ext_stg_revenue_budget,fcls_cd,varchar,etl.stg_revenue_budget,fund_class_code,varchar,2
 etl.ext_stg_revenue_budget,dept_cd,varchar,etl.stg_revenue_budget,agency_code,varchar,3
 etl.ext_stg_revenue_budget,func_cd,varchar,etl.stg_revenue_budget,budget_code,varchar,4
-etl.ext_stg_revenue_budget,revenue_source ,varchar,etl.stg_revenue_budget,revenue_source_code,varchar ,5
+etl.ext_stg_revenue_budget,revenue_source ,varchar,etl.stg_revenue_budget,revenue_source_code,varchar,5
 etl.ext_stg_revenue_budget,adpt_am,varchar,etl.stg_revenue_budget,adopted_amount,"numeric(20,2)",6
 etl.ext_stg_revenue_budget,curr_bud_am,varchar,etl.stg_revenue_budget,current_budget_amount,"numeric(20,2)",7
