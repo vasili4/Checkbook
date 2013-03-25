@@ -269,8 +269,8 @@ BEGIN
 		
 		
 	
-	INSERT INTO tmp_fk_budget_values(uniq_id,budget_code_id)
-	SELECT	a.uniq_id, f.budget_code_id 
+	INSERT INTO tmp_fk_budget_values(uniq_id,budget_code_id,budget_code,budget_code_name)
+	SELECT	a.uniq_id, f.budget_code_id, b.budget_code,b.attribute_name
 	FROM etl.stg_budget a JOIN ref_budget_code b ON a.budget_code = b.budget_code and a.budget_fiscal_year = b.fiscal_year
 		JOIN ref_agency d ON a.agency_code = d.agency_code AND b.agency_id = d.agency_id
 		JOIN ref_fund_class e ON a.fund_class_code = e.fund_class_code AND e.fund_class_id = b.fund_class_id
