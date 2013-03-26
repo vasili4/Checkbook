@@ -1403,6 +1403,7 @@ CREATE TABLE disbursement_line_item_details(
 	budget_name varchar(60),
 	contract_number varchar,
 	master_contract_number character varying,
+	master_child_contract_number character varying,
   	contract_vendor_id integer,
   	contract_vendor_id_cy integer,
   	master_contract_vendor_id integer,

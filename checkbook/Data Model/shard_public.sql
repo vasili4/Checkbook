@@ -317,6 +317,7 @@ CREATE TABLE disbursement_line_item_details(
 	budget_name varchar(60),
 	contract_number varchar,
 	master_contract_number character varying,
+	master_child_contract_number character varying,
   	contract_vendor_id integer,
   	contract_vendor_id_cy integer,
   	master_contract_vendor_id integer,
@@ -2055,4 +2056,7 @@ CREATE TABLE ref_award_category_industry (
  
  CREATE INDEX idx_month_id_agg_payroll_year_and_month ON aggregateon_payroll_year_and_month(month_id);
  
+ -- 03/21/2013
  
+ CREATE INDEX idx_agency_id_disbursement_line_item_details ON disbursement_line_item_details USING btree (agency_id);
+ CREATE INDEX idx_check_eft_nyc_year_id_disbursement_line_item_details ON disbursement_line_item_details USING btree (check_eft_issued_nyc_year_id);
