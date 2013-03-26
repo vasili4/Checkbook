@@ -1,0 +1,18 @@
+UPDATE 1
+INSERT 0 1
+[mdw4] real	13m39.550s
+[mdw4] user	0m0.098s
+[mdw4] sys	0m0.271s
+[mdw4] UPDATE 1
+[mdw4] SQL Ran successfully - nothing to do
+[mdw4] /home/gpadmin/ETL/QA/refresh_fix_log.sh: line 18: [: =: unary operator expected
+[mdw4] nothing to do
+UPDATE 2
+INSERT 0 1
+[mdw4] real	13m48.624s
+[mdw4] user	0m0.097s
+[mdw4] sys	0m0.273s
+[mdw4] UPDATE 1
+[mdw4] SQL Ran successfully - nothing to do
+[mdw4] /home/gpadmin/ETL/UAT/refresh_fix_log.sh: line 18: [: =: unary operator expected
+[mdw4] nothing to do

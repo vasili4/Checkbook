@@ -1,0 +1,11 @@
+Varnish is now using etl-group-1 configuration.
+Varnish is now using default All Servers configuration.
+Varnish is now using etl-group-2 configuration.
+Varnish cache cleared.
+[sdw52] TRUNCATE TABLE
+[sdw53] TRUNCATE TABLE
+[sdw56] TRUNCATE TABLE
+[sdw58] TRUNCATE TABLE
+[sdw51] TRUNCATE TABLE
+[sdw54] TRUNCATE TABLE
+[sdw55] TRUNCATE TABLE

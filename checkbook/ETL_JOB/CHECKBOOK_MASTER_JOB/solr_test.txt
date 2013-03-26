@@ -1,0 +1,19 @@
+solrIndexStatusUrl;EMAIL_FROM;EMAIL_TO;EMAIL_CC;EMAIL_SERVER;EMAIL_PORT;job_id;curl_command_check_status;solr_count_xml_path;solr_count_xml_path_di;result;sql;total_records_from_db;solr_count_di;solr_count;title;body
+http://192.168.3.23:8088/solr-checkbook/dataimport/;ETLJOB@reisys.com                                  ;treddy@reisys.com                                  ;treddy@reisys.com                                  ;mail.reisys.com                                    ;25                                                 ;40                                                 ;http://192.168.3.23:8088/solr-checkbook/dataimport/;file:///C:/Users/treddy/Desktop/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/Solr/solr_count.xml;file:///C:/Users/treddy/Desktop/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/Solr/solr_count_di.xml;"<?xml version=""1.0"" encoding=""UTF-8""?>
+<response>
+<lst name=""responseHeader""><int name=""status"">0</int><int name=""QTime"">0</int></lst><lst name=""initArgs""><lst name=""defaults""><str name=""config"">./db-config.xml</str></lst></lst><str name=""status"">idle</str><str name=""importResponse""/><lst name=""statusMessages""><str name=""Total Requests made to DataSource"">4</str><str name=""Total Rows Fetched"">37212857</str><str name=""Total Documents Skipped"">0</str><str name=""Full Dump Started"">2013-03-13 02:54:26</str><str name="""">Indexing completed. Added/Updated: 37212857 documents. Deleted 0 documents.</str><str name=""Committed"">2013-03-13 02:54:28</str><str name=""Total Documents Processed"">37212857</str><str name=""Time taken"">2:9:14.440</str></lst><str name=""WARNING"">This response format is experimental.  It is likely to change in the future.</str>
+</response>
+";SELECT sum(count)::integer as total_records_from_db FROM (select count(*) from disbursement_line_item_details UNION select count(*) from payroll UNION select count(*) from agreement_snapshot a  left join ref_document_code dc on a.document_code_id = dc.document_code_id left join ref_award_category rac on a.award_category_id = rac.award_category_id   where dc.document_code in ('MMA1', 'MA1', 'MAR', 'CT1', 'CTR', 'DO1', 'CTA1', 'RCT1') UNION select count(*) from pending_contracts ) X; 037212857; 37212857; 37212857;Solr indexing completed successfully for job id40;"The indexed records37212857 match with the database count 37212857 and the response for the Solr request:
+
+http://192.168.3.23:8088/solr-checkbook/dataimport/
+
+  is  
+<?xml version=""1.0"" encoding=""UTF-8""?>
+<response>
+<lst name=""responseHeader""><int name=""status"">0</int><int name=""QTime"">0</int></lst><lst name=""initArgs""><lst name=""defaults""><str name=""config"">./db-config.xml</str></lst></lst><str name=""status"">idle</str><str name=""importResponse""/><lst name=""statusMessages""><str name=""Total Requests made to DataSource"">4</str><str name=""Total Rows Fetched"">37212857</str><str name=""Total Documents Skipped"">0</str><str name=""Full Dump Started"">2013-03-13 02:54:26</str><str name="""">Indexing completed. Added/Updated: 37212857 documents. Deleted 0 documents.</str><str name=""Committed"">2013-03-13 02:54:28</str><str name=""Total Documents Processed"">37212857</str><str name=""Time taken"">2:9:14.440</str></lst><str name=""WARNING"">This response format is experimental.  It is likely to change in the future.</str>
+</response>
+
+"
+ALTER TABLE etl.stg_pending_contracts RENAME contract_number TO fms_contract_number ;
+ALTER TABLE etl.archive_pending_contracts RENAME contract_number TO fms_contract_number ;
+ALTER TABLE etl.invalid_pending_contracts RENAME contract_number TO fms_contract_number ;

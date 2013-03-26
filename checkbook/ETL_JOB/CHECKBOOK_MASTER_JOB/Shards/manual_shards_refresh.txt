@@ -1,0 +1,24 @@
+Manual steps if refresh fails:
+
+1. Run  sh use_group2_shards.sh (/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/Shards of prod etl server)
+2. Restart shard1 if there are any queries running for long
+3. Run nohup sh shards_refresh1.sh & (/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/Shards of prod etl server)  -- It will refresh shard1 and rsync the shard2 server
+4. Run the below sql in master Database (mdw) and if it returns 2 rows then the above step3 is successful
+   select * from etl.refresh_shards_status where shard_name IN ('shard1','shard2') and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1);
+5. Run  sh use_group1_shards.sh (/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/Shards of prod etl server)
+6.  Run the below sql in master Database (mdw) and if it returns 2 rows then the above step5 is successful
+   select * from etl.refresh_shards_status where shard_name IN ('shard1','shard3') and latest_flag = 1 and (sql_flag = 1 or fix_flag = 1 or rsync_flag=1)
+7. Run  sh use_all_shards.sh (/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/Shards of prod etl server)
+8. Update the sequence etl.seq_etl_job_id to start with the previous ETL Job id (Current -1) as below
+   ALTER SEQUENCE etl.seq_etl_job_id START WITH 2 (The current value is 3 which you know by executing select nextval('etl.seq_etl_job_id') )
+9. Run the below job to for solr incremental indexing. Please verify it the job is only for SOLR Incremental indexing.
+	nohup sh kitchen.sh -file /vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB/NYC_Master_mtr_test.kjb -norep -level:Minimal > /usr/local/data-integration/NYCETLMaster.out &
+
+
+
+
+
+34417003 -- prod
+34437315 -- dev and uat
+"34437529"  -- prod latest
+pay_cycle_code,  pay_date,  employee_number,  payroll_number,  job_sequence_number,  agency_code,  pay_frequency,  amount_basis
