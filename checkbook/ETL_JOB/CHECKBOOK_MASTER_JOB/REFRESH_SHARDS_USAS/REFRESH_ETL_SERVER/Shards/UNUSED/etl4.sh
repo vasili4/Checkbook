@@ -1,1 +1,0 @@
-time ./etl-4.pl -f  > ./etl-4.out 2>&1
