@@ -345,6 +345,11 @@ Raise NOTICE 'Revenue Budget 1.1';
 		   FROM  etl.stg_revenue_budget a 
 		   WHERE a.action_flag = 'I' AND a.budget_id IS NULL;		
 	
+			GET DIAGNOSTICS l_count = ROW_COUNT;
+		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
+		VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted into revenue_budget ');
+		
+	RAISE NOTICE 'REVENUE BUDGET 2';
 	
 	-- Updating revenue catgeory details
 		UPDATE revenue_budget a SET revenue_category_code = c.revenue_category_code,
@@ -360,12 +365,8 @@ Raise NOTICE 'Revenue Budget 1.1';
 		FROM ref_revenue_source b,ref_funding_class c WHERE a.revenue_source_id =b.revenue_source_id
 		AND b.funding_class_id = c.funding_class_id;
 	
-	
-		GET DIAGNOSTICS l_count = ROW_COUNT;
-		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-		VALUES(p_load_file_id_in,'RB',l_count,'# of records inserted into revenue_budget ');
-		
-	RAISE NOTICE 'REVENUE BUDGET 2';
+		RAISE NOTICE 'REVENUE BUDGET 3';
+
 	
 	RETURN 1;
 	
