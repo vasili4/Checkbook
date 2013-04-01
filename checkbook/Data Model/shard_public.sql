@@ -1893,7 +1893,7 @@ CREATE TABLE agreement_snapshot(
   	  load_id integer,
           last_modified_date timestamp without time zone,
           job_id bigint
-)WITH(appendonly=true,orientaion=column) 
+)WITH(appendonly=true,orientation=column) 
 DISTRIBUTED BY (original_agreement_id);
 
 CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
