@@ -486,7 +486,7 @@ CREATE TABLE history_agreement (
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-)WITH(appendonly=true and orientation=column)
+)WITH(appendonly=true ,orientation=column)
 distributed by (agreement_id);
 
 --
