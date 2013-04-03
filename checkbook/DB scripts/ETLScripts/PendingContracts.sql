@@ -425,6 +425,12 @@ BEGIN
 	FROM history_master_agreement b
 	WHERE a.fms_parent_contract_number = b.contract_number AND b.original_version_flag = 'Y' ;
 	
+	UPDATE pending_contracts a 
+	SET vendor_id = b.vendor_id
+	FROM vendor b
+	WHERE a.vendor_customer_code = b.vendor_customer_code
+	AND b.miscellaneous_vendor_flag::BIT = 0::BIT ;
+	
 	
 	RETURN 1;
 	

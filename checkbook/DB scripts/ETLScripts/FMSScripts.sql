@@ -1629,7 +1629,8 @@ BEGIN
 	USING tmp_disb_delete_ver_gt1_without_ver0 b
 	WHERE   a.disbursement_id = b.disbursement_id ;
 	
-
+	DELETE FROM disbursement_line_item_details 
+	WHERE reference_document_code IN ('MA1','MMA1') ;
 	 
 	 
 	

@@ -1914,6 +1914,7 @@ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (ori
  	registered_contract_max_amount numeric(15,2),
  	vendor_legal_name varchar(80),
  	vendor_customer_code varchar(20),
+ 	vendor_id int,
  	description varchar(78),
  	submitting_agency_id  smallint,
  	oaisis_submitting_agency_desc	 varchar(50),
