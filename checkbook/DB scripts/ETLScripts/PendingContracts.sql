@@ -432,6 +432,20 @@ BEGIN
 	AND b.miscellaneous_vendor_flag::BIT = 0::BIT ;
 	
 	
+	TRUNCATE etl.vendor_id_seq_pending;
+	
+	INSERT INTO etl.vendor_id_seq_pending(vendor_customer_code)
+	SELECT distinct vendor_customer_code 
+	FROM pending_contracts 
+	WHERE vendor_id IS NULL ;
+	
+	UPDATE pending_contracts a
+	SET vendor_id = b.vendor_id
+	FROM etl.vendor_id_seq_pending b
+	WHERE a.vendor_customer_code = b.vendor_customer_code ;
+	
+	
+	
 	RETURN 1;
 	
 EXCEPTION

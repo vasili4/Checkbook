@@ -1363,6 +1363,9 @@ CREATE TABLE invalid_fmsv_business_type (LIKE archive_fmsv_business_type) DISTRI
 CREATE TABLE vendor_id_seq(uniq_id bigint,vendor_id int DEFAULT nextval('public.seq_vendor_vendor_id'))
 DISTRIBUTED BY (uniq_id);
 
+CREATE TABLE vendor_id_seq_pending(vendor_customer_code character varying(20), vendor_id int DEFAULT nextval('public.seq_vendor_vendor_id'))
+DISTRIBUTED BY (vendor_customer_code);
+
 CREATE TABLE vendor_history_id_seq(uniq_id bigint,vendor_history_id int DEFAULT nextval('public.seq_vendor_history_vendor_history_id'))
 DISTRIBUTED BY (uniq_id);
 
