@@ -1224,6 +1224,7 @@ CREATE TABLE budget (
     post_closing_adjustment_amount_original numeric(20,2),
     post_closing_adjustment_amount numeric(20,2),
     total_expenditure_amount numeric(20,2),
+    remaining_budget numeric(20,2),
     source_updated_date_id int,
     budget_fiscal_year_id smallint,
     agency_id smallint,
