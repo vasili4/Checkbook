@@ -3332,6 +3332,7 @@ CREATE TABLE etl.stg_budget
   object_class_history_id integer,
   updated_date_id int,
   total_expenditure_amount numeric(20,2),
+  remaining_budget numeric(20,2),
   action_flag character(1),
   budget_id integer,
   budget_fiscal_year_id smallint,
