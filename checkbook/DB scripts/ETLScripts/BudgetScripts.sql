@@ -409,6 +409,7 @@ END;
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
 -- Function: etl.processbudget(integer, bigint)
 
 -- DROP FUNCTION etl.processbudget(integer, bigint);
@@ -435,8 +436,10 @@ BEGIN
 	SET action_flag = 'I', 
 		total_expenditure_amount = coalesce(pre_encumbered_amount,0) + coalesce(encumbered_amount,0) + 
 					   coalesce(accrued_expense_amount,0) + coalesce(cash_expense_amount,0) + 
-					   coalesce(post_closing_adjustment_amount,0),
-		remaining_budget = current_budget_amount-total_expenditure_amount;
+					   coalesce(post_closing_adjustment_amount,0);
+					   
+	UPDATE etl.stg_budget 
+	SET remaining_budget = current_budget_amount-total_expenditure_amount;
 
 	CREATE TEMPORARY TABLE tmp_budget_unique_keys(uniq_id bigint, budget_fiscal_year smallint, fund_class_id smallint, agency_history_id smallint,  department_history_id integer, budget_code_id integer, object_class_history_id integer, action_flag character(1), budget_id integer) 
 	DISTRIBUTED BY (uniq_id);
