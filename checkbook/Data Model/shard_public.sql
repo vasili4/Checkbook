@@ -1992,6 +1992,19 @@ CREATE TABLE ref_award_category_industry (
     created_date timestamp without time zone
 ) DISTRIBUTED BY (award_category_industry_id);
 
+CREATE TABLE aggregateon_budget_by_year
+(
+agency_id integer,
+department_id integer,
+department_code varchar,
+budget_fiscal_year smallint,
+object_class_id integer,
+modified_budget_amount numeric(20,2),
+modified_budget_amount_py numeric(20,2),
+modified_budget_amount_py_1 numeric(20,2),
+type varchar(10)
+) DISTRIBUTED BY(agency_id);
+
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  -- creating indexes
  

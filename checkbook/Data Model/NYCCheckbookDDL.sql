@@ -2115,6 +2115,19 @@ total_invalid_records bigint,
 invalid_reason varchar(255)
 ) ;
 
+CREATE TABLE aggregateon_budget_by_year
+(
+agency_id integer,
+department_id integer,
+department_code varchar,
+budget_fiscal_year smallint,
+object_class_id integer,
+modified_budget_amount numeric(20,2),
+modified_budget_amount_py numeric(20,2),
+modified_budget_amount_py_1 numeric(20,2),
+type varchar(10)
+) DISTRIBUTED BY(agency_id);
+
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  -- creating indexes
  

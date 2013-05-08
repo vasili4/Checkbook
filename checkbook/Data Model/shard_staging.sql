@@ -2972,4 +2972,26 @@ ENCODING 'UTF8';
 
 
 CREATE VIEW ref_award_category_industry AS
-    SELECT ref_award_category_industry__0.award_category_industry_id, ref_award_category_industry__0.award_category_code, ref_award_category_industry__0.industry_type_id, ref_award_category_industry__0.created_date FROM ONLY ref_award_category_industry__0;  
+    SELECT ref_award_category_industry__0.award_category_industry_id, ref_award_category_industry__0.award_category_code, ref_award_category_industry__0.industry_type_id, ref_award_category_industry__0.created_date FROM ONLY ref_award_category_industry__0;
+    
+
+CREATE EXTERNAL WEB TABLE aggregateon_budget_by_year__0
+(
+agency_id integer,
+department_id integer,
+department_code varchar,
+budget_fiscal_year smallint,
+object_class_id integer,
+modified_budget_amount numeric(20,2),
+modified_budget_amount_py numeric(20,2),
+modified_budget_amount_py_1 numeric(20,2),
+type varchar(10)
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_budget_by_year to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+
+CREATE VIEW aggregateon_budget_by_year AS
+    SELECT aggregateon_budget_by_year__0.agency_id, aggregateon_budget_by_year__0.department_id, aggregateon_budget_by_year__0.department_code, aggregateon_budget_by_year__0.budget_fiscal_year, aggregateon_budget_by_year__0.object_class_id, 
+    aggregateon_budget_by_year__0.modified_budget_amount, aggregateon_budget_by_year__0.modified_budget_amount_py, aggregateon_budget_by_year__0.modified_budget_amount_py_1,aggregateon_budget_by_year__0.type
+    FROM  aggregateon_budget_by_year__0;
+ 
