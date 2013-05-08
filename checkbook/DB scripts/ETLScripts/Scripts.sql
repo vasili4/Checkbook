@@ -1265,6 +1265,14 @@ BEGIN
 	ELSE 
 			RETURN 0;
 	END IF;
+	
+		
+	IF l_status = 1 THEN 
+		l_status :=etl.refreshbudgetaggregatetable(p_job_id_in);
+	ELSE 
+			RETURN 0;
+	END IF;	
+
 		
 	IF l_status = 1 THEN 
 		l_status :=etl.refreshaggregates(p_job_id_in);
