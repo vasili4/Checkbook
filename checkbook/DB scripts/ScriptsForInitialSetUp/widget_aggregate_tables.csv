@@ -279,7 +279,6 @@ a.budget_fiscal_year_id,
   GROUP BY 1,2,3,4) a1 on a.revenue_category_code = a1.revenue_category_code and a.funding_class_code = a1.funding_class_code 
   and a.budget_fiscal_year_id = a1.budget_fiscal_year_id and a.agency_id = a1.agency_id
 group by 1,2,3,4) b1 ) X ",,6
-
 PayrollByEmployeeAgency,aggregateon_payroll_employee_agency,"CREATE TABLE aggregateon_payroll_employee_agency(
 	employee_id bigint,
 	agency_id smallint,
