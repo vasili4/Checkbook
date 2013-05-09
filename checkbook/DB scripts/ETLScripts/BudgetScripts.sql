@@ -604,6 +604,15 @@ BEGIN
 	where a.agency_id=b.agency_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and  b.agency_id=c.agency_id and  b.budget_fiscal_year-2=c.budget_fiscal_year;
 
+
+	Update aggregateon_budget_by_year a
+	set modified_budget_amount_py_2 = c.modified_budget_amount
+	from tmp_budget_agency b ,tmp_budget_agency c 
+	where a.agency_id=b.agency_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	and  b.agency_id=c.agency_id and  b.budget_fiscal_year-3=c.budget_fiscal_year;
+
+
+
 	-- END agency
 	--------------------------------
 -- object class
@@ -634,6 +643,13 @@ BEGIN
 	where a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and  b.object_class_id=c.object_class_id and  b.budget_fiscal_year-2=c.budget_fiscal_year;
 
+	Update aggregateon_budget_by_year a
+	set modified_budget_amount_py_2 = c.modified_budget_amount
+	from tmp_budget_object b ,tmp_budget_object c 
+	where a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	and  b.object_class_id=c.object_class_id and  b.budget_fiscal_year-3=c.budget_fiscal_year;
+
+
 --END object class
 
 -----------------------
@@ -660,6 +676,14 @@ BEGIN
 	from tmp_budget_agency_object b ,tmp_budget_agency_object c 
 	where a.agency_id=b.agency_id and  a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.object_class_id=c.object_class_id and  b.budget_fiscal_year-2=c.budget_fiscal_year;
+
+
+	UPDATE aggregateon_budget_by_year a
+	set modified_budget_amount_py_2 = c.modified_budget_amount
+	from tmp_budget_agency_object b ,tmp_budget_agency_object c 
+	where a.agency_id=b.agency_id and  a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	and b.agency_id=c.agency_id and b.object_class_id=c.object_class_id and  b.budget_fiscal_year-3=c.budget_fiscal_year;
+
 
 --end agency object
 
@@ -691,7 +715,13 @@ BEGIN
 	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.department_code=c.department_code and  b.budget_fiscal_year-2=c.budget_fiscal_year;
 
+UPDATE aggregateon_budget_by_year a
+	set modified_budget_amount_py_2 = c.modified_budget_amount
+	from tmp_budget_agency_dept b ,tmp_budget_agency_dept c 
+	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.budget_fiscal_year =b.budget_fiscal_year 
+	and b.agency_id=c.agency_id and b.department_code=c.department_code and  b.budget_fiscal_year-3=c.budget_fiscal_year;
 
+	
 	--end agency dept
 
 	---------------------
@@ -719,6 +749,15 @@ BEGIN
 	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.department_code=c.department_code and b.object_class_id=c.object_class_id and b.budget_fiscal_year-2=c.budget_fiscal_year;
 
+
+	
+	UPDATE aggregateon_budget_by_year a
+	set modified_budget_amount_py_2 = c.modified_budget_amount
+	from tmp_budget_agency_dept_obj b ,tmp_budget_agency_dept_obj c 
+	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	and b.agency_id=c.agency_id and b.department_code=c.department_code and b.object_class_id=c.object_class_id and b.budget_fiscal_year-3=c.budget_fiscal_year;
+
+	
 	--end agency dept object
 
 	---------------------
@@ -727,7 +766,7 @@ BEGIN
 	UPDATE aggregateon_budget_by_year a
 	SET department_id = b.department_id
 	FROM ref_department b, ref_fund_class c 
-	where  a.agency_id = b.agency_id and a.budget_fiscal_year = b.fiscal_year  and b.fund_class_id = c.fund_class_id and c.fund_class_code ='001' and a.filter_type IN ('AD','ADO');
+	where  a.department_code =b.department_code and a.agency_id = b.agency_id and a.budget_fiscal_year = b.fiscal_year  and b.fund_class_id = c.fund_class_id and c.fund_class_code ='001' and a.filter_type IN ('AD','ADO');
 	
 
 		l_end_time := timeofday()::timestamp;
