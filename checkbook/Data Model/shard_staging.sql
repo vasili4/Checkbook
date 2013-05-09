@@ -1955,32 +1955,51 @@ CREATE VIEW ref_pay_frequency AS
 	
 
 CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_class__0(
-	revenue_category_id smallint,
-	funding_class_id smallint,
+	revenue_category_code character varying,
 	funding_class_code character varying,
-	agency_id character varying,
+	agency_id smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
 	current_modified_amount numeric(16,2)
 )
-
 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_category_funding_class to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
 
 CREATE VIEW aggregateon_revenue_category_funding_class AS
-	SELECT aggregateon_revenue_category_funding_class__0.revenue_category_id,aggregateon_revenue_category_funding_class__0.funding_class_id,
+	SELECT aggregateon_revenue_category_funding_class__0.revenue_category_code,
 	              aggregateon_revenue_category_funding_class__0.funding_class_code,aggregateon_revenue_category_funding_class__0.agency_id,
 	              aggregateon_revenue_category_funding_class__0.budget_fiscal_year_id,aggregateon_revenue_category_funding_class__0.posting_amount, 
 	              aggregateon_revenue_category_funding_class__0.adopted_amount,aggregateon_revenue_category_funding_class__0.current_modified_amount
 	FROM aggregateon_revenue_category_funding_class__0;
 	
 
+CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_by_year__0(
+        revenue_category_code character varying,
+        funding_class_code character varying,
+        agency_id smallint,
+        budget_fiscal_year_id smallint,
+        posting_amount_cy numeric(16,2),
+        posting_amount_ny numeric(16,2),
+        posting_amount_ny_1 numeric(16,2),
+        posting_amount numeric(16,2),
+        other_amount numeric(16,2),
+        remaining_amount numeric(16,2),
+        current_modified_amount numeric(16,2))
+)
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_category_funding_by_year to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
 
-
-	
+CREATE VIEW aggregateon_revenue_category_funding_by_year AS
+	SELECT aggregateon_revenue_category_funding_by_year__0.revenue_category_code,
+	              aggregateon_revenue_category_funding_by_year__0.funding_class_code,aggregateon_revenue_category_funding_by_year__0.agency_id,
+	              aggregateon_revenue_category_funding_by_year__0.budget_fiscal_year_id,aggregateon_revenue_category_funding_by_year__0.posting_amount_cy, 
+	              aggregateon_revenue_category_funding_by_year__0.posting_amount_ny, aggregateon_revenue_category_funding_by_year__0.posting_amount_ny_1, aggregateon_revenue_category_funding_by_year__0.posting_amount, 
+	              aggregateon_revenue_category_funding_by_year__0.other_amount,aggregateon_revenue_category_funding_by_year__0.remaining_amount,aggregateon_revenue_category_funding_by_year__0.current_modified_amount
+	FROM aggregateon_revenue_category_funding_by_year__0;	
 
 
 CREATE EXTERNAL WEB TABLE ref_amount_basis__0 (

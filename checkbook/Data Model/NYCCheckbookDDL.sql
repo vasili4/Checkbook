@@ -1520,15 +1520,28 @@ DISTRIBUTED BY (pay_frequency);
 
 
 CREATE TABLE aggregateon_revenue_category_funding_class(
-	revenue_category_id smallint,
-	funding_class_id smallint,
+	revenue_category_code character varying,
 	funding_class_code character varying,
-	agency_id character varying,
+	agency_id smallint,
 	budget_fiscal_year_id smallint,
 	posting_amount numeric(16,2),
 	adopted_amount numeric(16,2),
 	current_modified_amount numeric(16,2))
-DISTRIBUTED BY (revenue_category_id);	
+DISTRIBUTED BY (agency_id);	
+
+CREATE TABLE aggregateon_revenue_category_funding_by_year(
+        revenue_category_code character varying,
+        funding_class_code character varying,
+        agency_id smallint,
+        budget_fiscal_year_id smallint,
+        posting_amount_cy numeric(16,2),
+        posting_amount_ny numeric(16,2),
+        posting_amount_ny_1 numeric(16,2),
+        posting_amount numeric(16,2),
+        other_amount numeric(16,2),
+        remaining_amount numeric(16,2),
+        current_modified_amount numeric(16,2))
+DISTRIBUTED BY (agency_id);
 
 
 CREATE TABLE ref_amount_basis (

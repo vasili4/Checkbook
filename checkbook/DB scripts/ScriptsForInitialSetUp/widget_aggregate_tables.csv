@@ -190,47 +190,96 @@ GROUP BY 1,2,3,4","SELECT vendor_id,expenditure_object_id,spending_category_id,
  FROM disbursement_line_item_details
 GROUP BY 1,2,3,4",4
 RevenueByCategoryId,aggregateon_revenue_category_funding_class,"CREATE TABLE aggregateon_revenue_category_funding_class(
-	revenue_category_id smallint,
-	funding_class_id smallint,
-	funding_class_code character varying,
-	agency_id character varying,
-	budget_fiscal_year_id smallint,
-	posting_amount numeric(16,2),
-	adopted_amount numeric(16,2),
-	current_modified_amount numeric(16,2))
-DISTRIBUTED BY (revenue_category_id)","SELECT b1.revenue_category_id,b1.funding_class_id,f.funding_class_code,b1.agency_id,budget_fiscal_year_id,
+                revenue_category_code character varying,
+                funding_class_code character varying,
+                agency_id  smallint,
+                budget_fiscal_year_id smallint,
+                posting_amount numeric(16,2),
+                adopted_amount numeric(16,2),
+                current_modified_amount numeric(16,2))
+DISTRIBUTED BY (agency_id)","SELECT b1.revenue_category_code,b1.funding_class_code,b1.agency_id,budget_fiscal_year_id,
                posting_amount,adopted_amount,current_budget_amount
 FROM
 (
-SELECT COALESCE(a.revenue_category_id,a1.revenue_category_id) as revenue_category_id,
-               COALESCE(a.funding_class_id,a1.funding_class_id) as funding_class_id,
+SELECT COALESCE(a.revenue_category_code,a1.revenue_category_code) as revenue_category_code,
+               COALESCE(a.funding_class_code,a1.funding_class_code) as funding_class_code,
                COALESCE(a.agency_id,a1.agency_id) as agency_id,
        COALESCE(a.budget_fiscal_year_id,a1.budget_fiscal_year_id) as budget_fiscal_year_id,
        sum(a.posting_amount) AS posting_amount,
        SUM(a1.adopted_amount) AS adopted_amount,
        SUM(a1.current_budget_amount) AS current_budget_amount
-  FROM (SELECT y.revenue_category_id,
-                      y.funding_class_id,x.agency_id,
+  FROM (SELECT x.revenue_category_code,
+                      x.funding_class_code,x.agency_id,
                x.budget_fiscal_year_id,
                sum(x.posting_amount) AS posting_amount
           FROM   revenue_details x
-                          JOIN
-                             ref_revenue_source y
-                          ON x.revenue_source_id = y.revenue_source_id
                    GROUP BY 1, 2,3,4) a
           full outer join
-(SELECT b.revenue_category_id,
-  b.funding_class_id,a.agency_id,
-a.budget_fiscal_year_id,
-  sum(a.adopted_amount) as adopted_amount,
+(SELECT c.revenue_category_code,
+                d.funding_class_code,a.agency_id,
+                a.budget_fiscal_year_id,
+                sum(a.adopted_amount) as adopted_amount,
        sum(a.current_modified_budget_amount) as current_budget_amount
   FROM revenue_budget a
        JOIN ref_revenue_source b
           ON a.revenue_source_id = b.revenue_source_id
-  GROUP BY 1,2,3,4) a1 on a.revenue_category_id = a1.revenue_category_id and a.funding_class_id = a1.funding_class_id 
+                                LEFT JOIN ref_revenue_category c ON b.revenue_category_id = c.revenue_category_id
+                                LEFT JOIN ref_funding_class d ON b.funding_class_id = d.funding_class_id
+  GROUP BY 1,2,3,4) a1 on a.revenue_category_code = a1.revenue_category_code and a.funding_class_code = a1.funding_class_code 
   and a.budget_fiscal_year_id = a1.budget_fiscal_year_id and a.agency_id = a1.agency_id
-group by 1,2,3,4 ) b1 left join ref_funding_class f on b1.funding_class_id = f.funding_class_id
-ORDER BY 4",,5
+group by 1,2,3,4 ) b1 ORDER BY 4",,5
+RevenueByCategoryIdAndYear,aggregateon_revenue_category_funding_by_year,"CREATE TABLE aggregateon_revenue_category_funding_by_year(
+                revenue_category_code character varying,
+                funding_class_code character varying,
+                agency_id smallint,
+                budget_fiscal_year_id smallint,
+                posting_amount_cy numeric(16,2),
+                posting_amount_ny numeric(16,2),
+                posting_amount_ny_1 numeric(16,2),
+                posting_amount numeric(16,2),
+                other_amount numeric(16,2),
+                remaining_amount numeric(16,2),
+                current_modified_amount numeric(16,2))
+DISTRIBUTED BY (agency_id)","SELECT X.revenue_category_code,X.funding_class_code,X.agency_id,budget_fiscal_year_id,
+               posting_amount_cy, posting_amount_ny, posting_amount_ny_1, posting_amount,other_amount,remaining_amount,current_budget_amount
+FROM
+(
+SELECT revenue_category_code, funding_class_code, agency_id, budget_fiscal_year_id, posting_amount_cy, posting_amount_ny, posting_amount_ny_1, 
+posting_amount, (posting_amount - (posting_amount_cy + posting_amount_ny + posting_amount_ny_1)) as other_amount, (current_budget_amount - posting_amount) as remaining_amount, current_budget_amount
+FROM
+(
+SELECT a.revenue_category_code as revenue_category_code,
+               a.funding_class_code as funding_class_code,
+               a.agency_id as agency_id,
+       a.budget_fiscal_year_id as budget_fiscal_year_id,
+                   sum(a.posting_amount_cy) AS posting_amount_cy,
+                   sum(a.posting_amount_ny) AS posting_amount_ny,
+                   sum(a.posting_amount_ny_1) AS posting_amount_ny_1,
+       sum(a.posting_amount) AS posting_amount,
+       SUM(a1.current_budget_amount) AS current_budget_amount
+  FROM (SELECT x.revenue_category_code,
+                      x.funding_class_code,x.agency_id,
+               x.budget_fiscal_year_id,
+                                                   sum(CASE WHEN x.budget_fiscal_year = x.fiscal_year THEN x.posting_amount ELSE 0 END) AS posting_amount_cy,
+                                                   sum(CASE WHEN x.budget_fiscal_year+1 = x.fiscal_year THEN x.posting_amount ELSE 0 END) AS posting_amount_ny,
+                                                   sum(CASE WHEN x.budget_fiscal_year+2 = x.fiscal_year THEN x.posting_amount ELSE 0 END) AS posting_amount_ny_1,
+               sum(x.posting_amount) AS posting_amount
+          FROM   revenue_details x                          
+                   GROUP BY 1, 2,3,4) a
+          left join
+(SELECT c.revenue_category_code,
+  d.funding_class_code,a.agency_id,
+a.budget_fiscal_year_id,
+       sum(a.current_modified_budget_amount) as current_budget_amount
+  FROM revenue_budget a
+       JOIN ref_revenue_source b
+          ON a.revenue_source_id = b.revenue_source_id
+                                LEFT JOIN ref_revenue_category c ON b.revenue_category_id = c.revenue_category_id
+                                LEFT JOIN ref_funding_class d ON b.funding_class_id = d.funding_class_id
+  GROUP BY 1,2,3,4) a1 on a.revenue_category_code = a1.revenue_category_code and a.funding_class_code = a1.funding_class_code 
+  and a.budget_fiscal_year_id = a1.budget_fiscal_year_id and a.agency_id = a1.agency_id
+group by 1,2,3,4) b1 ) X ",,6
+
 PayrollByEmployeeAgency,aggregateon_payroll_employee_agency,"CREATE TABLE aggregateon_payroll_employee_agency(
 	employee_id bigint,
 	agency_id smallint,
@@ -301,7 +350,7 @@ FROM payroll e JOIN (SELECT d.employee_id,d.payroll_number,d.job_sequence_number
 						AND e.amount_basis_id = annual_sal_table.amount_basis_id
 						AND e.pay_frequency = annual_sal_table.pay_frequency
 	JOIN ref_amount_basis z ON e.amount_basis_id = z.amount_basis_id	
-GROUP BY 1,2,3,4,5,6 ",6
+GROUP BY 1,2,3,4,5,6 ",7
 PayrollByAgency,aggregateon_payroll_agency,"CREATE TABLE aggregateon_payroll_agency(	
 	agency_id smallint,	
 	fiscal_year_id smallint,
@@ -369,7 +418,7 @@ JOIN (SELECT employee_id, agency_id, fiscal_year_id, type_of_year, max(coalesce(
 			  FROM aggregateon_payroll_employee_agency 
 			  WHERE type_of_year = 'C' AND type_of_employment = 'Salaried'
 			  GROUP BY 1,2,3,4) Y ON X.agency_id = Y.agency_id AND X.calendar_fiscal_year_id = Y.fiscal_year_id AND X.type_of_year = Y.type_of_year
-GROUP BY 1,2,3 ",7
+GROUP BY 1,2,3 ",8
 PayrollByMonth,aggregateon_payroll_coa_month,"CREATE TABLE aggregateon_payroll_coa_month(	
 	agency_id smallint,
 	department_id integer,
@@ -392,7 +441,7 @@ DISTRIBUTED BY (agency_id) ","SELECT agency_id,department_id,fiscal_year_id,cale
 	SUM(other_payments) as other_payments,
 	SUM(gross_pay) as gross_pay_ytd	
 	FROM payroll a JOIN ref_date b ON a.pay_date_id = b.date_id
-	GROUP BY 1,2,3,4,5 ",8
+	GROUP BY 1,2,3,4,5 ",9
 PayrollByYear,aggregateon_payroll_year,"CREATE TABLE aggregateon_payroll_year(	
 	fiscal_year_id smallint,
 	type_of_year char(1),	
@@ -414,7 +463,7 @@ DISTRIBUTED BY (fiscal_year_id) ","SELECT fiscal_year_id,'B' as type_of_year,
 	       ROUND((COUNT(DISTINCT (CASE WHEN  amount_basis_name IN ('DAILY','HOURLY') THEN employee_number END)) )::DECIMAL /2) as hourly_employees,
 	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
-	GROUP BY 1,2 ",9
+	GROUP BY 1,2 ",10
 PayrollByEmployeeAgencyMonth,aggregateon_payroll_employee_agency_month,"CREATE TABLE aggregateon_payroll_employee_agency_month(
 	employee_id bigint,
 	agency_id smallint,
@@ -476,7 +525,7 @@ FROM payroll e LEFT JOIN (SELECT employee_id,payroll_number,job_sequence_number,
 						AND e.pay_frequency = annual_sal_table.pay_frequency
 	JOIN ref_amount_basis z ON e.amount_basis_id = z.amount_basis_id	
 	JOIN ref_date b ON e.pay_date_id = b.date_id
-GROUP BY 1,2,3,4,5,6,7 ",10
+GROUP BY 1,2,3,4,5,6,7 ",11
 PayrollByAgencyMonth,aggregateon_payroll_agency_month,"CREATE TABLE aggregateon_payroll_agency_month(	
 	agency_id smallint,	
 	fiscal_year_id smallint,
@@ -547,7 +596,7 @@ JOIN (SELECT employee_id, agency_id, fiscal_year_id, type_of_year, month_id as c
 			  FROM aggregateon_payroll_employee_agency_month 
 			  WHERE type_of_year = 'C' AND type_of_employment = 'Salaried'
 			  GROUP BY 1,2,3,4,5) Y ON X.agency_id = Y.agency_id AND X.calendar_fiscal_year_id = Y.fiscal_year_id AND X.type_of_year = Y.type_of_year AND X.calendar_month_id = Y.calendar_month_id
-GROUP BY 1,2,3,4 ",11
+GROUP BY 1,2,3,4 ",12
 PayrollByYearAndMonth,aggregateon_payroll_year_and_month,"CREATE TABLE aggregateon_payroll_year_and_month(	
 	fiscal_year_id smallint,
 	type_of_year char(1),	
@@ -572,7 +621,7 @@ DISTRIBUTED BY (fiscal_year_id) ","SELECT fiscal_year_id,'B' as type_of_year,cal
 	       COUNT(DISTINCT (CASE WHEN overtime_pay >0 THEN employee_number END)) as total_overtime_employees
 	FROM payroll a JOIN ref_amount_basis b ON a.amount_basis_id = b.amount_basis_id
 	JOIN ref_date c ON a.pay_date_id = c.date_id
-	GROUP BY 1,2,3 ",12
+	GROUP BY 1,2,3 ",13
 PopulateContractSpendingByYear,mid_aggregateon_disbursement_spending_year,"CREATE TABLE mid_aggregateon_disbursement_spending_year(
 	original_agreement_id bigint,
 	fiscal_year smallint,
