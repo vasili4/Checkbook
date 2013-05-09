@@ -1987,7 +1987,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_by_year__0(
         posting_amount numeric(16,2),
         other_amount numeric(16,2),
         remaining_amount numeric(16,2),
-        current_modified_amount numeric(16,2))
+        current_modified_amount numeric(16,2)
 )
 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_category_funding_by_year to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
