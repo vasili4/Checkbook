@@ -586,8 +586,8 @@ BEGIN
 	INSERT INTO tmp_budget_agency
 	SELECT agency_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget group by 1,2,3;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
-	select agency_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'A' as filter_filter_type from tmp_budget_agency;
+	INSERT INTO aggregateon_budget_by_year(agency_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_type) 
+	select agency_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'A' as filter_type from tmp_budget_agency;
 	
 
 	
@@ -617,8 +617,8 @@ BEGIN
 	INSERT INTO tmp_budget_object
 	SELECT object_class_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3;
 
-	INSERT INTO aggregateon_budget_by_year(object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
-	SELECT object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'O' as filter_filter_type FROM tmp_budget_object;
+	INSERT INTO aggregateon_budget_by_year(object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_type) 
+	SELECT object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'O' as filter_type FROM tmp_budget_object;
 	
 
 	UPDATE aggregateon_budget_by_year a
@@ -644,8 +644,8 @@ BEGIN
 	INSERT INTO tmp_budget_agency_object
 	SELECT agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3,4;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
-	SELECT agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AO' as filter_filter_type FROM tmp_budget_agency_object;
+	INSERT INTO aggregateon_budget_by_year(agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_type) 
+	SELECT agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AO' as filter_type FROM tmp_budget_agency_object;
 	
 
 	UPDATE aggregateon_budget_by_year a
@@ -674,8 +674,8 @@ BEGIN
 	INSERT INTO tmp_budget_agency_dept
 	SELECT agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3,4;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
-	SELECT agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AD' as filter_filter_type FROM tmp_budget_agency_dept a ;
+	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_type) 
+	SELECT agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AD' as filter_type FROM tmp_budget_agency_dept a ;
 	
 
 	UPDATE aggregateon_budget_by_year a
@@ -703,7 +703,7 @@ BEGIN
 	INSERT INTO tmp_budget_agency_dept_obj
 	SELECT agency_id,department_code,object_class_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3,4,5;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
+	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_type) 
 	SELECT agency_id,department_code,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'ADO' as filter_type FROM tmp_budget_agency_dept_obj;
 	
 
