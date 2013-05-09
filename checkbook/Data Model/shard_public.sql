@@ -1998,12 +1998,14 @@ agency_id integer,
 department_id integer,
 department_code varchar,
 budget_fiscal_year smallint,
+budget_fiscal_year_id smallint,
 object_class_id integer,
 modified_budget_amount numeric(20,2),
 modified_budget_amount_py numeric(20,2),
 modified_budget_amount_py_1 numeric(20,2),
-type varchar(10)
+filter_type varchar(10)
 ) DISTRIBUTED BY(agency_id);
+
 
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  -- creating indexes
