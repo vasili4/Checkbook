@@ -563,7 +563,6 @@ ALTER FUNCTION etl.processbudget(integer, bigint)
   OWNER TO gpadmin;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 -- Function: etl.refreshbudgetaggregatetable(bigint)
 
 -- DROP FUNCTION etl.refreshbudgetaggregatetable(bigint);
@@ -580,59 +579,59 @@ BEGIN
 
 	TRUNCATE aggregateon_budget_by_year;
 
-       -- start agency type A
+       -- start agency filter_type A
        
-	CREATE TEMPORARY TABLE tmp_budget_agency(agency_id integer,budget_fiscal_year smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (agency_id);
+	CREATE TEMPORARY TABLE tmp_budget_agency(agency_id integer,budget_fiscal_year smallint,budget_fiscal_year_id smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (agency_id);
 	
 	INSERT INTO tmp_budget_agency
-	SELECT agency_id,budget_fiscal_year, sum(current_budget_amount) as modified_budget_amount FROM   budget group by 1,2;
+	SELECT agency_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget group by 1,2,3;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,budget_fiscal_year,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,type) 
-	select agency_id,budget_fiscal_year,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'A' as type FROM tmp_budget_agency;
+	INSERT INTO aggregateon_budget_by_year(agency_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
+	select agency_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'A' as filter_filter_type from tmp_budget_agency;
 	
 
 	
 	Update aggregateon_budget_by_year a
-	SET modified_budget_amount_py = c.modified_budget_amount
-	FROM tmp_budget_agency b ,tmp_budget_agency c 
-	WHERE a.agency_id=b.agency_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py = c.modified_budget_amount
+	from tmp_budget_agency b ,tmp_budget_agency c 
+	where a.agency_id=b.agency_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and  b.agency_id=c.agency_id and  b.budget_fiscal_year-1=c.budget_fiscal_year;
 
 
 	Update aggregateon_budget_by_year a
-	SET modified_budget_amount_py_1 = c.modified_budget_amount
-	FROM tmp_budget_agency b ,tmp_budget_agency c 
-	WHERE a.agency_id=b.agency_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py_1 = c.modified_budget_amount
+	from tmp_budget_agency b ,tmp_budget_agency c 
+	where a.agency_id=b.agency_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and  b.agency_id=c.agency_id and  b.budget_fiscal_year-2=c.budget_fiscal_year;
 
 	-- END agency
 	--------------------------------
-	-- object class
+-- object class
 
- 
-	-- 	select object_class_code , count(distinct budget_fiscal_year) FROM budget group by 1 having count(distinct budget_fiscal_year)>1
-	-- select object_class_code , agency_id,department_id,count(distinct budget_fiscal_year) FROM budget group by 1,2,3 having count(distinct budget_fiscal_year)>1
+-- 
+-- 	select object_class_code , count(distinct budget_fiscal_year) from budget group by 1 having count(distinct budget_fiscal_year)>1
+-- select object_class_code , agency_id,department_id,count(distinct budget_fiscal_year) from budget group by 1,2,3 having count(distinct budget_fiscal_year)>1
 	
-	CREATE TEMPORARY TABLE tmp_budget_object(object_class_id integer,budget_fiscal_year smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (object_class_id);
+	CREATE TEMPORARY TABLE tmp_budget_object(object_class_id integer,budget_fiscal_year smallint,budget_fiscal_year_id smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (object_class_id);
 	
 	INSERT INTO tmp_budget_object
-	SELECT object_class_id,budget_fiscal_year, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2;
+	SELECT object_class_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3;
 
-	INSERT INTO aggregateon_budget_by_year(object_class_id,budget_fiscal_year,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,type) 
-	SELECT object_class_id,budget_fiscal_year,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'O' as type FROM tmp_budget_object;
+	INSERT INTO aggregateon_budget_by_year(object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
+	SELECT object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'O' as filter_filter_type FROM tmp_budget_object;
 	
 
 	UPDATE aggregateon_budget_by_year a
-	SET modified_budget_amount_py = c.modified_budget_amount
-	FROM tmp_budget_object b ,tmp_budget_object c 
-	WHERE a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py = c.modified_budget_amount
+	from tmp_budget_object b ,tmp_budget_object c 
+	where a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and  b.object_class_id=c.object_class_id and  b.budget_fiscal_year-1=c.budget_fiscal_year;
 
 
 	Update aggregateon_budget_by_year a
-	SET modified_budget_amount_py_1 = c.modified_budget_amount
-	FROM tmp_budget_object b ,tmp_budget_object c 
-	WHERE a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py_1 = c.modified_budget_amount
+	from tmp_budget_object b ,tmp_budget_object c 
+	where a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and  b.object_class_id=c.object_class_id and  b.budget_fiscal_year-2=c.budget_fiscal_year;
 
 --END object class
@@ -640,26 +639,26 @@ BEGIN
 -----------------------
 
 
-	CREATE TEMPORARY TABLE tmp_budget_agency_object(agency_id integer,object_class_id integer,budget_fiscal_year smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (object_class_id);
+	CREATE TEMPORARY TABLE tmp_budget_agency_object(agency_id integer,object_class_id integer,budget_fiscal_year smallint,budget_fiscal_year_id smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (object_class_id);
 	
 	INSERT INTO tmp_budget_agency_object
-	SELECT agency_id,object_class_id,budget_fiscal_year, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3;
+	SELECT agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3,4;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,object_class_id,budget_fiscal_year,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,type) 
-	SELECT agency_id,object_class_id,budget_fiscal_year,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AO' as type FROM tmp_budget_agency_object;
+	INSERT INTO aggregateon_budget_by_year(agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
+	SELECT agency_id,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AO' as filter_filter_type FROM tmp_budget_agency_object;
 	
 
 	UPDATE aggregateon_budget_by_year a
-	SET modified_budget_amount_py = c.modified_budget_amount
-	FROM tmp_budget_agency_object b ,tmp_budget_agency_object c 
-	WHERE a.agency_id=b.agency_id and  a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py = c.modified_budget_amount
+	from tmp_budget_agency_object b ,tmp_budget_agency_object c 
+	where a.agency_id=b.agency_id and  a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.object_class_id=c.object_class_id and  b.budget_fiscal_year-1=c.budget_fiscal_year;
 
 
 	UPDATE aggregateon_budget_by_year a
-	SET modified_budget_amount_py_1 = c.modified_budget_amount
-	FROM tmp_budget_agency_object b ,tmp_budget_agency_object c 
-	WHERE a.agency_id=b.agency_id and  a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py_1 = c.modified_budget_amount
+	from tmp_budget_agency_object b ,tmp_budget_agency_object c 
+	where a.agency_id=b.agency_id and  a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.object_class_id=c.object_class_id and  b.budget_fiscal_year-2=c.budget_fiscal_year;
 
 --end agency object
@@ -670,26 +669,26 @@ BEGIN
 -----------------------
 
 
-	CREATE TEMPORARY TABLE tmp_budget_agency_dept(agency_id integer,department_code varchar,budget_fiscal_year smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (department_code);
+	CREATE TEMPORARY TABLE tmp_budget_agency_dept(agency_id integer,department_code varchar,budget_fiscal_year smallint,budget_fiscal_year_id smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (department_code);
 	
 	INSERT INTO tmp_budget_agency_dept
-	SELECT agency_id,department_code,budget_fiscal_year, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3;
+	SELECT agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3,4;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,budget_fiscal_year,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,type) 
-	SELECT agency_id,department_code,budget_fiscal_year,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AD' as type FROM tmp_budget_agency_dept a ;
+	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
+	SELECT agency_id,department_code,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'AD' as filter_filter_type FROM tmp_budget_agency_dept a ;
 	
 
 	UPDATE aggregateon_budget_by_year a
-	SET modified_budget_amount_py = c.modified_budget_amount
-	FROM tmp_budget_agency_dept b ,tmp_budget_agency_dept c 
-	WHERE a.agency_id=b.agency_id and  a.department_code=b.department_code and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py = c.modified_budget_amount
+	from tmp_budget_agency_dept b ,tmp_budget_agency_dept c 
+	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.department_code=c.department_code and  b.budget_fiscal_year-1=c.budget_fiscal_year;
 
 
 	UPDATE aggregateon_budget_by_year a
-	SET modified_budget_amount_py_1 = c.modified_budget_amount
-	FROM tmp_budget_agency_dept b ,tmp_budget_agency_dept c 
-	WHERE a.agency_id=b.agency_id and  a.department_code=b.department_code and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py_1 = c.modified_budget_amount
+	from tmp_budget_agency_dept b ,tmp_budget_agency_dept c 
+	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.department_code=c.department_code and  b.budget_fiscal_year-2=c.budget_fiscal_year;
 
 
@@ -699,25 +698,25 @@ BEGIN
 
 
 
-	CREATE TEMPORARY TABLE tmp_budget_agency_dept_obj(agency_id integer,department_code varchar,object_class_id integer,budget_fiscal_year smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (department_code);
+	CREATE TEMPORARY TABLE tmp_budget_agency_dept_obj(agency_id integer,department_code varchar,object_class_id integer,budget_fiscal_year smallint,budget_fiscal_year_id smallint, modified_budget_amount numeric (20,2)) DISTRIBUTED BY (department_code);
 	
 	INSERT INTO tmp_budget_agency_dept_obj
-	SELECT agency_id,department_code,object_class_id,budget_fiscal_year, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3,4;
+	SELECT agency_id,department_code,object_class_id,budget_fiscal_year,budget_fiscal_year_id, sum(current_budget_amount) as modified_budget_amount FROM   budget  group by 1,2,3,4,5;
 
-	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,object_class_id,budget_fiscal_year,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,type) 
-	SELECT agency_id,department_code,object_class_id,budget_fiscal_year,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'ADO' as type FROM tmp_budget_agency_dept_obj;
+	INSERT INTO aggregateon_budget_by_year(agency_id,department_code,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,modified_budget_amount_py,modified_budget_amount_py_1,filter_filter_type) 
+	SELECT agency_id,department_code,object_class_id,budget_fiscal_year,budget_fiscal_year_id,modified_budget_amount,0 as modified_budget_amount_py,0 as modified_budget_amount_py_1,'ADO' as filter_type FROM tmp_budget_agency_dept_obj;
 	
 
 	UPDATE aggregateon_budget_by_year a
-	SET modified_budget_amount_py = c.modified_budget_amount
-	FROM tmp_budget_agency_dept_obj b ,tmp_budget_agency_dept_obj c 
-	WHERE a.agency_id=b.agency_id and  a.department_code=b.department_code and a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py = c.modified_budget_amount
+	from tmp_budget_agency_dept_obj b ,tmp_budget_agency_dept_obj c 
+	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.department_code=c.department_code and b.object_class_id=c.object_class_id and b.budget_fiscal_year-1=c.budget_fiscal_year;
 
 	UPDATE aggregateon_budget_by_year a
-	SET modified_budget_amount_py_1 = c.modified_budget_amount
-	FROM tmp_budget_agency_dept_obj b ,tmp_budget_agency_dept_obj c 
-	WHERE a.agency_id=b.agency_id and  a.department_code=b.department_code and a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
+	set modified_budget_amount_py_1 = c.modified_budget_amount
+	from tmp_budget_agency_dept_obj b ,tmp_budget_agency_dept_obj c 
+	where a.agency_id=b.agency_id and  a.department_code=b.department_code and a.object_class_id=b.object_class_id and a.budget_fiscal_year =b.budget_fiscal_year 
 	and b.agency_id=c.agency_id and b.department_code=c.department_code and b.object_class_id=c.object_class_id and b.budget_fiscal_year-2=c.budget_fiscal_year;
 
 	--end agency dept object
@@ -728,7 +727,7 @@ BEGIN
 	UPDATE aggregateon_budget_by_year a
 	SET department_id = b.department_id
 	FROM ref_department b, ref_fund_class c 
-	WHERE  a.agency_id = b.agency_id and a.budget_fiscal_year = b.fiscal_year  and b.fund_class_id = c.fund_class_id and c.fund_class_code ='001' and a.type IN ('AD','ADO');
+	where  a.agency_id = b.agency_id and a.budget_fiscal_year = b.fiscal_year  and b.fund_class_id = c.fund_class_id and c.fund_class_code ='001' and a.filter_type IN ('AD','ADO');
 	
 
 		l_end_time := timeofday()::timestamp;
