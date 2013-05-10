@@ -1953,9 +1953,10 @@ CREATE VIEW ref_pay_frequency AS
 	SELECT ref_pay_frequency__0.pay_frequency_id, ref_pay_frequency__0.pay_frequency FROM ref_pay_frequency__0;
 	
 	
-
 CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_class__0(
 	revenue_category_code character varying,
+	revenue_category_id smallint,
+	funding_class_id smallint,
 	funding_class_code character varying,
 	agency_id smallint,
 	budget_fiscal_year_id smallint,
@@ -1969,15 +1970,18 @@ ENCODING 'UTF8';
 
 
 CREATE VIEW aggregateon_revenue_category_funding_class AS
-	SELECT aggregateon_revenue_category_funding_class__0.revenue_category_code,
-	              aggregateon_revenue_category_funding_class__0.funding_class_code,aggregateon_revenue_category_funding_class__0.agency_id,
-	              aggregateon_revenue_category_funding_class__0.budget_fiscal_year_id,aggregateon_revenue_category_funding_class__0.posting_amount, 
-	              aggregateon_revenue_category_funding_class__0.adopted_amount,aggregateon_revenue_category_funding_class__0.current_modified_amount
+	SELECT aggregateon_revenue_category_funding_class__0.revenue_category_code,aggregateon_revenue_category_funding_class__0.revenue_category_id,
+	       aggregateon_revenue_category_funding_class__0.funding_class_id,aggregateon_revenue_category_funding_class__0.funding_class_code,aggregateon_revenue_category_funding_class__0.agency_id,
+	       aggregateon_revenue_category_funding_class__0.budget_fiscal_year_id,aggregateon_revenue_category_funding_class__0.posting_amount, 
+	       aggregateon_revenue_category_funding_class__0.adopted_amount,aggregateon_revenue_category_funding_class__0.current_modified_amount
 	FROM aggregateon_revenue_category_funding_class__0;
+
 	
 
 CREATE EXTERNAL WEB TABLE aggregateon_revenue_category_funding_by_year__0(
         revenue_category_code character varying,
+        revenue_category_id smallint,
+        funding_class_id smallint,
         funding_class_code character varying,
         agency_id smallint,
         budget_fiscal_year_id smallint,
@@ -1994,8 +1998,8 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_revenue_c
 ENCODING 'UTF8';
 
 CREATE VIEW aggregateon_revenue_category_funding_by_year AS
-	SELECT aggregateon_revenue_category_funding_by_year__0.revenue_category_code,
-	              aggregateon_revenue_category_funding_by_year__0.funding_class_code,aggregateon_revenue_category_funding_by_year__0.agency_id,
+	SELECT aggregateon_revenue_category_funding_by_year__0.revenue_category_code,aggregateon_revenue_category_funding_by_year__0.revenue_category_id,
+	              aggregateon_revenue_category_funding_by_year__0.funding_class_id,aggregateon_revenue_category_funding_by_year__0.funding_class_code,aggregateon_revenue_category_funding_by_year__0.agency_id,
 	              aggregateon_revenue_category_funding_by_year__0.budget_fiscal_year_id,aggregateon_revenue_category_funding_by_year__0.posting_amount_cy, 
 	              aggregateon_revenue_category_funding_by_year__0.posting_amount_ny, aggregateon_revenue_category_funding_by_year__0.posting_amount_ny_1, aggregateon_revenue_category_funding_by_year__0.posting_amount, 
 	              aggregateon_revenue_category_funding_by_year__0.other_amount,aggregateon_revenue_category_funding_by_year__0.remaining_amount,aggregateon_revenue_category_funding_by_year__0.current_modified_amount
