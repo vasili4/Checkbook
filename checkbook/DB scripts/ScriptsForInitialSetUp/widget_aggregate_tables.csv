@@ -191,13 +191,15 @@ GROUP BY 1,2,3,4","SELECT vendor_id,expenditure_object_id,spending_category_id,
 GROUP BY 1,2,3,4",4
 RevenueByCategoryId,aggregateon_revenue_category_funding_class,"CREATE TABLE aggregateon_revenue_category_funding_class(
                 revenue_category_code character varying,
+                revenue_category_id smallint,
+                funding_class_id smallint,
                 funding_class_code character varying,
                 agency_id  smallint,
                 budget_fiscal_year_id smallint,
                 posting_amount numeric(16,2),
                 adopted_amount numeric(16,2),
                 current_modified_amount numeric(16,2))
-DISTRIBUTED BY (agency_id)","SELECT b1.revenue_category_code,b1.funding_class_code,b1.agency_id,budget_fiscal_year_id,
+DISTRIBUTED BY (agency_id)","SELECT b1.revenue_category_code,d.revenue_category_id,c.funding_class_id,b1.funding_class_code,b1.agency_id,budget_fiscal_year_id,
                posting_amount,adopted_amount,current_budget_amount
 FROM
 (
@@ -227,9 +229,13 @@ SELECT COALESCE(a.revenue_category_code,a1.revenue_category_code) as revenue_cat
                                 LEFT JOIN ref_funding_class d ON b.funding_class_id = d.funding_class_id
   GROUP BY 1,2,3,4) a1 on a.revenue_category_code = a1.revenue_category_code and a.funding_class_code = a1.funding_class_code 
   and a.budget_fiscal_year_id = a1.budget_fiscal_year_id and a.agency_id = a1.agency_id
-group by 1,2,3,4 ) b1 ORDER BY 4",,5
+group by 1,2,3,4 ) b1 left join ref_year y on b1.budget_fiscal_year_id = y.year_id 
+left join ref_funding_class c on b1.funding_class_code =c.funding_class_code and c.fiscal_year= y.year_value
+left join ref_revenue_category d on b1.revenue_category_code = d.revenue_category_code",,5
 RevenueByCategoryIdAndYear,aggregateon_revenue_category_funding_by_year,"CREATE TABLE aggregateon_revenue_category_funding_by_year(
                 revenue_category_code character varying,
+                revenue_category_id smallint,
+                funding_class_id smallint,
                 funding_class_code character varying,
                 agency_id smallint,
                 budget_fiscal_year_id smallint,
@@ -240,7 +246,7 @@ RevenueByCategoryIdAndYear,aggregateon_revenue_category_funding_by_year,"CREATE 
                 other_amount numeric(16,2),
                 remaining_amount numeric(16,2),
                 current_modified_amount numeric(16,2))
-DISTRIBUTED BY (agency_id)","SELECT X.revenue_category_code,X.funding_class_code,X.agency_id,budget_fiscal_year_id,
+DISTRIBUTED BY (agency_id)","SELECT X.revenue_category_code,d.revenue_category_id,c.funding_class_id,X.funding_class_code,X.agency_id,budget_fiscal_year_id,
                posting_amount_cy, posting_amount_ny, posting_amount_ny_1, posting_amount,other_amount,remaining_amount,current_budget_amount
 FROM
 (
@@ -278,7 +284,9 @@ a.budget_fiscal_year_id,
                                 LEFT JOIN ref_funding_class d ON b.funding_class_id = d.funding_class_id
   GROUP BY 1,2,3,4) a1 on a.revenue_category_code = a1.revenue_category_code and a.funding_class_code = a1.funding_class_code 
   and a.budget_fiscal_year_id = a1.budget_fiscal_year_id and a.agency_id = a1.agency_id
-group by 1,2,3,4) b1 ) X ",,6
+group by 1,2,3,4) b1 ) X left join ref_year y on X.budget_fiscal_year_id = y.year_id 
+left join ref_funding_class c on X.funding_class_code =c.funding_class_code and c.fiscal_year= y.year_value
+left join ref_revenue_category d on X.revenue_category_code = d.revenue_category_code",,6
 PayrollByEmployeeAgency,aggregateon_payroll_employee_agency,"CREATE TABLE aggregateon_payroll_employee_agency(
 	employee_id bigint,
 	agency_id smallint,
