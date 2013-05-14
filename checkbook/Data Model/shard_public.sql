@@ -195,7 +195,8 @@ CREATE TABLE budget (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     agency_short_name varchar,
-    department_short_name varchar
+    department_short_name varchar,
+    job_id bigint
 ) DISTRIBUTED BY (budget_id);
 
 --
@@ -395,7 +396,8 @@ CREATE TABLE revenue_details
 	department_short_name varchar,
 	agency_history_id smallint,
 	load_id integer,
-    last_modified_date timestamp without time zone
+        last_modified_date timestamp without time zone,
+        job_id bigint
 ) DISTRIBUTED BY (revenue_id);
 
 --
