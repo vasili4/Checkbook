@@ -545,6 +545,9 @@ BEGIN
 	RAISE NOTICE 'BUDGET 2';
 
 	
+	UPDATE budget a set job_id = b.job_id 
+	FROM  etl.etl_data_load b 
+	WHERE a.created_load_id = c.load_id ;
 
 	
 	
