@@ -195,7 +195,8 @@ CREATE EXTERNAL WEB TABLE budget__0 (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     agency_short_name varchar,
-    department_short_name varchar
+    department_short_name varchar,
+    job_id bigint
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.budget to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
@@ -214,7 +215,7 @@ CREATE VIEW budget AS
     budget__0.budget_code, budget__0.budget_code_name,
     budget__0.agency_code, budget__0.department_code,budget__0.object_class_code,
     budget__0.created_load_id, budget__0.updated_load_id,budget__0.created_date,budget__0.updated_date,
-    budget__0.agency_short_name, budget__0.department_short_name
+    budget__0.agency_short_name, budget__0.department_short_name,budget__0.job_id
     FROM ONLY budget__0;
 
 --
