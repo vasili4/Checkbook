@@ -1243,7 +1243,8 @@ CREATE TABLE budget (
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     agency_short_name varchar(15),
-    department_short_name varchar(15)
+    department_short_name varchar(15),
+    job_id bigint
 ) distributed by (budget_id);
 	
 ALTER TABLE  budget ADD constraint fk_budget_ref_fund_class foreign key (fund_class_id) references ref_fund_class (fund_class_id);
@@ -1331,7 +1332,8 @@ CREATE TABLE revenue_details
 	department_short_name varchar(15),
 	agency_history_id smallint,
 	load_id integer,
-    last_modified_date timestamp without time zone	
+    last_modified_date timestamp without time zone,
+    job_id bigint
 ) DISTRIBUTED BY (revenue_id);
 
 ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_details_ref_revenue_category FOREIGN KEY (revenue_category_id) REFERENCES ref_revenue_category(revenue_category_id);
