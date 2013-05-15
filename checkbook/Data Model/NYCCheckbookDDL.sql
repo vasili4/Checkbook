@@ -1328,18 +1328,19 @@ CREATE TABLE revenue_details
 	funding_class_code varchar,
 	revenue_category_code varchar,
 	revenue_source_code varchar,
+	closing_classification_code  varchar(2),
+    	closing_classification_name varchar(45),
 	agency_short_name varchar(15),
 	department_short_name varchar(15),
 	agency_history_id smallint,
 	load_id integer,
-    last_modified_date timestamp without time zone,
-    job_id bigint
+    	last_modified_date timestamp without time zone,
+    	job_id bigint   
 ) DISTRIBUTED BY (revenue_id);
 
 ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_details_ref_revenue_category FOREIGN KEY (revenue_category_id) REFERENCES ref_revenue_category(revenue_category_id);
 ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_details_ref_revenue_source FOREIGN KEY (revenue_source_id) REFERENCES ref_revenue_source(revenue_source_id);
 ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_detailse_revenue FOREIGN KEY (revenue_id) REFERENCES revenue(revenue_id);
-
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
