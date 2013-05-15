@@ -443,14 +443,14 @@ FROM ONLY disbursement_line_item_details__0;
 --
 
 CREATE EXTERNAL WEB TABLE revenue_details__0 (
-    revenue_id bigint,
-    fiscal_year smallint,
-    fiscal_period bpchar,
-    posting_amount numeric,
-    revenue_category_id smallint,
-    revenue_source_id int,
-    fiscal_year_id smallint,
-    agency_id smallint,
+	revenue_id bigint,
+	fiscal_year smallint,
+	fiscal_period bpchar,
+	posting_amount numeric,
+	revenue_category_id smallint,
+	revenue_source_id int,
+	fiscal_year_id smallint,
+	agency_id smallint,
 	department_id integer,	
 	revenue_class_id smallint,
 	fund_class_id smallint,
@@ -471,14 +471,16 @@ CREATE EXTERNAL WEB TABLE revenue_details__0 (
 	funding_class_code varchar,
 	revenue_category_code varchar,
 	revenue_source_code varchar,
+	closing_classification_code  varchar,
+	closing_classification_name varchar,
 	agency_short_name varchar,
 	department_short_name varchar,
 	agency_history_id smallint,
 	load_id integer,
-    last_modified_date timestamp without time zone,
+	last_modified_date timestamp without time zone,
 	job_id bigint
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.revenue_details to stdout csv"' ON SEGMENT 0 
- FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
 ENCODING 'UTF8';
 
 --
@@ -491,7 +493,8 @@ CREATE VIEW revenue_details AS
     revenue_details__0.budget_code_id,revenue_details__0.budget_fiscal_year_id,revenue_details__0.agency_name, revenue_details__0.revenue_category_name,revenue_details__0.revenue_source_name,
     revenue_details__0.budget_fiscal_year,revenue_details__0.department_name,revenue_details__0.revenue_class_name,revenue_details__0.fund_class_name,revenue_details__0.funding_class_name, 
     revenue_details__0.agency_code,revenue_details__0.revenue_class_code,revenue_details__0.fund_class_code,revenue_details__0.funding_class_code,revenue_details__0.revenue_category_code,
-    revenue_details__0.revenue_source_code,revenue_details__0.agency_short_name,revenue_details__0.department_short_name,revenue_details__0.agency_history_id, 
+    revenue_details__0.revenue_source_code,revenue_details__0.closing_classification_code,revenue_details__0.closing_classification_name,
+    revenue_details__0.agency_short_name,revenue_details__0.department_short_name,revenue_details__0.agency_history_id, 
     revenue_details__0.load_id,revenue_details__0.last_modified_date,revenue_details__0.job_id
     FROM  ONLY revenue_details__0;
 
