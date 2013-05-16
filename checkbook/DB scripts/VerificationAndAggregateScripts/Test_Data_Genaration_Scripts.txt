@@ -206,6 +206,13 @@ DELETE from etl.stg_location where agency_code NOT IN ('781','003','102','042','
 
 DELETE from etl.stg_budget_code where dept_cd NOT IN ('781','003','102','042','130','810','836','126','127','819','DSB','856','827','858','156','068','095','816','103','841','820','806','131','826','801','072');
 
+
+--  COA Object Class
+
+UPDATE etl.stg_object_class  SET object_class_name = 'Object Class ' || object_class_code;
+
+-- 
+
 -- COA Vendor
 
 UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'0','M') ;
@@ -738,6 +745,7 @@ FROM mtr_change_deptname b
 WHERE a.agency = b.agency_code AND a.uoa = b.department_code;
 
 
+
 -- PENDING Contracts
 
 
@@ -791,6 +799,10 @@ SET awarding_agency_desc = b.agency_name
 FROM etl.stg_agency b 
 WHERE a.awarding_agency_code = b.agency_code;
 
+
+-- Budget Scripts
+
+DELETE FROM etl.stg_budget WHERE agency_code NOT in ('781','003','102','042','130','810','836','126','127','819');
 
 
 -- Scripts after creating demo database

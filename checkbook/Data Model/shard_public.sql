@@ -393,13 +393,16 @@ CREATE TABLE revenue_details
 	revenue_category_code varchar,
 	revenue_source_code varchar,
 	closing_classification_code  varchar,
-    	closing_classification_name varchar,
+    closing_classification_name varchar,
+    budget_code varchar(10),
+    adopted_amount decimal(20,2),
+    current_modified_budget_amount decimal(20,2),
 	agency_short_name varchar(15),
 	department_short_name varchar(15),
 	agency_history_id smallint,
 	load_id integer,
-    	last_modified_date timestamp without time zone,
-    	job_id bigint   
+    last_modified_date timestamp without time zone,
+    job_id bigint   
 ) DISTRIBUTED BY (revenue_id);
 
 --

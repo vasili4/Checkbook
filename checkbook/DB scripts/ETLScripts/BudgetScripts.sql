@@ -547,7 +547,7 @@ BEGIN
 	
 	UPDATE budget a set job_id = b.job_id 
 	FROM  etl.etl_data_load b 
-	WHERE coalesce(a.created_load_id,updated_load_id) = b.load_id ;
+	WHERE coalesce(a.updated_load_id,a.created_load_id) = b.load_id ;
 
 	
 	

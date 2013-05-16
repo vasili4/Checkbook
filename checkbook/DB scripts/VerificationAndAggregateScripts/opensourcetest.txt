@@ -105,7 +105,7 @@ to '/home/gpadmin/pvarma/testdata_open/mag_vendor.txt' DELIMITER '|';
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+-- COA elements
 
 
 copy(select agency_code,agency_name,'' as col3,agency_short_name,'' as col5 ,'' as col6 ,'' as col7 ,'' as col8 ,'' as col9 , '' as col10 , '' as col11 , '' as col12 , '' as col13 , '' as col14 , '' as col15 , '' as col16 , '' as col17 , '' as col18 , '' as col19 , '' as col20 , '' as col21 , '' as col22 , '' as col23 , '' as col24 , '' as col25 , '' as col26  from etl.stg_agency)
@@ -123,7 +123,8 @@ to '/home/gpadmin/pvarma/testdata_open/coa_budget_code.txt' DELIMITER '|';
 copy(select agency_code,location_code,location_name,location_short_name,upper_case_name,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,'' as col17 from etl.stg_location)
 to '/home/gpadmin/pvarma/testdata_open/coa_location.txt' DELIMITER '|';
 
-
+copy(select 'ALL' as doc_dept_cd, object_class_code, object_class_name, short_name, act_fl, effective_begin_date, effective_end_date, alw_bud_fl, description, cntac_cd, object_class_name_up, tbl_last_dt, intr_cty_fl, cntrc_pos_fl, pyrl_typ, dscr_ext, rltd_ocls_cd, '' as col18 from etl.stg_object_class)
+to '/home/gpadmin/pvarma/testdata_open/coa_object_class.txt' DELIMITER '|';
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -135,7 +136,12 @@ con_batch_suffix,con_version,original_or_modified,award_category_code from etl.s
 to '/home/gpadmin/pvarma/testdata_open/pending_contracts.txt' DELIMITER '|';
 
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- Budget
+
+copy(select budget_fiscal_year, fund_class_code, agency_code, department_code, budget_code, object_class_code, adopted_amount, current_budget_amount, pre_encumbered_amount, encumbered_amount, accrued_expense_amount, cash_expense_amount, post_closing_adjustment_amount, updated_date, '' as col15 from etl.stg_object_class)
+to '/home/gpadmin/pvarma/testdata_open/budget.txt' DELIMITER '|';
 
 
 

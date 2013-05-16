@@ -939,7 +939,8 @@ BEGIN
 					budget_code_id,budget_fiscal_year_id,agency_name,revenue_category_name,
 					revenue_source_name,budget_fiscal_year,department_name,revenue_class_name,
 					fund_class_name,funding_class_name,agency_code,revenue_class_code,fund_class_code,funding_class_code,
-					revenue_category_code,revenue_source_code,closing_classification_code,closing_classification_name,agency_short_name,department_short_name,
+					revenue_category_code,revenue_source_code,closing_classification_code,closing_classification_name,
+					budget_code,agency_short_name,department_short_name,
 					agency_history_id, load_id, last_modified_date,job_id)
 	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,
 			a.revenue_category_id,a.revenue_source_id,d.year_id,b.agency_id,
@@ -947,7 +948,8 @@ BEGIN
 			a.budget_code_id,f.year_id,b.agency_name,g.revenue_category_name,
 			e.revenue_source_name,a.budget_fiscal_year,c.department_name,i.revenue_class_name,
 			j.fund_class_name,k.funding_class_name,l.agency_code,i.revenue_class_code,j.fund_class_code,k.funding_class_code,
-			g.revenue_category_code,e.revenue_source_code,a.closing_classification_code,a.closing_classification_name,b.agency_short_name,c.department_short_name,
+			g.revenue_category_code,e.revenue_source_code,a.closing_classification_code,a.closing_classification_name,
+			n.budget_code,b.agency_short_name,c.department_short_name,
 			b.agency_history_id, a.load_id, a.created_date,p_job_id_in
 	FROM    revenue a join ref_agency_history b on a.agency_history_id = b.agency_history_id
 			join ref_department_history c on a.department_history_id = c.department_history_id
@@ -960,9 +962,16 @@ BEGIN
 			join ref_funding_class k on e.funding_class_id = k.funding_class_id
 			join ref_agency l on b.agency_id = l.agency_id
 			JOIN etl.etl_data_load m ON a.load_id = m.load_id
+			JOIN ref_budget_code n ON a.budget_code_id = n.budget_code_id
 		WHERE m.job_id = p_job_id_in AND m.data_source_code ='R' ;
 		
 			
+		UPDATE revenue_details a
+		SET adopted_amount = b.adopted_amount,
+			current_modified_budget_amount = b.current_modified_budget_amount
+		FROM revenue_budget b
+		WHERE a.budget_fiscal_year = b.budget_fiscal_year AND a.agency_code = b.agency_code AND a.budget_code = b.budget_code AND a.revenue_source_code = b.revenue_source_code
+		AND a.job_id = p_job_id_in;
 		
 		l_end_time := timeofday()::timestamp;
 		
