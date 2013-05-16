@@ -211,7 +211,23 @@ DELETE from etl.stg_budget_code where dept_cd NOT IN ('781','003','102','042','1
 
 UPDATE etl.stg_object_class  SET object_class_name = 'Object Class ' || object_class_code;
 
--- 
+-- COA Revenue Category 
+
+UPDATE etl.stg_revenue_category  SET rscat_nm = 'Revenue Category ' || rscat_cd;
+
+-- COA Revenue Class 
+
+UPDATE etl.stg_revenue_class  SET rscls_nm = 'Revenue Class ' || rscls_cd;
+
+-- COA Funding Class 
+
+UPDATE etl.stg_funding_class  SET funding_class_name = 'Funding Class ' || funding_class_code;
+
+-- COA Revenue Source 
+
+UPDATE etl.stg_revenue_source  SET rsrc_nm = 'Revenue Source ' || rsrc_cd;
+
+
 
 -- COA Vendor
 
@@ -225,6 +241,8 @@ UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'6','R
 UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'7','U') ;
 UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'8','N') ;
 UPDATE etl.stg_fmsv_business_type SET vend_cust_cd = replace(vend_cust_cd,'9','E') ;
+
+
 
 
 -- Contracts Domain
@@ -803,6 +821,32 @@ WHERE a.awarding_agency_code = b.agency_code;
 -- Budget Scripts
 
 DELETE FROM etl.stg_budget WHERE agency_code NOT in ('781','003','102','042','130','810','836','126','127','819');
+
+-- Revenue Scripts
+
+DELETE FROM etl.stg_revenue WHERE doc_dept_cd NOT in ('781','003','102','042','130','810','836','126','127','819');
+
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'0','M') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'1','W') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'2','A') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'3','F') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'4','K') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'5','T') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'6','R') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'7','U') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'8','N') ;
+UPDATE etl.stg_revenue SET pstng_cd_id = replace(pstng_cd_id,'9','E') ;
+
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'0','Z') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'1','Y') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'2','X') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'3','G') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'4','F') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'5','E') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'6','D') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'7','A') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'8','B') ;
+UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'9','C') ;
 
 
 -- Scripts after creating demo database

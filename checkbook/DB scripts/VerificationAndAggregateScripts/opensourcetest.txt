@@ -126,6 +126,19 @@ to '/home/gpadmin/pvarma/testdata_open/coa_location.txt' DELIMITER '|';
 copy(select 'ALL' as doc_dept_cd, object_class_code, object_class_name, short_name, act_fl, effective_begin_date, effective_end_date, alw_bud_fl, description, cntac_cd, object_class_name_up, tbl_last_dt, intr_cty_fl, cntrc_pos_fl, pyrl_typ, dscr_ext, rltd_ocls_cd, '' as col18 from etl.stg_object_class)
 to '/home/gpadmin/pvarma/testdata_open/coa_object_class.txt' DELIMITER '|';
 
+copy(select 'ALL' as doc_dept_cd, rscat_cd, rscat_nm, rscat_sh_nm, act_fl, efbgn_dt, efend_dt, alw_bud_fl, rscat_dscr, cntac_cd, rscat_nm_up, tbl_last_dt, '' as col13 from etl.stg_revenue_category)
+to '/home/gpadmin/pvarma/testdata_open/coa_revenue_category.txt' DELIMITER '|';
+
+copy(select 'ALL' as doc_dept_cd, rscls_cd, rscls_nm, rscls_sh_nm, act_fl, efbgn_dt, efend_dt, alw_bud_fl, rscls_dscr, cntac_cd, rscls_nm_up, tbl_last_dt,  '' as col13 from etl.stg_revenue_class)
+to '/home/gpadmin/pvarma/testdata_open/coa_revenue_class.txt' DELIMITER '|';
+
+copy(select 'ALL' as doc_dept_cd, fy, funding_class_code, funding_class_name, short_name, category_name, cty_fund_fl, intr_cty_fl, fund_aloc_req_fl, tbl_last_dt, ams_row_vers_no, rsfcls_nm_up, fund_category from etl.stg_funding_class)
+to '/home/gpadmin/pvarma/testdata_open/coa_funding_class.txt' DELIMITER '|';
+
+-- select column_name || ',' from information_schema.columns where table_name = 'stg_revenue_source'  order by ordinal_position
+
+copy(select  doc_dept_cd, fy, rsrc_cd, rsrc_nm, rsrc_sh_nm, act_fl, efbgn_dt, efend_dt, alw_bud_fl, oper_ind, fasb_cls_ind, fhwa_rev_cr_fl, usetax_coll_fl, rscls_cd, rscat_cd, rstyp_cd, rsgrp_cd, mjr_crtyp_cd, mnr_crtyp_cd, rsrc_dscr, cntac_cd, billu_rcvb_cd, billu_rcvb_s, bille_rcvb_cd, bille_rcvb_s, billu_rev_cd, billu_rev_s, collu_rev_cd, collu_rev_s, alw_bdebt_cd, alw_bdebt_s, bdebt_exp_obj, bdebt_exp_obj_s, bill_dps_cd, bill_dps_s, coll_dps_cd, coll_dps_s, nsf_ckcg_rsrc, nsf_ckcg_rsrc_s, intch_rsrc, intch_rsrc_s, lat_chrg_rsrc, lat_chrg_rsrc_s, cc_fee_rsrc, cc_fee_rsrc_s, cc_fee_obj, cc_fee_obj_s, fin_chrg_fee1_cd, fin_chrg_fee2_cd, fin_chrg_fee3_cd, fin_chrg_fee4_cd, fin_chrg_fee5_cd, apy_intr_lat_fee, apy_intr_admn_fee, apy_intr_nsf_fee, apy_intr_othr_fee, elg_inct_fl, rsrc_xfer_fl, bill_vend_rfnd_cd, bill_vend_rfnd_s, uern_rcvb_wo_cd, uern_rcvb_wo_s, dps_rcvb_wo_cd, dps_rcvb_wo_s, uern_rev_wo_cd, uern_rev_wo_s, dps_wo_cd, dps_wo_s, vrfnd_rcvb_wo_cd, vrfnd_rcvb_wo_s, vrfnd_wo_cd, vrfnd_wo_s, ernrev_to_coll_cd, ernrev_to_coll_s, vrfnd_to_coll_cd, vrfnd_to_coll_s, vend_rha_cd, vend_rha_s, rs_opay_cd, rs_opay_s, urs_opay_cd, urs_opay_s, bill_dps_rec_cd, bill_dps_rec_s, earn_rcvb_cd, earn_rcvb_s, rsrc_nm_up, rsrc_sh_nm_up, fin_fee_ov_fl, apy_intr_ov, tbl_last_dt, ext_rep_nm, fund_cls, fund_cls_nm, grnt_id, bill_lag_dy, bill_freq, bill_fy_strt_mnth, bill_fy_strt_dy, fed_agcy_cd, fed_agcy_sfx, fed_nm, ext_rep_num, dscr_ext, srsrc_req, '' as col106 from etl.stg_revenue_source)
+to '/home/gpadmin/pvarma/testdata_open/coa_revenue_source.txt' DELIMITER '|';
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- pending contracts
@@ -144,4 +157,9 @@ copy(select budget_fiscal_year, fund_class_code, agency_code, department_code, b
 to '/home/gpadmin/pvarma/testdata_open/budget.txt' DELIMITER '|';
 
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- Revenue
+
+copy(select doc_rec_dt, per_dc, fy_dc, bfy, fqtr, evnt_cat_id, evnt_typ_id, bank_acct_cd, pstng_pr_typ, pstng_cd_id, drcr_ind, ln_func_cd, pstng_am, incr_dcrs_ind, run_tmdt, fund_cd, sfund_cd, bsa_cd, sbsa_cd, bsa_typ_ind, obj_cd, sobj_cd, rsrc_cd, srsrc_cd, govt_brn_cd, cab_cd, dept_cd, div_cd, gp_cd, sect_cd, dstc_cd, bur_cd, unit_cd, sunit_cd, mjr_prog_cd, prog_cd, phase_cd, task_ord_cd, task_cd, stask_cd, ppc_cd, fprfl_cd, fline_cd, fprty_cd, appr_cd, actv_cd, sactv_cd, func_cd, sfunc_cd, rpt_cd, srpt_cd, dobj_cd, drsrc_cd, loc_cd, sloc_cd, ig_fund_cd, ig_sfund_cd, ig_dept_cd, fcls_cd, fcat_cd, ftyp_cd, fgrp_cd, cafrfgrp_cd, cafrftyp_cd, bscl_cd, bsct_cd, bst_cd, bsg_cd, cmjrbgrp_cd, cmnrbgrp_cd, bsa_ov_fl, ocls_cd, ocat_cd, otyp_cd, ogrp_cd, mjr_cetyp_cd, mnr_cetyp_cd, rscls_cd, rscat_cd, rstyp_cd, rsgrp_cd, mjr_crtyp_cd, mnr_crtyp_cd, apcls_cd, apcat_cd, aptyp_cd, apgrp_cd, lcls_cd, lcat_cd, ltyp_cd, cnty_cd, acls_cd, acat_cd, atyp_cd, agrp_cd, caunit_cd, mjr_catyp_cd, mnr_catyp_cd, fncls_cd, fncat_cd, fntyp_cd, fngrp_cd, rcls_cd, rcat_cd, rtyp_cd, rgrp_cd, docls_cd, docat_cd, dotyp_cd, dogrp_cd, drscls_cd, drscat_cd, drstyp_cd, drsgrp_cd, mjr_pcls_cd, mjr_pcat_cd, mjr_ptyp_cd, mjr_pgrp_cd, pcls_cd, pcat_cd, ptyp_cd, pgrp_cd, doc_cat, doc_typ, doc_cd, doc_dept_cd, doc_id, doc_vers_no, doc_func_cd, doc_vend_ln_no, doc_unit_cd, doc_comm_ln_no, doc_actg_ln_no, doc_pstng_ln_no, doc_last_usid, rfed_doc_cd, rfed_doc_dept_cd, rfed_doc_id, rfed_vend_ln_no, rfed_comm_ln_no, rfed_actg_ln_no, rfed_pstng_ln_no, rf_typ, stpf_cd, assoc_inv_no, assoc_inv_ln_no, assoc_inv_dt, vend_cust_cd, vend_cust_ind, lgl_nm, bpro_cd, actg_ln_dscr, misc3, svc_frm_dt, svc_to_dt, whse_cd, comm_cd, stk_itm_sfx, reas_cd, tin, tin_typ, chk_eft_no, reclass_ind_fl, pscd_clos_cl_cd, pscd_clos_cl_nm, '' as col from etl.stg_revenue)
+to '/home/gpadmin/pvarma/testdata_open/revenue.txt' DELIMITER '|';
