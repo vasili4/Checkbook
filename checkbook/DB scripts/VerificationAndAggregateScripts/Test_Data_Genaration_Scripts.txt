@@ -849,6 +849,12 @@ UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'8','B') ;
 UPDATE etl.stg_revenue SET doc_id = replace(doc_id,'9','C') ;
 
 
+
+-- Revenue Budget Scripts
+
+DELETE FROM etl.stg_revenue_budget WHERE agency_code NOT in ('781','003','102','042','130','810','836','126','127','819');
+
+
 -- Scripts after creating demo database
 
 /*
