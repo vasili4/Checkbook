@@ -1,16 +1,16 @@
 --ct contracts
 
 copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,max_cntrc_am,open_acrl_am,amend_no,cntrc_sta,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cntrct_strt_dt,cntrct_end_dt,hear_dt,psr_req_dt,proc_ini_dt,cited_auth,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,clsd_am,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,pc_chng_max_am,wf_pc_chng_max_am,wf_tot_max_am,orig_max_am,enc_am,out_am,rfed_am,rfed_lqd_am,oca_no,orig_cntrc_strt_dt,orig_cntrc_end_dt,reg_dt,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,issr_id,issr_nm,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_ph_ext,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,cmr_doc_cd,cmr_doc_dept_cd,cmr_doc_id,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd,'' as col113 from etl.stg_con_ct_header )
-to '/home/gpadmin/pvarma/testdata_open/con_ct_header.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_ct_header.txt' DELIMITER '|';
 
 copy(select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rel_actg_ln,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,sp_inst_cd,rl_fl_1,rl_fl_2,'' as col71 from etl.stg_con_ct_accounting_line )
-to '/home/gpadmin/pvarma/testdata_open/con_ct_accounting_line.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_ct_accounting_line.txt' DELIMITER '|';
 
 copy(select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,clsd_typ_cd,ctcat_cd_1,multi_cat_fl,ctcat_cd_2,ctcat_cd_3,ctcat_cd_4,ctcat_cd_5,resp_ct,out_of_no_so,loc_serv,loc_zip,brgh_cd,blck_cd,lot_cd,coun_dist_cd,rnew_cd,cntrc_mwbe_fl,tar_utl_pc,tar_utl_am,comp_crt_cd_1,comp_cri_resp_1,comp_crt_cd_2,comp_cri_resp_2,comp_crt_cd_3,comp_cri_resp_3,comp_crt_cd_4,comp_cri_resp_4,comp_crt_cd_5,comp_cri_resp_5,non_comp_reas,cons_reas_cd_1,cons_reas_cd_2,red_adv,constr_rel_fl,extrn_so_no,liq_dmg_chrg,req_prf_pay_bnd_fl,res_no_per_bnd,cnt_req_ins_pol_fl,wk_site_cd_01,wk_site_cd_02,wk_site_cd_03,wk_site_cd_04,wk_site_cd_05,wk_site_cd_06,wk_site_cd_07,wk_site_cd_08,wk_site_cd_09,wk_site_cd_10,percent_01,percent_02,percent_03,percent_04,percent_05,percent_06,percent_07,percent_08,percent_09,percent_10, '' as col69 from etl.stg_con_ct_award_detail )
-to '/home/gpadmin/pvarma/testdata_open/con_ct_award_detail.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_ct_award_detail.txt' DELIMITER '|';
 
 copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,web_ad,cntac_id,vend_pref_lvl,alias_nm,lgl_nm,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,tin_ein,tin_ssn,mod_fl,disc_1_dy,disc_2_dy,disc_3_dy,disc_4_dy,disc_1_pc,disc_2_pc,disc_3_pc,disc_4_pc,disc_alw_1_fl,disc_alw_2_fl,disc_alw_3_fl,disc_alw_4_fl,'' as col40 from etl.stg_con_ct_vendor )
-to '/home/gpadmin/pvarma/testdata_open/con_ct_vendor.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_ct_vendor.txt' DELIMITER '|';
 
 
 
@@ -24,13 +24,13 @@ to '/home/gpadmin/pvarma/testdata_open/con_ct_vendor.txt' DELIMITER '|';
 --do1 contracts
 
 copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,amend_no,pcard_rec_id,pcard_expr_dt,actg_prfl_id,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cnfrm_ord,blkt_agr_fl,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,brd_awd_no,brd_awd_dt,trkg_no,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,buyr_nm,buyr_ph_no,buyr_ph_ext,buyr_email_ad,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd,'' as col90 from etl.stg_con_do1_header )
-to '/home/gpadmin/pvarma/testdata_open/con_do1_header.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_do1_header.txt' DELIMITER '|';
 
 copy(select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2,'' as col69 from etl.stg_con_do1_accounting_line )
-to '/home/gpadmin/pvarma/testdata_open/con_do1_accounting_line.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_do1_accounting_line.txt' DELIMITER '|';
 
 copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl,'' as col37 from etl.stg_con_do1_vendor )
-to '/home/gpadmin/pvarma/testdata_open/con_do1_vendor.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_do1_vendor.txt' DELIMITER '|';
 
 
 
@@ -38,16 +38,16 @@ to '/home/gpadmin/pvarma/testdata_open/con_do1_vendor.txt' DELIMITER '|';
 -- po contracts
 
 copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,doc_clsd_am,doc_clsd_dt,open_am,open_acrl_am,max_cntrc_am,amend_no,pcard_rec_id,pcard_expr_dt,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,cntrct_strt_dt,cntrct_end_dt,psr_req_dt,actg_prfl_id,tc_tmpl,cnfrm_ord,prnt_job_cd,last_prn_dt,obj_att_sg_tot,obj_att_pg_tot,oblg_adj_outyr_am,avail_oblg_am,outyr_adj_am,ma_prch_lmt_am,part_rect_alw_fl,agree_doc_cd,agree_doc_dept_cd,agree_doc_id,agree_vend_ln_no,trkg_no,brd_awd_no,brd_awd_dt,po_repl_doc_cd,po_repl_dept_cd,po_repl_id,po_repl_by_doc_cd,po_repl_by_dept_cd,po_repl_by_id,rfed_am,rfed_lqd_am,issr_id,issr_ph_no,issr_ph_ext,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_id,cntrct_ofcr,cntrct_ofcr_ph,ofcr_ph_ext,cntrct_ofcr_eml,track_chgs,chg_ord_no,mod_fl,reas_mod_dc,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_dt,dlvr_typ,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,rl_fl_1,doc_func_cd,'' as col95 from etl.stg_con_po_header )
-to '/home/gpadmin/pvarma/testdata_open/con_po_header.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_po_header.txt' DELIMITER '|';
 
 copy(select 'A' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,doc_comm_ln_no,doc_actg_ln_no,evnt_typ_id,actg_tmpl_id,actg_ln_dscr,ln_am,rs_fndg_ind,bfy,fy_dc,per_dc,frght_pc,mod_fl,obj_att_sg_tot,al_clsd_am,al_clsd_dt,ln_open_am,rfed_ln_am,outyr_adj_am,oblg_adj_outyr_am,rfed_doc_cd,rfed_doc_dept_cd,rfed_doc_id,rfed_vend_ln_no,rfed_comm_ln_no,rfed_actg_ln_no,rf_typ,fn_doc_cd,fn_doc_dept_cd,fn_doc_id,fund_cd,sfund_cd,dept_cd,unit_cd,sunit_cd,appr_cd,obj_cd,sobj_cd,rsrc_cd,srsrc_cd,bsa_cd,sbsa_cd,obsa_cd,osbsa_cd,dobj_cd,drsrc_cd,loc_cd,sloc_cd,actv_cd,sactv_cd,func_cd,sfunc_cd,rpt_cd,srpt_cd,task_cd,stask_cd,task_ord_cd,mjr_prog_cd,prog_cd,phase_cd,ppc_cd,sp_inst_cd,chk_dscr,rl_fl_1,rl_fl_2, '' as col71 from etl.stg_con_po_accounting_line )
-to '/home/gpadmin/pvarma/testdata_open/con_po_accounting_line.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_po_accounting_line.txt' DELIMITER '|';
 
 copy(select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,ctcat_cd_1,resp_ct,out_of_no_so,constr_rel_fl,extrn_so_no,wk_site_cd_01,percent_01,wk_site_cd_02,percent_02,wk_site_cd_03,percent_03,wk_site_cd_04,percent_04,wk_site_cd_05,percent_05,wk_site_cd_06,percent_06,wk_site_cd_07,percent_07,wk_site_cd_08,percent_08,wk_site_cd_09,percent_09,wk_site_cd_10,percent_10,'' as col35 from etl.stg_con_po_award_detail )
-to '/home/gpadmin/pvarma/testdata_open/con_po_award_detail.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_po_award_detail.txt' DELIMITER '|';
 
 copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,alias_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,web_ad,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,vend_reas,mod_fl,disc_1_pc,disc_1_dy,disc_alw_1_fl,disc_2_pc,disc_2_dy,disc_alw_2_fl,disc_3_pc,disc_3_dy,disc_alw_3_fl,disc_4_pc,disc_4_dy,disc_alw_4_fl,'' as col38 from etl.stg_con_po_vendor )
-to '/home/gpadmin/pvarma/testdata_open/con_po_vendor.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/con_po_vendor.txt' DELIMITER '|';
 
 
 
@@ -60,13 +60,13 @@ to '/home/gpadmin/pvarma/testdata_open/con_po_vendor.txt' DELIMITER '|';
 copy(select 'H' as line_rec, a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_rec_dt_dc,a.doc_bfy,a.doc_fy_dc,a.doc_per_dc,a.chk_eft_am,a.chk_eft_iss_dt,
 a.chk_eft_rec_dt,a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,a.ln_am,a.disc_am,a.intr_am,a.bkup_whld_am,a.inct_am,a.rtg_am, '' as col22
  from etl.stg_fms_header a)
-to '/home/gpadmin/pvarma/testdata_open/fms_header.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/fms_header.txt' DELIMITER '|';
 
 copy(select 'A' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.doc_actg_ln_no,a.dept_cd,a.bfy,a.fy_dc,a.per_dc,a.rfed_doc_cd,a.rfed_doc_dept_cd,a.rfed_doc_id,a.rfed_doc_vers_no,a.rfed_vend_ln_no,a.rfed_comm_ln_no,a.rfed_actg_ln_no,a.rqporf_doc_cd,a.rqporf_doc_dept_cd,a.rqporf_doc_id,a.rqporf_vend_ln_no,a.rqporf_comm_ln_no,a.rqporf_actg_ln_no,a.disc_ln_am,a.intr_ln_am,a.bkup_whld_ln_am,a.inct_ln_am,a.rtg_ln_am,a.chk_amt,a.fcls_cd,a.fund_cd,a.sfund_cd,a.unit_cd,a.sunit_cd,a.appr_cd,a.obj_cd,a.sobj_cd,a.rsrc_cd,a.srsrc_cd,a.bsa_cd,a.dobj_cd,a.drsrc_cd,a.loc_cd,a.sloc_cd,a.actv_cd,a.func_cd,a.rpt_cd,'' as col49 from etl.stg_fms_accounting_line a )
-to '/home/gpadmin/pvarma/testdata_open/fms_accounting.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/fms_accounting.txt' DELIMITER '|';
 
 copy(select 'V' as line_rec,a.doc_cd,a.doc_dept_cd,a.doc_id,a.doc_vers_no,a.doc_vend_ln_no,a.vend_cust_cd,a.lgl_nm,a.alias_nm,a.ad_id,a.org_cls,a.misc_acct_fl,a.ad_ln_1,a.ad_ln_2,a.ctry,a.st,a.zip,a.city,'' as col19 from etl.stg_fms_vendor a) 
-to '/home/gpadmin/pvarma/testdata_open/fms_vendor.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/fms_vendor.txt' DELIMITER '|';
 
 
 
@@ -77,16 +77,31 @@ to '/home/gpadmin/pvarma/testdata_open/fms_vendor.txt' DELIMITER '|';
 copy(select pay_cycle_code,pay_date,employee_number,payroll_number,job_sequence_number,agency_code,agency_start_date,fiscal_year,
 orig_pay_cycle_code,orig_pay_date,pay_frequency,last_name,department_code,annual_salary,amount_basis,base_pay,overtime_pay,other_payments,gross_pay,
 civil_service_code,civil_service_level,civil_service_suffix,civil_service_title
- from etl.stg_payroll )
- to '/home/gpadmin/pvarma/testdata_open/payroll.txt' DELIMITER '|';
+ from etl.stg_payroll where fiscal_year =2011 limit 1000)
+ to '/home/gpadmin/pvarma/testdata_open_5_20_2013/payroll_2011.txt' DELIMITER '|';
  
+
+ 
+copy(select pay_cycle_code,pay_date,employee_number,payroll_number,job_sequence_number,agency_code,agency_start_date,fiscal_year,
+orig_pay_cycle_code,orig_pay_date,pay_frequency,last_name,department_code,annual_salary,amount_basis,base_pay,overtime_pay,other_payments,gross_pay,
+civil_service_code,civil_service_level,civil_service_suffix,civil_service_title
+ from etl.stg_payroll where fiscal_year =2012 limit 1000)
+ to '/home/gpadmin/pvarma/testdata_open_5_20_2013/payroll_2012.txt' DELIMITER '|';
+
+
+ 
+copy(select pay_cycle_code,pay_date,employee_number,payroll_number,job_sequence_number,agency_code,agency_start_date,fiscal_year,
+orig_pay_cycle_code,orig_pay_date,pay_frequency,last_name,department_code,annual_salary,amount_basis,base_pay,overtime_pay,other_payments,gross_pay,
+civil_service_code,civil_service_level,civil_service_suffix,civil_service_title
+ from etl.stg_payroll where fiscal_year =2013 limit 1000)
+ to '/home/gpadmin/pvarma/testdata_open_5_20_2013/payroll_2013.txt' DELIMITER '|';
  
   
  --payroll summary
  
  copy(select pay_cycle,pay_date,pyrl_no,pyrl_desc,uoa,uoa_name,pms_fy,object,object_desc,agency,pms_agency_name,bud_code,bud_code_desc,total_amt,'' as col15 
  from etl.stg_payroll_summary ) 
- to '/home/gpadmin/pvarma/testdata_open/payroll_summary.txt' DELIMITER '|';
+ to '/home/gpadmin/pvarma/testdata_open_5_20_2013/payroll_summary.txt' DELIMITER '|';
 
  
 
@@ -94,13 +109,13 @@ civil_service_code,civil_service_level,civil_service_suffix,civil_service_title
 
 --MAG
 copy(select 'H' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,trkg_no,doc_nm,doc_rec_dt_dc,doc_bfy,doc_fy_dc,doc_per_dc,doc_dscr,doc_actu_am,ord_tot_am,doc_clsd_am,po_repl_doc_cd,po_repl_id,po_repl_by_dept_cd,po_repl_by_id,cntrc_sta,prcu_id,prcu_typ_nm,prcu_typ_id,cited_auth,efbgn_dt,efend_dt,hear_dt,psr_req_dt,proc_ini_dt,brd_awd_no,brd_awd_dt,tc_tmpl,part_pymt_inv_alwd,part_rect_alw_fl,prnt_job_cd,obj_att_sg_tot,obj_att_pg_tot,pc_chng_max_am,wf_pc_chng_max_am,wf_tot_max_am,orig_max_ct_amt,oca_no,orig_strt_dt,orig_end_dt,reg_dt,reas_mod_dc,issr_id,issr_nm,issr_ph_no,issr_ph_ext,issr_email_ad,rqstr_id,rqstr_nm,rqstr_ph_no,rqstr_ph_ext,rqstr_email_ad,rqstr_dept_cd,team_id,buyr_nm,buyr_ph_no,buyr_ph_ext,ofcr_nm,ofcr_ph_no,ofcr_ph_ext,ofcr_email_ad,ord_min_am,ord_max_am,ma_prch_lmt_am,ord_min_fl,ord_max_fl,ma_prch_lmt_fl,dscr_ext,ship_loc_cd,ship_meth_cd,free_brd_cd,dlvr_typ,dlvr_dy,ship_info,bill_loc_cd,bill_info,gnrc_po_rpt_1,gnrc_po_rpt_2,gnrc_po_rpt_3,dept_report_1,dept_report_2,dept_report_3,dept_report_4,doc_crea_usid,doc_appl_crea_dt,doc_appl_last_usid,doc_appl_last_dt,po_repl_dept_cd,po_repl_by_doc_cd,doc_func_cd,'' as col95 from etl.stg_mag_header )
-to '/home/gpadmin/pvarma/testdata_open/mag_header.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/mag_header.txt' DELIMITER '|';
 
 copy(select 'W' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_awddet_ln_no,awd_meth_cd,awd_lvl_cd,cttyp_cd,ctcls_cd,clsd_typ_cd,ctcat_cd_1,multi_cat_fl,ctcat_cd_2,ctcat_cd_3,ctcat_cd_4,ctcat_cd_5,resp_no,out_of_no_so,loc_serv,loc_zip,brgh_cd,blck_cd,lot_cd,coun_dist_cd,rnew_cd,cntrc_mwbe_fl,tar_utl_pc,tar_utl_am,comp_crt_cd_1,comp_cri_resp_1,comp_crt_cd_2,comp_cri_resp_2,comp_crt_cd_3,comp_cri_resp_3,comp_crt_cd_4,comp_cri_resp_4,comp_crt_cd_5,comp_cri_resp_5,non_comp_reas,cons_reas_cd_1,cons_reas_cd_2,red_adv,constr_rel_fl,extrn_so_no,liq_dmg_chrg,req_perf_py_bnd_fl,reas_no_perf_bnd,wk_site_cd_01,wk_site_cd_02,wk_site_cd_03,wk_site_cd_04,wk_site_cd_05,wk_site_cd_06,wk_site_cd_07,wk_site_cd_08,wk_site_cd_09,wk_site_cd_10,percent_01,percent_02,percent_03,percent_04,percent_05,percent_06,percent_07,percent_08,percent_09,percent_10,'' as col69 from etl.stg_mag_award_detail )
-to '/home/gpadmin/pvarma/testdata_open/mag_award_detail.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/mag_award_detail.txt' DELIMITER '|';
 
 copy(select 'V' as line_rec,doc_cd,doc_dept_cd,doc_id,doc_vers_no,doc_vend_ln_no,vend_cust_cd,lgl_nm,alias_nm,ad_id,ad_ln_1,ad_ln_2,city,st,zip,ctry,vend_pref_lvl,cntac_id,prin_cntac,voice_ph_no,voice_ph_ext,email_ad,ma_vend_typ,ma_doc_cd,ma_doc_dept_cd,ma_doc_id,email_ad_dup,tin_ein,tin_ssn,disc_1_dy,disc_2_dy,disc_3_dy,disc_4_dy,disc_1_pc,disc_2_pc,disc_3_pc,disc_4_pc,disc_alw_1_fl,disc_alw_2_fl,disc_alw_3_fl,disc_alw_4_fl,'' as col42 from etl.stg_mag_vendor )
-to '/home/gpadmin/pvarma/testdata_open/mag_vendor.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/mag_vendor.txt' DELIMITER '|';
 
 
 
@@ -109,36 +124,36 @@ to '/home/gpadmin/pvarma/testdata_open/mag_vendor.txt' DELIMITER '|';
 
 
 copy(select agency_code,agency_name,'' as col3,agency_short_name,'' as col5 ,'' as col6 ,'' as col7 ,'' as col8 ,'' as col9 , '' as col10 , '' as col11 , '' as col12 , '' as col13 , '' as col14 , '' as col15 , '' as col16 , '' as col17 , '' as col18 , '' as col19 , '' as col20 , '' as col21 , '' as col22 , '' as col23 , '' as col24 , '' as col25 , '' as col26  from etl.stg_agency)
-to '/home/gpadmin/pvarma/testdata_open/coa_agency.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_agency.txt' DELIMITER '|';
 
 copy(select agency_code,fund_class_code,fiscal_year,department_code,department_name,'' as col6,'' as col7,department_short_name,'' as col9 ,'' as col10 ,'' as col11 ,'' as col12 ,'' as col13 ,'' as col14 ,'' as col15 ,'' as col16 ,'' as col17 ,'' as col18 ,'' as col19 ,'' as col20 ,'' as col21  from etl.stg_department)
-to '/home/gpadmin/pvarma/testdata_open/coa_department.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_department.txt' DELIMITER '|';
 
 copy(select col1,fiscal_year,expenditure_object_code,expenditure_object_name,col5,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,col17,col18,col19,col20,col21,col22,col23,col24,col25,col26,col27,col28,col29,col30,col31,col32,col33,col34,col35,col36,col37,col38,col39,col40,col41,col42,'' as col43 from etl.stg_expenditure_object)
-to '/home/gpadmin/pvarma/testdata_open/coa_expenditure_object.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_expenditure_object.txt' DELIMITER '|';
 
 copy(select fy,fcls_cd,fcls_nm,dept_cd,dept_nm,func_cd,func_nm,func_attr_nm,func_attr_sh_nm,resp_ctr,func_anlys_unit,cntrl_cat,local_svc_dist,ua_fund_fl,pyrl_dflt_fl,bud_cat_a,bud_cat_b,bud_func,dscr_ext,tbl_last_dt,func_attr_nm_up,fin_plan_sav_fl,'' as col23 from etl.stg_budget_code)
-to '/home/gpadmin/pvarma/testdata_open/coa_budget_code.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_budget_code.txt' DELIMITER '|';
 
 copy(select agency_code,location_code,location_name,location_short_name,upper_case_name,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15,col16,'' as col17 from etl.stg_location)
-to '/home/gpadmin/pvarma/testdata_open/coa_location.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_location.txt' DELIMITER '|';
 
 copy(select 'ALL' as doc_dept_cd, object_class_code, object_class_name, short_name, act_fl, effective_begin_date, effective_end_date, alw_bud_fl, description, cntac_cd, object_class_name_up, tbl_last_dt, intr_cty_fl, cntrc_pos_fl, pyrl_typ, dscr_ext, rltd_ocls_cd, '' as col18 from etl.stg_object_class)
-to '/home/gpadmin/pvarma/testdata_open/coa_object_class.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_object_class.txt' DELIMITER '|';
 
 copy(select 'ALL' as doc_dept_cd, rscat_cd, rscat_nm, rscat_sh_nm, act_fl, efbgn_dt, efend_dt, alw_bud_fl, rscat_dscr, cntac_cd, rscat_nm_up, tbl_last_dt, '' as col13 from etl.stg_revenue_category)
-to '/home/gpadmin/pvarma/testdata_open/coa_revenue_category.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_revenue_category.txt' DELIMITER '|';
 
 copy(select 'ALL' as doc_dept_cd, rscls_cd, rscls_nm, rscls_sh_nm, act_fl, efbgn_dt, efend_dt, alw_bud_fl, rscls_dscr, cntac_cd, rscls_nm_up, tbl_last_dt,  '' as col13 from etl.stg_revenue_class)
-to '/home/gpadmin/pvarma/testdata_open/coa_revenue_class.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_revenue_class.txt' DELIMITER '|';
 
 copy(select 'ALL' as doc_dept_cd, fy, funding_class_code, funding_class_name, short_name, category_name, cty_fund_fl, intr_cty_fl, fund_aloc_req_fl, tbl_last_dt, ams_row_vers_no, rsfcls_nm_up, fund_category from etl.stg_funding_class)
-to '/home/gpadmin/pvarma/testdata_open/coa_funding_class.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_funding_class.txt' DELIMITER '|';
 
 -- select column_name || ',' from information_schema.columns where table_name = 'stg_revenue_source'  order by ordinal_position
 
 copy(select  doc_dept_cd, fy, rsrc_cd, rsrc_nm, rsrc_sh_nm, act_fl, efbgn_dt, efend_dt, alw_bud_fl, oper_ind, fasb_cls_ind, fhwa_rev_cr_fl, usetax_coll_fl, rscls_cd, rscat_cd, rstyp_cd, rsgrp_cd, mjr_crtyp_cd, mnr_crtyp_cd, rsrc_dscr, cntac_cd, billu_rcvb_cd, billu_rcvb_s, bille_rcvb_cd, bille_rcvb_s, billu_rev_cd, billu_rev_s, collu_rev_cd, collu_rev_s, alw_bdebt_cd, alw_bdebt_s, bdebt_exp_obj, bdebt_exp_obj_s, bill_dps_cd, bill_dps_s, coll_dps_cd, coll_dps_s, nsf_ckcg_rsrc, nsf_ckcg_rsrc_s, intch_rsrc, intch_rsrc_s, lat_chrg_rsrc, lat_chrg_rsrc_s, cc_fee_rsrc, cc_fee_rsrc_s, cc_fee_obj, cc_fee_obj_s, fin_chrg_fee1_cd, fin_chrg_fee2_cd, fin_chrg_fee3_cd, fin_chrg_fee4_cd, fin_chrg_fee5_cd, apy_intr_lat_fee, apy_intr_admn_fee, apy_intr_nsf_fee, apy_intr_othr_fee, elg_inct_fl, rsrc_xfer_fl, bill_vend_rfnd_cd, bill_vend_rfnd_s, uern_rcvb_wo_cd, uern_rcvb_wo_s, dps_rcvb_wo_cd, dps_rcvb_wo_s, uern_rev_wo_cd, uern_rev_wo_s, dps_wo_cd, dps_wo_s, vrfnd_rcvb_wo_cd, vrfnd_rcvb_wo_s, vrfnd_wo_cd, vrfnd_wo_s, ernrev_to_coll_cd, ernrev_to_coll_s, vrfnd_to_coll_cd, vrfnd_to_coll_s, vend_rha_cd, vend_rha_s, rs_opay_cd, rs_opay_s, urs_opay_cd, urs_opay_s, bill_dps_rec_cd, bill_dps_rec_s, earn_rcvb_cd, earn_rcvb_s, rsrc_nm_up, rsrc_sh_nm_up, fin_fee_ov_fl, apy_intr_ov, tbl_last_dt, ext_rep_nm, fund_cls, fund_cls_nm, grnt_id, bill_lag_dy, bill_freq, bill_fy_strt_mnth, bill_fy_strt_dy, fed_agcy_cd, fed_agcy_sfx, fed_nm, ext_rep_num, dscr_ext, srsrc_req, '' as col106 from etl.stg_revenue_source)
-to '/home/gpadmin/pvarma/testdata_open/coa_revenue_source.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_revenue_source.txt' DELIMITER '|';
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- pending contracts
@@ -146,15 +161,15 @@ to '/home/gpadmin/pvarma/testdata_open/coa_revenue_source.txt' DELIMITER '|';
 copy(select con_trans_code,con_trans_ad_code,con_no,con_par_trans_code,con_par_ad_code,con_par_reg_num,con_cur_encumbrance,con_original_max,con_rev_max,vc_legal_name,con_vc_code,con_purpose,submitting_agency_desc,
 submitting_agency_code,awarding_agency_desc,awarding_agency_code,cont_desc,cont_code,am_desc,am_code,con_term_from,con_term_to,con_rev_start_dt,con_rev_end_dt,con_cif_received_date,con_pin,con_internal_pin,
 con_batch_suffix,con_version,original_or_modified,award_category_code from etl.stg_pending_contracts)
-to '/home/gpadmin/pvarma/testdata_open/pending_contracts.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/pending_contracts.txt' DELIMITER '|';
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Budget
 
-copy(select budget_fiscal_year, fund_class_code, agency_code, department_code, budget_code, object_class_code, adopted_amount, current_budget_amount, pre_encumbered_amount, encumbered_amount, accrued_expense_amount, cash_expense_amount, post_closing_adjustment_amount, updated_date, '' as col15 from etl.stg_object_class)
-to '/home/gpadmin/pvarma/testdata_open/budget.txt' DELIMITER '|';
+copy(select budget_fiscal_year, fund_class_code, agency_code, department_code, budget_code, object_class_code, adopted_amount, current_budget_amount, pre_encumbered_amount, encumbered_amount, accrued_expense_amount, cash_expense_amount, post_closing_adjustment_amount, updated_date, '' as col15 from etl.stg_budget)
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/budget.txt' DELIMITER '|';
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -162,11 +177,11 @@ to '/home/gpadmin/pvarma/testdata_open/budget.txt' DELIMITER '|';
 -- Revenue
 
 copy(select doc_rec_dt, per_dc, fy_dc, bfy, fqtr, evnt_cat_id, evnt_typ_id, bank_acct_cd, pstng_pr_typ, pstng_cd_id, drcr_ind, ln_func_cd, pstng_am, incr_dcrs_ind, run_tmdt, fund_cd, sfund_cd, bsa_cd, sbsa_cd, bsa_typ_ind, obj_cd, sobj_cd, rsrc_cd, srsrc_cd, govt_brn_cd, cab_cd, dept_cd, div_cd, gp_cd, sect_cd, dstc_cd, bur_cd, unit_cd, sunit_cd, mjr_prog_cd, prog_cd, phase_cd, task_ord_cd, task_cd, stask_cd, ppc_cd, fprfl_cd, fline_cd, fprty_cd, appr_cd, actv_cd, sactv_cd, func_cd, sfunc_cd, rpt_cd, srpt_cd, dobj_cd, drsrc_cd, loc_cd, sloc_cd, ig_fund_cd, ig_sfund_cd, ig_dept_cd, fcls_cd, fcat_cd, ftyp_cd, fgrp_cd, cafrfgrp_cd, cafrftyp_cd, bscl_cd, bsct_cd, bst_cd, bsg_cd, cmjrbgrp_cd, cmnrbgrp_cd, bsa_ov_fl, ocls_cd, ocat_cd, otyp_cd, ogrp_cd, mjr_cetyp_cd, mnr_cetyp_cd, rscls_cd, rscat_cd, rstyp_cd, rsgrp_cd, mjr_crtyp_cd, mnr_crtyp_cd, apcls_cd, apcat_cd, aptyp_cd, apgrp_cd, lcls_cd, lcat_cd, ltyp_cd, cnty_cd, acls_cd, acat_cd, atyp_cd, agrp_cd, caunit_cd, mjr_catyp_cd, mnr_catyp_cd, fncls_cd, fncat_cd, fntyp_cd, fngrp_cd, rcls_cd, rcat_cd, rtyp_cd, rgrp_cd, docls_cd, docat_cd, dotyp_cd, dogrp_cd, drscls_cd, drscat_cd, drstyp_cd, drsgrp_cd, mjr_pcls_cd, mjr_pcat_cd, mjr_ptyp_cd, mjr_pgrp_cd, pcls_cd, pcat_cd, ptyp_cd, pgrp_cd, doc_cat, doc_typ, doc_cd, doc_dept_cd, doc_id, doc_vers_no, doc_func_cd, doc_vend_ln_no, doc_unit_cd, doc_comm_ln_no, doc_actg_ln_no, doc_pstng_ln_no, doc_last_usid, rfed_doc_cd, rfed_doc_dept_cd, rfed_doc_id, rfed_vend_ln_no, rfed_comm_ln_no, rfed_actg_ln_no, rfed_pstng_ln_no, rf_typ, stpf_cd, assoc_inv_no, assoc_inv_ln_no, assoc_inv_dt, vend_cust_cd, vend_cust_ind, lgl_nm, bpro_cd, actg_ln_dscr, misc3, svc_frm_dt, svc_to_dt, whse_cd, comm_cd, stk_itm_sfx, reas_cd, tin, tin_typ, chk_eft_no, reclass_ind_fl, pscd_clos_cl_cd, pscd_clos_cl_nm, '' as col from etl.stg_revenue)
-to '/home/gpadmin/pvarma/testdata_open/revenue.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/revenue.txt' DELIMITER '|';
 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Revenue Budget Scripts 
 
 copy(select  budget_fiscal_year as bfy, fund_class_code as fcls_cd, agency_code as dept_cd, budget_code as func_cd, revenue_source_code as revenue_source, adopted_amount as adpt_am, current_budget_amount as curr_bud_am, updated_date as col8, '' as col9 from etl.stg_revenue_budget)
-to '/home/gpadmin/pvarma/testdata_open/revenue_budget.txt' DELIMITER '|';
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/revenue_budget.txt' DELIMITER '|';
