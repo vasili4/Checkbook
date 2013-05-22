@@ -2151,7 +2151,7 @@ modified_budget_amount_py numeric(20,2),
 modified_budget_amount_py_1 numeric(20,2),
 modified_budget_amount_py_2 numeric(20,2),
 filter_type varchar(10)
-) DISTRIBUTED BY(agency_id);
+) DISTRIBUTED BY (agency_id);
 
 
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

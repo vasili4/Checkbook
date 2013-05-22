@@ -959,7 +959,7 @@ BEGIN
 			join ref_revenue_category g on a.revenue_category_id = g.revenue_category_id
 			join ref_revenue_class i on a.revenue_class_id = i.revenue_class_id
 			join ref_fund_class j on a.fund_class_id = j.fund_class_id
-			join ref_funding_class k on e.funding_class_id = k.funding_class_id
+			left join ref_funding_class k on e.funding_class_id = k.funding_class_id
 			join ref_agency l on b.agency_id = l.agency_id
 			JOIN etl.etl_data_load m ON a.load_id = m.load_id
 			JOIN ref_budget_code n ON a.budget_code_id = n.budget_code_id
