@@ -548,7 +548,7 @@ CREATE TABLE address (
   state varchar(25) ,
   zip varchar(25) ,
   country varchar(25) 
-) distributed by(address_id);
+) distributed by (address_id);
 
 CREATE TABLE vendor (
     vendor_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_vendor_id'::regclass) NOT NULL,

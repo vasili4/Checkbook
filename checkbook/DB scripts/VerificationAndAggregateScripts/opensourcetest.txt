@@ -154,6 +154,11 @@ to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_funding_class.txt' DELIMITE
 
 copy(select  doc_dept_cd, fy, rsrc_cd, rsrc_nm, rsrc_sh_nm, act_fl, efbgn_dt, efend_dt, alw_bud_fl, oper_ind, fasb_cls_ind, fhwa_rev_cr_fl, usetax_coll_fl, rscls_cd, rscat_cd, rstyp_cd, rsgrp_cd, mjr_crtyp_cd, mnr_crtyp_cd, rsrc_dscr, cntac_cd, billu_rcvb_cd, billu_rcvb_s, bille_rcvb_cd, bille_rcvb_s, billu_rev_cd, billu_rev_s, collu_rev_cd, collu_rev_s, alw_bdebt_cd, alw_bdebt_s, bdebt_exp_obj, bdebt_exp_obj_s, bill_dps_cd, bill_dps_s, coll_dps_cd, coll_dps_s, nsf_ckcg_rsrc, nsf_ckcg_rsrc_s, intch_rsrc, intch_rsrc_s, lat_chrg_rsrc, lat_chrg_rsrc_s, cc_fee_rsrc, cc_fee_rsrc_s, cc_fee_obj, cc_fee_obj_s, fin_chrg_fee1_cd, fin_chrg_fee2_cd, fin_chrg_fee3_cd, fin_chrg_fee4_cd, fin_chrg_fee5_cd, apy_intr_lat_fee, apy_intr_admn_fee, apy_intr_nsf_fee, apy_intr_othr_fee, elg_inct_fl, rsrc_xfer_fl, bill_vend_rfnd_cd, bill_vend_rfnd_s, uern_rcvb_wo_cd, uern_rcvb_wo_s, dps_rcvb_wo_cd, dps_rcvb_wo_s, uern_rev_wo_cd, uern_rev_wo_s, dps_wo_cd, dps_wo_s, vrfnd_rcvb_wo_cd, vrfnd_rcvb_wo_s, vrfnd_wo_cd, vrfnd_wo_s, ernrev_to_coll_cd, ernrev_to_coll_s, vrfnd_to_coll_cd, vrfnd_to_coll_s, vend_rha_cd, vend_rha_s, rs_opay_cd, rs_opay_s, urs_opay_cd, urs_opay_s, bill_dps_rec_cd, bill_dps_rec_s, earn_rcvb_cd, earn_rcvb_s, rsrc_nm_up, rsrc_sh_nm_up, fin_fee_ov_fl, apy_intr_ov, tbl_last_dt, ext_rep_nm, fund_cls, fund_cls_nm, grnt_id, bill_lag_dy, bill_freq, bill_fy_strt_mnth, bill_fy_strt_dy, fed_agcy_cd, fed_agcy_sfx, fed_nm, ext_rep_num, dscr_ext, srsrc_req, '' as col106 from etl.stg_revenue_source)
 to '/home/gpadmin/pvarma/testdata_open_5_20_2013/coa_revenue_source.txt' DELIMITER '|';
+
+
+
+  copy(select  'M' as record_type, 'ALL' as doc_dept_cd,  vend_cust_cd, bus_typ, bus_typ_sta, min_typ, disp_cert_strt_dt, cert_end_dt, init_dt, '' as col10 from etl.stg_fmsv_business_type)
+to '/home/gpadmin/pvarma/testdata_open_5_20_2013/fmsv_business_types.txt' DELIMITER '|';
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- pending contracts
