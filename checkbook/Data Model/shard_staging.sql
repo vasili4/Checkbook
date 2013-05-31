@@ -479,6 +479,7 @@ CREATE EXTERNAL WEB TABLE revenue_details__0 (
 	agency_short_name varchar,
 	department_short_name varchar,
 	agency_history_id smallint,
+	object_class_id integer,
 	load_id integer,
 	last_modified_date timestamp without time zone,
 	job_id bigint
@@ -498,7 +499,7 @@ CREATE VIEW revenue_details AS
     revenue_details__0.agency_code,revenue_details__0.revenue_class_code,revenue_details__0.fund_class_code,revenue_details__0.funding_class_code,revenue_details__0.revenue_category_code,
     revenue_details__0.revenue_source_code,revenue_details__0.closing_classification_code,revenue_details__0.closing_classification_name,
     revenue_details__0.budget_code,revenue_details__0.adopted_amount,revenue_details__0.current_modified_budget_amount,
-    revenue_details__0.agency_short_name,revenue_details__0.department_short_name,revenue_details__0.agency_history_id, 
+    revenue_details__0.agency_short_name,revenue_details__0.department_short_name,revenue_details__0.agency_history_id, revenue_details__0.object_class_id, 
     revenue_details__0.load_id,revenue_details__0.last_modified_date,revenue_details__0.job_id
     FROM  ONLY revenue_details__0;
 

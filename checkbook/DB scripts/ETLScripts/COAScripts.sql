@@ -637,7 +637,7 @@ CREATE OR REPLACE FUNCTION etl.processCOAObjectClass(p_load_file_id_in int,p_loa
 DECLARE
 	l_count int;
 BEGIN
-	CREATE TEMPORARY TABLE tmp_ref_object_class(uniq_id bigint,object_class_code varchar(4),object_class_name varchar(60),exists_flag char(1), modified_flag char(1))
+	CREATE TEMPORARY TABLE tmp_ref_object_class(uniq_id bigint,object_class_code varchar(4),object_class_name varchar(60),intr_cty_fl bit(1),exists_flag char(1), modified_flag char(1))
 	DISTRIBUTED BY (uniq_id);
 	
 	-- For all records check if data is modified/new
@@ -646,8 +646,9 @@ BEGIN
 	SELECT  a.uniq_id,
 		a.object_class_code, 
 	       a.object_class_name,
+	       a.intr_cty_fl,
 	       (CASE WHEN b.object_class_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-	       (CASE WHEN b.object_class_code IS NOT NULL AND a.object_class_name <> b.object_class_name THEN 'Y' ELSE 'N' END) as modified_flag
+	       (CASE WHEN b.object_class_code IS NOT NULL AND (a.object_class_name <> b.object_class_name OR a.intr_cty_fl <> b.intra_city_flag )THEN 'Y' ELSE 'N' END) as modified_flag
 	FROM   etl.stg_object_class a LEFT JOIN ref_object_class b ON a.object_class_code = b.object_class_code;
 
 	RAISE NOTICE 'start';
@@ -668,7 +669,7 @@ BEGIN
 				     related_object_class_code,created_date,created_load_id,original_object_class_name)
 	SELECT a.object_class_id,b.object_class_code,b.object_class_name,c.short_name,
 		act_fl, d.date_id, e.date_id, alw_bud_fl, c.description,
-		c.tbl_last_dt,intr_cty_fl,cntrc_pos_fl,c.pyrl_typ,c.dscr_ext,
+		c.tbl_last_dt,b.intr_cty_fl,cntrc_pos_fl,c.pyrl_typ,c.dscr_ext,
 		c.rltd_ocls_cd,now()::timestamp,p_load_id_in,b.object_class_name
 	FROM   etl.ref_object_class_id_seq a JOIN tmp_ref_object_class b ON a.uniq_id = b.uniq_id
 		JOIN etl.stg_object_class c ON b.uniq_id = c.uniq_id
@@ -695,7 +696,7 @@ BEGIN
 		OR (exists_flag ='Y' and modified_flag='Y');
 		
 
-	CREATE TEMPORARY TABLE tmp_ref_object_class_1(uniq_id bigint,object_class_code varchar(20),object_class_name varchar, exists_flag char(1), modified_flag char(1), object_class_id smallint)
+	CREATE TEMPORARY TABLE tmp_ref_object_class_1(uniq_id bigint,object_class_code varchar(20),object_class_name varchar, intr_cty_fl bit(1), exists_flag char(1), modified_flag char(1), object_class_id smallint)
 	DISTRIBUTED BY (object_class_id);
 
 	INSERT INTO tmp_ref_object_class_1
@@ -706,6 +707,7 @@ BEGIN
 	
 	UPDATE ref_object_class a
 	SET	object_class_name = b.object_class_name,
+	    intra_city_flag   = b.intr_cty_fl,
 		updated_date = now()::timestamp,
 		updated_load_id = p_load_id_in
 	FROM	tmp_ref_object_class_1 b		
@@ -726,7 +728,7 @@ BEGIN
 				     related_object_class_code,created_date,load_id)
 	SELECT a.object_class_history_id,c.object_class_id,b.object_class_name,d.short_name,
 		d.act_fl, e.date_id, f.date_id, d.alw_bud_fl, d.description,
-		d.tbl_last_dt,intr_cty_fl, cntrc_pos_fl,d.pyrl_typ,d.dscr_ext,
+		d.tbl_last_dt,b.intr_cty_fl, cntrc_pos_fl,d.pyrl_typ,d.dscr_ext,
 		d.rltd_ocls_cd,now()::timestamp,p_load_id_in
 	FROM   etl.ref_object_class_history_id_seq a JOIN tmp_ref_object_class b ON a.uniq_id = b.uniq_id
 		JOIN ref_object_class c ON b.object_class_code = c.object_class_code
@@ -1427,7 +1429,7 @@ BEGIN
 		a.fcls_cd, 
 		a.fcls_nm,
 		(CASE WHEN b.budget_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-		(CASE WHEN b.budget_code IS NOT NULL AND a.func_nm <> b.budget_code_name THEN 'Y' ELSE 'N' END) as budget_code_modified_flag,
+		(CASE WHEN b.budget_code IS NOT NULL AND a.func_attr_nm <> b.attribute_name THEN 'Y' ELSE 'N' END) as budget_code_modified_flag,
 		(CASE WHEN c.agency_code IS NULL THEN 'N' ELSE 'Y' END) as agency_exists_flag,
 		(CASE WHEN d.fund_class_code IS NULL THEN 'N' ELSE 'Y' END) as fund_class_exists_flag,
 		a.dept_cd,
@@ -1602,7 +1604,7 @@ BEGIN
 		RAISE NOTICE 'RS - 4';
 
 		-- change of budget_code
-		CREATE TEMPORARY TABLE tmp_ref_budget_code_1(func_nm varchar, func_attr_nm varchar, func_attr_sh_nm varchar, budget_code_id smallint)
+		CREATE TEMPORARY TABLE tmp_ref_budget_code_1(func_nm varchar, func_attr_nm varchar, func_attr_sh_nm varchar, budget_code_id integer)
 		DISTRIBUTED BY (budget_code_id);
 
 

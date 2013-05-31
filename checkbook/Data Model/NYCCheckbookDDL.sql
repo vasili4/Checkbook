@@ -1336,6 +1336,7 @@ CREATE TABLE revenue_details
 	agency_short_name varchar(15),
 	department_short_name varchar(15),
 	agency_history_id smallint,
+	object_class_id integer,
 	load_id integer,
     last_modified_date timestamp without time zone,
     job_id bigint   
@@ -1348,9 +1349,6 @@ ALTER TABLE  revenue_details ADD CONSTRAINT fk_revenue_detailse_revenue FOREIGN 
 
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_agency_history FOREIGN KEY (agency_history_id) REFERENCES ref_agency_history(agency_history_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_document_code FOREIGN KEY (document_code_id) REFERENCES ref_document_code(document_code_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_reason FOREIGN KEY (expenditure_cancel_reason_id) REFERENCES ref_expenditure_cancel_reason(expenditure_cancel_reason_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_cancel_type FOREIGN KEY (expenditure_cancel_type_id) REFERENCES ref_expenditure_cancel_type(expenditure_cancel_type_id);
-ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_ref_expenditure_status FOREIGN KEY (expenditure_status_id) REFERENCES ref_expenditure_status(expenditure_status_id);
 ALTER TABLE  disbursement ADD CONSTRAINT fk_disbursement_vendor_history FOREIGN KEY (vendor_history_id) REFERENCES vendor_history(vendor_history_id);
 -- ALTER TABLE  disbursement ADD constraint fk_disbursement_etl_data_load foreign key (created_load_id) references etl_data_load (load_id);
 ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date foreign key (record_date_id) references ref_date (date_id);

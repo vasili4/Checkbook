@@ -400,6 +400,7 @@ CREATE TABLE revenue_details
 	agency_short_name varchar(15),
 	department_short_name varchar(15),
 	agency_history_id smallint,
+	object_class_id integer,
 	load_id integer,
     last_modified_date timestamp without time zone,
     job_id bigint   

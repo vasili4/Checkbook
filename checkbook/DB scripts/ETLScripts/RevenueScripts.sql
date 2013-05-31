@@ -941,7 +941,7 @@ BEGIN
 					fund_class_name,funding_class_name,agency_code,revenue_class_code,fund_class_code,funding_class_code,
 					revenue_category_code,revenue_source_code,closing_classification_code,closing_classification_name,
 					budget_code,agency_short_name,department_short_name,
-					agency_history_id, load_id, last_modified_date,job_id)
+					agency_history_id, object_class_id, load_id, last_modified_date,job_id)
 	SELECT  a.revenue_id,a.fiscal_year,a.fiscal_period,a.posting_amount,
 			a.revenue_category_id,a.revenue_source_id,d.year_id,b.agency_id,
 			c.department_id,a.revenue_class_id,a.fund_class_id,e.funding_class_id,
@@ -950,7 +950,7 @@ BEGIN
 			j.fund_class_name,k.funding_class_name,l.agency_code,i.revenue_class_code,j.fund_class_code,k.funding_class_code,
 			g.revenue_category_code,e.revenue_source_code,a.closing_classification_code,a.closing_classification_name,
 			n.budget_code,b.agency_short_name,c.department_short_name,
-			b.agency_history_id, a.load_id, a.created_date,p_job_id_in
+			b.agency_history_id, o.object_class_id, a.load_id, a.created_date,p_job_id_in
 	FROM    revenue a join ref_agency_history b on a.agency_history_id = b.agency_history_id
 			join ref_department_history c on a.department_history_id = c.department_history_id
 			join ref_year d on a.fiscal_year = d.year_value
@@ -963,6 +963,7 @@ BEGIN
 			join ref_agency l on b.agency_id = l.agency_id
 			JOIN etl.etl_data_load m ON a.load_id = m.load_id
 			JOIN ref_budget_code n ON a.budget_code_id = n.budget_code_id
+			left join ref_object_class_history o ON a.object_class_history_id = o.object_class_history_id
 		WHERE m.job_id = p_job_id_in AND m.data_source_code ='R' ;
 		
 			
