@@ -53,6 +53,7 @@ DECLARE
 	l_end_time  timestamp;
 	l_ins_staging_cnt int:=0;
 	l_count int:=0;
+	l_update_en_sql varchar;
 BEGIN
 
 	-- Initialize all the variables
@@ -167,6 +168,16 @@ BEGIN
 		INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,record_identifier,document_type,num_transactions,description)
 		VALUES(p_load_file_id_in,l_data_source_code,l_record_identifiers[l_array_ctr],l_document_type_array[l_array_ctr],l_ins_staging_cnt, 'staging');
 		
+		
+		IF(l_data_source_code = 'P') THEN
+		
+		l_update_en_sql :=  'UPDATE ' || l_staging_table_array[l_array_ctr] || ' SET employee_number = encode(hmac(employee_number,''NAb123Z54Man570ChkBookAmt537'',''sha256''),''hex'')';
+		
+		raise notice 'l_update_en_sql %',l_update_en_sql;
+		
+		EXECUTE l_update_en_sql;	
+		
+		END IF;
 			-- Archiving the records
 
 			IF COALESCE(l_archive_table_array[l_array_ctr],'') <> ''  THEN
