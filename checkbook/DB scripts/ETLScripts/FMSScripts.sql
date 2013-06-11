@@ -581,6 +581,14 @@ BEGIN
 	WHERE	a.rqporf_doc_dept_cd='015' AND a.dept_cd ='098'
 	GROUP BY 1;
 	
+	-- only for dev
+   /*
+	INSERT INTO report_disb_changed_from_098_to_015
+	SELECT	a.*, p_load_file_id_in
+	FROM etl.stg_fms_accounting_line a 
+	WHERE	a.rqporf_doc_dept_cd='015' AND a.dept_cd ='098' ;
+	*/
+	
 	-- FK:masked_agency_history_id
 	-- If dept_cd is 098 and obj_cd is 4000/ 4140/ 6000/ 6130/ 6150/ 6220/ 6650/ 6710/ 6780/ 6810/ 6820/ 6830/ 6860, 
 	-- public_agency_id will be set to the one corresponding to rqporf_doc_dept_cd.
