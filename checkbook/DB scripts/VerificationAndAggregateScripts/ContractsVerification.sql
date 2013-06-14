@@ -148,6 +148,26 @@ history_agreement b join (
 ORDER BY 3 desc
 
 
+
+select d.vendor_id,COUNT(distinct b.original_agreement_id ),SUM(distinct b.maximum_contract_amount),SUM(distinct original_contract_amount),sum(b.rfed_amount),
+group_concat(b.original_agreement_id)
+from
+history_agreement b join (
+	select a.original_agreement_id, max(document_version) as document_version
+	from
+	history_agreement a join 
+		(select original_agreement_id,max(source_updated_fiscal_year) as source_updated_fiscal_year 
+		from history_agreement  
+		where registered_fiscal_year_id  = 114
+		and source_updated_fiscal_year <= 2013
+		GROUP BY 1 ) tbl1 on a.original_agreement_id = tbl1.original_agreement_id AND a.source_updated_fiscal_year = tbl1.source_updated_fiscal_year
+	GROUP BY 1 order by 1) tbl2 on  b.original_agreement_id = tbl2.original_agreement_id AND b.document_version = tbl2.document_version
+	JOIN vendor_history d ON b.vendor_history_id = d.vendor_history_id
+	group by 1
+ORDER BY 3 desc
+
+
+
 Top 5 Vendors (Modified)
 -------------
 a) From Source tables
@@ -174,7 +194,24 @@ ORDER BY 4 desc LIMIT 5
 
 
 
-
+select f.vendor_id,COUNT(*),SUM(f.original_contract_amount),SUM(f.maximum_contract_amount),sum(f.spending_amount),  group_concat(original_agreement_id)
+FROM
+(SELECT b.original_agreement_id, d.vendor_id, MIN(b.original_contract_amount) as original_contract_amount, MIN(b.maximum_contract_amount) as maximum_contract_amount, sum(b.rfed_amount) as spending_amount
+from
+history_agreement b join (
+	select a.original_agreement_id, max(document_version) as document_version
+	from
+	history_agreement a join 
+		(select original_agreement_id,max(source_updated_fiscal_year) as source_updated_fiscal_year 
+		from history_agreement  
+		where registered_fiscal_year_id  = 114
+		and source_updated_fiscal_year <= 2013
+		GROUP BY 1 ) tbl1 on a.original_agreement_id = tbl1.original_agreement_id AND a.source_updated_fiscal_year = tbl1.source_updated_fiscal_year
+	GROUP BY 1 order by 1) tbl2 on  b.original_agreement_id = tbl2.original_agreement_id AND b.document_version = tbl2.document_version
+	JOIN vendor_history d ON b.vendor_history_id = d.vendor_history_id
+	group by 1,2) f 
+GROUP BY 1
+ORDER BY 4 desc LIMIT 5
 
 
 b) From aggregate table
