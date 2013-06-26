@@ -3029,4 +3029,17 @@ CREATE VIEW aggregateon_budget_by_year AS
     aggregateon_budget_by_year__0.modified_budget_amount, aggregateon_budget_by_year__0.modified_budget_amount_py, aggregateon_budget_by_year__0.modified_budget_amount_py_1,aggregateon_budget_by_year__0.modified_budget_amount_py_2,
     aggregateon_budget_by_year__0.filter_type
     FROM  aggregateon_budget_by_year__0;
- 
+    
+CREATE EXTERNAL WEB TABLE transactions_data_by_year__0
+(
+year smallint,
+type_of_year character(1),
+domain_name varchar,
+num_transactions bigint
+) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.transactions_data_by_year to stdout csv"' ON SEGMENT 0 
+ FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+ENCODING 'UTF8';
+
+ CREATE VIEW transactions_data_by_year AS
+    SELECT transactions_data_by_year__0.year, transactions_data_by_year__0.type_of_year, transactions_data_by_year__0.domain_name, transactions_data_by_year__0.num_transactions
+    FROM  transactions_data_by_year__0;

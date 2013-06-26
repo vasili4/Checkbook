@@ -102,7 +102,7 @@ AS
 
    CREATE OR REPLACE VIEW  payroll_mwbe AS
 SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,total_amount as LineItemAmount,6 AS CategoryID,
-'Non-MWBE (Ineligible)'::varchar(50) as CategoryName,b.agency_id,b.agency_name,d.date,
+'Individuals and Others'::varchar(50) as CategoryName,b.agency_id,b.agency_name,d.date,
        c.department_id,c.department_name,coalesce(a.updated_load_id,a.created_load_id)
   FROM payroll_summary a
        JOIN ref_agency_history b

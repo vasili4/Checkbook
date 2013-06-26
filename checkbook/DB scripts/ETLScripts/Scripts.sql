@@ -8,6 +8,7 @@
 	grantaccess
 	refreshfactandaggregatetables
 	insertInvalidRecords
+	gettransactionsbyyear
 */
 
 CREATE OR REPLACE FUNCTION concat(text, text) RETURNS text
@@ -1237,6 +1238,49 @@ EXCEPTION
 	RETURN 0;
 END;
 $$ language plpgsql;
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.gettransactionsbyyear(p_job_id_in bigint) RETURNS INT AS $$
+DECLARE
+	l_count int;
+BEGIN
+	
+TRUNCATE transactions_data_by_year;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT fiscal_year as year, 'B' as type_of_year, 'Contracts' as domain_name,  count(*) as num_transactions FROM agreement_snapshot_expanded group by 1,2 ;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT fiscal_year as year, 'C' as type_of_year, 'Contracts' as domain_name,  count(*) as num_transactions FROM agreement_snapshot_expanded_cy group by 1,2 ;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT fiscal_year as year, 'B' as type_of_year, 'Spending' as domain_name,  count(*) as num_transactions FROM disbursement_line_item_details WHERE spending_category_id != 2 group by 1,2 ;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT calendar_fiscal_year as year, 'C' as type_of_year, 'Spending' as domain_name,  count(*) as num_transactions FROM disbursement_line_item_details WHERE spending_category_id != 2 group by 1,2 ;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT fiscal_year as year, 'B' as type_of_year, 'Payroll' as domain_name,  count(*) as num_transactions FROM payroll group by 1,2 ;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT calendar_fiscal_year as year, 'C' as type_of_year, 'Payroll' as domain_name,  count(*) as num_transactions FROM payroll group by 1,2 ;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT budget_fiscal_year as year, 'B' as type_of_year, 'Budget' as domain_name,  count(*) as num_transactions FROM budget group by 1,2 ;
+
+INSERT INTO transactions_data_by_year(year, type_of_year, domain_name, num_transactions) 
+SELECT fiscal_year as year, 'B' as type_of_year, 'Revenue' as domain_name,  count(*) as num_transactions FROM revenue group by 1,2 ;
+	
+	RETURN 1;
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in gettransactionsbyyear';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	RETURN 0;
+END;
+$$ language plpgsql;
+
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION etl.refreshfactandaggregatetables(p_job_id_in bigint)
@@ -1290,6 +1334,15 @@ BEGIN
 	ELSE 
 			RETURN 0;
 	END IF;	
+	
+	
+	IF l_status = 1 THEN 
+		l_status :=etl.gettransactionsbyyear(p_job_id_in);
+	ELSE 
+			RETURN 0;
+	END IF;	
+	
+	
 	
 	/*
 	IF l_status = 1 THEN 

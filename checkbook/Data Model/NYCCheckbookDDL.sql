@@ -2152,6 +2152,15 @@ filter_type varchar(10)
 ) DISTRIBUTED BY (agency_id);
 
 
+CREATE TABLE transactions_data_by_year
+(
+year smallint,
+type_of_year character(1),
+domain_name varchar,
+num_transactions bigint
+) DISTRIBUTED BY (year);
+
+
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  -- creating indexes
  
