@@ -303,7 +303,7 @@ BEGIN
 	FROM etl.stg_fms_accounting_line a JOIN ref_department b ON coalesce(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
-		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 	GROUP BY 1;
 	
 	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line_new_dept(agency_history_id integer,agency_id integer,appr_cd varchar,
@@ -318,7 +318,7 @@ BEGIN
 						 HAVING max(department_history_id) IS NULL) b on a.uniq_id=b.uniq_id
 		JOIN ref_agency c ON a.dept_cd = c.agency_code
 		JOIN ref_agency_history d ON c.agency_id = d.agency_id
-		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code
+		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code
 	GROUP BY 1,2,3,4,5;
 
 	RAISE NOTICE '1.4';
@@ -385,7 +385,7 @@ BEGIN
 	FROM etl.stg_fms_accounting_line a JOIN ref_department b  ON coalesce(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
-		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 		JOIN etl.ref_department_history_id_seq f ON c.department_history_id = f.department_history_id
 	GROUP BY 1	;	
 
