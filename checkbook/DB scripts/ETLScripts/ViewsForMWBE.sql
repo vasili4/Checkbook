@@ -26,10 +26,10 @@ WHERE c.data_source_code::text = 'A'::text AND c.load_id = a.created_load_id AND
 
    CREATE OR REPLACE VIEW ref_agency_mwbe
 AS
-   SELECT distinct c.agency_id as departmentId,
+   SELECT distinct c.agency_id as DepartmentID,
 	  c.agency_name as DeptName ,
           c.agency_code as DeptCode,
-          coalesce(c.updated_load_id,c.created_load_id)
+          coalesce(c.updated_load_id,c.created_load_id) as load_id
      FROM (SELECT DISTINCT (agency_id)
              FROM disbursement_line_item_details) a
                    JOIN ref_agency c
@@ -103,7 +103,7 @@ AS
    CREATE OR REPLACE VIEW  payroll_mwbe AS
 SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,total_amount as LineItemAmount,6 AS CategoryID,
 'Individuals and Others'::varchar(50) as CategoryName,b.agency_id,b.agency_name,d.date,
-       c.department_id,c.department_name,coalesce(a.updated_load_id,a.created_load_id)
+       c.department_id as AppropriationUnitID, c.department_name as AppropriationUnitName, coalesce(a.updated_load_id,a.created_load_id) as load_id
   FROM payroll_summary a
        JOIN ref_agency_history b
           ON a.agency_history_id = b.agency_history_id
@@ -113,7 +113,8 @@ SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,tota
           ON a.pay_date_id = d.date_id
        JOIN etl.etl_data_load e
           ON e.load_id = coalesce(a.updated_load_id,a.created_load_id)
-        where e.job_id > (select max(job_id) from mwbe_last_job);
+        --where e.job_id > (select max(job_id) from mwbe_last_job);
+        where e.publish_start_time::date >= '2013-07-01';
           
 
 --disbursement
@@ -151,8 +152,8 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
 	   when c.business_type_id = 5 then 1
            else c.minority_type_id end) as MinoritytypeId,
           minority_type_name as MinorityGroup,
-          department_id as appropriationUnitID,
-          department_code as appropriationUnitCode,
+          department_id as AppropriationUnitID,
+          department_code as AppropriationUnitCode,
           location_code,
           expenditure_object_id,
           expenditure_object_name,
@@ -167,10 +168,11 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
 				left join ref_minority_type d on c.minority_type_id = d.minority_type_id 
 				JOIN etl.etl_data_load e ON e.load_id = a.load_id
 				JOIN ref_date rd on a.check_eft_issued_date_id = rd.date_id
-				where e.job_id > (select max(job_id) from mwbe_last_job);
+				--where e.job_id > (select max(job_id) from mwbe_last_job);
+				where e.publish_start_time::date >= '2013-07-01';
 
 
-
+-- Need to check with Vinay if Payroll summary data should be excluded while giving disbursement data using the above view.
 
 --vendor
 /*
@@ -213,13 +215,17 @@ AS
              ON a2.vendor_history_id = a4.vendor_history_id
           LEFT JOIN address f
              ON f.address_id = a4.address_id;
-*/
+
 
 CREATE OR REPLACE VIEW vendor_mwbe as
 SELECT 
 a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as VendorName,a.miscellaneous_vendor_flag,
           a.created_load_id as LoadID,
-          f.address_line_1 as StreetAddrLine1,f.address_line_2 as StreetAddrLine2,f.city as City,f.state as StateProv,f.zip as PostalCode,f.country as Country
+          f.address_line_1 as StreetAddrLine1,f.address_line_2 as StreetAddrLine2,f.city as City,f.state as StateProv,f.zip as PostalCode,f.country as Country,
+          (case when g.business_type_id =2 then 6 
+	   			when g.business_type_id = 5 then 1
+           		else g.minority_type_id end) as MinoritytypeId,
+          h.minority_type_name as MinorityGroup
           FROM vendor a 
 		   left join (SELECT a.vendor_id,
                        max(vendor_history_id) AS vendor_history_id
@@ -240,11 +246,32 @@ a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as Ven
                                vendor_address e
                             ON a2.vendor_address_id = e.vendor_address_id) a3
                             on a1.vendor_history_id = a3.vendor_history_id
-			left join address f on f.address_id = a3.address_id;
+			left join address f on f.address_id = a3.address_id
+			left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
+				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
+					(select distinct vendor_customer_code from fmsv_business_type 
+					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null)) AND business_type_id=5)))g
+					 on a.vendor_customer_code =g.vendor_customer_code 
+			left join ref_minority_type h on g.minority_type_id = h.minority_type_id  ; 
 
 
-
-
+*/
+				
+CREATE OR REPLACE VIEW vendor_mwbe as
+SELECT 
+a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as VendorName,a.miscellaneous_vendor_flag,
+          a.created_load_id as LoadID,
+          (case when g.business_type_id =2 then 6 
+	   			when g.business_type_id = 5 then 1
+           		else g.minority_type_id end) as MinoritytypeId,
+          h.minority_type_name as MinorityGroup
+          FROM vendor a 
+		   	left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
+				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
+					(select distinct vendor_customer_code from fmsv_business_type 
+					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null)) AND business_type_id=5)))g
+					 on a.vendor_customer_code =g.vendor_customer_code 
+			left join ref_minority_type h on g.minority_type_id = h.minority_type_id  ; 
 
 
 
@@ -375,7 +402,7 @@ from disbursement_line_item a join agreement_snapshot b on a.reference_document_
 
 
 -- vendor address mwbe
-
+/*
 CREATE OR REPLACE VIEW vendor_address_mwbe
 as
 select  
@@ -385,8 +412,37 @@ from vendor v ,
 (select vendor_id,max(b.vendor_history_id) as vendor_history_id from vendor_history a join vendor_address b on a.vendor_history_id =b.vendor_history_id where address_type_id =2 group by 1)x ,
 vendor_address  va, address c
 WHERE v.vendor_id = x.vendor_id AND x.vendor_history_id = va.vendor_history_id AND va.address_id = c.address_id;
+*/
 
 
+CREATE OR REPLACE VIEW vendor_address_mwbe as
+SELECT 
+a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as VendorName,a.miscellaneous_vendor_flag,
+          a.created_load_id as LoadID,
+          f.address_line_1 as StreetAddrLine1,f.address_line_2 as StreetAddrLine2,f.city as City,f.state as StateProv,f.zip as PostalCode,f.country as Country
+          FROM vendor a 
+		   left join (SELECT a.vendor_id,
+                       max(vendor_history_id) AS vendor_history_id
+                  FROM vendor_history a
+                GROUP BY 1) a1
+             ON a1.vendor_id = a.vendor_id
+		left join		   
+		  (SELECT a2.vendor_history_id,
+                            a2.vendor_address_id,
+                            e.address_id
+                       FROM    (SELECT a.vendor_history_id,
+                                       max(vendor_address_id)
+                                          AS vendor_address_id
+                                  FROM vendor_address a
+                                 WHERE a.address_type_id = 2
+                                GROUP BY 1) a2
+                            LEFT JOIN
+                               vendor_address e
+                            ON a2.vendor_address_id = e.vendor_address_id) a3
+                            on a1.vendor_history_id = a3.vendor_history_id
+			left join address f on f.address_id = a3.address_id ;
+			
+			
 -- payroll  disbursement mwbe
 
 CREATE OR REPLACE VIEW processed_payroll_disbursement_mwbe AS

@@ -1429,7 +1429,7 @@ BEGIN
 		a.fcls_cd, 
 		a.fcls_nm,
 		(CASE WHEN b.budget_code IS NULL THEN 'N' ELSE 'Y' END) as exists_flag,
-		(CASE WHEN b.budget_code IS NOT NULL AND a.func_attr_nm <> b.attribute_name THEN 'Y' ELSE 'N' END) as budget_code_modified_flag,
+		(CASE WHEN b.budget_code IS NOT NULL AND a.func_attr_nm <> coalesce(b.attribute_name,'') THEN 'Y' ELSE 'N' END) as budget_code_modified_flag,
 		(CASE WHEN c.agency_code IS NULL THEN 'N' ELSE 'Y' END) as agency_exists_flag,
 		(CASE WHEN d.fund_class_code IS NULL THEN 'N' ELSE 'Y' END) as fund_class_exists_flag,
 		a.dept_cd,
@@ -1450,7 +1450,9 @@ BEGIN
 		a.dscr_ext,
 		a.tbl_last_dt,	
 		a.func_attr_nm_up,
-		a.fin_plan_sav_fl 
+		a.fin_plan_sav_fl,
+		b.agency_id,
+		b.fund_class_id
 	FROM   etl.stg_budget_code a LEFT JOIN ref_agency c on  a.dept_cd = c.agency_code 
 				     LEFT JOIN ref_fund_class d on a.fcls_cd =  d.fund_class_code 
 				     LEFT JOIN ref_budget_code b ON a.func_cd = b.budget_code 
@@ -1609,7 +1611,8 @@ BEGIN
 
 
 		INSERT INTO tmp_ref_budget_code_1
-		SELECT a.func_nm,a.func_attr_nm,a.func_attr_sh_nm, b.budget_code_id FROM tmp_ref_budget_code a JOIN ref_budget_code b ON a.func_cd = b.budget_code AND a.fy = b.fiscal_year
+		SELECT a.func_nm,a.func_attr_nm,a.func_attr_sh_nm, b.budget_code_id 
+		FROM tmp_ref_budget_code a JOIN ref_budget_code b ON a.func_cd = b.budget_code AND a.fy = b.fiscal_year AND a.agency_id = b.agency_id AND a.fund_class_id = b.fund_class_id
 		WHERE exists_flag ='Y' and budget_code_modified_flag ='Y';
 
 

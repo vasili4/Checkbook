@@ -507,9 +507,9 @@ BEGIN
 	SELECT uniq_id
 	FROM   tmp_fk_revenue_values_new_budget_codes;
 	
-	INSERT INTO ref_budget_code(budget_code_id,fiscal_year,budget_code,budget_code_name,agency_id, fund_class_id, created_date,load_id)
+	INSERT INTO ref_budget_code(budget_code_id,fiscal_year,budget_code,attribute_name,agency_id, fund_class_id, created_date,load_id)
 	SELECT a.budget_code_id,fiscal_year,COALESCE(func_cd,'---'),(CASE WHEN COALESCE(func_cd,'')='' THEN '<Non-Applicable Budget Code>'
-					    ELSE '<Unknown Budget Code>' End )as budget_code_name,
+					    ELSE '<Unknown Budget Code>' End )as attribute_name,
 		agency_id,fund_class_id,now()::timestamp,p_load_id_in
 	FROM   etl.ref_budget_code_id_seq a JOIN tmp_fk_revenue_values_new_budget_codes b ON a.uniq_id = b.uniq_id;
 

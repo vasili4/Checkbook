@@ -1078,7 +1078,7 @@ BEGIN
 	FROM   tmp_fk_values_pms_summary_new_budget;		
 
 	INSERT INTO  ref_budget_code( budget_code_id,fiscal_year ,budget_code ,
-				      agency_id,fund_class_id,budget_code_name ,
+				      agency_id,fund_class_id,attribute_name,
 				      created_date,load_id)
 	SELECT a.budget_code_id,b.fiscal_year,b.budget_code,
 		b.agency_id,b.fund_class_id,b.bud_code_desc,
