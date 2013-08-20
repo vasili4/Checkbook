@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS mwbe_last_job CASCADE;
 CREATE table mwbe_last_job (
 use char(10),
 job_id integer 
-) DISTRIBUTED BY (job_id);
+) DISTRIBUTED BY (use);
 
 -- This table should be given access to mwbe etl user to update etl job_id in order to get incremental files. The value is to be set to 0 if a complete load is needed
 
@@ -114,8 +114,9 @@ SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,tota
        JOIN etl.etl_data_load e
           ON e.load_id = coalesce(a.updated_load_id,a.created_load_id)
         --where e.job_id > (select max(job_id) from mwbe_last_job);
-        where e.publish_start_time::date >= '2013-07-01';
-          
+        -- where e.publish_start_time::date >= '2013-07-01';
+         -- WHERE d.date >= '2013-01-18' ;
+         WHERE e.job_id > (select max(job_id) from mwbe_last_job);
 
 --disbursement
 
@@ -151,14 +152,24 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
 	  (case when c.business_type_id =2 then 6 
 	   when c.business_type_id = 5 then 1
            else c.minority_type_id end) as MinoritytypeId,
-          minority_type_name as MinorityGroup,
+          (case when c.business_type_id = 2 then 'Native' 
+	   			when c.business_type_id = 5 then 'Unspecified MWBE'
+           		else d.minority_type_name end) as MinorityGroup,
+           	c.business_type_id as BusinessTypeId,
+           	i.business_type_code as BusinessTypeCode,
+           	i.business_type_name as BusinessTypeName,
           department_id as AppropriationUnitID,
           department_code as AppropriationUnitCode,
           location_code,
           expenditure_object_id,
           expenditure_object_name,
           expenditure_object_code,
-          fiscal_year,a.load_id
+          fiscal_year,a.load_id,
+          a.contract_number::varchar(25) AS AgreementID,
+          split_part(a.disbursement_number, '-', 2)::integer as DocumentVersion,
+          split_part(a.disbursement_number, '-', 3) as DocDeptCode,
+          split_part(a.disbursement_number, '-', 4) as DocCode,
+          a.line_number as LineNumber
  from disbursement_line_item_details a left join  vendor b on a.vendor_id =b.vendor_id 
 				left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
 				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
@@ -166,11 +177,12 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
 					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null)) AND business_type_id=5)))c
 				 on b.vendor_customer_code =c.vendor_customer_code
 				left join ref_minority_type d on c.minority_type_id = d.minority_type_id 
+				left join ref_business_type i on c.business_type_id = i.business_type_id
 				JOIN etl.etl_data_load e ON e.load_id = a.load_id
 				JOIN ref_date rd on a.check_eft_issued_date_id = rd.date_id
 				--where e.job_id > (select max(job_id) from mwbe_last_job);
-				where e.publish_start_time::date >= '2013-07-01';
-
+				-- where a.spending_category_id != 2 AND e.publish_start_time::date >= '2013-07-01';
+				WHERE a.spending_category_id != 2 AND e.job_id > (select max(job_id) from mwbe_last_job);
 
 -- Need to check with Vinay if Payroll summary data should be excluded while giving disbursement data using the above view.
 
@@ -264,14 +276,20 @@ a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as Ven
           (case when g.business_type_id =2 then 6 
 	   			when g.business_type_id = 5 then 1
            		else g.minority_type_id end) as MinoritytypeId,
-          h.minority_type_name as MinorityGroup
+           	(case when g.business_type_id =2 then 'Native' 
+	   			when g.business_type_id = 5 then 'Unspecified MWBE'
+           		else h.minority_type_name end) as MinorityGroup,
+           		g.business_type_id as BusinessTypeId,
+           		i.business_type_code as BusinessTypeCode,
+           		i.business_type_name as BusinessTypeName
           FROM vendor a 
 		   	left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
 				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
 					(select distinct vendor_customer_code from fmsv_business_type 
 					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null)) AND business_type_id=5)))g
 					 on a.vendor_customer_code =g.vendor_customer_code 
-			left join ref_minority_type h on g.minority_type_id = h.minority_type_id  ; 
+			left join ref_minority_type h on g.minority_type_id = h.minority_type_id  
+			left join ref_business_type i on g.business_type_id = i.business_type_id; 
 
 
 
@@ -315,35 +333,48 @@ FROM  history_agreement a
    JOIN vendor z1 on z1.vendor_id =y1.vendor_id
    JOIN mwbe_last_job d ON c.job_id >= d.job_id
   JOIN disbursement_line_item d1 on d1.reference_document_number = Coalesce(a.contract_number,b.contract_number)
-*/
+
 
 
 CREATE  OR REPLACE VIEW disbursement_agreement_mwbe AS 
 SELECT b.contract_number ::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode,b.document_id  AS AgreementDocID, b.effective_begin_date_id AS AgreementStartDate,
        b.effective_end_date_id AS AgreementEndDate,b.description AS AgreementPurpose,
-       ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode 
-FROM (SELECT distinct agreement_id  FROM disbursement_line_item_details  WHERE master_agreement_id is null) a JOIN history_agreement b on a.agreement_id = b.original_agreement_id 
+       ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode, agt.agreement_type_code as AgreementTypeCode 
+FROM (SELECT distinct agreement_id  FROM disbursement_line_item_details  WHERE spending_category_id != 2 AND master_agreement_id is null) a JOIN history_agreement b on a.agreement_id = b.original_agreement_id 
                                       JOIN ref_date rb on  b.effective_begin_date_id =rb.date_id
                                       JOIN ref_date re on b.effective_end_date_id =re.date_id
                                       JOIN ref_document_code dc on b.document_code_id = dc.document_code_id
 				      				  JOIN ref_agency_history h on b.agency_history_id = h.agency_history_id
                                       JOIN ref_agency ag on h.agency_id = ag.agency_id
+                                      LEFT JOIN ref_agreement_type agt ON b.agreement_type_id = agt.agreement_type_id
                                     UNION
 SELECT ma.contract_number ::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode, ma.document_id AS AgreementDocID,ma.effective_begin_date_id AS AgreementStartDate,
 	ma.effective_end_date_id AS AgreementEndDate,ma.description AS AgreementPurpose,
-	ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode 
-FROM (select distinct master_agreement_id  from disbursement_line_item_details WHERE master_agreement_id is not null) a JOIN history_master_agreement ma on a.master_agreement_id = ma.original_master_agreement_id	
+	ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode, agt.agreement_type_code as AgreementTypeCode 
+FROM (select distinct master_agreement_id  from disbursement_line_item_details WHERE spending_category_id != 2 AND master_agreement_id is not null) a JOIN history_master_agreement ma on a.master_agreement_id = ma.original_master_agreement_id	
                                       JOIN ref_date rb on  ma.effective_begin_date_id =rb.date_id
                                       JOIN ref_date re on ma.effective_end_date_id =re.date_id
                                       JOIN ref_document_code dc on ma.document_code_id = dc.document_code_id
                                       JOIN ref_agency_history h on ma.agency_history_id = h.agency_history_id
-                                      JOIN ref_agency ag on h.agency_id = ag.agency_id   ;
+                                      JOIN ref_agency ag on h.agency_id = ag.agency_id   
+                                      LEFT JOIN ref_agreement_type agt ON ma.agreement_type_id = agt.agreement_type_id;
 
 
+*/
 
 
-
-
+CREATE  OR REPLACE VIEW disbursement_agreement_mwbe AS 
+SELECT b.contract_number::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode,b.document_id  AS AgreementDocID, b.effective_begin_date_id AS AgreementStartDate,
+       b.effective_end_date_id AS AgreementEndDate,b.description AS AgreementPurpose,
+       ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode, agt.agreement_type_code as AgreementTypeCode , b.maximum_contract_amount as MaxContractAmount
+FROM (SELECT distinct agreement_id  FROM disbursement_line_item_details  WHERE spending_category_id != 2 ) a JOIN history_agreement b on a.agreement_id = b.original_agreement_id 
+                                      JOIN ref_date rb on  b.effective_begin_date_id =rb.date_id
+                                      JOIN ref_date re on b.effective_end_date_id =re.date_id
+                                      JOIN ref_document_code dc on b.document_code_id = dc.document_code_id
+				      				  JOIN ref_agency_history h on b.agency_history_id = h.agency_history_id
+                                      JOIN ref_agency ag on h.agency_id = ag.agency_id
+                                      LEFT JOIN ref_agreement_type agt ON b.agreement_type_id = agt.agreement_type_id;
+                                      
 -- minority type
 
 CREATE OR REPLACE VIEW minoirty_mwbe
@@ -387,7 +418,8 @@ SELECT x.disbursement_id,a.vendor_id as VendorID,a.vendor_customer_code as Vendo
                                vendor_address e
                             ON a2.vendor_address_id = e.vendor_address_id) a3
                             on a1.vendor_history_id = a3.vendor_history_id
-			left join address f on f.address_id = a3.address_id;
+			left join address f on f.address_id = a3.address_id
+			WHERE x.spending_category_id != 2;
 
 
 
@@ -451,3 +483,16 @@ from etl.etl_data_load a join etl.etl_data_load_file b
 on a.load_id=b.load_id
  where a.data_source_code in('F','PS')
  and b.processed_flag ='Y' group by 1,2,3,4,5;
+ 
+ 
+ /*  
+ select count(*) from vendor_mwbe limit 10000 --> 94215
+
+select count(*) from fmsv_business_type -- 15729
+
+select count(distinct vendor_customer_code) from fmsv_business_type  -- 9478
+
+select count(*) from vendor_mwbe  where BusinessTypeId IS NOT NULL OR MinoritytypeId IS NOT NULL  --> 1453
+
+select count(distinct VendorCode) from vendor_mwbe  where BusinessTypeId IS NOT NULL OR MinoritytypeId IS NOT NULL  -- 1453
+ */
