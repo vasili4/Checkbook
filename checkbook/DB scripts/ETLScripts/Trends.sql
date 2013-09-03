@@ -1246,8 +1246,8 @@ Distributed by (fiscal_year);
 COPY  trends_pledged_revenue_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_pledged_revenue.csv' CSV HEADER QUOTE as '"';
 
 INSERT INTO trends_pledged_revenue select * from trends_pledged_revenue_temp;
-update  trends_pledged_revenue set display_yn ='N' where fiscal_year <2002;
-update  trends_pledged_revenue set display_yn ='Y' where fiscal_year >=2002;
+update  trends_pledged_revenue set display_yn ='N' where fiscal_year <2003;
+update  trends_pledged_revenue set display_yn ='Y' where fiscal_year >=2003;
 
 DROP TABLE trends_pledged_revenue_temp;
 
@@ -1258,6 +1258,7 @@ DROP TABLE IF EXISTS trends_uncollected_parking_violation_temp;
 CREATE TABLE trends_uncollected_parking_violation_temp
 (
 category varchar,	
+fy_2012	numeric(20,2),
 fy_2011	numeric(20,2),
 fy_2010 numeric(20,2),
 fy_2009 numeric(20,2),
@@ -1298,6 +1299,7 @@ DISTRIBUTED BY (category);
 
 COPY  trends_uncollected_parking_violation_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_uncollected_parking_violation.csv' CSV HEADER QUOTE as '"';
 
+INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2012, fy_2012, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
 INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
 INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
 INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
@@ -1316,8 +1318,8 @@ INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount,
 INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1996, fy_1996, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
 INSERT INTO trends_uncollected_parking_violation (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_uncollected_parking_violation_temp;
 
-update  trends_uncollected_parking_violation set display_yn ='N' where fiscal_year <1997;
-update  trends_uncollected_parking_violation set display_yn ='Y' where fiscal_year >=1997; 
+update  trends_uncollected_parking_violation set display_yn ='N' where fiscal_year <1998;
+update  trends_uncollected_parking_violation set display_yn ='Y' where fiscal_year >=1998; 
 
 DROP TABLE trends_uncollected_parking_violation_temp;
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1328,6 +1330,7 @@ DROP TABLE IF EXISTS trends_changes_net_assets_temp;
 CREATE TABLE trends_changes_net_assets_temp
 (
 category varchar,	
+fy_2012	numeric(20,2),
 fy_2011	numeric(20,2),
 fy_2010 numeric(20,2),
 fy_2009 numeric(20,2),
@@ -1369,6 +1372,7 @@ DISTRIBUTED BY (category);
 
 COPY  trends_changes_net_assets_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_changes_net_assets.csv' CSV HEADER QUOTE as '"';
 
+INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2012, fy_2012, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
 INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
 INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
 INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
@@ -1388,8 +1392,8 @@ INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_or
 INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
 INSERT INTO trends_changes_net_assets (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_changes_net_assets_temp;
 
-update  trends_changes_net_assets set display_yn ='N' where fiscal_year <2002;
-update  trends_changes_net_assets set display_yn ='Y' where fiscal_year >=2002;
+update  trends_changes_net_assets set display_yn ='N' where fiscal_year < 2003;
+update  trends_changes_net_assets set display_yn ='Y' where fiscal_year >= 2003;
 
 DROP TABLE trends_changes_net_assets_temp;
 
@@ -1400,6 +1404,7 @@ DROP TABLE IF EXISTS trends_government_funds_temp;
 CREATE TABLE trends_government_funds_temp
 (
 category varchar,	
+fy_2012 numeric(20,2),
 fy_2011 numeric(20,2),
 fy_2010 numeric(20,2),
 fy_2009 numeric(20,2),
@@ -1441,6 +1446,7 @@ DISTRIBUTED BY (category);
 
 COPY  trends_government_funds_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_government_funds.csv' CSV HEADER QUOTE as '"';
 
+INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2012, fy_2012, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
@@ -1460,8 +1466,8 @@ INSERT INTO trends_government_funds (category, fiscal_year, amount, display_orde
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1995, fy_1995, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 INSERT INTO trends_government_funds (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_government_funds_temp;
 
-update  trends_government_funds set display_yn ='N' where fiscal_year <1997;
-update  trends_government_funds set display_yn ='Y' where fiscal_year >=1997;
+update  trends_government_funds set display_yn ='N' where fiscal_year < 1998;
+update  trends_government_funds set display_yn ='Y' where fiscal_year >= 1998;
 
 
 DROP TABLE trends_government_funds_temp;
@@ -1514,11 +1520,12 @@ COPY  trends_hudson_yards_infrastructure_temp FROM '/home/gpadmin/TREDDY/TRENDS/
 
 INSERT INTO trends_hudson_yards_infrastructure  select * from trends_hudson_yards_infrastructure_temp;
 
-update trends_hudson_yards_infrastructure set display_yn ='Y';
+update trends_hudson_yards_infrastructure set display_yn ='N' where fiscal_year < 2006;
+update trends_hudson_yards_infrastructure set display_yn ='Y' where fiscal_year >= 2006;
 
 
 alter table trends_hudson_yards_infrastructure add column superscript_value character(1);
-update trends_hudson_yards_infrastructure set superscript_value ='1' where fiscal_year  in(2009,2010,2011);
+update trends_hudson_yards_infrastructure set superscript_value ='1' where fiscal_year  in(2009,2010,2011,2012);
 
 DROP TABLE trends_hudson_yards_infrastructure_temp;
 
@@ -1529,6 +1536,7 @@ DROP TABLE IF EXISTS trends_legal_debt_margin_temp;
 CREATE TABLE trends_legal_debt_margin_temp
 (
 category varchar,	
+fy_2012	numeric(20,2),
 fy_2011	numeric(20,2),
 fy_2010 numeric(20,2),
 fy_2009 numeric(20,2),
@@ -1571,6 +1579,7 @@ DISTRIBUTED BY (category);
 
 COPY  trends_legal_debt_margin_temp FROM '/home/gpadmin/TREDDY/TRENDS/trends_legal_debt_margin.csv' CSV HEADER QUOTE as '"';
 
+INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2012, fy_2012, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
 INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2011, fy_2011, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
 INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2010, fy_2010, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
 INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 2009, fy_2009, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
@@ -1591,8 +1600,8 @@ INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_ord
 INSERT INTO trends_legal_debt_margin (category, fiscal_year, amount, display_order, highlight_yn, amount_display_type, indentation_level) select trim(category), 1994, fy_1994, display_order, highlight_yn, amount_display_type, indentation_level from trends_legal_debt_margin_temp;
 
 
-update  trends_legal_debt_margin set display_yn ='N' where fiscal_year <1997;
-update  trends_legal_debt_margin set display_yn ='Y' where fiscal_year >=1997;
+update  trends_legal_debt_margin set display_yn ='N' where fiscal_year <1998;
+update  trends_legal_debt_margin set display_yn ='Y' where fiscal_year >=1998;
 
 DROP TABLE trends_legal_debt_margin_temp;
 
@@ -1627,8 +1636,8 @@ COPY  trends_ratios_general_bonded_debt_outstanding_temp FROM '/home/gpadmin/TRE
 INSERT INTO trends_ratios_general_bonded_debt_outstanding select * from trends_ratios_general_bonded_debt_outstanding_temp;
 
 
-update  trends_ratios_general_bonded_debt_outstanding set display_yn ='N' where fiscal_year <1997;
-update  trends_ratios_general_bonded_debt_outstanding set display_yn ='Y' where fiscal_year >=1997;
+update  trends_ratios_general_bonded_debt_outstanding set display_yn ='N' where fiscal_year <1998;
+update  trends_ratios_general_bonded_debt_outstanding set display_yn ='Y' where fiscal_year >=1998;
 
 
 DROP TABLE trends_ratios_general_bonded_debt_outstanding_temp;

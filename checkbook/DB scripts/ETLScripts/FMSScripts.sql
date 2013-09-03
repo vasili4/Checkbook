@@ -306,20 +306,19 @@ BEGIN
 		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 	GROUP BY 1;
 	
-	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line_new_dept(agency_history_id integer,agency_id integer,appr_cd varchar,
+	CREATE TEMPORARY TABLE tmp_fk_values_fms_acc_line_new_dept(agency_id integer,appr_cd varchar,
 						fund_class_id smallint,fiscal_year smallint, uniq_id bigint)
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_values_fms_acc_line_new_dept
-	SELECT d.agency_history_id,c.agency_id,coalesce(appr_cd,'---------'),e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
+	SELECT c.agency_id,coalesce(appr_cd,'---------'),e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_fms_accounting_line a join (SELECT uniq_id
 						 FROM tmp_fk_values_fms_acc_line
 						 GROUP BY 1
 						 HAVING max(department_history_id) IS NULL) b on a.uniq_id=b.uniq_id
 		JOIN ref_agency c ON a.dept_cd = c.agency_code
-		JOIN ref_agency_history d ON c.agency_id = d.agency_id
 		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code
-	GROUP BY 1,2,3,4,5;
+	GROUP BY 1,2,3,4;
 
 	RAISE NOTICE '1.4';
 						
@@ -330,6 +329,8 @@ BEGIN
 	INSERT INTO etl.ref_department_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   tmp_fk_values_fms_acc_line_new_dept;
+	
+	RAISE NOTICE '1.4.1';
 
 	INSERT INTO ref_department(department_id,department_code,
 				   department_name,
