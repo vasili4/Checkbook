@@ -946,7 +946,10 @@ BEGIN
 				 check_eft_amount_original,check_eft_amount,check_eft_issued_date_id,check_eft_record_date_id,
 				 expenditure_status_id,expenditure_cancel_type_id,expenditure_cancel_reason_id,
 				 total_accounting_line_amount_original,total_accounting_line_amount,vendor_history_id,
-				 retainage_amount_original,retainage_amount,privacy_flag,created_load_id,created_date)
+				 retainage_amount_original,retainage_amount,privacy_flag,
+				 bustype_mnrt, bustype_mnrt_status, minority_type_id, bustype_wmno, bustype_wmno_status,
+				 bustype_locb, bustype_locb_status, bustype_eent, bustype_eent_status, bustype_exmp, bustype_exmp_status,
+				 created_load_id,created_date)
 	SELECT d.disbursement_id, a.document_code_id,a.agency_history_id,
 	       a.doc_id,a.doc_vers_no,a.doc_id||'-'||a.doc_vers_no||'-'|| a.doc_dept_cd || '-' || a.doc_cd,
 	       a.record_date_id,
@@ -954,7 +957,10 @@ BEGIN
 	       a.chk_eft_am,coalesce(a.chk_eft_am,0) as check_eft_amount,a.check_eft_issued_date_id,a.check_eft_record_date_id,
 	       a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,
 	       a.ln_am,coalesce(a.ln_am,0) as total_accounting_line_amount, b.vendor_history_id, 
-	       a.rtg_am,coalesce(a.rtg_am,0) as retainage_amount, l_display_type,p_load_id_in,now()::timestamp
+	       a.rtg_am,coalesce(a.rtg_am,0) as retainage_amount, l_display_type,
+	       b.bustype_mnrt, b.bustype_mnrt_status, b.minority_type_id, b.bustype_wmno, b.bustype_wmno_status,
+		   b.bustype_locb, b.bustype_locb_status, b.bustype_eent, b.bustype_eent_status, b.bustype_exmp, b.bustype_exmp_status,
+	       p_load_id_in,now()::timestamp
 	FROM	etl.stg_fms_header a JOIN etl.stg_fms_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 		JOIN tmp_all_disbs d ON a.uniq_id = d.uniq_id
@@ -978,8 +984,9 @@ BEGIN
 	       a.doc_bfy,a.doc_fy_dc,a.doc_per_dc,
 	       a.chk_eft_am,a.check_eft_issued_date_id,a.check_eft_record_date_id,
 	       a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,
-	       a.ln_am,b.vendor_history_id, 
-	       a.rtg_am
+	       a.ln_am,b.vendor_history_id, a.rtg_am,
+	       b.bustype_mnrt, b.bustype_mnrt_status, b.minority_type_id, b.bustype_wmno, b.bustype_wmno_status,
+		   b.bustype_locb, b.bustype_locb_status, b.bustype_eent, b.bustype_eent_status, b.bustype_exmp, b.bustype_exmp_status
 	FROM	etl.stg_fms_header a JOIN etl.stg_fms_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
 					AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no
 		JOIN tmp_all_disbs d ON a.uniq_id = d.uniq_id
@@ -1009,6 +1016,17 @@ BEGIN
 		retainage_amount_original = b.rtg_am,
 		retainage_amount = coalesce(b.rtg_am,0),
 		privacy_flag = l_display_type,
+		bustype_mnrt = b.bustype_mnrt,
+		bustype_mnrt_status = b.bustype_mnrt_status,
+		minority_type_id = b.minority_type_id,
+		bustype_wmno = b.bustype_wmno,
+		bustype_wmno_status = b.bustype_wmno_status,
+		bustype_locb = b.bustype_locb,
+		bustype_locb_status = b.bustype_locb_status,
+		bustype_eent = b.bustype_eent,
+		bustype_eent_status = b.bustype_eent_status,
+		bustype_exmp = b.bustype_exmp,
+		bustype_exmp_status = b.bustype_exmp_status,
 		updated_load_id = p_load_id_in,
 		updated_date = now()::timestamp
 	FROM	tmp_disbs_update b
