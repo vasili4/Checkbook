@@ -35,6 +35,7 @@ CREATE TABLE etl.stg_fms_vendor(
 	invalid_reason varchar	)
 DISTRIBUTED BY (uniq_id)	;	
 
+DROP TABLE IF EXISTS etl.archive_fms_vendor_pfp;
 
 CREATE TABLE etl.archive_fms_vendor_pfp as select * from etl.archive_fms_vendor;
 
@@ -62,10 +63,11 @@ SELECT      doc_cd, doc_dept_cd, doc_id, doc_vers_no, doc_vend_ln_no, vend_cust_
             vendor_history_id, uniq_id, invalid_flag, invalid_reason, load_file_id
 FROM etl.archive_fms_vendor_pfp ;
 
+DROP TABLE IF EXISTS disbursement_pfp;
 
 CREATE TABLE disbursement_pfp as select * from disbursement;
 
-DROP TABLE IF EXISTS disbursement;
+DROP TABLE IF EXISTS disbursement CASCADE;
 
 CREATE TABLE disbursement (
     disbursement_id integer  PRIMARY KEY DEFAULT nextval('seq_expenditure_expenditure_id'::regclass) NOT NULL,
@@ -577,6 +579,8 @@ $$ language plpgsql;
 
 -- Execute the below script after copying the ref_column_mapping.csv in /home/gpadmin/TREDDY/CREATE_NEW_DATABASE/  folder
 
+TRUNCATE TABLE etl.ref_column_mapping;
+
 COPY etl.ref_column_mapping FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/ref_column_mapping.csv' CSV HEADER QUOTE as '"';	  
 
 -- Shard Changes
@@ -688,5 +692,5 @@ CREATE VIEW disbursement AS
     disbursement__0.bustype_locb, disbursement__0.bustype_locb_status, disbursement__0.bustype_eent, disbursement__0.bustype_eent_status, disbursement__0.bustype_exmp, disbursement__0.bustype_exmp_status,     
     disbursement__0.created_load_id, disbursement__0.updated_load_id, disbursement__0.created_date , disbursement__0.updated_date FROM ONLY disbursement__0;
 
-	
+	SET search_path = public ;
 	SELECT grantaccess('webuser1','SELECT');

@@ -1,0 +1,57 @@
+vacuum analyze	history_agreement;
+vacuum analyze	history_master_agreement;
+vacuum analyze history_agreement_accounting_line;
+vacuum analyze	employee;
+vacuum analyze	payroll;
+vacuum analyze	payroll_summary;
+vacuum analyze	disbursement;
+vacuum analyze	disbursement_line_item;
+vacuum analyze	disbursement_line_item_details;
+vacuum analyze	vendor;
+vacuum analyze	vendor_address;
+vacuum analyze	vendor_business_type;
+vacuum analyze	budget;
+vacuum analyze	revenue;
+vacuum analyze	revenue_budget;
+vacuum analyze	ref_agency;
+vacuum analyze	ref_department;
+vacuum analyze	ref_expenditure_object;
+vacuum analyze	ref_budget_code;
+vacuum analyze	ref_location;
+vacuum analyze	ref_industry_type;
+vacuum analyze	ref_award_method;
+vacuum analyze	ref_funding_class;
+vacuum analyze	ref_revenue_source;
+vacuum analyze	ref_revenue_category;
+vacuum analyze	ref_revenue_class;
+vacuum analyze	ref_object_class;
+
+vacuum analyze	vendor_history;
+vacuum analyze	ref_agency_history;
+vacuum analyze	ref_department_history;
+vacuum analyze	ref_expenditure_object_history;
+vacuum analyze	ref_location_history;
+vacuum analyze	ref_object_class_history;
+	
+vacuum analyze	agreement_snapshot;
+vacuum analyze	agreement_snapshot_cy;
+vacuum analyze	aggregateon_contracts_cumulative_spending;
+vacuum analyze	aggregateon_contracts_department;
+vacuum analyze	aggregateon_contracts_expense;
+vacuum analyze	aggregateon_contracts_spending_by_month;
+vacuum analyze	aggregateon_total_contracts;
+	
+vacuum analyze	contracts_spending_transactions;
+vacuum analyze	aggregateon_payroll_agency;
+vacuum analyze	aggregateon_payroll_agency_month;
+vacuum analyze	aggregateon_payroll_coa_month;
+vacuum analyze	aggregateon_payroll_employee_agency;
+vacuum analyze	aggregateon_payroll_employee_agency_month;
+	
+vacuum analyze	aggregateon_spending_coa_entities;
+vacuum analyze	aggregateon_spending_contract;
+vacuum analyze	aggregateon_spending_vendor;
+vacuum analyze	aggregateon_spending_vendor_exp_object;
+vacuum analyze	revenue_details;
+vacuum analyze	aggregateon_revenue_category_funding_class;
+vacuum analyze	aggregateon_revenue_category_funding_by_year;
