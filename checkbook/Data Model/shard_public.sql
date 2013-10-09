@@ -227,6 +227,7 @@ CREATE TABLE disbursement (
     retainage_amount_original numeric(16,2),
     retainage_amount numeric(16,2),
     privacy_flag char(1),
+    vendor_org_classification smallint,
     bustype_mnrt varchar(4),
 	bustype_mnrt_status smallint,
 	minority_type_id smallint,

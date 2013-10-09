@@ -184,7 +184,7 @@ document_id as DocID,disbursement_id as DisbursementID,rd.date as DisbursementDa
 				-- where a.spending_category_id != 2 AND e.publish_start_time::date >= '2013-07-01';
 				WHERE a.spending_category_id != 2 AND e.job_id > (select max(job_id) from mwbe_last_job);
 
- */
+ 
 CREATE VIEW disbursement_mwbe
 AS         
 select 
@@ -216,11 +216,11 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
           split_part(a.disbursement_number, '-', 3) as DocDeptCode,
           split_part(a.disbursement_number, '-', 4) as DocCode,
           a.line_number as LineNumber
- from disbursement disb JOIN disbursement_line_item_details a ON disb.disbursement_id = a.disbursement_id left join  vendor b on a.vendor_id =b.vendor_id 
+ from disbursement disb JOIN disbursement_line_item_details a ON disb.disbursement_id = a.disbursement_id join vendor_history vh ON disb.vendor_history_id = vh.vendor_history_id JOIN vendor b on vh.vendor_id =b.vendor_id 
 				left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
 				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
 					(select distinct vendor_customer_code from fmsv_business_type 
-					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null)) AND business_type_id=5)))c
+					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null and status = 2)) AND business_type_id=5)))c
 				 on b.vendor_customer_code =c.vendor_customer_code
 				left join ref_minority_type d on c.minority_type_id = d.minority_type_id 
 				left join ref_business_type i on c.business_type_id = i.business_type_id
@@ -283,6 +283,125 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
 				--where e.job_id > (select max(job_id) from mwbe_last_job);
 				-- where a.spending_category_id != 2 AND e.publish_start_time::date >= '2013-07-01';
 				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.job_id > (select max(job_id) from mwbe_last_job) ;
+				
+*/
+
+         CREATE VIEW disbursement_mwbe
+AS         
+select 
+a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as DisbursementDate,disbursement_line_item_id as LineItemNum,
+          check_amount as LineItemAmount,
+          agency_id  as DepartmentID,
+          agency_name as DeptName,
+          agency_code as DeptCode,
+          'D'::char(1) as RecordType,
+          a.vendor_id as VendorId,b.vendor_customer_code as VendorCode,(case when b.miscellaneous_vendor_flag = '1' then b.vendor_id else 0 end) as vendor_sub_code ,b.legal_name::varchar(500) as VendorName,
+	  (case when coalesce(f.business_type_id,c.business_type_id) =2 then 6 
+	   when coalesce(f.business_type_id,c.business_type_id) = 5 then 1
+           else coalesce(f.minority_type_id,c.minority_type_id) end) as MinoritytypeId,
+          (case when coalesce(f.business_type_id,c.business_type_id) = 2 then 'Native' 
+	   			when coalesce(f.business_type_id,c.business_type_id) = 5 then 'Unspecified MWBE'
+           		else coalesce(g.minority_type_name,d.minority_type_name) end) as MinorityGroup,
+           	coalesce(f.business_type_id,c.business_type_id) as BusinessTypeId,
+           	coalesce(h.business_type_code, i.business_type_code) as BusinessTypeCode,
+           	coalesce(h.business_type_name, i.business_type_name) as BusinessTypeName,
+          department_id as AppropriationUnitID,
+          department_code as AppropriationUnitCode,
+          location_code,
+          expenditure_object_id,
+          expenditure_object_name,
+          expenditure_object_code,
+          fiscal_year,a.load_id,
+          a.contract_number::varchar(25) AS AgreementID,
+          split_part(a.disbursement_number, '-', 2)::integer as DocumentVersion,
+          split_part(a.disbursement_number, '-', 3) as DocDeptCode,
+          split_part(a.disbursement_number, '-', 4) as DocCode,
+          a.line_number as LineNumber,
+          rat.agreement_type_code,
+          ram.award_method_code,
+          disb.vendor_org_classification
+ from disbursement disb JOIN disbursement_line_item_details a ON disb.disbursement_id = a.disbursement_id join vendor_history vh ON disb.vendor_history_id = vh.vendor_history_id JOIN vendor b on vh.vendor_id =b.vendor_id 
+				left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
+				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
+					(select distinct vendor_customer_code from fmsv_business_type 
+					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null and status = 2)) AND business_type_id=5)))c
+				 on b.vendor_customer_code =c.vendor_customer_code
+				left join ref_minority_type d on c.minority_type_id = d.minority_type_id 
+				left join ref_business_type i on c.business_type_id = i.business_type_id
+				left join (select vendor_history_id , business_type_id ,minority_type_id from vendor_business_type 
+				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_history_id in 
+					(select distinct vendor_history_id from vendor_business_type 
+					  where  business_type_id = 5 and status = 2 and vendor_history_id not in (select distinct vendor_history_id from vendor_business_type where minority_type_id is not null and status = 2)) AND business_type_id=5))) f
+					  ON disb.vendor_history_id = f.vendor_history_id
+				left join ref_minority_type g on f.minority_type_id = g.minority_type_id 
+				left join ref_business_type h on f.business_type_id = h.business_type_id
+				JOIN etl.etl_data_load e ON e.load_id = a.load_id
+				JOIN ref_date rd on a.check_eft_issued_date_id = rd.date_id
+				LEFT JOIN (select original_agreement_id, agreement_id,  agreement_type_id, award_method_id FROM history_agreement where original_version_flag = 'Y') hag ON hag.original_agreement_id = a.agreement_id
+				LEFT JOIN ref_agreement_type rat ON rat.agreement_type_id = hag.agreement_type_id
+				LEFT JOIN ref_award_method ram ON ram.award_method_id = hag.award_method_id
+				-- where a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.publish_start_time::date >= '2013-07-01';
+				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.job_id > (select max(job_id) from mwbe_last_job)
+  UNION ALL
+ select 
+a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as DisbursementDate,disbursement_line_item_id as LineItemNum,
+          check_amount as LineItemAmount,
+          agency_id  as DepartmentID,
+          agency_name as DeptName,
+          agency_code as DeptCode,
+          'D'::char(1) as RecordType,
+          a.vendor_id as VendorId,b.vendor_customer_code as VendorCode,(case when b.miscellaneous_vendor_flag = '1' then b.vendor_id else 0 end) as vendor_sub_code ,b.legal_name::varchar(500) as VendorName,
+            (case when disb.bustype_exmp = 'EXMP' AND disb.bustype_exmp_status = 2 then 6
+			when disb.bustype_mnrt = 'MNRT' AND disb.bustype_mnrt_status = 2 then d.minority_type_id 
+			WHEN disb.bustype_wmno = 'WMNO' AND disb.bustype_wmno_status = 2 then 1
+           		else NULL end) as MinoritytypeId,
+          (case when disb.bustype_exmp = 'EXMP' AND disb.bustype_exmp_status = 2 then 'Native'
+			when disb.bustype_mnrt = 'MNRT' AND disb.bustype_mnrt_status = 2 then d.minority_type_name 
+			WHEN disb.bustype_wmno = 'WMNO' AND disb.bustype_wmno_status = 2 then 'Unspecified MWBE'
+           		else NULL end) as MinorityGroup,
+           	 (case when disb.bustype_exmp = 'EXMP' AND disb.bustype_exmp_status = 2 then 2
+			when disb.bustype_mnrt = 'MNRT' AND disb.bustype_mnrt_status = 2 then 4
+			WHEN disb.bustype_wmno = 'WMNO' AND disb.bustype_wmno_status = 2 then 5
+			when disb.bustype_locb = 'LOCB' AND disb.bustype_locb_status = 2 then 3
+			WHEN disb.bustype_eent = 'EENT' AND disb.bustype_eent_status = 2 then 1
+           		else NULL end) as BusinessTypeId,
+           	(case when disb.bustype_exmp = 'EXMP' AND disb.bustype_exmp_status = 2 then 'EXMP'
+			when disb.bustype_mnrt = 'MNRT' AND disb.bustype_mnrt_status = 2 then 'MNRT'
+			WHEN disb.bustype_wmno = 'WMNO' AND disb.bustype_wmno_status = 2 then 'WMNO'
+			when disb.bustype_locb = 'LOCB' AND disb.bustype_locb_status = 2 then 'LOCB'
+			WHEN disb.bustype_eent = 'EENT' AND disb.bustype_eent_status = 2 then 'EENT'
+           		else NULL end) as BusinessTypeCode,
+         	(case when disb.bustype_exmp = 'EXMP' AND disb.bustype_exmp_status = 2 then 'Exempt From MWBE Rpt Card'
+			when disb.bustype_mnrt = 'MNRT' AND disb.bustype_mnrt_status = 2 then 'Minority Owned'
+			WHEN disb.bustype_wmno = 'WMNO' AND disb.bustype_wmno_status = 2 then 'Woman Owned'
+			when disb.bustype_locb = 'LOCB' AND disb.bustype_locb_status = 2 then 'Local Business'
+			WHEN disb.bustype_eent = 'EENT' AND disb.bustype_eent_status = 2 then 'Emerging Enterprises Business'
+           		else NULL end) as BusinessTypeName,
+          department_id as AppropriationUnitID,
+          department_code as AppropriationUnitCode,
+          location_code,
+          expenditure_object_id,
+          expenditure_object_name,
+          expenditure_object_code,
+          fiscal_year,a.load_id,
+          a.contract_number::varchar(25) AS AgreementID,
+          split_part(a.disbursement_number, '-', 2)::integer as DocumentVersion,
+          split_part(a.disbursement_number, '-', 3) as DocDeptCode,
+          split_part(a.disbursement_number, '-', 4) as DocCode,
+          a.line_number as LineNumber,
+          rat.agreement_type_code,
+          ram.award_method_code,
+          disb.vendor_org_classification
+ from disbursement disb JOIN disbursement_line_item_details a ON disb.disbursement_id = a.disbursement_id left join  vendor b on a.vendor_id =b.vendor_id 
+				left join ref_minority_type d on disb.minority_type_id = d.minority_type_id 
+				JOIN etl.etl_data_load e ON e.load_id = a.load_id
+				JOIN ref_date rd on a.check_eft_issued_date_id = rd.date_id
+				LEFT JOIN (select original_agreement_id, agreement_id,  agreement_type_id, award_method_id FROM history_agreement where original_version_flag = 'Y') hag ON hag.original_agreement_id = a.agreement_id
+				LEFT JOIN ref_agreement_type rat ON rat.agreement_type_id = hag.agreement_type_id
+				LEFT JOIN ref_award_method ram ON ram.award_method_id = hag.award_method_id
+				-- where a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.publish_start_time::date >= '2013-07-01';
+				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.job_id > (select max(job_id) from mwbe_last_job) ;
+         
 -- Need to check with Vinay if Payroll summary data should be excluded while giving disbursement data using the above view.
 
 --vendor
@@ -385,7 +504,7 @@ a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as Ven
 		   	left join (select vendor_customer_code , business_type_id ,minority_type_id from fmsv_business_type 
 				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
 					(select distinct vendor_customer_code from fmsv_business_type 
-					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null)) AND business_type_id=5)))g
+					  where  business_type_id = 5 and status = 2 and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null and status = 2)) AND business_type_id=5)))g
 					 on a.vendor_customer_code =g.vendor_customer_code 
 			left join ref_minority_type h on g.minority_type_id = h.minority_type_id  
 			left join ref_business_type i on g.business_type_id = i.business_type_id; 

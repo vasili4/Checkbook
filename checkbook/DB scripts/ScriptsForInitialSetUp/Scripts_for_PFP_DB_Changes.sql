@@ -93,6 +93,7 @@ CREATE TABLE disbursement (
     retainage_amount_original numeric(16,2),
     retainage_amount numeric(16,2),
     privacy_flag char(1),
+    vendor_org_classification smallint,
     bustype_mnrt varchar(4),
 	bustype_mnrt_status smallint,
 	minority_type_id smallint,
@@ -131,7 +132,7 @@ ALTER TABLE  disbursement ADD constraint fk_disbursement_ref_date_2 foreign key 
             expenditure_status_id, expenditure_cancel_type_id, expenditure_cancel_reason_id, 
             total_accounting_line_amount_original, total_accounting_line_amount, 
             vendor_history_id, retainage_amount_original, retainage_amount, 
-            privacy_flag, bustype_mnrt, bustype_mnrt_status, minority_type_id, 
+            privacy_flag, vendor_org_classification, bustype_mnrt, bustype_mnrt_status, minority_type_id, 
             bustype_wmno, bustype_wmno_status, bustype_locb, bustype_locb_status, 
             bustype_eent, bustype_eent_status, bustype_exmp, bustype_exmp_status, 
             created_load_id, updated_load_id, created_date, updated_date)
@@ -142,12 +143,21 @@ SELECT 	    disbursement_id, document_code_id, agency_history_id, document_id,
             expenditure_status_id, expenditure_cancel_type_id, expenditure_cancel_reason_id, 
             total_accounting_line_amount_original, total_accounting_line_amount, 
             vendor_history_id, retainage_amount_original, retainage_amount, 
-            privacy_flag, NULL as bustype_mnrt, NULL as bustype_mnrt_status, NULL as minority_type_id, 
+            privacy_flag, NULL as vendor_org_classification, NULL as bustype_mnrt, NULL as bustype_mnrt_status, NULL as minority_type_id, 
             NULL as bustype_wmno, NULL as bustype_wmno_status, NULL as bustype_locb, NULL as bustype_locb_status, 
             NULL as bustype_eent, NULL as bustype_eent_status, NULL as bustype_exmp, NULL as bustype_exmp_status, 
             created_load_id, updated_load_id, created_date, updated_date
       FROM disbursement_pfp;
 	  
+
+UPDATE disbursement a 
+SET vendor_org_classification = (CASE WHEN coalesce(b.org_cls,'') = ''  THEN NULL ELSE b.org_cls::smallint END)
+FROM (SELECT distinct a.doc_cd, a.doc_dept_cd, a.doc_id, a.doc_vers_no,a.load_file_id, a.org_cls
+FROM etl.archive_fms_vendor a JOIN (select doc_cd, doc_dept_cd, doc_id, doc_vers_no, max(load_file_id) as max_load_file_id from etl.archive_fms_vendor group by 1,2,3,4) b 
+ON a.doc_id = b.doc_id AND a.doc_dept_cd = b.doc_dept_cd AND a.doc_id = b.doc_id AND a.doc_vers_no = b.doc_vers_no AND a.load_file_id = b.max_load_file_id) b
+WHERE a.disbursement_number = b.doc_id||'-'||b.doc_vers_no||'-'||b.doc_dept_cd || '-' || b.doc_cd ;
+
+
 
 select etl.grantaccess('webuser1','SELECT');
 	  
@@ -272,7 +282,7 @@ BEGIN
 				 check_eft_amount_original,check_eft_amount,check_eft_issued_date_id,check_eft_record_date_id,
 				 expenditure_status_id,expenditure_cancel_type_id,expenditure_cancel_reason_id,
 				 total_accounting_line_amount_original,total_accounting_line_amount,vendor_history_id,
-				 retainage_amount_original,retainage_amount,privacy_flag,
+				 retainage_amount_original,retainage_amount,privacy_flag,vendor_org_classification,
 				 bustype_mnrt, bustype_mnrt_status, minority_type_id, bustype_wmno, bustype_wmno_status,
 				 bustype_locb, bustype_locb_status, bustype_eent, bustype_eent_status, bustype_exmp, bustype_exmp_status,
 				 created_load_id,created_date)
@@ -283,7 +293,7 @@ BEGIN
 	       a.chk_eft_am,coalesce(a.chk_eft_am,0) as check_eft_amount,a.check_eft_issued_date_id,a.check_eft_record_date_id,
 	       a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,
 	       a.ln_am,coalesce(a.ln_am,0) as total_accounting_line_amount, b.vendor_history_id, 
-	       a.rtg_am,coalesce(a.rtg_am,0) as retainage_amount, l_display_type,
+	       a.rtg_am,coalesce(a.rtg_am,0) as retainage_amount, l_display_type,(CASE WHEN coalesce(b.org_cls,'') = ''  THEN NULL ELSE b.org_cls::smallint END) as vendor_org_classification,
 	       b.bustype_mnrt, b.bustype_mnrt_status, b.minority_type_id, b.bustype_wmno, b.bustype_wmno_status,
 		   b.bustype_locb, b.bustype_locb_status, b.bustype_eent, b.bustype_eent_status, b.bustype_exmp, b.bustype_exmp_status,
 	       p_load_id_in,now()::timestamp
@@ -310,7 +320,7 @@ BEGIN
 	       a.doc_bfy,a.doc_fy_dc,a.doc_per_dc,
 	       a.chk_eft_am,a.check_eft_issued_date_id,a.check_eft_record_date_id,
 	       a.chk_eft_sta,a.can_typ_cd,a.can_reas_cd_dc,
-	       a.ln_am,b.vendor_history_id, a.rtg_am,
+	       a.ln_am,b.vendor_history_id, a.rtg_am, (CASE WHEN coalesce(b.org_cls,'') = ''  THEN NULL ELSE b.org_cls::smallint END) as org_cls,
 	       b.bustype_mnrt, b.bustype_mnrt_status, b.minority_type_id, b.bustype_wmno, b.bustype_wmno_status,
 		   b.bustype_locb, b.bustype_locb_status, b.bustype_eent, b.bustype_eent_status, b.bustype_exmp, b.bustype_exmp_status
 	FROM	etl.stg_fms_header a JOIN etl.stg_fms_vendor b ON a.doc_cd = b.doc_cd AND a.doc_dept_cd = b.doc_dept_cd
@@ -342,6 +352,7 @@ BEGIN
 		retainage_amount_original = b.rtg_am,
 		retainage_amount = coalesce(b.rtg_am,0),
 		privacy_flag = l_display_type,
+		vendor_org_classification = b.org_cls,
 		bustype_mnrt = b.bustype_mnrt,
 		bustype_mnrt_status = b.bustype_mnrt_status,
 		minority_type_id = b.minority_type_id,
@@ -612,6 +623,7 @@ CREATE TABLE disbursement (
     retainage_amount_original numeric(16,2),
     retainage_amount numeric(16,2),
     privacy_flag char(1),
+    vendor_org_classification smallint,
     bustype_mnrt varchar(4),
 	bustype_mnrt_status smallint,
 	minority_type_id smallint,
@@ -661,6 +673,7 @@ CREATE EXTERNAL WEB TABLE disbursement__0 (
     retainage_amount_original numeric,
     retainage_amount numeric,
     privacy_flag bpchar,
+    vendor_org_classification smallint,
     bustype_mnrt character varying(4),
 	bustype_mnrt_status smallint,
 	minority_type_id smallint,
@@ -687,7 +700,7 @@ CREATE VIEW disbursement AS
     disbursement__0.document_version,disbursement__0.disbursement_number, disbursement__0.record_date_id, disbursement__0.budget_fiscal_year, disbursement__0.document_fiscal_year, 
     disbursement__0.document_period, disbursement__0.check_eft_amount_original, disbursement__0.check_eft_amount, disbursement__0.check_eft_issued_date_id, disbursement__0.check_eft_record_date_id, 
     disbursement__0.expenditure_status_id, disbursement__0.expenditure_cancel_type_id, disbursement__0.expenditure_cancel_reason_id, disbursement__0.total_accounting_line_amount_original, 
-    disbursement__0.total_accounting_line_amount, disbursement__0.vendor_history_id, disbursement__0.retainage_amount_original, disbursement__0.retainage_amount, disbursement__0.privacy_flag,     
+    disbursement__0.total_accounting_line_amount, disbursement__0.vendor_history_id, disbursement__0.retainage_amount_original, disbursement__0.retainage_amount, disbursement__0.privacy_flag, disbursement__0.vendor_org_classification,     
     disbursement__0.bustype_mnrt, disbursement__0.bustype_mnrt_status, disbursement__0.minority_type_id, disbursement__0.bustype_wmno, disbursement__0.bustype_wmno_status, 
     disbursement__0.bustype_locb, disbursement__0.bustype_locb_status, disbursement__0.bustype_eent, disbursement__0.bustype_eent_status, disbursement__0.bustype_exmp, disbursement__0.bustype_exmp_status,     
     disbursement__0.created_load_id, disbursement__0.updated_load_id, disbursement__0.created_date , disbursement__0.updated_date FROM ONLY disbursement__0;

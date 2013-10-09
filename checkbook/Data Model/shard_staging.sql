@@ -246,6 +246,7 @@ CREATE EXTERNAL WEB TABLE disbursement__0 (
     retainage_amount_original numeric,
     retainage_amount numeric,
     privacy_flag bpchar,
+    vendor_org_classification smallint,
     bustype_mnrt character varying(4),
 	bustype_mnrt_status smallint,
 	minority_type_id smallint,
@@ -274,7 +275,7 @@ CREATE VIEW disbursement AS
     disbursement__0.document_version,disbursement__0.disbursement_number, disbursement__0.record_date_id, disbursement__0.budget_fiscal_year, disbursement__0.document_fiscal_year, 
     disbursement__0.document_period, disbursement__0.check_eft_amount_original, disbursement__0.check_eft_amount, disbursement__0.check_eft_issued_date_id, disbursement__0.check_eft_record_date_id, 
     disbursement__0.expenditure_status_id, disbursement__0.expenditure_cancel_type_id, disbursement__0.expenditure_cancel_reason_id, disbursement__0.total_accounting_line_amount_original, 
-    disbursement__0.total_accounting_line_amount, disbursement__0.vendor_history_id, disbursement__0.retainage_amount_original, disbursement__0.retainage_amount, disbursement__0.privacy_flag,     
+    disbursement__0.total_accounting_line_amount, disbursement__0.vendor_history_id, disbursement__0.retainage_amount_original, disbursement__0.retainage_amount, disbursement__0.privacy_flag, disbursement__0.vendor_org_classification,  
     disbursement__0.bustype_mnrt, disbursement__0.bustype_mnrt_status, disbursement__0.minority_type_id, disbursement__0.bustype_wmno, disbursement__0.bustype_wmno_status, 
     disbursement__0.bustype_locb, disbursement__0.bustype_locb_status, disbursement__0.bustype_eent, disbursement__0.bustype_eent_status, disbursement__0.bustype_exmp, disbursement__0.bustype_exmp_status,     
     disbursement__0.created_load_id, disbursement__0.updated_load_id, disbursement__0.created_date , disbursement__0.updated_date FROM ONLY disbursement__0;
