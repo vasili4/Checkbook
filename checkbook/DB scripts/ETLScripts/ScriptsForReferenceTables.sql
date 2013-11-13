@@ -118,7 +118,8 @@ INSERT INTO ref_minority_type values (1,'Unspecified MWBE',now()::timestamp),
 				     (7,'Non-Minority',now()::timestamp),
 				     (8,'Other',now()::timestamp),
 				     (9,'Caucasian Woman',now()::timestamp),
-				     (10,'Asian American',now()::timestamp);		
+				     (10,'Asian American',now()::timestamp),
+				     (11,'Individuals & Others',now()::timestamp);
 
 				     
 update ref_minority_type set created_date = now()::timestamp;

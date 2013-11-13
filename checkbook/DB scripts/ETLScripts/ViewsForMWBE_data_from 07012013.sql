@@ -113,10 +113,9 @@ SELECT payroll_summary_id as DisbursementID,payroll_number , pay_cycle_code,tota
           ON a.pay_date_id = d.date_id
        JOIN etl.etl_data_load e
           ON e.load_id = coalesce(a.updated_load_id,a.created_load_id)
-        --where e.job_id > (select max(job_id) from mwbe_last_job);
-        -- where e.publish_start_time::date >= '2013-07-01';
-         -- WHERE d.date >= '2013-01-18' ;
-         WHERE e.job_id > (select max(job_id) from mwbe_last_job);
+          -- where e.publish_start_time::date >= '2013-07-01';
+          WHERE d.date >= '2013-01-18' ;
+        -- WHERE e.job_id > (select max(job_id) from mwbe_last_job);
 
 --disbursement
 
@@ -340,8 +339,8 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
 				LEFT JOIN (select original_agreement_id, agreement_id,  agreement_type_id, award_method_id FROM history_agreement where original_version_flag = 'Y') hag ON hag.original_agreement_id = a.agreement_id
 				LEFT JOIN ref_agreement_type rat ON rat.agreement_type_id = hag.agreement_type_id
 				LEFT JOIN ref_award_method ram ON ram.award_method_id = hag.award_method_id
-				-- where a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.publish_start_time::date >= '2013-07-01';
-				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.job_id > (select max(job_id) from mwbe_last_job)
+				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.publish_start_time::date >= '2013-07-01'
+				-- WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.job_id > (select max(job_id) from mwbe_last_job)
   UNION ALL
  select 
 a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as DisbursementDate,disbursement_line_item_id as LineItemNum,
@@ -399,8 +398,8 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
 				LEFT JOIN (select original_agreement_id, agreement_id,  agreement_type_id, award_method_id FROM history_agreement where original_version_flag = 'Y') hag ON hag.original_agreement_id = a.agreement_id
 				LEFT JOIN ref_agreement_type rat ON rat.agreement_type_id = hag.agreement_type_id
 				LEFT JOIN ref_award_method ram ON ram.award_method_id = hag.award_method_id
-				-- where a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.publish_start_time::date >= '2013-07-01';
-				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.job_id > (select max(job_id) from mwbe_last_job) ;
+				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.publish_start_time::date >= '2013-07-01';
+				-- WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.job_id > (select max(job_id) from mwbe_last_job) ;
          
 -- Need to check with Vinay if Payroll summary data should be excluded while giving disbursement data using the above view.
 
