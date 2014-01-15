@@ -819,7 +819,7 @@ CREATE TABLE etl.stg_budget_code
 		tbl_last_dt date,	
 		func_attr_nm_up character varying(50),
 		fin_plan_sav_fl bit(1),
-		uniq_id bigint DEFAULT nextval('etl.seq_stg_rs_source_uniq_id'::regclass),
+		uniq_id bigint DEFAULT nextval('etl.seq_stg_budget_code_uniq_id'::regclass),
 		invalid_flag character(1),
 		invalid_reason character varying
 		

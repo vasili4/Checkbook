@@ -313,9 +313,9 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
           expenditure_object_code,
           fiscal_year,a.load_id,
           a.contract_number::varchar(25) AS AgreementID,
-          split_part(a.disbursement_number, '-', 2)::integer as DocumentVersion,
-          split_part(a.disbursement_number, '-', 3) as DocDeptCode,
-          split_part(a.disbursement_number, '-', 4) as DocCode,
+          disb.document_version as DocumentVersion ,
+          (CASE WHEN split_part(a.disbursement_number, '-', 2) IN ('1','2') THEN split_part(a.disbursement_number, '-', 3) ELSE split_part(a.disbursement_number, '-', 4) END) as DocDeptCode,
+          rdc.document_code as DocCode,
           a.line_number as LineNumber,
           rat.agreement_type_code,
           ram.award_method_code,
@@ -340,6 +340,7 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
 				LEFT JOIN (select original_agreement_id, agreement_id,  agreement_type_id, award_method_id FROM history_agreement where original_version_flag = 'Y') hag ON hag.original_agreement_id = a.agreement_id
 				LEFT JOIN ref_agreement_type rat ON rat.agreement_type_id = hag.agreement_type_id
 				LEFT JOIN ref_award_method ram ON ram.award_method_id = hag.award_method_id
+				LEFT JOIN ref_document_code rdc ON disb.document_code_id = rdc.document_code_id
 				-- where a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.publish_start_time::date >= '2013-07-01';
 				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'F' AND e.job_id > (select max(job_id) from mwbe_last_job)
   UNION ALL
@@ -385,9 +386,9 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
           expenditure_object_code,
           fiscal_year,a.load_id,
           a.contract_number::varchar(25) AS AgreementID,
-          split_part(a.disbursement_number, '-', 2)::integer as DocumentVersion,
-          split_part(a.disbursement_number, '-', 3) as DocDeptCode,
-          split_part(a.disbursement_number, '-', 4) as DocCode,
+          disb.document_version as DocumentVersion,
+          (CASE WHEN split_part(a.disbursement_number, '-', 2) IN ('1','2') THEN split_part(a.disbursement_number, '-', 3) ELSE split_part(a.disbursement_number, '-', 4) END) as DocDeptCode,
+          rdc.document_code as DocCode,
           a.line_number as LineNumber,
           rat.agreement_type_code,
           ram.award_method_code,
@@ -399,6 +400,7 @@ a.document_id as DocID,a.disbursement_id as DisbursementID,rd.date as Disburseme
 				LEFT JOIN (select original_agreement_id, agreement_id,  agreement_type_id, award_method_id FROM history_agreement where original_version_flag = 'Y') hag ON hag.original_agreement_id = a.agreement_id
 				LEFT JOIN ref_agreement_type rat ON rat.agreement_type_id = hag.agreement_type_id
 				LEFT JOIN ref_award_method ram ON ram.award_method_id = hag.award_method_id
+				LEFT JOIN ref_document_code rdc ON disb.document_code_id = rdc.document_code_id
 				-- where a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.publish_start_time::date >= '2013-07-01';
 				WHERE a.spending_category_id != 2 AND disb.privacy_flag = 'P' AND e.job_id > (select max(job_id) from mwbe_last_job) ;
          
@@ -582,8 +584,8 @@ FROM (select distinct master_agreement_id  from disbursement_line_item_details W
 
 
 CREATE  OR REPLACE VIEW disbursement_agreement_mwbe AS 
-SELECT b.contract_number::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode,b.document_id  AS AgreementDocID, b.effective_begin_date_id AS AgreementStartDate,
-       b.effective_end_date_id AS AgreementEndDate,b.description AS AgreementPurpose,
+SELECT b.contract_number::varchar(25) AS AgreementID,dc.document_code as AgreementDocCode,b.document_id  AS AgreementDocID, rb.date AS AgreementStartDate,
+       re.date AS AgreementEndDate,b.description AS AgreementPurpose,
        ag.agency_id AS AgreementDeptId,ag.agency_code AS AgreementDeptCode, agt.agreement_type_code as AgreementTypeCode , b.maximum_contract_amount as MaxContractAmount
 FROM (SELECT distinct agreement_id  FROM disbursement_line_item_details  WHERE spending_category_id != 2 ) a JOIN history_agreement b on a.agreement_id = b.original_agreement_id 
                                       LEFT JOIN ref_date rb on  b.effective_begin_date_id =rb.date_id
