@@ -1,0 +1,161 @@
+-- ref_datasources.csv
+ED,NYCEDC,,,,,etl.ext_stg_edc_contract_data_feed,,,1,0
+ED,NYCEDC,,,,,etl.stg_edc_contract,etl.archive_edc_contract,etl.invalid_edc_contract,2,0
+
+-- ref_file_name_pattern.csv
+ED,EDC_CONTRACT_,EDC_CONTRACT_DATA_20[0-9][0-9][0-1][0-9][0-3][0-9][0-2][0-9][0-5][0-9][0-5][0-9].csv,EDC_feed.csv
+
+-- ref_validation_rule.csv
+ED,,,Missing key elements,,,"agency_code,fms_contract_number,fms_commodity_line,edc_registered_amount,contractor_name",,,,,1
+ED,,,Duplicate,,,"agency_code,fms_contract_number,fms_commodity_line,edc_registered_amount",,,,,2
+
+-- ref_column_mappings.csv
+etl.ext_stg_edc_contract_data_feed,agency_code,varchar,etl.stg_edc_contract,agency_code,varchar,1
+etl.ext_stg_edc_contract_data_feed,contract_number,varchar,etl.stg_edc_contract,fms_contract_number,varchar,2
+etl.ext_stg_edc_contract_data_feed,commodity_line,varchar,etl.stg_edc_contract,fms_commodity_line,int,3
+etl.ext_stg_edc_contract_data_feed,edc_contract_number,varchar,etl.stg_edc_contract,edc_contract_number,varchar,4
+etl.ext_stg_edc_contract_data_feed,purpose,varchar,etl.stg_edc_contract,purpose,varchar,5
+etl.ext_stg_edc_contract_data_feed,budget_name,varchar,etl.stg_edc_contract,budget_name,varchar,6
+etl.ext_stg_edc_contract_data_feed,edc_registered_amount,varchar,etl.stg_edc_contract,edc_registered_amount,"numeric(16,2)",7
+etl.ext_stg_edc_contract_data_feed,contractor_name,varchar,etl.stg_edc_contract,contractor_name,varchar,8
+etl.ext_stg_edc_contract_data_feed,contractor_address,varchar,etl.stg_edc_contract,contractor_address,varchar,9
+etl.ext_stg_edc_contract_data_feed,contractor_city,varchar,etl.stg_edc_contract,contractor_city,varchar,10
+etl.ext_stg_edc_contract_data_feed,contractor_state,varchar,etl.stg_edc_contract,contractor_state,varchar,11
+etl.ext_stg_edc_contract_data_feed,contractor_zip,varchar,etl.stg_edc_contract,contractor_zip,varchar,12
+
+
+-- ScriptsForReferenceTables.sql
+
+INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name, is_display) VALUES(nextval('seq_ref_agency_agency_id'),'z81','NEW YORK CITY ECONOMIC DEVELOPMENT CORPORATION','NEW YORK CITY ECONOMIC DEVELOPMENT CORPORATION', now()::timestamp, 'NYC EDC','Y');
+
+INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'z81';
+
+
+-- Scripts.sql
+
+copy tmp_malformed from '/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB_EDC/PreProcessing_DataFiles/badfile.txt';
+
+		ELSIF 	l_data_source_code ='ED' THEN
+			l_processed := etl.processEDCContracts(p_load_file_id_in,l_load_id);	
+			
+			
+-- To test the scripts
+
+insert into etl.etl_data_load(job_id,data_source_code)
+values(1,'ED');
+
+insert into etl.etl_data_load_file(load_id,file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag)
+values(1,'EDC_CONTRACT_DATA_20140113054545.csv','20140113054545','D','Y','Y','N');
+
+select etl.stageandarchivedata(1);
+select etl.validatedata(1);
+select etl.processdata(1);
+
+/usr/bin/nohup /bin/sh /vol1/data-integration-4.2.0/kitchen.sh -file /vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB_EDC/NYC_Master_DEVELOPMENT_EDC.kjb -norep -level:Minimal > /vol1/data-integration-4.2.0/NYCETLMaster_EDC.out &
+
+
+
+-- queries for analysys/testing
+
+select * from history_agreement where contract_number = 'CTA180120117200496'
+
+select * from history_agreement_accounting_line where agreement_id = 252226
+
+select * from ref_department_history  where department_history_id = 124182 
+
+select * from ref_department where department_id = 116940
+
+select * from ref_agency where agency_code = '801'
+
+select count(*) from history_agreement where agency_history_id = 151 -- 5596
+
+select count(*) from history_agreement where agency_history_id = 151 and original_version_flag = 'Y'  -- 2496
+
+select count(*) from history_agreement where contract_number like 'CTA18012%' and original_version_flag = 'Y'  - 461
+
+
+select contract_number, count(*) from history_agreement_edc  group by 1 order by contract_number desc
+
+select b.contract_number, count(*) FROM  history_agreement_accounting_line a, history_agreement_edc b , (select distinct fms_contract_number, fms_commodity_line from edc_contract) c 
+	WHERE  a.agreement_id = b.agreement_id AND  b.contract_number = c.fms_contract_number AND a.commodity_line_number = c.fms_commodity_line group by 1 order by contract_number desc;
+
+CTA180120127206106
+
+select * from history_agreement where contract_number = 'CTA180120127204981' order by document_version
+select * from history_agreement_accounting_line where agreement_id in (select agreement_id from history_agreement where contract_number = 'CTA180120127204981') order by agreement_id, commodity_line_number
+
+select * from edc_contract where fms_contract_number = 'CTA180120127204981'
+
+-- edc analysys current and rfed amounts
+
+select agreement_id, contract_number, document_version, original_contract_amount as fms_registered_amount, maximum_contract_amount as current_amount, rfed_amount as spent_to_date_amount, starting_year, ending_year, registered_year, original_version_flag from agreement_snapshot where contract_number ='CTA180120127206106'  order by document_version
+select a.agreement_id, contract_number, commodity_line_number, line_amount as current_amount, rfed_line_amount as spent_to_date_amount, fiscal_year from history_agreement_accounting_line a JOIN agreement_snapshot b ON a.agreement_id = b.agreement_id where a.agreement_id in (224065,1617220,1735998) order by agreement_id, commodity_line_number
+select distinct fms_contract_number from edc_contract a LEFT JOIN history_agreement_edc b ON a.fms_contract_number = b.contract_number WHERE b.contract_number IS NULL
+select fms_contract_number as contract_number, fms_commodity_line, edc_registered_amount from edc_contract where fms_contract_number = 'CTA180120127206106' order by 1,2
+select distinct contract_number from history_agreement_edc a LEFT JOIN history_agreement_accounting_line_edc b ON a.agreement_id = b.agreement_id WHERE b.agreement_id IS NULL
+
+select * from edc_contract where fms_contract_number = 'CTA180120117200496'
+
+select * from history_agreement_accounting_line_edc where agreement_id in (select agreement_id from history_agreement where contract_number = 'CTA180120117200496') and commodity_line_number in (12,13,20)
+
+
+-- edc analysys master agreements issue
+
+ select distinct contract_number, master_agreement_id from agreement_snapshot where master_agreement_id in (2437,4385,5456,8446,8765,9903,  12156,  12428,  13105,  13812,  14390,  16610,  19017,  19462,  22513,  25007,  29503,  31554,1481155,1627568,1627573,1627575,1784160,1784161) order by master_agreement_id, contract_number;
+
+ select master_agreement_id, count(distinct contract_number) from agreement_snapshot where master_agreement_id in (2437,4385,5456,8446,8765,9903,  12156,  12428,  13105,  13812,  14390,  16610,  19017,  19462,  22513,  25007,  29503,  31554,1481155,1627568,1627573,1627575,1784160,1784161) group by 1 order by 1
+
+MMA180120136200331
+
+select distinct fms_contract_number,vendor_name from edc_contract a JOIN history_agreement_edc b ON a.fms_contract_number = b.contract_number WHERE b.master_agreement_id = 31554;
+
+
+-- EDC Analysys for aggregate tables
+
+select master_agreement_yn,status_flag,count(*) from agreement_snapshot_expanded_edc group by 1,2 order by 1,2;
+select master_agreement_yn,status_flag,count(*) from agreement_snapshot_expanded group by 1,2 order by 1,2;
+
+select contract_number, count(distinct vendor_id) from agreement_snapshot_expanded where master_agreement_yn = 'N' and status_flag = 'A' group by 1 having count(distinct vendor_id) > 1;
+
+select * from agreement_snapshot_expanded where master_agreement_yn = 'N' and status_flag = 'A' and contract_number = 'CTA180120137206361';
+select * from agreement_snapshot_expanded where master_agreement_yn = 'N' and status_flag = 'A' and contract_number = 'CTA180120137206361' order by fiscal_year;
+select fms_contract_number, fms_commodity_line, vendor_id, edc_registered_amount from edc_contract where fms_contract_number = 'CTA180120127207066';
+select * from agreement_snapshot_expanded_edc where master_agreement_yn = 'N' and status_flag = 'A' limit 2;
+
+
+select original_agreement_id, status_flag, count(*) from agreement_snapshot_expanded_edc where master_agreement_yn = 'Y' group by 1,2 order by 2;
+select original_agreement_id, status_flag, count(*) from agreement_snapshot_expanded where master_agreement_yn = 'Y' group by 1,2 order by 2;
+select * from agreement_snapshot_expanded_edc where master_agreement_yn = 'Y' and status_flag = 'A' and original_agreement_id = 13105;
+select * from agreement_snapshot_expanded where master_agreement_yn = 'Y' and status_flag = 'A' and original_agreement_id = 13105;
+select distinct contract_number from history_agreement where master_agreement_id = 13105;
+select fms_contract_number, fms_commodity_line, vendor_id, edc_registered_amount from edc_contract where fms_contract_number in ('CTA180120100003482','CTA180120117201006','CTA180120137201081');
+
+ select original_agreement_id, fiscal_year, master_agreement_yn,status_flag, count(*) from agreement_snapshot_expanded_edc group by 1,2,3,4 having count(*) > 1;
+ original_agreement_id | fiscal_year | master_agreement_yn | status_flag | count
+-----------------------+-------------+---------------------+-------------+-------
+(0 rows)
+
+checkbook_edc=# select original_agreement_id, vendor_id, fiscal_year, master_agreement_yn,status_flag, count(*) from agreement_snapshot_expanded group by 1,2,3,4,5 having count(*) > 1;
+ original_agreement_id | vendor_id | fiscal_year | master_agreement_yn | status_flag | count
+-----------------------+-----------+-------------+---------------------+-------------+-------
+(0 rows)
+
+-- For Award Methods
+
+select distinct contract_number from aggregateon_contracts_cumulative_spending_no_vendor where award_method_id = 65 and type_of_year = 'B' and status_flag = 'A' and  fiscal_year_id = 115 and document_code_id IN (1,2,5);
+
+select fms_contract_number from oge_contract a LEFT JOIN (select distinct contract_number from aggregateon_contracts_cumulative_spending_no_vendor where award_method_id = 65 and type_of_year = 'B' and status_flag = 'A' and  fiscal_year_id = 115 and document_code_id IN (1,2,5)) b ON a.fms_contract_number = b.contract_number WHERE b.contract_number IS NULL;
+
+
+SELECT a.contract_number FROM (select distinct contract_number from aggregateon_contracts_cumulative_spending_no_vendor where award_method_id = 65 and type_of_year = 'B' and status_flag = 'A' and  fiscal_year_id = 115 and document_code_id IN (1,2,5)) a  JOIN (select distinct contract_number from aggregateon_contracts_cumulative_spending_no_vendor where award_method_id = 65 and type_of_year = 'B' and status_flag = 'A' and  fiscal_year_id = 114 and document_code_id IN (1,2,5)) b ON a.contract_number = b.contract_number;
+
+select sum(oge_registered_amount) from oge_contract where fms_contract_number in (select distinct contract_number from aggregateon_contracts_cumulative_spending_no_vendor where award_method_id = 65 and type_of_year = 'B' and status_flag = 'A' and  fiscal_year_id = 115 and document_code_id IN (1,2,5));
+
+-- For Spending Top 5 vendors
+
+select count(*), vendor_id from oge_contract where vendor_id in (22,56,25,11,51) group by 2;
+
+select * from oge_contract where vendor_id = 25;
+
+select sum(check_amount) from disbursement_line_item_details where contract_number in ('CTA180120147200602','CTA180120147200603') and agreement_commodity_line_number in (1,2) and fiscal_year = 2014;
+
