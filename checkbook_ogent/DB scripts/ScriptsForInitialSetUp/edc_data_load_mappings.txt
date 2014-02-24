@@ -159,3 +159,183 @@ select * from oge_contract where vendor_id = 25;
 
 select sum(check_amount) from disbursement_line_item_details where contract_number in ('CTA180120147200602','CTA180120147200603') and agreement_commodity_line_number in (1,2) and fiscal_year = 2014;
 
+
+
+
+
+
+select * from ref_department where department_id >= 900000;
+select * from ref_agency where agency_id >= 9000;
+select vendor_id, count(*) from disbursement_line_item_details group by 1;
+select count(*) from oge_contract;
+select count(distinct vendor_id) from oge_contract;
+select distinct agency_id from oge_contract;
+select distinct department_id from oge_contract;
+select distinct department_id from disbursement_line_item_details;
+select distinct department_history_id from history_agreement_accounting_line;
+select distinct department_history_id,agency_history_id from disbursement_line_item;
+
+select count(*) from history_agreement;
+ count
+-------
+   302
+(1 row)
+
+checkbook_oge=# select count(*) from history_master_agreement;
+ count
+-------
+    24
+(1 row)
+
+checkbook_oge=# select count(*) from agreement_snapshot;
+ count
+-------
+   149
+(1 row)
+
+checkbook_oge=# select count(*) from agreement_snapshot_cy;
+ count
+-------
+   130
+(1 row)
+
+checkbook_oge=# select count(*) from agreement_snapshot_expanded;
+ count
+-------
+   481
+(1 row)
+
+checkbook_oge=# select count(*) from agreement_snapshot_expanded_cy;
+ count
+-------
+   500
+(1 row)
+
+checkbook_oge=# select count(*) from aggregateon_contracts_cumulative_spending;
+ count
+-------
+   981
+(1 row)
+
+checkbook_oge=# select count(*) from disbursement;
+ count
+-------
+   247
+(1 row)
+
+checkbook_oge=# select count(*) from disbursement_line_item;
+ count
+-------
+   334
+(1 row)
+
+checkbook_oge=# select count(*) from disbursement_line_item_details;
+ count
+-------
+   334
+(1 row)
+
+
+Testing Widgets data:
+
+
+-- TOP 5 master agrrement widget testing
+
+select sum(rfed_amount) from agreement_snapshot a JOIN (select distinct contract_number from history_agreement where master_agreement_id = 31554) b ON a.contract_number = b.contract_number WHERE a.latest_flag = 'Y';
+     sum
+-------------
+ 34765601.37
+(1 row)
+
+select sum(rfed_amount) from history_agreement where master_agreement_id = 1481155 and latest_flag = 'Y';
+select contract_number, original_agreement_id, original_contract_amount, maximum_contract_amount, rfed_amount from agreement_snapshot_expanded where fiscal_year =2014 and original_agreement_id = 1481155;
+
+-- Top 5 Contracts:
+
+select * from oge_contract where fms_contract_number = 'CTA180120127207518'; 
+select contract_number, original_agreement_id, original_contract_amount, maximum_contract_amount, rfed_amount from agreement_snapshot_expanded where fiscal_year =2014 and contract_number = 'CTA180120127207518';
+
+select original_agreement_id, agreement_id, vendor_name, original_contract_amount, maximum_contract_amount, rfed_amount  from agreement_snapshot where contract_number = 'CTA180120127204981' and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year;
+
+-- TOP 5 Vendors
+
+select sum(oge_registered_amount) from oge_contract where vendor_id = 17;
+select count(distinct fms_contract_number) from oge_contract where vendor_id = 17;
+select group_concat(distinct fms_contract_number) from oge_contract where vendor_id = 17;
+select contract_number, maximum_contract_amount, rfed_amount from agreement_snapshot where contract_number in ('CTA180120107200512','CTA180120117200496') and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year;
+select sum(maximum_contract_amount), sum(rfed_amount)  from agreement_snapshot where contract_number in ('CTA180120107200512','CTA180120117200496') and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year;
+
+-- TOP 5 Award Methods:
+
+
+ select sum(oge_registered_amount) from oge_contract where fms_contract_number in (select distinct contract_number from aggregateon_contracts_cumulative_spending_no_vendor where award_method_id = 65 and type_of_year = 'B' and status_flag = 'A' and  fiscal_year_id = 115 and document_code_id IN (1,2,5));
+ 
+ select sum(maximum_contract_amount), sum(rfed_amount)  from agreement_snapshot where award_method_id = 65 and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year;
+ 
+ select sum(oge_registered_amount) from oge_contract where fms_contract_number in (select distinct contract_number from agreement_snapshot where award_method_id = 11 and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year);
+ 
+ select fms_contract_number, oge_registered_amount from oge_contract where fms_contract_number in (select distinct contract_number from agreement_snapshot where award_method_id = 11 and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year);
+ 
+ select * from agreement_snapshot where contract_number = 'CTA180120137202761' and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year;
+ 
+
+ -- Contracts by Industries
+ 
+ select distinct industry_type_id from agreement_snapshot;
+ 
+ select count(distinct contract_number) from agreement_snapshot where 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year and master_agreement_yn = 'N';
+ 
+ select sum(oge_registered_amount) from oge_contract where fms_contract_number in (select distinct contract_number from agreement_snapshot where industry_type_id = 5 and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year);
+ 
+ select sum(maximum_contract_amount), sum(rfed_amount)  from agreement_snapshot where industry_type_id = 5 and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year and master_agreement_yn = 'N';
+ 
+ -- Contracts by size
+ 
+ select count(*), (CASE WHEN maximum_contract_amount IS NULL THEN 5 WHEN maximum_contract_amount <= 5000 THEN 4 WHEN maximum_contract_amount > 5000  AND maximum_contract_amount <= 100000 THEN 3  WHEN  maximum_contract_amount > 100000 AND maximum_contract_amount <= 1000000 THEN 2 WHEN maximum_contract_amount > 1000000 THEN 1 ELSE 5 END) as award_size_id from agreement_snapshot where 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year and master_agreement_yn = 'N' group by 2 order by 2;
+ 
+ select sum(oge_registered_amount) from oge_contract where fms_contract_number in (select distinct contract_number from agreement_snapshot where award_size_id = 1 and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year);
+ 
+  select sum(maximum_contract_amount), sum(rfed_amount)  from agreement_snapshot where award_size_id = 1 and 2014 between starting_year and ending_year and 2014 between effective_begin_year and effective_end_year and master_agreement_yn = 'N';
+ 
+ 
+ -- Spending widgets
+ 
+ -- TOP 5 Checks
+ 
+ select contract_number, agreement_commodity_line_number, * from disbursement_line_item_details where disbursement_line_item_id = 9439626;
+ 
+ select * from oge_contract where fms_contract_number = 'CTA180120147200602' and fms_commodity_line = 1;
+ 
+ 
+ -- Top 5 departments
+ 
+ select sum(check_amount) from disbursement_line_item_details where fiscal_year = 2014;
+ select fiscal_year, sum(check_amount) from disbursement_line_item_details group by 1
+ select sum(check_amount), department_name from disbursement_line_item_details where fiscal_year = 2014 group by 2;
+ 
+ -- Top 5 Expense Categories
+
+ select sum(check_amount), expenditure_object_name from disbursement_line_item_details where fiscal_year = 2014 group by 2 order by 1 desc;
+ 
+ -- TOP 5 Vendors:
+ 
+ select sum(check_amount) from disbursement_line_item_details a join oge_contract b ON a.contract_number = b.fms_contract_number and a.agreement_commodity_line_number = b.fms_commodity_line WHERE a.fiscal_year = 2014 and b.vendor_id = 17;
+ 
+ select sum(maximum_contract_amount) from agreement_snapshot a JOIN (select distinct a.contract_number from agreement_snapshot a JOIN oge_contract b ON a.contract_number = b.fms_contract_number WHERE b.vendor_id = 17 and 2014 between a.starting_year and a.ending_year and 2014 between a.effective_begin_year and effective_end_year) b ON a.contract_number = b.contract_number where 2014 between a.starting_year and a.ending_year and 2014 between a.effective_begin_year and effective_end_year;
+ 
+ 
+ -- TOP 5 Contracts
+ 
+ select sum(check_amount) from disbursement_line_item_details where fiscal_year = 2014 and contract_number = 'CTA180120137201772' and vendor_id = 47;
+ 
+ select sum(check_amount), contract_number, vendor_id from disbursement_line_item_details where fiscal_year = 2014 group by 2,3 order by 1 desc limit 5;
+ 
+ select * from oge_contract where fms_contract_number = 'CTA180120137201772';
+ 
+ select legal_name from vendor where vendor_id in (24,17);
+ 
+ select maximum_contract_amount, description from agreement_snapshot where contract_number = 'CTA180120137201772' and 2014 between starting_year and ending_year and 2014 between  effective_begin_year and effective_end_year;
+ 
+ select maximum_contract_amount, starting_year, ending_year, effective_begin_year, effective_end_year from agreement_snapshot where contract_number = 'CTA180120137201772';
+ 
+ select maximum_contract_amount, starting_year, ending_year, effective_begin_year, effective_end_year, description from agreement_snapshot where contract_number = 'CTA180120147200602';

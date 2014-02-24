@@ -113,10 +113,10 @@ BEGIN
 	TRUNCATE  edc_contract;
 	
 	INSERT INTO edc_contract(agency_code, fms_contract_number, fms_commodity_line, edc_contract_number, purpose, budget_name,
-	edc_registered_amount, vendor_name, agency_id, vendor_id, created_load_id, created_date)
+	edc_registered_amount, vendor_name, agency_id, vendor_id, department_id, created_load_id, created_date)
 	SELECT agency_code, fms_contract_number, fms_commodity_line, edc_contract_number, purpose, budget_name, 
-	edc_registered_amount, contractor_name, agency_id, vendor_id, p_load_id_in, now()::timestamp
-	FROM etl.stg_edc_contract ;
+	edc_registered_amount, contractor_name, agency_id, vendor_id, b.department_id, p_load_id_in, now()::timestamp
+	FROM etl.stg_edc_contract a , (select department_id from ref_department where department_code = '110' and agency_id in (select agency_id from ref_agency where agency_code = 'z81')) b;
 	
 	TRUNCATE oge_contract_previous_load;
 	
@@ -127,10 +127,10 @@ BEGIN
 	TRUNCATE oge_contract;
 	
 	INSERT INTO oge_contract(agency_code, fms_contract_number, fms_commodity_line, oge_contract_number, purpose, budget_name,
-	oge_registered_amount, vendor_name, agency_id, vendor_id, created_load_id, created_date)
+	oge_registered_amount, vendor_name, agency_id, vendor_id, department_id, created_load_id, created_date)
 	SELECT agency_code, fms_contract_number, fms_commodity_line, min(edc_contract_number), min(purpose), min(budget_name), 
-	sum(edc_registered_amount), vendor_name, agency_id, vendor_id, p_load_id_in, now()::timestamp
-	FROM edc_contract group by 1,2,3,8,9,10,11;
+	sum(edc_registered_amount), vendor_name, agency_id, vendor_id, department_id, p_load_id_in, now()::timestamp
+	FROM edc_contract group by 1,2,3,8,9,10,11,12;
 	
 	
 	

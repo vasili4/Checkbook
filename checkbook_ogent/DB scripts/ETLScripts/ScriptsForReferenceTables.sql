@@ -1,12 +1,12 @@
-COPY etl.ref_data_source FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/ref_data_source.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_data_source FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/ref_data_source.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_column_mapping FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/ref_column_mapping.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_column_mapping FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/ref_column_mapping.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_validation_rule FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/ref_validation_rule.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_validation_rule FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/ref_validation_rule.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.ref_file_name_pattern FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/ref_file_name_pattern.csv' CSV HEADER QUOTE as '"';
+COPY etl.ref_file_name_pattern FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/ref_file_name_pattern.csv' CSV HEADER QUOTE as '"';
 
-COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/widget_aggregate_tables_edc.csv' CSV HEADER QUOTE as '"';
+COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/widget_aggregate_tables_edc.csv' CSV HEADER QUOTE as '"';
 
 ---------------------------------------------------------------------------------------------------------------------------------
 
@@ -145,7 +145,7 @@ update ref_business_type_status set created_date = now()::timestamp;
 	rsfcls_nm_up  varchar(52),
 	fund_category  varchar(50));
 	
-COPY etl.stg_funding_class FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/FundingClass.txt' DELIMITER AS '|' ESCAPE '~' FILL MISSING FIELDS;		
+COPY etl.stg_funding_class FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/FundingClass.txt' DELIMITER AS '|' ESCAPE '~' FILL MISSING FIELDS;		
 
 
 INSERT INTO   ref_funding_class(funding_class_code,funding_class_name,funding_class_short_name,category_name,city_fund_flag,intra_city_flag,fund_allocation_required_flag,category_code,created_date)
@@ -190,16 +190,16 @@ select etl.initializedate('1900-01-01'::date,'2200-12-31'::date);
 				  END);
 --------------------------------------------------------------------------------------------------------------------------------------------
 
-COPY etl.stg_award_method FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/AwardMethod.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_method FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/AwardMethod.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_method(award_method_code,award_method_name,created_date) SELECT  award_method_code,award_method_name,now()::timestamp  FROM etl.stg_award_method;
 
-COPY etl.stg_agreement_type FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/AgreementType.csv' DELIMITER AS ',' ;
+COPY etl.stg_agreement_type FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/AgreementType.csv' DELIMITER AS ',' ;
   
 insert into ref_agreement_type(agreement_type_code,agreement_type_name,created_date) SELECT agreement_type_code,name,now()::timestamp from etl.stg_agreement_type;											
 
 
-COPY etl.stg_award_category FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/AgreementCategory.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_category FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/AgreementCategory.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_category(award_category_code,award_category_name,created_date) SELECT award_category_code, award_method_name,now()::timestamp  from etl.stg_award_category;  
 
@@ -277,7 +277,7 @@ INSERT INTO ref_award_size(award_size_id, award_size_name,created_date) VALUES(1
 update ref_award_size set created_date = now()::timestamp;
 																						 
 																						 
-COPY etl.stg_award_category_industry FROM '/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE/AgreementIndustryCategory.csv' CSV QUOTE as '"' ;
+COPY etl.stg_award_category_industry FROM '/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE/AgreementIndustryCategory.csv' CSV QUOTE as '"' ;
 
 INSERT INTO ref_award_category_industry(award_category_code,industry_type_id,created_date) SELECT award_category_code, industry_type_id,now()::timestamp  from etl.stg_award_category_industry;  
 
@@ -351,15 +351,6 @@ INSERT INTO ref_amount_basis(amount_basis_id,amount_basis_name) VALUES (1,'ANNUA
 
 
 
-INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name) VALUES(nextval('seq_ref_agency_agency_id'),'N/A','N/A (PRIVACY/SECURITY)','N/A (PRIVACY/SECURITY)', now()::timestamp, 'N/A');
-
-INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'N/A';
-
-
-INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name, is_display) VALUES(nextval('seq_ref_agency_agency_id'),'z81','NEW YORK CITY ECONOMIC DEVELOPMENT CORPORATION','NEW YORK CITY ECONOMIC DEVELOPMENT CORPORATION', now()::timestamp, 'NYC EDC','Y');
-
-INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'z81';
-
 /*ref_fund_class*/
 
  INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES('360',2);
@@ -376,3 +367,40 @@ INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, create
  INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES('520',2);
  INSERT INTO ref_fund_class(fund_class_code,created_load_id) VALUES('701',2);
  update ref_fund_class set created_date = now()::timestamp;
+
+ 
+ 
+ INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name) VALUES(nextval('seq_ref_agency_agency_id'),'N/A','N/A (PRIVACY/SECURITY)','N/A (PRIVACY/SECURITY)', now()::timestamp, 'N/A');
+
+INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'N/A';
+
+ALTER SEQUENCE seq_ref_agency_agency_id RESTART WITH 9000;
+ALTER SEQUENCE seq_ref_agency_history_id RESTART WITH 9000;
+ALTER SEQUENCE seq_ref_department_department_id RESTART WITH 900000;
+ALTER SEQUENCE seq_ref_department_history_id RESTART WITH 900000;
+
+INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name, is_display, is_oge_agency) VALUES(nextval('seq_ref_agency_agency_id'),'z81','NEW YORK CITY ECONOMIC DEVELOPMENT CORPORATION','NEW YORK CITY ECONOMIC DEVELOPMENT CORPORATION', now()::timestamp, 'NYC EDC','Y', 'Y');
+
+INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'z81';
+
+
+INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name, is_display, is_oge_agency) VALUES(nextval('seq_ref_agency_agency_id'),'z82','NYC TECHNOLOGY DEVELOPMENT CORPORATION','NYC TECHNOLOGY DEVELOPMENT CORPORATION', now()::timestamp, 'NYC TDC','Y', 'Y');
+
+INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'z82';
+
+
+INSERT INTO ref_department(department_id,department_code,department_name,department_short_name,agency_id,fund_class_id,fiscal_year,created_date,original_department_name)
+SELECT nextval('seq_ref_department_department_id'),'110' as department_code, 'NYCEDC' as department_name, 'NYCEDC' as department_short_name,b.agency_id,c.fund_class_id,2014 as fiscal_year,now()::timestamp, 'NYCEDC' as department_name
+FROM   ( select agency_id from ref_agency where agency_code = 'z81') b, (select fund_class_id from ref_fund_class  where fund_class_code = '400') c;
+
+INSERT INTO ref_department_history(department_history_id,department_id,department_name,department_short_name,agency_id,fund_class_id,fiscal_year,created_date)
+SELECT nextval('seq_ref_department_history_id'),a.department_id,a.department_name,a.department_short_name,b.agency_id,a.fund_class_id,a.fiscal_year,now()::timestamp
+FROM ref_department a , ref_agency b WHERE a.agency_id = b.agency_id AND b.agency_code = 'z81' and a.department_code = '110';
+
+INSERT INTO ref_department(department_id,department_code,department_name,department_short_name,agency_id,fund_class_id,fiscal_year,created_date,original_department_name)
+SELECT nextval('seq_ref_department_department_id'),'111' as department_code, 'NYCTDC' as department_name, 'NYCTDC' as department_short_name,b.agency_id,c.fund_class_id,2014 as fiscal_year,now()::timestamp, 'NYCTDC' as department_name
+FROM   ( select agency_id from ref_agency where agency_code = 'z82') b, (select fund_class_id from ref_fund_class  where fund_class_code = '400') c;
+
+INSERT INTO ref_department_history(department_history_id,department_id,department_name,department_short_name,agency_id,fund_class_id,fiscal_year,created_date)
+SELECT nextval('seq_ref_department_history_id'),a.department_id,a.department_name,a.department_short_name,b.agency_id,a.fund_class_id,a.fiscal_year,now()::timestamp
+FROM ref_department a , ref_agency b WHERE a.agency_id = b.agency_id AND b.agency_code = 'z82' and a.department_code = '111';

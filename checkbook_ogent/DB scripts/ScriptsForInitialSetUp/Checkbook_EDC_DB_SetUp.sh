@@ -1,5 +1,5 @@
 TODAY=$(date)
-SCRIPT_DIR=/home/gpadmin/TREDDY/EDC/CREATE_NEW_DATABASE
+SCRIPT_DIR=/home/gpadmin/TREDDY/OGE/CREATE_NEW_DATABASE
 export SCRIPT_DIR
 EXEC_TIME=`date +%m%d%Y:%T`
 export EXEC_TIME
@@ -31,6 +31,7 @@ psql -d $DB_NAME -f $SCRIPT_DIR/PMSScripts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/EDCContracts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/TDCContracts.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/RestoreOGETransactionsData.sql
+psql -d $DB_NAME -f $SCRIPT_DIR/ModifyFMSDataForOGE.sql
 
 psql -d $DB_NAME -f $SCRIPT_DIR/PendingContracts.sql  
 echo "--pendingscripts "

@@ -422,7 +422,7 @@ BEGIN
 	VALUES(p_job_id_in,'ED',l_count, '# of records inserted into address');
 	
 	
-	
+	/*
 	DELETE FROM ref_agency_history a 
 	USING ref_agency b
 	WHERE   a.agency_id = b.agency_id  AND b.agency_code in ('z81');
@@ -468,14 +468,26 @@ BEGIN
 		master_contract_vendor_id_cy = edc_data.vendor_id,
 		master_child_contract_vendor_id = edc_data.vendor_id,
 		master_child_contract_vendor_id_cy = edc_data.vendor_id,
-		vendor_customer_code = NULL
-	FROM (select disb.disbursement_line_item_id, ag.agency_code, ag.agency_id, ag.agency_name, ag.agency_short_name, agh.agency_history_id, edc.vendor_id, edc.vendor_name FROM disbursement_line_item_details disb JOIN oge_contract edc ON disb.contract_number = edc.fms_contract_number AND disb.agreement_commodity_line_number = edc.fms_commodity_line  JOIN ref_agency ag ON edc.agency_id = ag.agency_id JOIN (select agency_id, max(agency_history_id) agency_history_id from ref_agency_history group by 1) agh ON ag.agency_id = agh.agency_id) edc_data
+		vendor_customer_code = NULL,
+		department_id = edc_data.department_id ,
+		department_name = edc_data.department_name,
+		department_short_name = edc_data.department_short_name,
+		department_code = edc_data.department_code		
+	FROM (select disb.disbursement_line_item_id, ag.agency_code, ag.agency_id, ag.agency_name, ag.agency_short_name, agh.agency_history_id, edc.vendor_id, edc.vendor_name, 
+	dep.department_id, dep.department_name, dep.department_short_name, dep.department_code FROM disbursement_line_item_details disb JOIN oge_contract edc ON disb.contract_number = edc.fms_contract_number AND disb.agreement_commodity_line_number = edc.fms_commodity_line  JOIN ref_agency ag ON edc.agency_id = ag.agency_id 
+	JOIN (select agency_id, max(agency_history_id) agency_history_id from ref_agency_history group by 1) agh ON ag.agency_id = agh.agency_id
+	JOIN ref_department dep ON edc.department_id = dep.department_id) edc_data
 	WHERE disb.disbursement_line_item_id = edc_data.disbursement_line_item_id;
 	
 	UPDATE disbursement_line_item disb
 	SET agency_history_id = disb1.agency_history_id
 	FROM disbursement_line_item_details disb1
 	WHERE disb.disbursement_line_item_id = disb1.disbursement_line_item_id;
+	
+	UPDATE disbursement_line_item disb
+	SET department_history_id = disb1.department_history_id
+	FROM disbursement_line_item_details disb1, ref_department dep, ref_department_history dep_his
+	WHERE disb.disbursement_line_item_id = disb1.disbursement_line_item_id AND disb1.department_id = dep.department_id AND dep.department_id = dep_his.department_id ;
 	
 	
 	TRUNCATE agreement_snapshot_expanded CASCADE;
@@ -668,7 +680,7 @@ BEGIN
             original_or_modified, original_or_modified_desc, award_size_id, 
             award_category_id, industry_type_id, document_version, latest_flag
 	FROM pending_contracts a JOIN (select c.contract_number, vendor_id, agency_id, vendor_name, sum(oge_registered_amount) as  oge_registered_amount FROM oge_contract a JOIN (select distinct contract_number, master_agreement_id FROM history_agreement) b ON a.fms_contract_number = b.contract_number JOIN (SELECT distinct contract_number, original_master_agreement_id FROM history_master_agreement) c ON b.master_agreement_id = c.original_master_agreement_id group by 1,2,3,4) b ON a.fms_contract_number = b.contract_number  JOIN ref_agency c ON b.agency_id = b.agency_id;
-	
+	*/
 		l_end_time := timeofday()::timestamp;
 INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
 	VALUES(p_job_id_in,'etl.restoreOGETransactionsData',1,l_start_time,l_end_time);

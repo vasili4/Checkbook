@@ -200,7 +200,7 @@ BEGIN
 	-- Copying the malformed records to the respective malformed tables
 	CREATE TEMPORARY TABLE tmp_malformed(col1 varchar) DISTRIBUTED BY (col1);
 	
-	copy tmp_malformed from '/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB_EDC/PreProcessing_DataFiles/badfile.txt';
+	copy tmp_malformed from '/vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB_OGE/PreProcessing_DataFiles/badfile.txt';
 	
 	l_insert_sql := 'INSERT INTO ' || replace(l_data_feed_table,'ext_stg','malformed') ||
 			' SELECT col1, ' || p_load_file_id_in ||
@@ -1333,6 +1333,20 @@ BEGIN
 	END IF;	
 
 	*/
+	
+	
+	IF l_status = 1 THEN 
+		l_status :=etl.refreshContractsPreAggregateTables(p_job_id_in);
+	ELSE 
+			RETURN 0;
+	END IF;	
+	
+	IF l_status = 1 THEN 
+		l_status :=etl.modifyFMSDataForOGE(p_job_id_in);
+	ELSE 
+			RETURN 0;
+	END IF;	
+	
 	
 	IF l_status = 1 THEN 
 		l_status :=etl.refreshaggregates(p_job_id_in);

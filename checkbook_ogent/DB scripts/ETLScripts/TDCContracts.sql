@@ -212,7 +212,7 @@ BEGIN
 	UPDATE etl.stg_tdc_contract a
 	SET agency_id = b.agency_id
 	FROM ref_agency b
-	WHERE a.agency_code = b.agency_code AND b.agency_code = 'z81';
+	WHERE a.agency_code = b.agency_code AND b.agency_code = 'z82';
 	
 	UPDATE etl.stg_tdc_contract a
 	SET vendor_id = b.vendor_id
@@ -222,17 +222,17 @@ BEGIN
 	TRUNCATE  tdc_contract;
 	
 	INSERT INTO tdc_contract(agency_code, fms_contract_number, fms_commodity_line, tdc_contract_number, purpose, budget_name,
-	tdc_registered_amount, vendor_name, agency_id, vendor_id, created_load_id, created_date)
+	tdc_registered_amount, vendor_name, agency_id, vendor_id, department_id, created_load_id, created_date)
 	SELECT agency_code, fms_contract_number, fms_commodity_line, tdc_contract_number, purpose, budget_name, 
-	tdc_registered_amount, contractor_name, agency_id, vendor_id, p_load_id_in, now()::timestamp
-	FROM etl.stg_tdc_contract ;
+	tdc_registered_amount, contractor_name, agency_id, vendor_id, b.department_id, p_load_id_in, now()::timestamp
+	FROM etl.stg_tdc_contract a, (select department_id from ref_department where department_code = '111' and agency_id in (select agency_id from ref_agency where agency_code = 'z82')) b;
 	
 		
 	INSERT INTO oge_contract(agency_code, fms_contract_number, fms_commodity_line, oge_contract_number, purpose, budget_name,
-	oge_registered_amount, vendor_name, agency_id, vendor_id, created_load_id, created_date)
+	oge_registered_amount, vendor_name, agency_id, vendor_id, department_id, created_load_id, created_date)
 	SELECT agency_code, fms_contract_number, fms_commodity_line, min(tdc_contract_number), min(purpose), min(budget_name), 
-	sum(tdc_registered_amount), vendor_name, agency_id, vendor_id, p_load_id_in, now()::timestamp
-	FROM tdc_contract group by 1,2,3,8,9,10,11;
+	sum(tdc_registered_amount), vendor_name, agency_id, vendor_id, department_id, p_load_id_in, now()::timestamp
+	FROM tdc_contract group by 1,2,3,8,9,10,11,12;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
 	

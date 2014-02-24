@@ -137,6 +137,13 @@ BEGIN
             updated_load_id, created_date, updated_date
 	FROM history_master_agreement a JOIN (select distinct master_agreement_id from history_agreement_edc) b ON a.original_master_agreement_id = b.master_agreement_id ;
 	
+UPDATE history_master_agreement_edc a 
+	SET num_associated_contracts = b.total_contracts
+	FROM (SELECT count(*) as total_contracts, a.master_agreement_id   FROM history_agreement a  JOIN history_master_agreement_edc b ON a.master_agreement_id = b.original_master_agreement_id
+ WHERE  a.latest_flag = 'Y' GROUP BY 2) b  
+ WHERE  a.original_master_agreement_id = b.master_agreement_id;
+ 
+ 
 	TRUNCATE  agreement_snapshot_edc;
 	INSERT INTO agreement_snapshot_edc(
             original_agreement_id, document_version, document_code_id, agency_history_id, 

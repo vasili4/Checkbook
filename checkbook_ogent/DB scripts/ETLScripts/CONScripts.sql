@@ -1987,9 +1987,9 @@ BEGIN
 	l_start_time := timeofday()::timestamp;
 	
 	
-	TRUNCATE agreement_snapshot_expanded;
+	TRUNCATE agreement_snapshot_expanded_edc;
 	
-	INSERT INTO agreement_snapshot_expanded
+	INSERT INTO agreement_snapshot_expanded_edc
 SELECT  original_agreement_id ,
 	agreement_id,
 	fiscal_year ,
@@ -2033,11 +2033,11 @@ FROM
 	master_agreement_id,
 	master_agreement_yn,
 	'A' as status_flag
-FROM	agreement_snapshot ) expanded_tbl  WHERE fiscal_year between starting_year AND ending_year
+FROM	agreement_snapshot_edc ) expanded_tbl  WHERE fiscal_year between starting_year AND ending_year
 AND fiscal_year >= 2010 AND ( (fiscal_year <= extract(year from now()::date) AND extract(month from now()::date) <= 6) OR
 		     (fiscal_year <= (extract(year from now()::date)::smallint)+1 AND extract(month from now()::date) > 6) );
 
-INSERT INTO agreement_snapshot_expanded
+INSERT INTO agreement_snapshot_expanded_edc
 SELECT original_agreement_id,
 	agreement_id,
 	registered_year,
@@ -2059,18 +2059,18 @@ SELECT original_agreement_id,
 	master_agreement_id,
 	master_agreement_yn,
 	'R' as status_flag
-FROM	agreement_snapshot
+FROM	agreement_snapshot_edc
 WHERE registered_year between starting_year AND ending_year
 AND registered_year >= 2010 ;
 	
 RAISE NOTICE 'PRE_CON_AGGR1';
 
 CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded AS
-SELECT * from agreement_snapshot_expanded
+SELECT * from agreement_snapshot_expanded_edc
 WHERE master_agreement_yn = 'N';
 
 CREATE TEMPORARY TABLE tmp_ct_master_agreement_snapshot_expanded AS 
-SELECT * from agreement_snapshot_expanded 
+SELECT * from agreement_snapshot_expanded_edc 
 WHERE master_agreement_yn = 'Y';
 
 
@@ -2093,7 +2093,7 @@ FROM tmp_ct_child_agreement_snapshot_expanded a LEFT JOIN tmp_ct_child_agreement
 
 
 CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot AS
-SELECT * FROM agreement_snapshot
+SELECT * FROM agreement_snapshot_edc
 WHERE master_agreement_yn = 'N';
 
 CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_max_endingyear(original_agreement_id bigint,max_ending_year smallint) 
@@ -2153,7 +2153,7 @@ AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version
 AND magse.document_code_id = dc.document_code_id 
 GROUP BY 1,2,3;
 
-UPDATE agreement_snapshot_expanded a
+UPDATE agreement_snapshot_expanded_edc a
 SET rfed_amount = b.rfed_amount
 FROM tmp_ct_master_agreements_rfed b
 WHERE a.original_agreement_id = b.original_master_agreement_id
@@ -2161,32 +2161,32 @@ AND a.fiscal_year = b.fiscal_year
 AND a.status_flag = b.status_flag
 AND a.master_agreement_yn = 'Y';
 
-UPDATE agreement_snapshot_expanded 
+UPDATE agreement_snapshot_expanded_edc 
 SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y';
 
+/*
 UPDATE agreement_snapshot X
 SET rfed_amount = Y.rfed_amount
 FROM
-(select a.agreement_id, a.rfed_amount from  agreement_snapshot_expanded a,
-(select agreement_id, max(fiscal_year) as fiscal_year from agreement_snapshot_expanded where master_agreement_yn = 'Y' group by 1) b 
-WHERE a.agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year AND a.status_flag = 'A') Y
-WHERE X.agreement_id = Y.agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
+(select master_agreement_id, sum(rfed_amount) as rfed_amount from agreement_snapshot_edc where master_agreement_yn = 'N' and latest_flag = 'Y' group by 1) Y
+WHERE X.original_agreement_id = Y.master_agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
 
 UPDATE agreement_snapshot 
 SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y' AND latest_flag = 'Y' ;
+*/
 
 RAISE NOTICE 'PRE_CON_AGGR3';
 
 -- changes for agreement_snapshot_expanded_cy
 
-	TRUNCATE agreement_snapshot_expanded_cy;
+	TRUNCATE agreement_snapshot_expanded_cy_edc;
 	
 	
-INSERT INTO agreement_snapshot_expanded_cy
+INSERT INTO agreement_snapshot_expanded_cy_edc
 SELECT  original_agreement_id ,
 	agreement_id,
 	fiscal_year ,
@@ -2230,10 +2230,10 @@ FROM
 	master_agreement_id,
 	master_agreement_yn,
 	'A' as status_flag
-FROM	agreement_snapshot_cy ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
+FROM	agreement_snapshot_cy_edc ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
 AND fiscal_year >= 2010 AND (fiscal_year <= extract(year from now()::date) ) ;
 
-INSERT INTO agreement_snapshot_expanded_cy
+INSERT INTO agreement_snapshot_expanded_cy_edc
 SELECT original_agreement_id,
 	agreement_id,
 	registered_year,
@@ -2255,18 +2255,18 @@ SELECT original_agreement_id,
 	master_agreement_id,
 	master_agreement_yn,
 	'R' as status_flag
-FROM	agreement_snapshot_cy
+FROM	agreement_snapshot_cy_edc
 WHERE registered_year between starting_year AND ending_year
 AND registered_year >= 2010 ;
 
 RAISE NOTICE 'PRE_CON_AGGR4';
 
 CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_cy AS 
-SELECT * from agreement_snapshot_expanded_cy 
+SELECT * from agreement_snapshot_expanded_cy_edc 
 WHERE master_agreement_yn = 'N';
 
 CREATE TEMPORARY TABLE tmp_ct_master_agreement_snapshot_expanded_cy AS 
-SELECT * from agreement_snapshot_expanded_cy 
+SELECT * from agreement_snapshot_expanded_cy_edc 
 WHERE master_agreement_yn = 'Y';
 
 
@@ -2289,7 +2289,7 @@ FROM tmp_ct_child_agreement_snapshot_expanded_cy a LEFT JOIN tmp_ct_child_agreem
 
 
 CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_cy AS
-SELECT * FROM agreement_snapshot_cy
+SELECT * FROM agreement_snapshot_cy_edc
 WHERE master_agreement_yn = 'N';
 
 CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_max_endingyear_cy(original_agreement_id bigint,max_ending_year smallint) 
@@ -2347,7 +2347,7 @@ AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version
 AND magse.document_code_id = dc.document_code_id 
 GROUP BY 1,2,3;
 
-UPDATE agreement_snapshot_expanded_cy a
+UPDATE agreement_snapshot_expanded_cy_edc a
 SET rfed_amount = b.rfed_amount
 FROM tmp_ct_master_agreements_rfed b
 WHERE a.original_agreement_id = b.original_master_agreement_id
@@ -2355,10 +2355,11 @@ AND a.fiscal_year = b.fiscal_year
 AND a.status_flag = b.status_flag
 AND a.master_agreement_yn = 'Y';
 
-UPDATE agreement_snapshot_expanded_cy
+UPDATE agreement_snapshot_expanded_cy_edc
 SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y';
+
 	RAISE NOTICE 'PRE_CON_AGGR5';
 	
 	l_end_time := timeofday()::timestamp;

@@ -2,6 +2,7 @@ CREATE SEQUENCE seq_oge_contract_id;
 CREATE SEQUENCE seq_edc_contract_id;
 CREATE SEQUENCE seq_tdc_contract_id;
 
+DROP TABLE IF EXISTS edc_contract;
 CREATE TABLE edc_contract (
     edc_contract_id integer  PRIMARY KEY DEFAULT nextval('seq_edc_contract_id'::regclass) NOT NULL,
 	agency_code character varying(4),
@@ -14,13 +15,14 @@ CREATE TABLE edc_contract (
 	vendor_name varchar(150),
 	agency_id integer,
 	vendor_id integer,
+	department_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (edc_contract_id);
 
-
+DROP TABLE IF EXISTS tdc_contract;
 CREATE TABLE tdc_contract (
     tdc_contract_id integer  PRIMARY KEY DEFAULT nextval('seq_tdc_contract_id'::regclass) NOT NULL,
 	agency_code character varying(4),
@@ -33,6 +35,7 @@ CREATE TABLE tdc_contract (
 	vendor_name varchar(150),
 	agency_id integer,
 	vendor_id integer,
+	department_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -40,6 +43,7 @@ CREATE TABLE tdc_contract (
 ) distributed by (tdc_contract_id);
 
 
+DROP TABLE IF EXISTS oge_contract;
 CREATE TABLE oge_contract (
     oge_contract_id integer  PRIMARY KEY DEFAULT nextval('seq_oge_contract_id'::regclass) NOT NULL,
 	agency_code character varying(4),
@@ -52,6 +56,7 @@ CREATE TABLE oge_contract (
 	vendor_name varchar(150),
 	agency_id integer,
 	vendor_id integer,
+	department_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -59,6 +64,8 @@ CREATE TABLE oge_contract (
 ) distributed by (oge_contract_id);
 
 
+
+DROP TABLE IF EXISTS oge_contract_previous_load;
 CREATE TABLE oge_contract_previous_load (
     oge_contract_id integer  NOT NULL,
 	agency_code character varying(4),
@@ -71,6 +78,7 @@ CREATE TABLE oge_contract_previous_load (
 	vendor_name varchar(150),
 	agency_id integer,
 	vendor_id integer,
+	department_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -444,6 +452,7 @@ CREATE TABLE history_master_agreement_edc
   source_updated_calendar_year_id smallint,
   contract_number character varying,
   original_master_agreement_id bigint,
+  num_associated_contracts smallint,
   original_version_flag character(1),
   latest_flag character(1),
   privacy_flag character(1),
