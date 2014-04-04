@@ -150,6 +150,7 @@ BEGIN
 	INSERT INTO etl.etl_data_load_verification(job_id,data_source_code,num_transactions,description)
 	VALUES(p_job_id_in,'ED',l_count, '# of records inserted into history_master_agreement');
 	
+	
 	TRUNCATE  agreement_snapshot CASCADE;
 	INSERT INTO agreement_snapshot(
             original_agreement_id, document_version, document_code_id, agency_history_id, 

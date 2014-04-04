@@ -2,6 +2,8 @@ CREATE SEQUENCE seq_oge_contract_id;
 CREATE SEQUENCE seq_edc_contract_id;
 CREATE SEQUENCE seq_tdc_contract_id;
 
+
+
 DROP TABLE IF EXISTS edc_contract;
 CREATE TABLE edc_contract (
     edc_contract_id integer  PRIMARY KEY DEFAULT nextval('seq_edc_contract_id'::regclass) NOT NULL,
@@ -13,9 +15,12 @@ CREATE TABLE edc_contract (
 	budget_name varchar(75),
 	edc_registered_amount numeric(16,2),
 	vendor_name varchar(150),
-	agency_id integer,
+	agency_id smallint,
 	vendor_id integer,
 	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -33,9 +38,12 @@ CREATE TABLE tdc_contract (
 	budget_name varchar(75),
 	tdc_registered_amount numeric(16,2),
 	vendor_name varchar(150),
-	agency_id integer,
+	agency_id smallint,
 	vendor_id integer,
 	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -53,10 +61,16 @@ CREATE TABLE oge_contract (
 	purpose varchar(75),
 	budget_name varchar(75),
 	oge_registered_amount numeric(16,2),
+	original_amount numeric(16,2),
+	current_amount numeric(16,2),
+	current_amount_commodity_level numeric(16,2),
 	vendor_name varchar(150),
-	agency_id integer,
+	agency_id smallint,
 	vendor_id integer,
 	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -75,15 +89,73 @@ CREATE TABLE oge_contract_previous_load (
 	purpose varchar(75),
 	budget_name varchar(75),
 	oge_registered_amount numeric(16,2),
+	original_amount numeric(16,2),
+	current_amount numeric(16,2),
+	current_amount_commodity_level numeric(16,2),
 	vendor_name varchar(150),
-	agency_id integer,
+	agency_id smallint,
 	vendor_id integer,
 	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (oge_contract_id);
+
+DROP TABLE IF EXISTS oge_contract_history;
+CREATE TABLE oge_contract_history (
+    oge_contract_id integer  NOT NULL,
+	agency_code character varying(4),
+	fms_contract_number character varying,
+	fms_commodity_line integer,
+	oge_contract_number varchar(15),
+	purpose varchar(75),
+	budget_name varchar(75),
+	oge_registered_amount numeric(16,2),
+	original_amount numeric(16,2),
+	current_amount numeric(16,2),
+	current_amount_commodity_level numeric(16,2),
+	vendor_name varchar(150),
+	agency_id smallint,
+	vendor_id integer,
+	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
+    created_load_id integer,
+    updated_load_id integer,
+    created_date timestamp without time zone,
+    updated_date timestamp without time zone
+) distributed by (oge_contract_id);
+
+
+DROP TABLE IF EXISTS oge_contract_vendor_level;
+CREATE TABLE oge_contract_vendor_level (	
+	fms_contract_number character varying,	
+	agency_code character varying(4),
+	agency_id smallint,
+	agency_name character varying(100),
+	agency_history_id smallint,
+	vendor_id integer,
+	vendor_history_id integer,
+	vendor_name varchar(150),
+	original_amount numeric(16,2),
+	current_amount numeric(16,2)
+) distributed by (fms_contract_number);
+
+DROP TABLE IF EXISTS oge_contract_contract_level;
+CREATE TABLE oge_contract_contract_level (	
+	fms_contract_number character varying,	
+	agency_code character varying(4),
+	agency_id smallint,
+	agency_name character varying(100),
+	agency_history_id smallint,
+	original_amount numeric(16,2),
+	current_amount numeric(16,2)
+) distributed by (fms_contract_number);
 
 
 /*
@@ -459,8 +531,7 @@ CREATE TABLE history_master_agreement_edc
   created_load_id integer,
   updated_load_id integer,
   created_date timestamp without time zone,
-  updated_date timestamp without time zone,
-  CONSTRAINT history_master_agreement_pkey PRIMARY KEY (master_agreement_id)
+  updated_date timestamp without time zone
 )
 DISTRIBUTED BY (master_agreement_id);
 
@@ -791,3 +862,4 @@ CREATE TABLE pending_contracts_edc
   latest_flag character(1)
 )
 DISTRIBUTED BY (document_code_id);
+

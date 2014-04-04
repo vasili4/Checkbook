@@ -1,5 +1,6 @@
 -- Reference Tables
-TRUNCATE ref_address_type  CASCADE ;
+--TRUNCATE ref_address_type  CASCADE ;
+DELETE FROM ref_address_type ;
 --TRUNCATE ref_agency CASCADE ;
 --TRUNCATE ref_agency_history CASCADE ;
 DELETE FROM ref_agency WHERE agency_id < 9000;

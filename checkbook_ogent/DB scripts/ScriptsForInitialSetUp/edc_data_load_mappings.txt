@@ -176,9 +176,20 @@ select distinct department_history_id from history_agreement_accounting_line;
 select distinct department_history_id,agency_history_id from disbursement_line_item;
 
 select count(*) from history_agreement;
+select count(*) from history_master_agreement;
+select count(*) from agreement_snapshot;
+select count(*) from agreement_snapshot_cy;
+select count(*) from agreement_snapshot_expanded;
+select count(*) from agreement_snapshot_expanded_cy;
+select count(*) from aggregateon_contracts_cumulative_spending;
+select count(*) from disbursement;
+select count(*) from disbursement_line_item;
+select count(*) from disbursement_line_item_details;
+
+select count(*) from history_agreement;
  count
 -------
-   302
+   304
 (1 row)
 
 checkbook_oge=# select count(*) from history_master_agreement;
@@ -196,7 +207,7 @@ checkbook_oge=# select count(*) from agreement_snapshot;
 checkbook_oge=# select count(*) from agreement_snapshot_cy;
  count
 -------
-   130
+   131
 (1 row)
 
 checkbook_oge=# select count(*) from agreement_snapshot_expanded;
@@ -220,19 +231,19 @@ checkbook_oge=# select count(*) from aggregateon_contracts_cumulative_spending;
 checkbook_oge=# select count(*) from disbursement;
  count
 -------
-   247
+   264
 (1 row)
 
 checkbook_oge=# select count(*) from disbursement_line_item;
  count
 -------
-   334
+   355
 (1 row)
 
 checkbook_oge=# select count(*) from disbursement_line_item_details;
  count
 -------
-   334
+   355
 (1 row)
 
 

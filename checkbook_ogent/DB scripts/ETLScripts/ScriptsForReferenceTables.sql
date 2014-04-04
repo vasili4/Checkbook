@@ -299,6 +299,12 @@ UPDATE vendor_address a
 SET vendor_history_id = b.vendor_history_id
 FROM vendor_history b WHERE b.legal_name = 'N/A (PRIVACY/SECURITY)';
 
+
+ALTER SEQUENCE seq_address_address_id RESTART WITH 5;
+ALTER SEQUENCE seq_vendor_vendor_id RESTART WITH 5;	
+ALTER SEQUENCE seq_vendor_history_vendor_history_id RESTART WITH 5;	
+ALTER SEQUENCE seq_vendor_address_vendor_address_id RESTART WITH 5;	
+
 INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
 VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2009, 'Payroll Summary', now()::timestamp, 0);
 

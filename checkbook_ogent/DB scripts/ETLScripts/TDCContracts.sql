@@ -9,9 +9,9 @@ BEGIN
 	
 	TRUNCATE etl.tmp_all_vendors;
 	
-	INSERT INTO etl.tmp_all_vendors
+	INSERT INTO etl.tmp_all_vendors (uniq_id, vendor_history_id, vendor_id, is_new_vendor, is_vendor_address_changed, is_address_new, lgl_nm, ad_ln_1, st, zip, city)
 	SELECT MAX(uniq_id), COALESCE(MAX(b.vendor_history_id),0) as vendor_history_id, COALESCE(MAX(b.vendor_id),0) as vendor_id,
-				'N' as is_new_vendor,  'N' as is_vendor_address_changed, 'N' as  is_address_new, lgl_nm, ad_ln_1, st, zip, city		
+				'N' as is_new_vendor,  'N' as is_vendor_address_changed, 'N' as  is_address_new, contractor_name as lgl_nm, contractor_address as ad_ln_1, contractor_state as st, contractor_zip as zip, contractor_city as city		
 	FROM etl.stg_tdc_contract a LEFT JOIN 
 	(SELECT max(b.vendor_id) as vendor_id, max(c.vendor_history_id) as vendor_history_id, b.legal_name 
 	FROM vendor b, vendor_history c
@@ -204,7 +204,7 @@ BEGIN
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
 					INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
-					VALUES(p_load_file_id_in,'ED',l_count,'Number of records inserted into vendor_address');
+					VALUES(p_load_file_id_in,'TD',l_count,'Number of records inserted into vendor_address');
 	END IF;
 
 	RAISE NOTICE 'VENDOR 8';
@@ -225,14 +225,34 @@ BEGIN
 	tdc_registered_amount, vendor_name, agency_id, vendor_id, department_id, created_load_id, created_date)
 	SELECT agency_code, fms_contract_number, fms_commodity_line, tdc_contract_number, purpose, budget_name, 
 	tdc_registered_amount, contractor_name, agency_id, vendor_id, b.department_id, p_load_id_in, now()::timestamp
-	FROM etl.stg_tdc_contract a, (select department_id from ref_department where department_code = '111' and agency_id in (select agency_id from ref_agency where agency_code = 'z82')) b;
+	FROM etl.stg_tdc_contract a, 
+	(select a.department_id, max(department_history_id) as department_history_id from ref_department a JOIN ref_department_history b ON a.department_id = b.department_id
+	where a.department_code = '111' and a.agency_id in (select agency_id from ref_agency where agency_code = 'z82') GROUP BY 1) b,
+	(select a.agency_id, max(agency_history_id) as agency_history_id FROM ref_agency a JOIN ref_agency_history b ON a.agency_id = b.agency_id 
+	WHERE a.agency_code = 'z82' GROUP BY 1) c,
+	(select a.vendor_id, max(vendor_history_id) as vendor_history_id FROM vendor a JOIN vendor_history b ON a.vendor_id = b.vendor_id  GROUP BY 1) d
+	WHERE a.vendor_id = d.vendor_id ;
 	
-		
+	DELETE FROM  oge_contract_previous_load a
+	USING ref_agency b 
+	WHERE a.agency_id = b.agency_id AND b.agency_code = 'z82';
+	
+	INSERT INTO oge_contract_previous_load 
+	SELECT a.* FROM oge_contract a , ref_agency b
+	WHERE a.agency_id = b.agency_id AND b.agency_code = 'z82';
+	
+	
+	DELETE FROM oge_contract a
+	USING ref_agency b 
+	WHERE a.agency_id = b.agency_id AND b.agency_code = 'z82';
+	
 	INSERT INTO oge_contract(agency_code, fms_contract_number, fms_commodity_line, oge_contract_number, purpose, budget_name,
-	oge_registered_amount, vendor_name, agency_id, vendor_id, department_id, created_load_id, created_date)
-	SELECT agency_code, fms_contract_number, fms_commodity_line, min(tdc_contract_number), min(purpose), min(budget_name), 
-	sum(tdc_registered_amount), vendor_name, agency_id, vendor_id, department_id, p_load_id_in, now()::timestamp
-	FROM tdc_contract group by 1,2,3,8,9,10,11,12;
+	oge_registered_amount, vendor_name, agency_id, vendor_id, department_id, agency_history_id, 
+	vendor_history_id, department_history_id, created_load_id, created_date)
+	SELECT agency_code, fms_contract_number, fms_commodity_line, tdc_contract_number, purpose, budget_name, 
+	tdc_registered_amount, vendor_name, agency_id, vendor_id, department_id, agency_history_id, 
+	vendor_history_id, department_history_id, p_load_id_in, now()::timestamp
+	FROM tdc_contract ;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;	
 	
@@ -240,6 +260,57 @@ BEGIN
 			INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 			VALUES(p_load_file_id_in,'TD',l_count, '# of records inserted into tdc_contract');
 		END IF;
+	
+
+	
+		UPDATE oge_contract a 
+	SET original_amount = b.original_amount
+	FROM (
+	SELECT b.fms_contract_number, b.vendor_id, b.agency_id,a.oge_registered_amount as original_amount
+	FROM oge_contract a JOIN  
+	(SELECT fms_contract_number, a.agency_id, vendor_id, min(fms_commodity_line) as fms_commodity_line 
+	FROM oge_contract a JOIN ref_agency b ON a.agency_id = b.agency_id WHERE b.agency_code = 'z82' GROUP BY 1,2,3) b 
+	ON a.fms_contract_number = b.fms_contract_number AND a.fms_commodity_line = b.fms_commodity_line AND a.vendor_id = b.vendor_id) b
+	WHERE a.fms_contract_number = b.fms_contract_number  AND a.vendor_id = b.vendor_id  AND a.agency_id = b.agency_id;
+	
+	UPDATE oge_contract a 
+	SET current_amount = b.current_amount
+	FROM
+	(SELECT fms_contract_number, vendor_id, a.agency_id, sum(oge_registered_amount) as current_amount 
+	FROM oge_contract a JOIN ref_agency b ON a.agency_id = b.agency_id WHERE b.agency_code = 'z82' GROUP BY 1,2,3) b 	
+	WHERE a.fms_contract_number = b.fms_contract_number  AND a.vendor_id = b.vendor_id AND a.agency_id = b.agency_id;
+	
+	UPDATE oge_contract a 
+	SET current_amount_commodity_level = b.current_amount_commodity_level
+	FROM
+	(select a.vendor_id, a.fms_contract_number, a.fms_commodity_line, sum(b.oge_registered_amount) as current_amount_commodity_level
+	 FROM oge_contract a , oge_contract b, ref_agency c 
+     WHERE  a.fms_contract_number = b.fms_contract_number AND a.vendor_id = b.vendor_id AND a.fms_commodity_line >= b.fms_commodity_line AND a.agency_id = c.agency_id AND c.agency_code = 'z82'  GROUP BY 1,2,3) b 
+	 WHERE a.fms_contract_number = b.fms_contract_number  AND a.fms_commodity_line = b.fms_commodity_line ;
+	 
+	INSERT INTO oge_contract_history SELECT a.* FROM oge_contract a JOIN ref_agency b ON a.agency_id = b.agency_id WHERE b.agency_code = 'z82';
+		
+	DELETE FROM oge_contract_vendor_level a
+	USING ref_agency b 
+	WHERE a.agency_id = b.agency_id AND b.agency_code = 'z82';
+	
+	INSERT INTO oge_contract_vendor_level(agency_id, agency_code, agency_history_id, agency_name, vendor_id, vendor_history_id, vendor_name, fms_contract_number, current_amount, original_amount)
+	SELECT a.agency_id, a.agency_code, a.agency_history_id, b.agency_name, vendor_id, a.vendor_history_id, vendor_name, fms_contract_number, max(current_amount) as current_amount, max(original_amount) as original_amount
+	FROM oge_contract a JOIN ref_agency b ON a.agency_id = b.agency_id 
+	WHERE b.agency_code = 'z82'
+	GROUP BY 1,2,3,4,5,6,7,8;
+	
+	DELETE FROM oge_contract_contract_level a
+	USING ref_agency b 
+	WHERE a.agency_id = b.agency_id AND b.agency_code = 'z82';
+	
+	INSERT INTO oge_contract_contract_level(agency_id, agency_code, agency_history_id, agency_name, fms_contract_number, current_amount, original_amount)
+	SELECT a.agency_id, a.agency_code,  a.agency_history_id, b.agency_name, fms_contract_number, sum(current_amount) as current_amount, sum(original_amount) as original_amount
+	FROM oge_contract_vendor_level a 
+	JOIN ref_agency b ON a.agency_id = b.agency_id 
+	WHERE b.agency_code = 'z82'
+	GROUP BY 1,2,3,4,5;
+	
 	
 	l_end_time := timeofday()::timestamp;
 

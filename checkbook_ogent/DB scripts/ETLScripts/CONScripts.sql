@@ -2084,11 +2084,11 @@ WHERE status_flag = 'A'
 GROUP BY 1;
 
 
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_active(agreement_id bigint, original_agreement_id bigint,rfed_amount numeric(16,2),status_flag character(1),fiscal_year smallint,max_fiscal_year smallint) 
+CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_active(agreement_id bigint, original_agreement_id bigint,rfed_amount numeric(16,2), maximum_contract_amount numeric(16,2), status_flag character(1),fiscal_year smallint,max_fiscal_year smallint) 
 DISTRIBUTED BY (original_agreement_id);
 
 INSERT INTO tmp_ct_child_agreement_snapshot_expanded_active
-SELECT agreement_id , a.original_agreement_id, rfed_amount, status_flag, fiscal_year, b.max_fiscal_year
+SELECT agreement_id , a.original_agreement_id, rfed_amount, maximum_contract_amount, status_flag, fiscal_year, b.max_fiscal_year
 FROM tmp_ct_child_agreement_snapshot_expanded a LEFT JOIN tmp_ct_child_agreement_snapshot_expanded_maxyear b ON a.original_agreement_id = b.original_agreement_id ;
 
 
@@ -2104,19 +2104,19 @@ SELECT original_agreement_id, max(ending_year)
 FROM tmp_ct_child_agreement_snapshot
 GROUP BY 1;
 
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_active(master_agreement_id bigint, rfed_amount numeric(16,2),starting_year smallint, ending_year smallint, max_ending_year smallint) 
+CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_active(master_agreement_id bigint, rfed_amount numeric(16,2), maximum_contract_amount numeric(16,2), starting_year smallint, ending_year smallint, max_ending_year smallint) 
 DISTRIBUTED BY (master_agreement_id);
 
 INSERT INTO tmp_ct_child_agreement_snapshot_active
-SELECT master_agreement_id, rfed_amount,  starting_year, coalesce(ending_year,starting_year),  b.max_ending_year
+SELECT master_agreement_id, rfed_amount,  maximum_contract_amount, starting_year, coalesce(ending_year,starting_year),  b.max_ending_year
 FROM tmp_ct_child_agreement_snapshot a LEFT JOIN tmp_ct_child_agreement_snapshot_max_endingyear b ON a.original_agreement_id = b.original_agreement_id ;
 
 RAISE NOTICE 'PRE_CON_AGGR2';
 
-CREATE TEMPORARY TABLE tmp_ct_master_agreements_rfed(original_master_agreement_id bigint, status_flag char(1), fiscal_year smallint, rfed_amount numeric(16,2)) DISTRIBUTED BY(original_master_agreement_id);
+CREATE TEMPORARY TABLE tmp_ct_master_agreements_rfed(original_master_agreement_id bigint, status_flag char(1), fiscal_year smallint, rfed_amount numeric(16,2), maximum_contract_amount numeric(16,2)) DISTRIBUTED BY(original_master_agreement_id);
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount, sum(cagse.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_child_agreement_snapshot_expanded_active cagse, tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
 WHERE magse.status_flag = 'A' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
 AND ha.master_agreement_id = magse.original_agreement_id AND (cagse.fiscal_year = magse.fiscal_year OR ( magse.fiscal_year > cagse.fiscal_year AND cagse.fiscal_year = cagse.max_fiscal_year))
@@ -2126,7 +2126,7 @@ GROUP BY 1,2,3;
 RAISE NOTICE 'PRE_CON_AGGR2.1';
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount, sum(ha.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
 WHERE magse.status_flag = 'R' AND dc.document_code = 'MMA1' 
 AND ha.master_agreement_id = magse.original_agreement_id  AND ha.original_version_flag = 'Y'
@@ -2136,7 +2136,7 @@ GROUP BY 1,2,3;
 RAISE NOTICE 'PRE_CON_AGGR2.2';
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount, sum(ha.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_master_agreement_snapshot_expanded magse, tmp_ct_child_agreement_snapshot_active ha, ref_document_code dc
 WHERE magse.status_flag = 'A' AND dc.document_code = 'MA1' 
 AND ha.master_agreement_id = magse.original_agreement_id AND (magse.fiscal_year between ha.starting_year and ha.ending_year OR (magse.fiscal_year > ha.ending_year AND ha.ending_year = ha.max_ending_year))
@@ -2146,15 +2146,20 @@ GROUP BY 1,2,3;
 RAISE NOTICE 'PRE_CON_AGGR2.3';
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount, sum(ha.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
 WHERE magse.status_flag = 'R' AND dc.document_code = 'MA1' 
 AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
 AND magse.document_code_id = dc.document_code_id 
 GROUP BY 1,2,3;
 
+UPDATE agreement_snapshot_expanded_edc 
+SET maximum_contract_amount = NULL
+WHERE master_agreement_yn = 'Y';
+
 UPDATE agreement_snapshot_expanded_edc a
-SET rfed_amount = b.rfed_amount
+SET rfed_amount = b.rfed_amount,
+maximum_contract_amount = b.maximum_contract_amount
 FROM tmp_ct_master_agreements_rfed b
 WHERE a.original_agreement_id = b.original_master_agreement_id
 AND a.fiscal_year = b.fiscal_year
@@ -2166,18 +2171,40 @@ SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y';
 
-/*
+UPDATE agreement_snapshot_expanded_edc 
+SET maximum_contract_amount = 0
+WHERE maximum_contract_amount IS NULL 
+AND master_agreement_yn = 'Y';
+
+
+UPDATE agreement_snapshot 
+SET maximum_contract_amount = NULL
+WHERE master_agreement_yn = 'Y';
+
+
 UPDATE agreement_snapshot X
-SET rfed_amount = Y.rfed_amount
+SET maximum_contract_amount = Y.maximum_contract_amount
+FROM agreement_snapshot_expanded_edc Y
+WHERE X.original_agreement_id = Y.original_agreement_id AND Y.master_agreement_yn = 'Y' AND X.master_agreement_yn = 'Y'
+AND Y.fiscal_year between X.starting_year and X.ending_year AND Y.fiscal_year between X.effective_begin_year and X.effective_end_year
+AND status_flag = 'A';
+
+UPDATE agreement_snapshot X
+SET rfed_amount = Y.rfed_amount,
+maximum_contract_amount = Y.maximum_contract_amount
 FROM
-(select master_agreement_id, sum(rfed_amount) as rfed_amount from agreement_snapshot_edc where master_agreement_yn = 'N' and latest_flag = 'Y' group by 1) Y
+(select master_agreement_id, sum(rfed_amount) as rfed_amount, sum(maximum_contract_amount) as maximum_contract_amount from agreement_snapshot_edc where master_agreement_yn = 'N' and latest_flag = 'Y' group by 1) Y
 WHERE X.original_agreement_id = Y.master_agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
 
 UPDATE agreement_snapshot 
 SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y' AND latest_flag = 'Y' ;
-*/
+
+UPDATE agreement_snapshot 
+SET maximum_contract_amount = 0
+WHERE maximum_contract_amount IS NULL 
+AND master_agreement_yn = 'Y' ;
 
 RAISE NOTICE 'PRE_CON_AGGR3';
 
@@ -2280,11 +2307,11 @@ WHERE status_flag = 'A'
 GROUP BY 1;
 
 
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_active_cy(agreement_id bigint, original_agreement_id bigint,rfed_amount numeric(16,2),status_flag character(1),fiscal_year smallint,max_fiscal_year smallint) 
+CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_active_cy(agreement_id bigint, original_agreement_id bigint,rfed_amount numeric(16,2),maximum_contract_amount numeric(16,2),status_flag character(1),fiscal_year smallint,max_fiscal_year smallint) 
 DISTRIBUTED BY (original_agreement_id);
 
 INSERT INTO tmp_ct_child_agreement_snapshot_expanded_active_cy
-SELECT agreement_id , a.original_agreement_id, rfed_amount, status_flag, fiscal_year, b.max_fiscal_year
+SELECT agreement_id , a.original_agreement_id, rfed_amount, maximum_contract_amount, status_flag, fiscal_year, b.max_fiscal_year
 FROM tmp_ct_child_agreement_snapshot_expanded_cy a LEFT JOIN tmp_ct_child_agreement_snapshot_expanded_maxyear_cy b ON a.original_agreement_id = b.original_agreement_id ;
 
 
@@ -2300,11 +2327,11 @@ SELECT original_agreement_id, max(ending_year)
 FROM tmp_ct_child_agreement_snapshot_cy
 GROUP BY 1;
 
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_active_cy(master_agreement_id bigint, rfed_amount numeric(16,2),starting_year smallint, ending_year smallint, max_ending_year smallint) 
+CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_active_cy(master_agreement_id bigint, rfed_amount numeric(16,2), maximum_contract_amount numeric(16,2), starting_year smallint, ending_year smallint, max_ending_year smallint) 
 DISTRIBUTED BY (master_agreement_id);
 
 INSERT INTO tmp_ct_child_agreement_snapshot_active_cy
-SELECT master_agreement_id, rfed_amount,  starting_year, coalesce(ending_year,starting_year),  b.max_ending_year
+SELECT master_agreement_id, rfed_amount,  maximum_contract_amount, starting_year, coalesce(ending_year,starting_year),  b.max_ending_year
 FROM tmp_ct_child_agreement_snapshot_cy a LEFT JOIN tmp_ct_child_agreement_snapshot_max_endingyear_cy b ON a.original_agreement_id = b.original_agreement_id ;
 
 
@@ -2316,7 +2343,7 @@ FROM tmp_ct_child_agreement_snapshot_cy a LEFT JOIN tmp_ct_child_agreement_snaps
 TRUNCATE tmp_ct_master_agreements_rfed;
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount, sum(cagse.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_child_agreement_snapshot_expanded_active_cy cagse, tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
 WHERE magse.status_flag = 'A' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
 AND ha.master_agreement_id = magse.original_agreement_id AND (cagse.fiscal_year = magse.fiscal_year OR ( magse.fiscal_year > cagse.fiscal_year AND cagse.fiscal_year = cagse.max_fiscal_year))
@@ -2324,7 +2351,7 @@ AND cagse.status_flag = magse.status_flag AND magse.document_code_id = dc.docume
 GROUP BY 1,2,3;
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount, sum(ha.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
 WHERE magse.status_flag = 'R' AND dc.document_code = 'MMA1' 
 AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
@@ -2332,7 +2359,7 @@ AND magse.document_code_id = dc.document_code_id
 GROUP BY 1,2,3;
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount, sum(ha.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, tmp_ct_child_agreement_snapshot_active_cy ha, ref_document_code dc
 WHERE magse.status_flag = 'A' AND dc.document_code = 'MA1' 
 AND ha.master_agreement_id = magse.original_agreement_id AND (magse.fiscal_year between ha.starting_year and ha.ending_year OR (magse.fiscal_year > ha.ending_year AND ha.ending_year = ha.max_ending_year))
@@ -2340,15 +2367,20 @@ AND magse.document_code_id = dc.document_code_id
 GROUP BY 1,2,3;
 
 INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
+SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount, sum(ha.maximum_contract_amount) as maximum_contract_amount
 FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
 WHERE magse.status_flag = 'R' AND dc.document_code = 'MA1' 
 AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
 AND magse.document_code_id = dc.document_code_id 
 GROUP BY 1,2,3;
 
+UPDATE agreement_snapshot_expanded_cy_edc 
+SET maximum_contract_amount = NULL
+WHERE master_agreement_yn = 'Y';
+
 UPDATE agreement_snapshot_expanded_cy_edc a
-SET rfed_amount = b.rfed_amount
+SET rfed_amount = b.rfed_amount,
+maximum_contract_amount = b.maximum_contract_amount
 FROM tmp_ct_master_agreements_rfed b
 WHERE a.original_agreement_id = b.original_master_agreement_id
 AND a.fiscal_year = b.fiscal_year
@@ -2359,6 +2391,42 @@ UPDATE agreement_snapshot_expanded_cy_edc
 SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y';
+
+
+UPDATE agreement_snapshot_expanded_cy_edc 
+SET maximum_contract_amount = 0
+WHERE maximum_contract_amount IS NULL 
+AND master_agreement_yn = 'Y';
+
+
+UPDATE agreement_snapshot_cy 
+SET maximum_contract_amount = NULL
+WHERE master_agreement_yn = 'Y';
+
+
+UPDATE agreement_snapshot_cy X
+SET maximum_contract_amount = Y.maximum_contract_amount
+FROM agreement_snapshot_expanded_cy_edc Y
+WHERE X.original_agreement_id = Y.original_agreement_id AND Y.master_agreement_yn = 'Y' AND X.master_agreement_yn = 'Y'
+AND Y.fiscal_year between X.starting_year and X.ending_year AND Y.fiscal_year between X.effective_begin_year and X.effective_end_year
+AND status_flag = 'A';
+
+UPDATE agreement_snapshot_cy X
+SET rfed_amount = Y.rfed_amount,
+maximum_contract_amount = Y.maximum_contract_amount
+FROM
+(select master_agreement_id, sum(rfed_amount) as rfed_amount, sum(maximum_contract_amount) as maximum_contract_amount from agreement_snapshot_cy_edc where master_agreement_yn = 'N' and latest_flag = 'Y' group by 1) Y
+WHERE X.original_agreement_id = Y.master_agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
+
+UPDATE agreement_snapshot_cy
+SET rfed_amount = 0
+WHERE rfed_amount IS NULL 
+AND master_agreement_yn = 'Y' AND latest_flag = 'Y' ;
+
+UPDATE agreement_snapshot_cy
+SET maximum_contract_amount = 0
+WHERE maximum_contract_amount IS NULL 
+AND master_agreement_yn = 'Y' ;
 
 	RAISE NOTICE 'PRE_CON_AGGR5';
 	

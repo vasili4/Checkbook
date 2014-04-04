@@ -4271,8 +4271,8 @@ CREATE EXTERNAL TABLE ext_stg_oaisis_feed(
  
  CREATE TABLE tmp_stg_vendor(
  	vend_cust_cd varchar(20),	
- 	lgl_nm varchar(60), 
- 	alias_nm varchar(60), 
+ 	lgl_nm varchar(150), 
+ 	alias_nm varchar(150), 
  	ad_id varchar(25), 					     
  	org_cls varchar(25), 
  	misc_acct_fl integer, 
@@ -4301,8 +4301,8 @@ CREATE TABLE tmp_all_vendors(
 	is_vendor_address_changed char(1), 
 	is_address_new char(1), 
 	is_bus_type_changed char(1), 					
-	lgl_nm varchar(60), 
-	alias_nm varchar(60), 
+	lgl_nm varchar(150), 
+	alias_nm varchar(150), 
 	ad_ln_1 varchar(75),
 	ad_ln_2 varchar(75), 
 	ctry varchar(25),
@@ -4318,8 +4318,8 @@ CREATE TABLE tmp_all_vendors_uniq_id(
 
 CREATE TABLE tmp_vendor_update (
      	vendor_id integer,
-     	legal_name varchar(60), 
-		alias_name varchar(60)
+     	legal_name varchar(150), 
+		alias_name varchar(150)
 		)	DISTRIBUTED BY (vendor_id);	
 		
 	-- for contracts by indutry and size

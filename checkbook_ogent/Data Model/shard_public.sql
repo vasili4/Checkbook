@@ -1750,8 +1750,8 @@ CREATE TABLE aggregateon_contracts_cumulative_spending(
 	current_year_spending_amount numeric(16,2),
 	dollar_difference numeric(16,2),
 	percent_difference numeric(16,2),
-	mag_agency_id smallint,
-	mag_vendor_id int,
+	display_agency_id smallint,
+	display_vendor_id int,
 	status_flag char(1),
 	type_of_year char(1)	
 ) DISTRIBUTED BY (vendor_id);	
@@ -1775,10 +1775,38 @@ CREATE TABLE aggregateon_contracts_cumulative_spending_no_vendor(
 	current_year_spending_amount numeric(16,2),
 	dollar_difference numeric(16,2),
 	percent_difference numeric(16,2),
+	display_agency_id smallint,
 	status_flag char(1),
 	type_of_year char(1)	
 ) DISTRIBUTED BY (original_agreement_id);
 
+CREATE TABLE aggregateon_contracts_cumulative_spending_visualizations(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	master_agreement_yn character(1),
+	description varchar,
+	contract_number varchar,
+	vendor_id int,
+	award_method_id smallint,
+	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
+	original_contract_amount numeric(16,2),
+	maximum_contract_amount numeric(16,2),
+	spending_amount_disb numeric(16,2),
+	spending_amount numeric(16,2),
+	current_year_spending_amount numeric(16,2),
+	dollar_difference numeric(16,2),
+	percent_difference numeric(16,2),
+	display_agency_id smallint,
+	display_vendor_id int,
+	display_vendor_name character varying(150),
+	is_vendor_page char(1),
+	status_flag char(1),
+	type_of_year char(1)	
+) DISTRIBUTED BY (vendor_id);	
 
 CREATE TABLE aggregateon_contracts_spending_by_month(
 	original_agreement_id bigint,
@@ -1845,13 +1873,29 @@ CREATE TABLE aggregateon_total_contracts_no_vendor(
 
 CREATE TABLE aggregateon_contracts_department(
 	document_code_id smallint,
-	document_agency_id smallint,
 	agency_id smallint,
 	department_id integer,
 	fiscal_year smallint,
 	fiscal_year_id smallint,
 	award_method_id smallint,
 	vendor_id int,
+	industry_type_id smallint,
+    award_size_id smallint,
+	spending_amount_disb numeric(16,2),
+	spending_amount numeric(16,2),
+	total_contracts integer,
+	status_flag char(1),
+	type_of_year char(1)
+) DISTRIBUTED BY (department_id);	
+
+
+CREATE TABLE aggregateon_contracts_department_no_vendor(
+	document_code_id smallint,
+	agency_id smallint,
+	department_id integer,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	award_method_id smallint,
 	industry_type_id smallint,
     award_size_id smallint,
 	spending_amount_disb numeric(16,2),
@@ -1895,6 +1939,9 @@ CREATE TABLE contracts_spending_transactions(
 	disb_fiscal_year_id  smallint,
 	disb_check_eft_issued_cal_month_id integer,
 	disb_disbursement_number character varying(40),
+	disb_agreement_commodity_line_number integer,
+	oge_contract_number character varying(15),
+	oge_budget_name character varying(75),
 	status_flag char(1),
 	type_of_year char(1)
 )WITH (appendonly=true,orientation=column)
@@ -1913,6 +1960,109 @@ CREATE TABLE aggregateon_contracts_expense(
 	spending_amount numeric(16,2),
 	is_disbursements_exist char(1)
 ) DISTRIBUTED BY (original_agreement_id);	
+
+
+CREATE TABLE contracts_detailed_transactions(
+  original_agreement_id bigint,
+  contract_number character varying,
+  document_code_id smallint,
+  document_code character varying(8),
+  description character varying,
+  document_version smallint,
+  fiscal_year smallint,
+  fiscal_year_id smallint,
+  agency_id smallint,
+  agency_name character varying(100),  
+  vendor_id integer,  
+  vendor_name character varying,  
+  award_method_id smallint,
+  industry_type_id smallint,
+  award_size_id smallint,
+  agreement_type_name character varying,
+  award_method_name character varying,
+  expenditure_object_names character varying,
+  expenditure_object_codes character varying,
+  agreement_type_code character varying(2),
+  master_contract_number character varying,
+  effective_begin_date date,
+  effective_end_date date,
+  registered_date date,
+  brd_awd_no character varying,
+  tracking_number character varying,
+  industry_type_name character varying(50),
+  dollar_difference numeric(16,2),
+  percent_difference numeric(17,4),
+  starting_year_id smallint,
+  ending_year_id smallint,
+  registered_year_id smallint,
+  effective_begin_year_id smallint,
+  effective_end_year_id smallint,
+  fms_commodity_line integer,
+  oge_contract_number character varying(15),
+  budget_name character varying(75),
+  original_contract_amount numeric(16,2),
+  maximum_contract_amount numeric(16,2),  
+  spending_amount_disb numeric(16,2),
+  agreement_id bigint,
+  master_agreement_id bigint,
+  display_agency_id smallint,
+  display_vendor_id integer,
+  has_children character(1),
+  master_agreement_yn character(1),
+  status_flag character(1),
+  type_of_year character(1)
+) DISTRIBUTED BY (original_agreement_id);
+
+CREATE TABLE contracts_detailed_transactions_mag_vendor(
+  original_agreement_id bigint,
+  contract_number character varying,
+  document_code_id smallint,
+  document_code character varying(8),
+  description character varying,
+  document_version smallint,
+  fiscal_year smallint,
+  fiscal_year_id smallint,
+  agency_id smallint,
+  agency_name character varying(100),  
+  vendor_id integer,  
+  vendor_name character varying,  
+  award_method_id smallint,
+  industry_type_id smallint,
+  award_size_id smallint,
+  agreement_type_name character varying,
+  award_method_name character varying,
+  expenditure_object_names character varying,
+  expenditure_object_codes character varying,
+  agreement_type_code character varying(2),
+  master_contract_number character varying,
+  effective_begin_date date,
+  effective_end_date date,
+  registered_date date,
+  brd_awd_no character varying,
+  tracking_number character varying,
+  industry_type_name character varying(50),
+  dollar_difference numeric(16,2),
+  percent_difference numeric(17,4),
+  starting_year_id smallint,
+  ending_year_id smallint,
+  registered_year_id smallint,
+  effective_begin_year_id smallint,
+  effective_end_year_id smallint,
+  fms_commodity_line integer,
+  oge_contract_number character varying(15),
+  budget_name character varying(75),
+  original_contract_amount numeric(16,2),
+  maximum_contract_amount numeric(16,2),  
+  spending_amount_disb numeric(16,2),
+  agreement_id bigint,
+  master_agreement_id bigint,
+  display_agency_id smallint,
+  display_vendor_id integer,
+  has_children character(1),
+  master_agreement_yn character(1),
+  status_flag character(1),
+  type_of_year character(1)
+) DISTRIBUTED BY (original_agreement_id);
 
 -- End Contract Aggregate Tables
 
@@ -1971,6 +2121,8 @@ CREATE TABLE agreement_snapshot(
 	  brd_awd_no character varying,
 	  tracking_number character varying,
 	  rfed_amount numeric(16,2),
+	  oge_agency_id smallint,
+	  oge_agency_name character varying(100),
 	  master_agreement_yn character(1),
 	  has_children character(1),
 	  original_version_flag character(1),
@@ -2115,6 +2267,9 @@ CREATE TABLE edc_contract (
 	agency_id integer,
 	vendor_id integer,
 	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -2135,6 +2290,9 @@ CREATE TABLE tdc_contract (
 	agency_id integer,
 	vendor_id integer,
 	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
@@ -2151,15 +2309,36 @@ CREATE TABLE oge_contract (
 	purpose character varying(75),
 	budget_name character varying(75),
 	oge_registered_amount numeric(16,2),
+	original_amount numeric(16,2),
+	current_amount numeric(16,2),
+	current_amount_commodity_level numeric(16,2),
 	vendor_name character varying,
 	agency_id integer,
 	vendor_id integer,
 	department_id integer,
+	agency_history_id smallint,
+	vendor_history_id integer,
+	department_history_id integer,
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (oge_contract_id);
+
+
+DROP TABLE IF EXISTS oge_contract_vendor_level;
+CREATE TABLE oge_contract_vendor_level (	
+	fms_contract_number character varying,	
+	agency_code character varying(4),
+	agency_id smallint,
+	agency_name character varying(100),
+	agency_history_id smallint,
+	vendor_id integer,
+	vendor_history_id integer,
+	vendor_name varchar(150),
+	original_amount numeric(16,2),
+	current_amount numeric(16,2)
+) distributed by (fms_contract_number);
 
 
 
