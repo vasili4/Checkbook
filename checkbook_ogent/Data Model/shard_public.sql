@@ -2009,10 +2009,12 @@ CREATE TABLE contracts_detailed_transactions(
   display_vendor_id integer,
   has_children character(1),
   master_agreement_yn character(1),
+  is_vendor_flag char(1),
   status_flag character(1),
   type_of_year character(1)
 ) DISTRIBUTED BY (original_agreement_id);
 
+/*
 CREATE TABLE contracts_detailed_transactions_mag_vendor(
   original_agreement_id bigint,
   contract_number character varying,
@@ -2064,6 +2066,7 @@ CREATE TABLE contracts_detailed_transactions_mag_vendor(
   type_of_year character(1)
 ) DISTRIBUTED BY (original_agreement_id);
 
+*/
 -- End Contract Aggregate Tables
 
 

@@ -10,15 +10,17 @@ BEGIN
 	TRUNCATE etl.tmp_all_vendors;
 	
 	INSERT INTO etl.tmp_all_vendors (uniq_id, vendor_history_id, vendor_id, is_new_vendor, is_vendor_address_changed, is_address_new, lgl_nm, ad_ln_1, st, zip, city)
-	SELECT MAX(uniq_id), COALESCE(MAX(b.vendor_history_id),0) as vendor_history_id, COALESCE(MAX(b.vendor_id),0) as vendor_id,
-				'N' as is_new_vendor,  'N' as is_vendor_address_changed, 'N' as  is_address_new, contractor_name as lgl_nm, contractor_address as ad_ln_1, contractor_state as st, contractor_zip as zip, contractor_city as city		
-	FROM etl.stg_tdc_contract a LEFT JOIN 
+	SELECT uniq_id, vendor_history_id, vendor_id, is_new_vendor, is_vendor_address_changed, is_address_new, lgl_nm, ad_ln_1, st, zip, city
+	FROM (
+	SELECT MAX(uniq_id) as uniq_id, COALESCE(MAX(b.vendor_history_id),0) as vendor_history_id, COALESCE(MAX(b.vendor_id),0) as vendor_id,
+				'N' as is_new_vendor,  'N' as is_vendor_address_changed, 'N' as  is_address_new, lower(contractor_name) as lower_lgl_nm, UPPER(coalesce(contractor_address,'')) as ad_ln_1, UPPER(coalesce(contractor_state,'')) as st, coalesce(contractor_zip) as zip, UPPER(coalesce(contractor_city,'')) as city, min(contractor_name) as lgl_nm		
+	FROM etl.stg_edc_contract a LEFT JOIN 
 	(SELECT max(b.vendor_id) as vendor_id, max(c.vendor_history_id) as vendor_history_id, b.legal_name 
 	FROM vendor b, vendor_history c
 	WHERE b.vendor_id = c.vendor_id
 	GROUP BY 3) b
 	ON a.contractor_name = b.legal_name	
-	GROUP BY 4,5,6,7,8,9,10,11;
+	GROUP BY 4,5,6,7,8,9,10,11) X;
 
 
 	RAISE NOTICE 'VENDOR 01';
@@ -90,7 +92,7 @@ BEGIN
 
 	INSERT INTO etl.address_id_seq(uniq_id)
 	SELECT uniq_id
-	FROM (SELECT min(uniq_id) as uniq_id, ad_ln_1, st, zip, city
+	FROM (SELECT min(uniq_id) as uniq_id, coalesce(ad_ln_1,''), coalesce(st,''), coalesce(zip,''), coalesce(city,'')
 	FROM   etl.tmp_all_vendors
 	WHERE  is_address_new ='Y'
 	GROUP BY 2,3,4,5) a;
@@ -113,7 +115,7 @@ BEGIN
 	
 	INSERT INTO etl.vendor_id_seq(uniq_id)
 	SELECT uniq_id
-	FROM (SELECT lgl_nm, min(uniq_id) as uniq_id
+	FROM (SELECT UPPER(lgl_nm), min(uniq_id) as uniq_id
 	      FROM   etl.tmp_all_vendors
 		WHERE  is_new_vendor ='Y' 
 		GROUP BY 1) a;
@@ -142,14 +144,19 @@ BEGIN
 	INSERT INTO etl.vendor_history_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   etl.tmp_all_vendors
-	WHERE  is_new_vendor ='Y'  OR is_vendor_address_changed = 'Y' ;
+	WHERE   coalesce(ad_ln_1,'') = ''  AND (is_new_vendor ='Y'  OR is_vendor_address_changed = 'Y') ;
+
+	INSERT INTO etl.vendor_history_id_seq(uniq_id)
+	SELECT uniq_id
+	FROM   etl.tmp_all_vendors
+	WHERE   coalesce(ad_ln_1,'') != ''  AND (is_new_vendor ='Y'  OR is_vendor_address_changed = 'Y') ;
 
 
 	INSERT INTO vendor_history(vendor_history_id, vendor_id, legal_name,
 	    		load_id ,created_date)
 		SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,p_load_id_in as load_id, now()::timestamp
 		FROM	etl.tmp_all_vendors a JOIN etl.vendor_history_id_seq b ON a.uniq_id = b.uniq_id
-			JOIN vendor c ON a.lgl_nm = c.legal_name ;
+			JOIN vendor c ON UPPER(a.lgl_nm) = UPPER(c.legal_name) ;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
@@ -217,7 +224,7 @@ BEGIN
 	UPDATE etl.stg_tdc_contract a
 	SET vendor_id = b.vendor_id
 	FROM vendor b
-	WHERE a.contractor_name = b.legal_name;
+	WHERE UPPER(a.contractor_name) = UPPER(b.legal_name);
 	
 	TRUNCATE  tdc_contract;
 	
