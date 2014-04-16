@@ -135,7 +135,7 @@ BEGIN
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, master_agreement_yn, has_children, 
-            original_version_flag, latest_flag, load_id, last_modified_date, 
+            original_version_flag, latest_flag, oge_agency_id, oge_agency_name, load_id, last_modified_date, 
             job_id)
 	SELECT original_agreement_id, document_version, document_code_id, b.agency_history_id, 
             b.agency_id, b.agency_code, b.agency_name, a.agreement_id, starting_year, 
@@ -154,7 +154,7 @@ BEGIN
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, master_agreement_yn, has_children, 
-            original_version_flag, latest_flag, load_id, last_modified_date, 
+            original_version_flag, latest_flag, b.agency_id, b.agency_name,load_id, last_modified_date, 
             job_id
 	FROM agreement_snapshot_edc a JOIN oge_contract_vendor_level b ON a.contract_number = b.fms_contract_number
 	WHERE master_agreement_yn = 'N';
@@ -178,7 +178,7 @@ BEGIN
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, master_agreement_yn, has_children, 
-            original_version_flag, latest_flag, load_id, last_modified_date, 
+            original_version_flag, latest_flag, oge_agency_id, oge_agency_name, load_id, last_modified_date, 
             job_id)
 	SELECT original_agreement_id, document_version, document_code_id, b.agency_history_id, 
             b.agency_id, b.agency_code, b.agency_name, a.agreement_id, starting_year, 
@@ -197,7 +197,7 @@ BEGIN
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, master_agreement_yn, has_children, 
-            original_version_flag, latest_flag, load_id, last_modified_date, 
+            original_version_flag, latest_flag, b.agency_id, b.agency_name, load_id, last_modified_date, 
             job_id
 	FROM agreement_snapshot_cy_edc a JOIN oge_contract_vendor_level b ON a.contract_number = b.fms_contract_number
 	WHERE master_agreement_yn = 'N';
@@ -284,6 +284,14 @@ SET award_size_id = (CASE WHEN b.maximum_contract_amount IS NULL THEN 5 WHEN b.m
 		ELSE 5 END)
 FROM (select agreement_id, sum(maximum_contract_amount) as maximum_contract_amount FROM agreement_snapshot group by 1) b 
 WHERE a.agreement_id = b.agreement_id ;
+
+UPDATE agreement_snapshot a 
+SET latest_flag = 'N'
+WHERE latest_flag IS NULL AND master_agreement_yn = 'Y';
+
+UPDATE agreement_snapshot_cy a 
+SET latest_flag = 'N'
+WHERE latest_flag IS NULL AND master_agreement_yn = 'Y';
 
 /*
 

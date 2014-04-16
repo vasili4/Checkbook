@@ -2009,7 +2009,9 @@ CREATE TABLE contracts_detailed_transactions(
   display_vendor_id integer,
   has_children character(1),
   master_agreement_yn character(1),
-  is_vendor_flag char(1),
+  is_vendor_flag character(1),
+  if_for_all_years character(1),
+  latest_flag character(1),
   status_flag character(1),
   type_of_year character(1)
 ) DISTRIBUTED BY (original_agreement_id);
