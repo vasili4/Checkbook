@@ -1572,6 +1572,7 @@ ContractsByAppropriationUnitNoVendor,aggregateon_contracts_department_no_vendor,
   budget_name character varying(75),
   original_contract_amount numeric(16,2),
   maximum_contract_amount numeric(16,2),  
+  current_amount_for_transaction numeric(16,2), 
   spending_amount_disb numeric(16,2),
   agreement_id bigint,
   master_agreement_id bigint,
@@ -1624,7 +1625,8 @@ ContractsByAppropriationUnitNoVendor,aggregateon_contracts_department_no_vendor,
 		l2.budget_name,
 		l1.original_contract_amount,
 		l2.current_amount_commodity_level,
-		l3.spending_amount_disb,
+		l2.oge_registered_amount as current_amount_for_transaction,
+		l5.check_amount as spending_amount_disb,
 		l1.agreement_id,
 		l1.master_agreement_id,
 		l3.display_agency_id,
@@ -1640,6 +1642,7 @@ ContractsByAppropriationUnitNoVendor,aggregateon_contracts_department_no_vendor,
 		   LEFT OUTER JOIN oge_contract l2 ON l2.fms_contract_number = l1.contract_number AND l1.vendor_id = l2.vendor_id
 		   LEFT OUTER JOIN aggregateon_contracts_cumulative_spending l3 ON l3.original_agreement_id = l1.original_agreement_id AND l1.vendor_id = l3.vendor_id
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN (select * from mid_aggregateon_disbursement_spending_year_and_commodity where type_of_year = 'B') l5 ON l1.original_agreement_id = l5.original_agreement_id AND l2.fms_commodity_line = l5.agreement_commodity_line_number AND l3.fiscal_year = l5.fiscal_year
 	 WHERE  l4.document_code IN ('CT1', 'CTA1') and l3.type_of_year = 'B'
 UNION ALL
 	SELECT l1.original_agreement_id,
@@ -1681,6 +1684,7 @@ UNION ALL
             NULL as budget_name,
             l1.original_contract_amount,
             l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
 			l3.spending_amount_disb,
 			l1.agreement_id,
 			l1.master_agreement_id,
@@ -1739,7 +1743,8 @@ UNION ALL
 		l2.budget_name,
 		l1.original_contract_amount,
 		l2.current_amount_commodity_level,
-		l3.spending_amount_disb,
+		l2.oge_registered_amount as current_amount_for_transaction,
+		l5.check_amount as spending_amount_disb,
 		l1.agreement_id,
 		l1.master_agreement_id,
 		l3.display_agency_id,
@@ -1755,6 +1760,7 @@ UNION ALL
 		   LEFT OUTER JOIN oge_contract l2 ON l2.fms_contract_number = l1.contract_number AND l1.vendor_id = l2.vendor_id
 		   LEFT OUTER JOIN aggregateon_contracts_cumulative_spending l3 ON l3.original_agreement_id = l1.original_agreement_id AND l1.vendor_id = l3.vendor_id
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN (select * from mid_aggregateon_disbursement_spending_year_and_commodity where type_of_year = 'B') l5 ON l1.original_agreement_id = l5.original_agreement_id AND l2.fms_commodity_line = l5.agreement_commodity_line_number AND l3.fiscal_year = l5.fiscal_year
 	 WHERE  l4.document_code IN ('CT1', 'CTA1') and l3.type_of_year = 'B' 
 	 UNION ALL 
 	 SELECT l1.original_agreement_id,
@@ -1796,6 +1802,7 @@ UNION ALL
             NULL as budget_name,
             l1.original_contract_amount,
             l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
 			l3.spending_amount_disb,
 			l1.agreement_id,
 			l1.master_agreement_id,
@@ -1855,7 +1862,8 @@ UNION ALL
 		l2.budget_name,
 		l1.original_contract_amount,
 		l2.current_amount_commodity_level,
-		l3.spending_amount_disb,
+		l2.oge_registered_amount as current_amount_for_transaction,
+		l5.check_amount as spending_amount_disb,
 		l1.agreement_id,
 		l1.master_agreement_id,
 		l3.display_agency_id,
@@ -1871,6 +1879,7 @@ UNION ALL
 		   LEFT OUTER JOIN oge_contract l2 ON l2.fms_contract_number = l1.contract_number AND l1.vendor_id = l2.vendor_id
 		   LEFT OUTER JOIN (select original_agreement_id, agency_id, display_agency_id, type_of_year,  status_flag, vendor_id, display_vendor_id,  max(fiscal_year) as fiscal_year, max(fiscal_year_id) as fiscal_year_id, max(spending_amount_disb) as spending_amount_disb from aggregateon_contracts_cumulative_spending where type_of_year = 'B' group by 1,2,3,4,5,6,7) l3 ON l3.original_agreement_id = l1.original_agreement_id AND l1.vendor_id = l3.vendor_id
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN (select * from mid_aggregateon_disbursement_spending_year_and_commodity where type_of_year = 'B') l5 ON l1.original_agreement_id = l5.original_agreement_id AND l2.fms_commodity_line = l5.agreement_commodity_line_number AND l3.fiscal_year = l5.fiscal_year
 	 WHERE  l4.document_code IN ('CT1', 'CTA1') and l3.type_of_year = 'B'
 UNION ALL
 	SELECT l1.original_agreement_id,
@@ -1912,6 +1921,7 @@ UNION ALL
             NULL as budget_name,
             l1.original_contract_amount,
             l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
 			l3.spending_amount_disb,
 			l1.agreement_id,
 			l1.master_agreement_id,
@@ -1970,7 +1980,8 @@ UNION ALL
 		l2.budget_name,
 		l1.original_contract_amount,
 		l2.current_amount_commodity_level,
-		l3.spending_amount_disb,
+		l2.oge_registered_amount as current_amount_for_transaction,
+		l5.check_amount as spending_amount_disb,
 		l1.agreement_id,
 		l1.master_agreement_id,
 		l3.display_agency_id,
@@ -1986,6 +1997,7 @@ UNION ALL
 		   LEFT OUTER JOIN oge_contract l2 ON l2.fms_contract_number = l1.contract_number AND l1.vendor_id = l2.vendor_id
 		   LEFT OUTER JOIN (select original_agreement_id, agency_id, display_agency_id, type_of_year,  status_flag, vendor_id, display_vendor_id,  max(fiscal_year) as fiscal_year, max(fiscal_year_id) as fiscal_year_id, max(spending_amount_disb) as spending_amount_disb from aggregateon_contracts_cumulative_spending where type_of_year = 'B' group by 1,2,3,4,5,6,7) l3 ON l3.original_agreement_id = l1.original_agreement_id AND l1.vendor_id = l3.vendor_id
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN (select * from mid_aggregateon_disbursement_spending_year_and_commodity where type_of_year = 'B') l5 ON l1.original_agreement_id = l5.original_agreement_id AND l2.fms_commodity_line = l5.agreement_commodity_line_number AND l3.fiscal_year = l5.fiscal_year
 	 WHERE  l4.document_code IN ('CT1', 'CTA1') and l3.type_of_year = 'B' AND latest_flag = 'Y'
 	 UNION ALL 
 	 SELECT l1.original_agreement_id,
@@ -2027,6 +2039,7 @@ UNION ALL
             NULL as budget_name,
             l1.original_contract_amount,
             l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
 			l3.spending_amount_disb,
 			l1.agreement_id,
 			l1.master_agreement_id,
@@ -2084,7 +2097,8 @@ UNION ALL
 		l2.budget_name,
 		l1.original_contract_amount,
 		l2.current_amount_commodity_level,
-		l3.spending_amount_disb,
+		l2.oge_registered_amount as current_amount_for_transaction,
+		l5.check_amount as spending_amount_disb,
 		l1.agreement_id,
 		l1.master_agreement_id,		
 		l3.display_agency_id,
@@ -2100,6 +2114,7 @@ UNION ALL
 		   LEFT OUTER JOIN oge_contract l2 ON l2.fms_contract_number = l1.contract_number AND l1.vendor_id = l2.vendor_id
 		   LEFT OUTER JOIN aggregateon_contracts_cumulative_spending l3 ON l3.original_agreement_id = l1.original_agreement_id AND l1.vendor_id = l3.vendor_id
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN (select * from mid_aggregateon_disbursement_spending_year_and_commodity where type_of_year = 'C') l5 ON l1.original_agreement_id = l5.original_agreement_id AND l2.fms_commodity_line = l5.agreement_commodity_line_number AND l3.fiscal_year = l5.fiscal_year
 	 WHERE  l4.document_code IN ('CT1', 'CTA1') and l3.type_of_year = 'C'
 UNION ALL
 	SELECT l1.original_agreement_id,
@@ -2141,6 +2156,7 @@ UNION ALL
             NULL as budget_name,
             l1.original_contract_amount,
             l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
 			l3.spending_amount_disb,
 			l1.agreement_id,
 			l1.master_agreement_id,
@@ -2199,7 +2215,8 @@ UNION ALL
 		l2.budget_name,
 		l1.original_contract_amount,
 		l2.current_amount_commodity_level,
-		l3.spending_amount_disb,
+		l2.oge_registered_amount as current_amount_for_transaction,
+		l5.check_amount as spending_amount_disb,
 		l1.agreement_id,
 		l1.master_agreement_id,		
 		l3.display_agency_id,
@@ -2215,6 +2232,7 @@ UNION ALL
 		   LEFT OUTER JOIN oge_contract l2 ON l2.fms_contract_number = l1.contract_number AND l1.vendor_id = l2.vendor_id
 		   LEFT OUTER JOIN aggregateon_contracts_cumulative_spending l3 ON l3.original_agreement_id = l1.original_agreement_id AND l1.vendor_id = l3.vendor_id
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN (select * from mid_aggregateon_disbursement_spending_year_and_commodity where type_of_year = 'C') l5 ON l1.original_agreement_id = l5.original_agreement_id AND l2.fms_commodity_line = l5.agreement_commodity_line_number AND l3.fiscal_year = l5.fiscal_year
 	 WHERE  l4.document_code IN ('CT1', 'CTA1') and l3.type_of_year = 'C' 
 	 UNION ALL 
 	 SELECT l1.original_agreement_id,
@@ -2256,6 +2274,7 @@ UNION ALL
             NULL as budget_name,
             l1.original_contract_amount,
             l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
 			l3.spending_amount_disb,
 			l1.agreement_id,
 			l1.master_agreement_id,

@@ -60,9 +60,11 @@ BEGIN
 		department_id = edc_data.department_id ,
 		department_name = edc_data.department_name,
 		department_short_name = edc_data.department_short_name,
-		department_code = edc_data.department_code		
+		department_code = edc_data.department_code,
+		oge_contract_number = edc_data.oge_contract_number,
+		oge_budget_name = edc_data.oge_budget_name
 	FROM (select disb.disbursement_line_item_id, ag.agency_code, ag.agency_id, ag.agency_name, ag.agency_short_name, agh.agency_history_id, edc.vendor_id, edc.vendor_name, 
-	dep.department_id, dep.department_name, dep.department_short_name, dep.department_code FROM disbursement_line_item_details disb JOIN oge_contract edc ON disb.contract_number = edc.fms_contract_number AND disb.agreement_commodity_line_number = edc.fms_commodity_line  JOIN ref_agency ag ON edc.agency_id = ag.agency_id 
+	dep.department_id, dep.department_name, dep.department_short_name, dep.department_code, edc.oge_contract_number, edc.budget_name as oge_budget_name FROM disbursement_line_item_details disb JOIN oge_contract edc ON disb.contract_number = edc.fms_contract_number AND disb.agreement_commodity_line_number = edc.fms_commodity_line  JOIN ref_agency ag ON edc.agency_id = ag.agency_id 
 	JOIN (select agency_id, max(agency_history_id) agency_history_id from ref_agency_history group by 1) agh ON ag.agency_id = agh.agency_id
 	JOIN ref_department dep ON edc.department_id = dep.department_id) edc_data
 	WHERE disb.disbursement_line_item_id = edc_data.disbursement_line_item_id;

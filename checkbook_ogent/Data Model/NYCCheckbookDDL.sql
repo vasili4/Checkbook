@@ -1457,6 +1457,8 @@ CREATE TABLE disbursement_line_item_details(
 	reference_document_code varchar(8),
 	contract_document_code varchar(8),
 	master_contract_document_code varchar(8),
+	oge_contract_number character varying(15),
+	oge_budget_name character varying(75),
 	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone,
@@ -1991,6 +1993,16 @@ CREATE TABLE mid_aggregateon_disbursement_spending_year(
 	master_agreement_yn character(1))
 DISTRIBUTED BY (original_agreement_id) 	;
 
+CREATE TABLE mid_aggregateon_disbursement_spending_year_and_commodity(
+	original_agreement_id bigint,
+	agreement_commodity_line_number integer,
+	fiscal_year smallint,	
+	check_amount numeric(16,2),
+	type_of_year char(1))
+DISTRIBUTED BY (original_agreement_id);
+
+
+
 CREATE TABLE aggregateon_contracts_cumulative_spending(
 	original_agreement_id bigint,
 	fiscal_year smallint,
@@ -2255,7 +2267,8 @@ CREATE TABLE contracts_detailed_transactions(
   oge_contract_number character varying(15),
   budget_name character varying(75),
   original_contract_amount numeric(16,2),
-  maximum_contract_amount numeric(16,2),  
+  maximum_contract_amount numeric(16,2), 
+  current_amount_for_transaction numeric(16,2), 
   spending_amount_disb numeric(16,2),
   agreement_id bigint,
   master_agreement_id bigint,
