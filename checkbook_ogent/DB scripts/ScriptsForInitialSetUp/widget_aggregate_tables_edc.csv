@@ -1822,6 +1822,64 @@ UNION ALL
 		   LEFT OUTER JOIN vendor ve ON l3.vendor_id = ve.vendor_id
 	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'B' 
 	 UNION ALL 
+	 SELECT l1.original_agreement_id,
+			l1.contract_number,
+			l1.document_code_id,
+			l4.document_code,
+            l1.description,
+            l1.document_version,
+			l3.fiscal_year,
+			l3.fiscal_year_id,
+			l3.agency_id,
+			ag.agency_name,
+			l1.vendor_id,
+            l1.vendor_name,
+			l1.award_method_id,
+			l1.industry_type_id,
+			l1.award_size_id,
+			l1.agreement_type_name,               
+			l1.award_method_name,
+            l1.expenditure_object_names,
+			l1.expenditure_object_codes,
+			l1.agreement_type_code,
+			l1.master_contract_number,
+            l1.effective_begin_date,
+            l1.effective_end_date,
+            l1.registered_date,
+            l1.brd_awd_no,
+            l1.tracking_number,
+            l1.industry_type_name,
+            l1.dollar_difference,
+            l1.percent_difference,
+            l1.starting_year_id,
+            l1.ending_year_id,
+			l1.registered_year_id,
+            l1.effective_begin_year_id,
+            l1.effective_end_year_id,
+            NULL as fms_commodity_line,
+			NULL as oge_contract_number,
+            NULL as budget_name,
+            l1.original_contract_amount,
+            l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
+			l3.spending_amount_disb,
+			l1.agreement_id,
+			l1.master_agreement_id,
+			l3.display_agency_id,
+			l1.vendor_id as display_vendor_id,
+			l1.has_children,
+            l1.master_agreement_yn,
+			'Y' as is_vendor_flag,
+			'N' as if_for_all_years,
+			l1.latest_flag ,
+			l3.status_flag AS status_flag,
+            l3.type_of_year AS type_of_year
+	  FROM agreement_snapshot l1
+		   LEFT OUTER JOIN aggregateon_contracts_cumulative_spending_no_vendor l3 ON l3.original_agreement_id = l1.original_agreement_id 
+		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN ref_agency ag ON l3.agency_id = ag.agency_id
+	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'B'
+	 UNION ALL 
 	 SELECT  l1.original_agreement_id,
 		l1.contract_number,
 		l1.document_code_id,
@@ -1935,7 +1993,7 @@ UNION ALL
 			l3.status_flag AS status_flag,
             l3.type_of_year AS type_of_year
 	  FROM agreement_snapshot l1
-		   LEFT OUTER JOIN (select original_agreement_id, agency_id, display_agency_id, type_of_year,  status_flag,   max(fiscal_year) as fiscal_year, max(fiscal_year_id) as fiscal_year_id, max(spending_amount_disb) as spending_amount_disb from aggregateon_contracts_cumulative_spending where type_of_year = 'B' group by 1,2,3,4,5) l3 ON l3.original_agreement_id = l1.original_agreement_id 
+		   LEFT OUTER JOIN (select original_agreement_id, agency_id, display_agency_id, type_of_year,  status_flag,   max(fiscal_year) as fiscal_year, max(fiscal_year_id) as fiscal_year_id, max(spending_amount_disb) as spending_amount_disb from aggregateon_contracts_cumulative_spending_no_vendor where type_of_year = 'B' group by 1,2,3,4,5) l3 ON l3.original_agreement_id = l1.original_agreement_id 
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
 		   LEFT OUTER JOIN ref_agency ag ON l3.agency_id = ag.agency_id
 	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'B' AND latest_flag = 'Y'
@@ -2057,6 +2115,64 @@ UNION ALL
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
 		   LEFT OUTER JOIN ref_agency ag ON l3.agency_id = ag.agency_id
 		   LEFT OUTER JOIN vendor ve ON l3.vendor_id = ve.vendor_id
+	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'B' AND latest_flag = 'Y' 
+	 UNION ALL
+	 SELECT l1.original_agreement_id,
+			l1.contract_number,
+			l1.document_code_id,
+			l4.document_code,
+            l1.description,
+            l1.document_version,
+			l3.fiscal_year,
+			l3.fiscal_year_id,
+			l3.agency_id,
+			ag.agency_name,
+			l1.vendor_id,
+            l1.vendor_name,
+			l1.award_method_id,
+			l1.industry_type_id,
+			l1.award_size_id,
+			l1.agreement_type_name,               
+			l1.award_method_name,
+            l1.expenditure_object_names,
+			l1.expenditure_object_codes,
+			l1.agreement_type_code,
+			l1.master_contract_number,
+            l1.effective_begin_date,
+            l1.effective_end_date,
+            l1.registered_date,
+            l1.brd_awd_no,
+            l1.tracking_number,
+            l1.industry_type_name,
+            l1.dollar_difference,
+            l1.percent_difference,
+            l1.starting_year_id,
+            l1.ending_year_id,
+			l1.registered_year_id,
+            l1.effective_begin_year_id,
+            l1.effective_end_year_id,
+            NULL as fms_commodity_line,
+			NULL as oge_contract_number,
+            NULL as budget_name,
+            l1.original_contract_amount,
+            l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
+			l3.spending_amount_disb,
+			l1.agreement_id,
+			l1.master_agreement_id,
+			l3.display_agency_id,
+			l1.vendor_id as display_vendor_id,
+			l1.has_children,
+            l1.master_agreement_yn,
+			'Y' as is_vendor_flag,
+			'Y' as if_for_all_years,
+			l1.latest_flag ,
+			l3.status_flag AS status_flag,
+            l3.type_of_year AS type_of_year
+	  FROM agreement_snapshot l1
+		   LEFT OUTER JOIN (select original_agreement_id, agency_id, display_agency_id, type_of_year,  status_flag,   max(fiscal_year) as fiscal_year, max(fiscal_year_id) as fiscal_year_id, max(spending_amount_disb) as spending_amount_disb from aggregateon_contracts_cumulative_spending_no_vendor where type_of_year = 'B' group by 1,2,3,4,5) l3 ON l3.original_agreement_id = l1.original_agreement_id 
+		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN ref_agency ag ON l3.agency_id = ag.agency_id
 	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'B' AND latest_flag = 'Y' ","SELECT  l1.original_agreement_id,
 		l1.contract_number,
 		l1.document_code_id,
@@ -2292,4 +2408,62 @@ UNION ALL
 		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
 		   LEFT OUTER JOIN ref_agency ag ON l3.agency_id = ag.agency_id
 		   LEFT OUTER JOIN vendor ve ON l3.vendor_id = ve.vendor_id
-	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'C' ",26
+	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'C' 
+	 UNION ALL 
+	 SELECT l1.original_agreement_id,
+			l1.contract_number,
+			l1.document_code_id,
+			l4.document_code,
+            l1.description,
+            l1.document_version,
+			l3.fiscal_year,
+			l3.fiscal_year_id,
+			l3.agency_id,
+			ag.agency_name,
+			l1.vendor_id,
+            l1.vendor_name,
+			l1.award_method_id,
+			l1.industry_type_id,
+			l1.award_size_id,
+			l1.agreement_type_name,               
+			l1.award_method_name,
+            l1.expenditure_object_names,
+			l1.expenditure_object_codes,
+			l1.agreement_type_code,
+			l1.master_contract_number,
+            l1.effective_begin_date,
+            l1.effective_end_date,
+            l1.registered_date,
+            l1.brd_awd_no,
+            l1.tracking_number,
+            l1.industry_type_name,
+            l1.dollar_difference,
+            l1.percent_difference,
+            l1.starting_year_id,
+            l1.ending_year_id,
+			l1.registered_year_id,
+            l1.effective_begin_year_id,
+            l1.effective_end_year_id,
+            NULL as fms_commodity_line,
+			NULL as oge_contract_number,
+            NULL as budget_name,
+            l1.original_contract_amount,
+            l1.maximum_contract_amount,
+			l1.maximum_contract_amount as current_amount_for_transaction,
+			l3.spending_amount_disb,
+			l1.agreement_id,
+			l1.master_agreement_id,
+			l3.display_agency_id,
+			l1.vendor_id as display_vendor_id,
+			l1.has_children,
+            l1.master_agreement_yn,
+			'Y' as is_vendor_flag,
+			'N' as if_for_all_years,
+			l1.latest_flag ,
+			l3.status_flag AS status_flag,
+            l3.type_of_year AS type_of_year
+	  FROM agreement_snapshot_cy l1
+		   LEFT OUTER JOIN aggregateon_contracts_cumulative_spending_no_vendor l3 ON l3.original_agreement_id = l1.original_agreement_id 
+		   LEFT OUTER JOIN ref_document_code l4 ON l4.document_code_id = l1.document_code_id
+		   LEFT OUTER JOIN ref_agency ag ON l3.agency_id = ag.agency_id
+	 WHERE l4.document_code IN ('MA1', 'MMA1') AND l3.type_of_year = 'C'  ",26
