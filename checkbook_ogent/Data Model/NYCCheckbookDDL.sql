@@ -1993,8 +1993,19 @@ CREATE TABLE mid_aggregateon_disbursement_spending_year(
 	master_agreement_yn character(1))
 DISTRIBUTED BY (original_agreement_id) 	;
 
+CREATE TABLE mid_aggregateon_disbursement_spending_year_and_commodity_temp(
+	original_agreement_id bigint,
+	vendor_id int,
+	agreement_commodity_line_number integer,
+	fiscal_year smallint,	
+	check_amount numeric(16,2),
+	type_of_year char(1))
+DISTRIBUTED BY (original_agreement_id) ;
+
+
 CREATE TABLE mid_aggregateon_disbursement_spending_year_and_commodity(
 	original_agreement_id bigint,
+	vendor_id int,
 	agreement_commodity_line_number integer,
 	fiscal_year smallint,	
 	check_amount numeric(16,2),
