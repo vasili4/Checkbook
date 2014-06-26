@@ -3347,11 +3347,16 @@ CREATE EXTERNAL WEB TABLE edc_contract__0 (
 	agency_code character varying(4),
 	fms_contract_number character varying,
 	fms_commodity_line integer,
+	is_sandy_related character varying(3),
 	edc_contract_number character varying(15),
 	purpose character varying(75),
 	budget_name character varying(75),
 	edc_registered_amount numeric(16,2),
 	vendor_name character varying,
+	vendor_address character varying,
+	vendor_city character varying,
+	vendor_state character varying,
+	vendor_zip character varying,
 	agency_id integer,
 	vendor_id integer,
 	department_id integer,
@@ -3367,9 +3372,10 @@ CREATE EXTERNAL WEB TABLE edc_contract__0 (
 ENCODING 'UTF8';
 
  CREATE VIEW edc_contract AS
-    SELECT edc_contract__0.edc_contract_id, edc_contract__0.agency_code, edc_contract__0.fms_contract_number, edc_contract__0.fms_commodity_line,
+    SELECT edc_contract__0.edc_contract_id, edc_contract__0.agency_code, edc_contract__0.fms_contract_number, edc_contract__0.fms_commodity_line, edc_contract__0.is_sandy_related, 
 	edc_contract__0.edc_contract_number, edc_contract__0.purpose, edc_contract__0.budget_name, edc_contract__0.edc_registered_amount,
-	edc_contract__0.vendor_name, edc_contract__0.agency_id, edc_contract__0.vendor_id, edc_contract__0.department_id,
+	edc_contract__0.vendor_name, edc_contract__0.vendor_address, edc_contract__0.vendor_city, edc_contract__0.vendor_state, edc_contract__0.vendor_zip,
+	edc_contract__0.agency_id, edc_contract__0.vendor_id, edc_contract__0.department_id,
 	edc_contract__0.agency_history_id, edc_contract__0.vendor_history_id, edc_contract__0.department_history_id,
 	edc_contract__0.created_load_id, edc_contract__0.updated_load_id, edc_contract__0.created_date, edc_contract__0.updated_date
     FROM  edc_contract__0;
@@ -3380,11 +3386,16 @@ CREATE EXTERNAL WEB TABLE tdc_contract__0 (
 	agency_code character varying(4),
 	fms_contract_number character varying,
 	fms_commodity_line integer,
+	is_sandy_related character varying(3),
 	tdc_contract_number character varying(15),
 	purpose character varying(75),
 	budget_name character varying(75),
 	tdc_registered_amount numeric(16,2),
 	vendor_name character varying,
+	vendor_address character varying,
+	vendor_city character varying,
+	vendor_state character varying,
+	vendor_zip character varying,
 	agency_id integer,
 	vendor_id integer,
 	department_id integer,
@@ -3400,9 +3411,10 @@ CREATE EXTERNAL WEB TABLE tdc_contract__0 (
 ENCODING 'UTF8';
 
  CREATE VIEW tdc_contract AS
-    SELECT tdc_contract__0.tdc_contract_id, tdc_contract__0.agency_code, tdc_contract__0.fms_contract_number, tdc_contract__0.fms_commodity_line,
+    SELECT tdc_contract__0.tdc_contract_id, tdc_contract__0.agency_code, tdc_contract__0.fms_contract_number, tdc_contract__0.fms_commodity_line, tdc_contract__0.is_sandy_related,
 	tdc_contract__0.tdc_contract_number, tdc_contract__0.purpose, tdc_contract__0.budget_name, tdc_contract__0.tdc_registered_amount,
-	tdc_contract__0.vendor_name, tdc_contract__0.agency_id, tdc_contract__0.vendor_id, tdc_contract__0.department_id,
+	tdc_contract__0.vendor_name, tdc_contract__0.vendor_address, tdc_contract__0.vendor_city, tdc_contract__0.vendor_state, tdc_contract__0.vendor_zip,
+	tdc_contract__0.agency_id, tdc_contract__0.vendor_id, tdc_contract__0.department_id,
 	 tdc_contract__0.agency_history_id, tdc_contract__0.vendor_history_id, tdc_contract__0.department_history_id,
 	tdc_contract__0.created_load_id, tdc_contract__0.updated_load_id, tdc_contract__0.created_date, tdc_contract__0.updated_date
     FROM  tdc_contract__0;
@@ -3413,6 +3425,7 @@ CREATE EXTERNAL WEB TABLE oge_contract__0 (
 	agency_code character varying(4),
 	fms_contract_number character varying,
 	fms_commodity_line integer,
+	is_sandy_related character varying(3),
 	oge_contract_number character varying(15),
 	purpose character varying(75),
 	budget_name character varying(75),
@@ -3421,6 +3434,10 @@ CREATE EXTERNAL WEB TABLE oge_contract__0 (
 	current_amount numeric(16,2),
 	current_amount_commodity_level numeric(16,2),
 	vendor_name character varying,
+	vendor_address character varying,
+	vendor_city character varying,
+	vendor_state character varying,
+	vendor_zip character varying,
 	agency_id integer,
 	vendor_id integer,
 	department_id integer,
@@ -3437,9 +3454,11 @@ ENCODING 'UTF8';
 
 
  CREATE VIEW oge_contract AS
-    SELECT oge_contract__0.oge_contract_id, oge_contract__0.agency_code, oge_contract__0.fms_contract_number, oge_contract__0.fms_commodity_line,
+    SELECT oge_contract__0.oge_contract_id, oge_contract__0.agency_code, oge_contract__0.fms_contract_number, oge_contract__0.fms_commodity_line, oge_contract__0.is_sandy_related,
 	oge_contract__0.oge_contract_number, oge_contract__0.purpose, oge_contract__0.budget_name, oge_contract__0.oge_registered_amount,
-	oge_contract__0.original_amount, oge_contract__0.current_amount, oge_contract__0.current_amount_commodity_level, oge_contract__0.vendor_name, oge_contract__0.agency_id, oge_contract__0.vendor_id, oge_contract__0.department_id,	oge_contract__0.agency_history_id, oge_contract__0.vendor_history_id, oge_contract__0.department_history_id,
+	oge_contract__0.original_amount, oge_contract__0.current_amount, oge_contract__0.current_amount_commodity_level, oge_contract__0.vendor_name,
+    oge_contract__0.vendor_address, oge_contract__0.vendor_city, oge_contract__0.vendor_state, oge_contract__0.vendor_zip,	
+	oge_contract__0.agency_id, oge_contract__0.vendor_id, oge_contract__0.department_id,	oge_contract__0.agency_history_id, oge_contract__0.vendor_history_id, oge_contract__0.department_history_id,
 	oge_contract__0.created_load_id, oge_contract__0.updated_load_id, oge_contract__0.created_date, oge_contract__0.updated_date
     FROM  oge_contract__0;
 	

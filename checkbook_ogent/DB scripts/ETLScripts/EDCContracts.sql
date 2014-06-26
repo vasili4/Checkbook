@@ -9,6 +9,8 @@ BEGIN
 	
 	TRUNCATE etl.tmp_all_vendors;
 	
+	UPDATE etl.stg_edc_contract SET contractor_name = 'EDC To Provide' WHERE contractor_name IS NULL OR coalesce(contractor_name,'N/A') = 'N/A';
+	
 	INSERT INTO etl.tmp_all_vendors (uniq_id, vendor_history_id, vendor_id, is_new_vendor, is_vendor_address_changed, is_address_new, lgl_nm, ad_ln_1, st, zip, city)
 	SELECT uniq_id, vendor_history_id, vendor_id, is_new_vendor, is_vendor_address_changed, is_address_new, lgl_nm, ad_ln_1, st, zip, city
 	FROM (
@@ -19,7 +21,7 @@ BEGIN
 	FROM vendor b, vendor_history c
 	WHERE b.vendor_id = c.vendor_id
 	GROUP BY 3) b
-	ON a.contractor_name = b.legal_name	
+	ON UPPER(a.contractor_name) = UPPER(b.legal_name)	
 	GROUP BY 4,5,6,7,8,9,10,11) X;
 
 
@@ -156,7 +158,7 @@ BEGIN
 	    		load_id ,created_date)
 		SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,p_load_id_in as load_id, now()::timestamp
 		FROM	etl.tmp_all_vendors a JOIN etl.vendor_history_id_seq b ON a.uniq_id = b.uniq_id
-			JOIN vendor c ON UPPER(a.lgl_nm) = UPPER(c.legal_name) ;
+			JOIN (select max(vendor_id) as vendor_id, UPPER(legal_name) as legal_name from vendor group by 2) c ON UPPER(a.lgl_nm) = UPPER(c.legal_name) ;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
@@ -228,10 +230,11 @@ BEGIN
 	
 	TRUNCATE  edc_contract;
 	
-	INSERT INTO edc_contract(agency_code, fms_contract_number, fms_commodity_line, edc_contract_number, purpose, budget_name,
-	edc_registered_amount, vendor_name, agency_id, vendor_id, department_id, agency_history_id, vendor_history_id, department_history_id, created_load_id, created_date)
-	SELECT agency_code, fms_contract_number, fms_commodity_line, edc_contract_number, purpose, budget_name, 
-	edc_registered_amount, contractor_name, a.agency_id, a.vendor_id, b.department_id, c.agency_history_id, d.vendor_history_id, 
+	INSERT INTO edc_contract(agency_code, fms_contract_number, fms_commodity_line, is_sandy_related, edc_contract_number, purpose, budget_name,
+	edc_registered_amount, vendor_name, vendor_address, vendor_city, vendor_state, vendor_zip, agency_id, vendor_id, 
+	department_id, agency_history_id, vendor_history_id, department_history_id, created_load_id, created_date)
+	SELECT agency_code, fms_contract_number, fms_commodity_line, is_sandy_related, edc_contract_number, purpose, budget_name, 
+	edc_registered_amount, contractor_name, contractor_address, contractor_city, contractor_state, contractor_zip, a.agency_id, a.vendor_id, b.department_id, c.agency_history_id, d.vendor_history_id, 
 	b.department_history_id, p_load_id_in, now()::timestamp
 	FROM etl.stg_edc_contract a , 
 	(select a.department_id, max(department_history_id) as department_history_id from ref_department a JOIN ref_department_history b ON a.department_id = b.department_id
@@ -257,11 +260,11 @@ BEGIN
 	USING ref_agency b 
 	WHERE a.agency_id = b.agency_id AND b.agency_code = 'z81';
 	
-	INSERT INTO oge_contract(agency_code, fms_contract_number, fms_commodity_line, oge_contract_number, purpose, budget_name,
-	oge_registered_amount, vendor_name, agency_id, vendor_id, department_id, agency_history_id, 
+	INSERT INTO oge_contract(agency_code, fms_contract_number, fms_commodity_line, is_sandy_related, oge_contract_number, purpose, budget_name,
+	oge_registered_amount, vendor_name, vendor_address, vendor_city, vendor_state, vendor_zip, agency_id, vendor_id, department_id, agency_history_id, 
 	vendor_history_id, department_history_id, created_load_id, created_date)
-	SELECT agency_code, fms_contract_number, fms_commodity_line, edc_contract_number, purpose, budget_name, 
-	edc_registered_amount, vendor_name, agency_id, vendor_id, department_id, agency_history_id, 
+	SELECT agency_code, fms_contract_number, fms_commodity_line, is_sandy_related, edc_contract_number, purpose, budget_name, 
+	edc_registered_amount, vendor_name, vendor_address, vendor_city, vendor_state, vendor_zip, agency_id, vendor_id, department_id, agency_history_id, 
 	vendor_history_id, department_history_id,p_load_id_in, now()::timestamp
 	FROM edc_contract;
 	

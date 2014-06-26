@@ -193,6 +193,13 @@ GROUP BY 1,2,3,4","SELECT vendor_id,expenditure_object_id,spending_category_id,
  calendar_fiscal_year_id AS year_id,  'C' as type_of_year,SUM(check_amount) as total_spending_amount
  FROM disbursement_line_item_details
 GROUP BY 1,2,3,4",4
+PopulateContractSpendingByYearAndCommodityTemp1,mid_aggregateon_disbursement_spending_year_and_commodity_temp1,"CREATE TABLE mid_aggregateon_disbursement_spending_year_and_commodity_temp1(
+	original_agreement_id bigint,
+	vendor_id int,
+	agreement_commodity_line_number integer,
+	fiscal_year smallint,	
+	check_amount numeric(16,2))
+DISTRIBUTED BY (original_agreement_id)","select  b.original_agreement_id, a.vendor_id, a.fms_commodity_line as agreement_commodity_line_number, year_value as fiscal_year, 0 as check_amount from oge_contract a , (select contract_number, original_agreement_id from history_agreement where original_version_flag = 'Y') b, (select * from ref_year where year_value >= 2010 and year_value <= 2014) c WHERE  a.fms_contract_number = b.contract_number ",,12
 PopulateContractSpendingByYearAndCommodityTemp,mid_aggregateon_disbursement_spending_year_and_commodity_temp,"CREATE TABLE mid_aggregateon_disbursement_spending_year_and_commodity_temp(
 	original_agreement_id bigint,
 	vendor_id int,
@@ -200,44 +207,56 @@ PopulateContractSpendingByYearAndCommodityTemp,mid_aggregateon_disbursement_spen
 	fiscal_year smallint,	
 	check_amount numeric(16,2),
 	type_of_year char(1))
-DISTRIBUTED BY (original_agreement_id)","SELECT a.agreement_id, a.vendor_id, a.agreement_commodity_line_number, a.fiscal_year, sum(b.check_amount), a.type_of_year
+DISTRIBUTED BY (original_agreement_id)","SELECT a.original_agreement_id, a.vendor_id, a.agreement_commodity_line_number, a.fiscal_year, sum(b.check_amount), a.type_of_year
 FROM
+( SELECT a.original_agreement_id, a.vendor_id, a.agreement_commodity_line_number as agreement_commodity_line_number, a.fiscal_year as fiscal_year, (CASE WHEN b.agreement_id IS NULL THEN  0 ELSE b.check_amount END) as check_amount, 'B' as type_of_year
+FROM mid_aggregateon_disbursement_spending_year_and_commodity_temp1 a
+LEFT JOIN
 (SELECT agreement_id,
  vendor_id,
   agreement_commodity_line_number,
  a.fiscal_year,
  SUM(check_amount) as check_amount,
  'B' as type_of_year
-FROM disbursement_line_item_details a JOIN ref_year b ON a.fiscal_year = b.year_value AND agreement_id IS NOT NULL 
-GROUP  BY 1,2,3,4,6) a ,
+FROM disbursement_line_item_details a WHERE agreement_id IS NOT NULL 
+GROUP  BY 1,2,3,4,6) b  ON a.original_agreement_id = b.agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.fiscal_year = b.fiscal_year) a ,
+( SELECT a.original_agreement_id, a.vendor_id, a.agreement_commodity_line_number as agreement_commodity_line_number, a.fiscal_year as fiscal_year, (CASE WHEN b.agreement_id IS NULL THEN  0 ELSE b.check_amount END) as check_amount, 'B' as type_of_year
+FROM mid_aggregateon_disbursement_spending_year_and_commodity_temp1 a
+LEFT JOIN
 (SELECT agreement_id,
-vendor_id,
+ vendor_id,
   agreement_commodity_line_number,
  a.fiscal_year,
  SUM(check_amount) as check_amount,
  'B' as type_of_year
-FROM disbursement_line_item_details a JOIN ref_year b ON a.fiscal_year = b.year_value AND agreement_id IS NOT NULL
-GROUP  BY 1,2,3,4,6) b
-WHERE a.agreement_id = b.agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.fiscal_year >= b.fiscal_year
-GROUP BY 1,2,3,4,6 ","SELECT a.agreement_id, a.vendor_id,  a.agreement_commodity_line_number, a.calendar_fiscal_year, sum(b.check_amount), a.type_of_year
+FROM disbursement_line_item_details a WHERE agreement_id IS NOT NULL 
+GROUP  BY 1,2,3,4,6) b  ON a.original_agreement_id = b.agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.fiscal_year = b.fiscal_year) b
+WHERE a.original_agreement_id = b.original_agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.fiscal_year >= b.fiscal_year
+GROUP BY 1,2,3,4,6 ","SELECT a.original_agreement_id, a.vendor_id,  a.agreement_commodity_line_number, a.calendar_fiscal_year, sum(b.check_amount), a.type_of_year
 FROM
+( SELECT a.original_agreement_id, a.vendor_id, a.agreement_commodity_line_number as agreement_commodity_line_number, a.fiscal_year as calendar_fiscal_year, (CASE WHEN b.agreement_id IS NULL THEN  0 ELSE b.check_amount END) as check_amount, 'C' as type_of_year
+FROM mid_aggregateon_disbursement_spending_year_and_commodity_temp1 a
+LEFT JOIN
 (SELECT agreement_id,
 vendor_id,
  agreement_commodity_line_number,
  a.calendar_fiscal_year,
  SUM(check_amount) as check_amount,
  'C' as type_of_year
-FROM disbursement_line_item_details a JOIN ref_year b ON a.calendar_fiscal_year = b.year_value AND agreement_id IS NOT NULL
-GROUP  BY 1,2,3,4,6) a,
+FROM disbursement_line_item_details a WHERE  agreement_id IS NOT NULL
+GROUP  BY 1,2,3,4,6) b  ON a.original_agreement_id = b.agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.fiscal_year = b.calendar_fiscal_year) a,
+(SELECT a.original_agreement_id, a.vendor_id, a.agreement_commodity_line_number as agreement_commodity_line_number, a.fiscal_year as calendar_fiscal_year, (CASE WHEN b.agreement_id IS NULL THEN  0 ELSE b.check_amount END) as check_amount, 'C' as type_of_year
+FROM mid_aggregateon_disbursement_spending_year_and_commodity_temp1 a
+LEFT JOIN
 (SELECT agreement_id,
 vendor_id,
  agreement_commodity_line_number,
  a.calendar_fiscal_year,
  SUM(check_amount) as check_amount,
  'C' as type_of_year
-FROM disbursement_line_item_details a JOIN ref_year b ON a.calendar_fiscal_year = b.year_value AND agreement_id IS NOT NULL
-GROUP  BY 1,2,3,4,6) b 
-WHERE a.agreement_id = b.agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.calendar_fiscal_year >= b.calendar_fiscal_year
+FROM disbursement_line_item_details a WHERE  agreement_id IS NOT NULL
+GROUP  BY 1,2,3,4,6) b  ON a.original_agreement_id = b.agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.fiscal_year = b.calendar_fiscal_year) b 
+WHERE a.original_agreement_id = b.original_agreement_id AND a.vendor_id = b.vendor_id AND a.agreement_commodity_line_number = b.agreement_commodity_line_number AND a.calendar_fiscal_year >= b.calendar_fiscal_year
 GROUP BY 1,2,3,4,6 ",13
 PopulateContractSpendingByYearAndCommodity,mid_aggregateon_disbursement_spending_year_and_commodity,"CREATE TABLE mid_aggregateon_disbursement_spending_year_and_commodity(
 	original_agreement_id bigint,
