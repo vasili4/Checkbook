@@ -1634,7 +1634,17 @@ BEGIN
 		AND starting_year > 2010
 		AND rank_value = 1
 		AND registered_fiscal_year <= 2010;
+
 		
+	-- Updating the starting_year to effective_begin_fiscal_year if starting_year > effective_begin_fiscal_year
+	
+		/*
+		 UPDATE 	tmp_agreement_snapshot
+		SET	starting_year = effective_begin_fiscal_year,
+		starting_year_id = effective_begin_fiscal_year_id
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
+		 */
+	
 	-- Updating the ending year to be ending year - 1 
 	-- Until this step ending year of a record is equivalent to the staring year of the sucessor. So -1 should be done to ensure no overlapping
 	
@@ -1777,6 +1787,16 @@ BEGIN
 		AND rank_value = 1
 		AND registered_fiscal_year <= 2010;
 
+		-- Updating the starting_year to effective_begin_fiscal_year if starting_year > effective_begin_fiscal_year
+	
+		/*
+		 UPDATE 	tmp_agreement_snapshot
+		SET	starting_year = effective_begin_fiscal_year,
+		starting_year_id = effective_begin_fiscal_year_id
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
+		 */
+		
+		
 	-- Updating the ending year to be ending year - 1 
 	-- Until this step ending year of a record is equivalent to the staring year of the sucessor. So -1 should be done to ensure no overlapping
 

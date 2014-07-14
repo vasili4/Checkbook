@@ -368,7 +368,10 @@ CREATE TABLE disbursement_line_item_details(
     last_modified_date timestamp without time zone,
     job_id bigint
 	)WITH(appendonly=true,orientation=column)
-DISTRIBUTED BY (disbursement_line_item_id);
+DISTRIBUTED BY (disbursement_line_item_id)
+PARTITION BY RANGE (fiscal_year) 
+(START (2010) END (2014) EVERY (1),
+DEFAULT PARTITION outlying_years);
 
 
 --
@@ -696,6 +699,7 @@ CREATE TABLE ref_agency (
     agency_short_name character varying(15),
     original_agency_name character varying(100),
     is_display char(1) ,
+    is_oge_agency char(1) ,
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
@@ -2061,27 +2065,27 @@ num_transactions bigint
  CREATE INDEX idx_original_master_agreement_id_history_master_agreement ON history_master_agreement(original_master_agreement_id);
  CREATE INDEX idx_latest_flag_history_master_agreement ON history_master_agreement(latest_flag);
  
- CREATE INDEX idx_agreement_id_disbursement_line_item_details ON disbursement_line_item_details(agreement_id);
+ CREATE INDEX idx_agreement_id_disb_line_item_dets ON disbursement_line_item_details(agreement_id);
  
  CREATE INDEX idx_agreement_id_disbursement_line_item ON disbursement_line_item(agreement_id);
  
  -- 10/12/2012
  
- CREATE INDEX idx_ma_agreement_id_disbursement_line_item_details ON disbursement_line_item_details(master_agreement_id);
+ CREATE INDEX idx_ma_agreement_id_disb_line_item_dets ON disbursement_line_item_details(master_agreement_id);
  
- CREATE INDEX idx_disb_agreement_id_contracts_spending_transactions ON contracts_spending_transactions(disb_agreement_id);
+ CREATE INDEX idx_disb_agreement_id_cont_spen_trans ON contracts_spending_transactions(disb_agreement_id);
  
  CREATE INDEX idx_orig_agr_id_aggregateon_contracts_cumulative_spending ON aggregateon_contracts_cumulative_spending(original_agreement_id);
  
  
  -- 11/01/2012
  
- CREATE INDEX idx_fiscal_year_id_contracts_spending_transactions ON contracts_spending_transactions(fiscal_year_id);
- CREATE INDEX idx_disb_fiscal_year_id_contracts_spending_transactions ON contracts_spending_transactions(disb_fiscal_year_id);
- CREATE INDEX idx_disb_cont_doc_code_contracts_spending_transactions ON contracts_spending_transactions(disb_contract_document_code);
- CREATE INDEX idx_document_agency_id_contracts_spending_transactions ON contracts_spending_transactions(document_agency_id);
- CREATE INDEX idx_disb_cal_month_id_contracts_spending_transactions ON contracts_spending_transactions(disb_check_eft_issued_cal_month_id);
- CREATE INDEX idx_document_code_id_contracts_spending_transactions ON contracts_spending_transactions(document_code_id);
+ CREATE INDEX idx_fiscal_year_id_cont_spen_trans ON contracts_spending_transactions(fiscal_year_id);
+ CREATE INDEX idx_disb_fiscal_year_id_cont_spen_trans ON contracts_spending_transactions(disb_fiscal_year_id);
+ CREATE INDEX idx_disb_cont_doc_code_cont_spen_trans ON contracts_spending_transactions(disb_contract_document_code);
+ CREATE INDEX idx_document_agency_id_cont_spen_trans ON contracts_spending_transactions(document_agency_id);
+ CREATE INDEX idx_disb_cal_month_id_cont_spen_trans ON contracts_spending_transactions(disb_check_eft_issued_cal_month_id);
+ CREATE INDEX idx_document_code_id_cont_spen_trans ON contracts_spending_transactions(document_code_id);
     
  
  -- 12/11/2012
@@ -2118,5 +2122,5 @@ num_transactions bigint
  
  -- 03/21/2013
  
- CREATE INDEX idx_agency_id_disbursement_line_item_details ON disbursement_line_item_details USING btree (agency_id);
- CREATE INDEX idx_check_eft_nyc_year_id_disbursement_line_item_details ON disbursement_line_item_details USING btree (check_eft_issued_nyc_year_id);
+ CREATE INDEX idx_agency_id_disb_line_item_dets ON disbursement_line_item_details USING btree (agency_id);
+ CREATE INDEX idx_nyc_year_id_disb_line_item_dets ON disbursement_line_item_details USING btree (check_eft_issued_nyc_year_id);

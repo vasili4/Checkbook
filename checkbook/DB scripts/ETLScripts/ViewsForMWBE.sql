@@ -679,7 +679,7 @@ vendor_address  va, address c
 WHERE v.vendor_id = x.vendor_id AND x.vendor_history_id = va.vendor_history_id AND va.address_id = c.address_id;
 */
 
-
+/*
 CREATE OR REPLACE VIEW vendor_address_mwbe as
 SELECT 
 a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as VendorName,a.miscellaneous_vendor_flag,
@@ -707,7 +707,19 @@ a.vendor_id as VendorID,a.vendor_customer_code as VendorCode,a.legal_name as Ven
                             on a1.vendor_history_id = a3.vendor_history_id
 			left join address f on f.address_id = a3.address_id ;
 			
-			
+	*/
+
+CREATE OR REPLACE VIEW vendor_address_mwbe AS 
+ SELECT a.vendor_id AS vendorid, a.vendor_customer_code AS vendorcode, a.legal_name AS vendorname, a.miscellaneous_vendor_flag, a.created_load_id AS loadid, f.address_line_1 AS streetaddrline1, f.address_line_2 AS streetaddrline2, f.city, f.state AS stateprov, f.zip AS postalcode, f.country
+   FROM vendor a
+   LEFT JOIN ( SELECT a.vendor_id, max(b.vendor_address_id) AS vendor_address_id
+           FROM vendor_history a
+      JOIN vendor_address b ON a.vendor_history_id = b.vendor_history_id
+     GROUP BY a.vendor_id) a1 ON a1.vendor_id = a.vendor_id
+   LEFT JOIN vendor_address e ON a1.vendor_address_id = e.vendor_address_id
+   LEFT JOIN address f ON f.address_id = e.address_id;
+   
+   
 -- payroll  disbursement mwbe
 
 CREATE OR REPLACE VIEW processed_payroll_disbursement_mwbe AS

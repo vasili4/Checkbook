@@ -1263,8 +1263,8 @@ BEGIN
 	
 	RAISE NOTICE 'FMS RF 1';
 	
-	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, load_id, deleted_date, job_id)
-	SELECT a.disbursement_line_item_id, c.load_id, now()::timestamp, p_job_id_in
+	INSERT INTO disbursement_line_item_deleted(disbursement_line_item_id, agency_id, load_id, deleted_date, job_id)
+	SELECT a.disbursement_line_item_id, a.agency_id, c.load_id, now()::timestamp, p_job_id_in
 	FROM disbursement_line_item_details a, disbursement b, etl.etl_data_load c
 	WHERE   a.disbursement_id = b.disbursement_id 
 	AND b.updated_load_id = c.load_id

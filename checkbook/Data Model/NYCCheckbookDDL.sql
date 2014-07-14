@@ -108,6 +108,7 @@ CREATE TABLE ref_agency (
     agency_short_name character varying(15),
     original_agency_name character varying(100),
     is_display char(1) default 'N',
+    is_oge_agency char(1) default 'N',
     created_date timestamp without time zone,
     updated_date timestamp,
     created_load_id integer,
@@ -552,7 +553,7 @@ CREATE TABLE address (
 
 CREATE TABLE vendor (
     vendor_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_vendor_id'::regclass) NOT NULL,
-    vendor_customer_code character varying(25),
+    vendor_customer_code character varying(20),
     legal_name character varying(60),
     alias_name character varying(60),
     miscellaneous_vendor_flag bit(1),
@@ -1077,6 +1078,7 @@ CREATE TABLE disbursement_line_item (
 
 CREATE TABLE disbursement_line_item_deleted (
   disbursement_line_item_id bigint NOT NULL,
+  agency_id smallint,
   load_id integer,
   deleted_date timestamp without time zone,
   job_id bigint

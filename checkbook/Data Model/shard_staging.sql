@@ -897,6 +897,7 @@ CREATE EXTERNAL WEB TABLE ref_agency__0 (
     agency_short_name character varying,
     original_agency_name character varying,
     is_display char(1),
+    is_oge_agency char(1),
     created_date timestamp without time zone,
     updated_date timestamp without time zone,
     created_load_id integer,
@@ -910,8 +911,8 @@ ENCODING 'UTF8';
 --
 
 CREATE VIEW ref_agency AS
-    SELECT ref_agency__0.agency_id, ref_agency__0.agency_code, ref_agency__0.agency_name, ref_agency__0.agency_short_name,ref_agency__0.original_agency_name,ref_agency__0.is_display, 
-    ref_agency__0.created_date, ref_agency__0.updated_date, ref_agency__0.created_load_id, ref_agency__0.updated_load_id FROM ONLY ref_agency__0;
+    SELECT ref_agency__0.agency_id, ref_agency__0.agency_code, ref_agency__0.agency_name, ref_agency__0.agency_short_name,ref_agency__0.original_agency_name,ref_agency__0.is_display,
+    ref_agency__0.is_oge_agency, ref_agency__0.created_date, ref_agency__0.updated_date, ref_agency__0.created_load_id, ref_agency__0.updated_load_id FROM ONLY ref_agency__0;
 
 --
 -- Name: ref_agency_history__0; Type: EXTERNAL TABLE; Schema: staging; Owner: gpadmin; Tablespace: 
