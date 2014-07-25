@@ -1247,12 +1247,14 @@ BEGIN
 				agency_name,department_name,vendor_name,department_code,expenditure_object_name,expenditure_object_code,budget_code_id,
 				budget_code,budget_name,fund_class_code,spending_category_id,
 				spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
+				minority_type_id, minority_type_name,
 				agency_short_name,department_short_name,load_id)
 	SELECT 	payroll_summary_id,pay_date_id,fiscal_year_id,calendar_month_id,
 		fund_class_id,coalesce(total_amt,0) as check_amount,agency_id,agency,b.expenditure_object_id,department_id,pay_date::date,
 		agency_name,department_name,department_name,uoa,b.expenditure_object_name,b.expenditure_object_code,budget_code_id,
 		bud_code,budget_code_name,'001',2 as spending_category_id,
 		'Payroll',calendar_fiscal_year_id,calendar_fiscal_year,a.fiscal_year,
+		11 as minority_type_id, 'Individuals & Others' as minority_type_name,
 		agency_short_name,department_short_name,p_load_id_in
 	FROM 	etl.stg_payroll_summary a JOIN (select * from ref_expenditure_object where expenditure_object_code = '!PS!') b ON  a.pms_fy = b.fiscal_year
 	WHERE  action_flag = 'I';

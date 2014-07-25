@@ -9,6 +9,7 @@ echo "--------------------CREATE TABLES STRUCTURES---------------------"
 
 psql -d $DB_NAME -f $SCRIPT_DIR/NYCCheckbookDDL.sql
 psql -d $DB_NAME -f $SCRIPT_DIR/NYCCheckbookETL_DDL.sql
+psql -d $DB_NAME -f $SCRIPT_DIR/NYCCheckbookDDL_EDC.sql
 
 echo "--------------------Reference tables-----------------------------"
 
@@ -35,5 +36,6 @@ psql -d $DB_NAME -f $SCRIPT_DIR/RevenueBudgetScripts.sql
 echo "--revenue budget scripts"
 psql -d $DB_NAME -f $SCRIPT_DIR/PendingContracts.sql  
 echo "--pendingscripts "
-psql -d $DB_NAME -f$SCRIPT_DIR/VendorScripts.sql 
+psql -d $DB_NAME -f $SCRIPT_DIR/VendorScripts.sql 
+psql -d $DB_NAME -f $SCRIPT_DIR/CreateOGETransactionsData.sql 
 

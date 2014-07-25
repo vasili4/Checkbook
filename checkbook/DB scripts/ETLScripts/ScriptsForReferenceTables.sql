@@ -8,6 +8,8 @@ COPY etl.ref_file_name_pattern FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/re
 
 COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/widget_aggregate_tables.csv' CSV HEADER QUOTE as '"';
 
+COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/CREATE_NEW_DATABASE/widget_aggregate_tables_mwbe.csv' CSV HEADER QUOTE as '"';
+
 ---------------------------------------------------------------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION etl.initializedate(p_start_date_in date, p_end_date_in date) RETURNS INT AS $$

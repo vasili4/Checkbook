@@ -1683,6 +1683,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
+					minority_type_id, minority_type_name,
 					master_agreement_yn,load_id,last_modified_date,job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
@@ -1706,6 +1707,7 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
+		m.minority_type_id, m.minority_type_name,
 		'N' as master_agreement_yn, coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
@@ -1726,10 +1728,29 @@ BEGIN
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
 		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
+		LEFT JOIN vendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
 		WHERE b.source_updated_date_id IS NOT NULL;
 
-		
-	RAISE NOTICE 'PCON6';				
+	
+	RAISE NOTICE 'PCON6';	
+	
+	UPDATE agreement_snapshot a
+	SET minority_type_id=11,
+		minority_type_name = 'Individuals & Others'
+	WHERE job_id = p_job_id_in AND agreement_type_code IN ('35','36','39','40','44','65','68','79','85') 
+	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
+	UPDATE agreement_snapshot a
+	SET minority_type_id=11,
+		minority_type_name = 'Individuals & Others'
+	WHERE job_id = p_job_id_in AND award_method_code IN ('07','08','09','17','18','44','45','55') 
+	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
+	UPDATE agreement_snapshot a
+	SET minority_type_id=7,
+		minority_type_name = 'Non-Minority'
+	WHERE job_id = p_job_id_in 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
 	/* End of one time changes */
 	
 	-- Populating the agreement_snapshot tables related to the calendar year			      
@@ -1834,6 +1855,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
+					minority_type_id, minority_type_name,
 					master_agreement_yn,load_id,last_modified_date, job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
@@ -1857,6 +1879,7 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
+		m.minority_type_id, m.minority_type_name,
 		'N' as master_agreement_yn,coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
@@ -1877,10 +1900,29 @@ BEGIN
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id		
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
 		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
+		LEFT JOIN vendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
 		WHERE b.source_updated_date_id IS NOT NULL;
 
 	RAISE NOTICE 'PCON9';
-			-- Associate Disbursement line item to the original version of the agreement
+	
+	UPDATE agreement_snapshot_cy a
+	SET minority_type_id=11,
+		minority_type_name = 'Individuals & Others'
+	WHERE job_id = p_job_id_in AND agreement_type_code IN ('35','36','39','40','44','65','68','79','85') 
+	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
+	UPDATE agreement_snapshot_cy a
+	SET minority_type_id=11,
+		minority_type_name = 'Individuals & Others'
+	WHERE job_id = p_job_id_in AND award_method_code IN ('07','08','09','17','18','44','45','55') 
+	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
+	UPDATE agreement_snapshot_cy a
+	SET minority_type_id=7,
+		minority_type_name = 'Non-Minority'
+	WHERE job_id = p_job_id_in 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
+	-- Associate Disbursement line item to the original version of the agreement
 	
 	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
 	DISTRIBUTED BY (disbursement_line_item_id);
@@ -2029,6 +2071,8 @@ SELECT  original_agreement_id ,
 	award_method_id,
 	document_code_id,
 	master_agreement_id,
+	minority_type_id, 
+	minority_type_name,
 	master_agreement_yn,
 	status_flag
 FROM	
@@ -2051,6 +2095,8 @@ FROM
 	award_method_id,
 	document_code_id,
 	master_agreement_id,
+	minority_type_id, 
+	minority_type_name,
 	master_agreement_yn,
 	'A' as status_flag
 FROM	agreement_snapshot ) expanded_tbl  WHERE fiscal_year between starting_year AND ending_year
@@ -2077,6 +2123,8 @@ SELECT original_agreement_id,
 	award_method_id,
 	document_code_id,
 	master_agreement_id,
+	minority_type_id, 
+	minority_type_name,
 	master_agreement_yn,
 	'R' as status_flag
 FROM	agreement_snapshot
@@ -2226,6 +2274,8 @@ SELECT  original_agreement_id ,
 	award_method_id,
 	document_code_id,
 	master_agreement_id,
+	minority_type_id, 
+	minority_type_name,
 	master_agreement_yn,
 	status_flag
 FROM	
@@ -2248,6 +2298,8 @@ FROM
 	award_method_id,
 	document_code_id,
 	master_agreement_id,
+	minority_type_id, 
+	minority_type_name,
 	master_agreement_yn,
 	'A' as status_flag
 FROM	agreement_snapshot_cy ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
@@ -2273,6 +2325,8 @@ SELECT original_agreement_id,
 	award_method_id,
 	document_code_id,
 	master_agreement_id,
+	minority_type_id, 
+	minority_type_name,
 	master_agreement_yn,
 	'R' as status_flag
 FROM	agreement_snapshot_cy

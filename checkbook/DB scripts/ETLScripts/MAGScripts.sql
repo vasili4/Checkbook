@@ -1047,7 +1047,8 @@ BEGIN
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
-					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,
+					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
+					 minority_type_id, minority_type_name, master_agreement_yn,
 					load_id,last_modified_date, job_id)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
@@ -1070,7 +1071,8 @@ BEGIN
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
 		b.registered_fiscal_year, registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
-		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 'Y' as master_agreement_yn, 
+		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id, 
+		m.minority_type_id, m.minority_type_name, 'Y' as master_agreement_yn, 
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_master_agreement_snapshot a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
@@ -1089,7 +1091,8 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
-		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id;
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
+		LEFT JOIN vendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id;
 
 		-- Populating the agreement_snapshot tables for Calendar Year (CY)
 	
@@ -1180,7 +1183,8 @@ BEGIN
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
-					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,master_agreement_yn,
+					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
+					minority_type_id, minority_type_name, master_agreement_yn,
 					load_id,last_modified_date, job_id)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id, b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
@@ -1203,7 +1207,8 @@ BEGIN
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
 		j.date_id as registered_date_id,b.board_approved_award_no,b.tracking_number,
 		b.registered_calendar_year, registered_calendar_year_id,b.latest_flag,a.original_version_flag,
-		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 'Y' as master_agreement_yn,
+		a.effective_begin_calendar_year,a.effective_begin_calendar_year_id,a.effective_end_calendar_year,a.effective_end_calendar_year_id, 
+		m.minority_type_id, m.minority_type_name, 'Y' as master_agreement_yn,
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_master_agreement_snapshot_cy a JOIN history_master_agreement b ON a.master_agreement_id = b.master_agreement_id 
 		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
@@ -1222,7 +1227,8 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
 		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
-		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id;
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
+		LEFT JOIN vendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id;
 	
 	-- Associate contracts/agreements to the original version of the master agreement
 	
