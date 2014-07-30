@@ -2406,6 +2406,8 @@ CREATE TABLE contracts_mwbe_spending_transactions(
 CREATE SEQUENCE seq_subvendor_vendor_id;
 CREATE SEQUENCE seq_subvendor_bus_type_vendor_bus_type_id;
 CREATE SEQUENCE seq_subvendor_history_vendor_history_id;
+CREATE SEQUENCE seq_sub_agreement_agreement_id;
+-- CREATE SEQUENCE seq_sub_disbursement_line_item_id;
 
 CREATE TABLE subcontract_vendor_business_type (
 	vendor_customer_code character varying(20),
@@ -2424,6 +2426,7 @@ DISTRIBUTED BY (vendor_customer_code);
 CREATE TABLE subcontract_business_type (
     contract_number varchar,
     subcontract_id character varying(20),
+    prime_vendor_customer_code character varying(20),
 	vendor_customer_code character varying(20),
 	business_type_id smallint,
 	status smallint,
@@ -2485,6 +2488,94 @@ CREATE TABLE subcontract_status (
     updated_date timestamp without time zone
 )
 DISTRIBUTED BY (contract_number);
+
+CREATE  TABLE subcontract_details
+(
+  agreement_id bigint NOT NULL DEFAULT nextval('seq_sub_agreement_agreement_id'::regclass),,
+  contract_number varchar,
+  sub_contract_id character varying(20),
+  agency_history_id smallint,
+  document_id character varying(20),
+  document_version integer,
+  vendor_history_id integer,
+  prime_vendor_history_id integer,
+  agreement_type_id smallint,  
+  aprv_sta smallint,
+  aprv_reas_id character varying(3),
+  aprv_reas_nm character varying(30),
+  description character varying(256),
+  is_mwbe_cert smallint,
+  industry_type_id smallint,
+  effective_begin_date_id integer,
+  effective_end_date_id integer,
+  registered_date_id integer,
+  source_updated_date_id integer,
+  maximum_contract_amount_original numeric(16,2),
+  maximum_contract_amount numeric(16,2) numeric(16,2),
+  original_contract_amount_original numeric(16,2),
+  original_contract_amount numeric(16,2),
+  rfed_amount_original numeric(16,2), 
+  rfed_amount numeric(16,2),
+  total_scntrc_pymt numeric(16,2),
+  is_scntrc_pymt_complete smallint,
+  scntrc_mode smallint,
+  scntrc_trkg_no character varying(30),
+  doc_ref character varying(75),
+  registered_fiscal_year smallint,
+  registered_fiscal_year_id smallint,
+  registered_calendar_year smallint,
+  registered_calendar_year_id smallint,
+  effective_end_fiscal_year smallint,
+  effective_end_fiscal_year_id smallint,
+  effective_end_calendar_year smallint,
+  effective_end_calendar_year_id smallint,
+  effective_begin_fiscal_year smallint,
+  effective_begin_fiscal_year_id smallint,
+  effective_begin_calendar_year smallint,
+  effective_begin_calendar_year_id smallint,
+  source_updated_fiscal_year smallint,
+  source_updated_fiscal_year_id smallint,
+  source_updated_calendar_year smallint,
+  source_updated_calendar_year_id smallint,
+  original_agreement_id bigint,
+  original_version_flag character(1),
+  latest_flag character(1),
+  privacy_flag character(1),
+  created_load_id integer,
+  updated_load_id integer,
+  created_date timestamp without time zone,
+  updated_date timestamp without time zone
+)
+DISTRIBUTED BY (agreement_id);
+
+CREATE TABLE subcontract_spendings (
+    disbursement_line_item_id bigint  PRIMARY KEY DEFAULT nextval('seq_disbursement_line_item_id'::regclass) NOT NULL,
+    document_code_id smallint,
+    agency_history_id smallint,
+    document_id character varying(20),
+    document_version integer,
+    payment_id character varying(10),
+    disbursement_number character varying(40),
+    check_eft_amount_original numeric(16,2),
+    check_eft_amount numeric(16,2),
+    check_eft_issued_date_id int,
+    check_eft_issued_nyc_year_id smallint,
+    payment_description character varying(256),
+    payment_proof character varying(256),
+    is_final_payment varchar(3),
+    doc_ref character varying(75),
+    contract_number varchar,
+  	sub_contract_id character varying(20),
+    agreement_id bigint,
+    vendor_history_id integer,
+    prime_vendor_history_id integer,    
+    created_load_id integer,
+    updated_load_id integer,
+    created_date timestamp without time zone,
+    updated_date timestamp without time zone
+) distributed by (disbursement_id);
+
+
 
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  

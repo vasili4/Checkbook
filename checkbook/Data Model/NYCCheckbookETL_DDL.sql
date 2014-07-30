@@ -4408,6 +4408,29 @@ CREATE  TABLE stg_scntrc_details
   lgl_nm character varying(60),
   lgl_nm_up character varying(60),
   doc_ref character varying(75),
+  doc_appl_last_dt date,
+  reg_dt date,
+  agency_history_id smallint,
+	effective_begin_date_id int,
+	effective_end_date_id int,
+	source_updated_date_id int,
+	registered_date_id int,
+  	registered_fiscal_year smallint,
+	registered_fiscal_year_id smallint, 
+	registered_calendar_year smallint,
+	registered_calendar_year_id smallint,
+	effective_begin_fiscal_year smallint,
+	effective_begin_fiscal_year_id smallint, 
+	effective_begin_calendar_year smallint,
+	effective_begin_calendar_year_id smallint,
+	effective_end_fiscal_year smallint,
+	effective_end_fiscal_year_id smallint, 
+	effective_end_calendar_year smallint,
+	effective_end_calendar_year_id smallint,
+	source_updated_calendar_year smallint,
+	source_updated_calendar_year_id smallint,
+	source_updated_fiscal_year_id smallint,
+	source_updated_fiscal_year smallint,
   uniq_id bigint DEFAULT nextval('etl.seq_stg_scntrc_details_uniq_id'::regclass),
   invalid_flag character(1),
   invalid_reason character varying
@@ -4567,6 +4590,11 @@ CREATE  TABLE stg_scntrc_pymt
   scntrc_prf_pymt_up character varying(256),
   scntrc_fnl_pymt_fl character varying(3),
   doc_ref character varying(75),
+  agreement_id bigint,
+  document_code_id smallint,
+  agency_history_id smallint,
+  check_eft_issued_date_id int,
+  check_eft_issued_nyc_year_id smallint,  
   uniq_id bigint DEFAULT nextval('etl.seq_stg_scntrc_pymt_uniq_id'::regclass),
   invalid_flag character(1),
   invalid_reason character varying
@@ -4618,7 +4646,10 @@ CREATE TABLE scntrc_vendor_history_id_seq(uniq_id bigint,vendor_history_id int D
 DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE scntrc_vendor_business_id_seq(uniq_id bigint,vendor_business_type_id int DEFAULT nextval('public.seq_subvendor_bus_type_vendor_bus_type_id'))
-DISTRIBUTED BY (uniq_id);		
+DISTRIBUTED BY (uniq_id);	
+
+CREATE TABLE sub_agreement_id_seq(uniq_id bigint, agreement_id bigint default nextval('public.seq_sub_agreement_agreement_id'))
+DISTRIBUTED BY (uniq_id);
 		
 -- Create Indexes
  -- payroll indexes on 12/08/2012
