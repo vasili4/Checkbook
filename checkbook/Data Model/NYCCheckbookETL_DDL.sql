@@ -4329,7 +4329,7 @@ CREATE TABLE tmp_vendor_update (
   industry_type_id smallint 
 );
 
--- Tables for Sub Contracts
+-- Start Changes for Sub Contracts
 
 create sequence   seq_stg_scntrc_details_uniq_id;
 create sequence   seq_stg_scntrc_status_uniq_id;
@@ -4410,7 +4410,9 @@ CREATE  TABLE stg_scntrc_details
   doc_ref character varying(75),
   doc_appl_last_dt date,
   reg_dt date,
+  document_code_id smallint,
   agency_history_id smallint,
+  vendor_history_id integer,
 	effective_begin_date_id int,
 	effective_end_date_id int,
 	source_updated_date_id int,
@@ -4593,6 +4595,7 @@ CREATE  TABLE stg_scntrc_pymt
   agreement_id bigint,
   document_code_id smallint,
   agency_history_id smallint,
+  vendor_history_id integer,
   check_eft_issued_date_id int,
   check_eft_issued_nyc_year_id smallint,  
   uniq_id bigint DEFAULT nextval('etl.seq_stg_scntrc_pymt_uniq_id'::regclass),
@@ -4638,7 +4641,7 @@ CREATE TABLE tmp_scntrc_vendor_update (
      	legal_name varchar(60)
 		)	DISTRIBUTED BY (vendor_id);	
 		
-		
+/*		
 CREATE TABLE scntrc_vendor_id_seq(uniq_id bigint,vendor_id int DEFAULT nextval('public.seq_subvendor_vendor_id'))
 DISTRIBUTED BY (uniq_id);
 
@@ -4650,7 +4653,32 @@ DISTRIBUTED BY (uniq_id);
 
 CREATE TABLE sub_agreement_id_seq(uniq_id bigint, agreement_id bigint default nextval('public.seq_sub_agreement_agreement_id'))
 DISTRIBUTED BY (uniq_id);
-		
+*/
+
+CREATE TABLE malformed_scntrc_details_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+
+CREATE TABLE malformed_scntrc_status_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_scntrc_bus_type_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+CREATE TABLE malformed_scntrc_pymt_data_feed(
+	record varchar,
+	load_file_id integer)
+DISTRIBUTED BY (load_file_id);
+
+-- End Changes for Sub Contracts
+
+
 -- Create Indexes
  -- payroll indexes on 12/08/2012
 CREATE INDEX idx_agency_id_stg_payroll ON etl.stg_payroll(agency_id);

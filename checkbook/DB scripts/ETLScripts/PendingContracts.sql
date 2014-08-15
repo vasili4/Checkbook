@@ -444,6 +444,33 @@ BEGIN
 	FROM etl.vendor_id_seq_pending b
 	WHERE a.vendor_customer_code = b.vendor_customer_code ;
 	
+	UPDATE pending_contracts c
+	SET minority_type_id = (case when a.business_type_id = 2 then 11 
+	   							 when a.business_type_id = 5 then 9
+           						 else a.minority_type_id end),
+	    minority_type_name = (case  when a.business_type_id = 2 then 'Individuals & Others' 
+	   								when a.business_type_id = 5 then 'Caucasian Woman'
+           							else b.minority_type_name end)
+	FROM (select vendor_customer_code , business_type_id, minority_type_id from fmsv_business_type 
+				where status =2 and (business_type_id=2 or minority_type_id is not null or (vendor_customer_code in 
+					(select distinct vendor_customer_code from fmsv_business_type 
+					  where  business_type_id = 5 and status = 2 
+					and vendor_customer_code not in (select distinct vendor_customer_code from fmsv_business_type where minority_type_id is not null and status = 2))
+					AND business_type_id=5))) a JOIN ref_minority_type b ON a.minority_type_id = b.minority_type_id
+	WHERE a.vendor_customer_code = c.vendor_customer_code;
+	
+	
+	UPDATE pending_contracts a
+	SET minority_type_id=11,
+		minority_type_name = 'Individuals & Others'
+	WHERE  (case when length(a.award_method_code)= 1 THEN lpad(a.award_method_code,2,'0') ELSE a.award_method_code END) IN ('07','08','09','17','18','44','45','55') 
+	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
+	UPDATE pending_contracts a
+	SET minority_type_id=7,
+		minority_type_name = 'Non-Minority'
+	WHERE ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+	
 	
 	
 	RETURN 1;

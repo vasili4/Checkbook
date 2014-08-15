@@ -1569,7 +1569,7 @@ BEGIN
 	b.agency_id as contract_agency_id_cy,
 	b.industry_type_id as contract_industry_type_id_cy,
 	b.minority_type_id as contract_minority_type_id_cy
-		FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
+		FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.agreement_id = b.original_agreement_id AND a.calendar_fiscal_year between b.starting_year and b.ending_year
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
 		JOIN ref_document_code e ON b.document_code_id = e.document_code_id;
 		
@@ -1615,7 +1615,7 @@ BEGIN
 	b.description as master_purpose_cy,
 	b.industry_type_id as master_contract_industry_type_id_cy,
 	b.minority_type_id as master_contract_minority_type_id_cy
-	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.fiscal_year between b.starting_year and b.ending_year
+	FROM tmp_agreement_con a JOIN agreement_snapshot_cy b ON a.master_agreement_id = b.original_agreement_id AND b.master_agreement_yn = 'Y' AND a.calendar_fiscal_year between b.starting_year and b.ending_year
 		JOIN disbursement_line_item c ON a.disbursement_line_item_id = c.disbursement_line_item_id
 		JOIN ref_document_code e ON b.document_code_id = e.document_code_id;
 		

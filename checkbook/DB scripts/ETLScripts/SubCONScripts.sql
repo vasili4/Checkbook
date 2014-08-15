@@ -25,6 +25,26 @@ BEGIN
 					      source_updated_fiscal_year_id smallint)
 	DISTRIBUTED BY (uniq_id);
 	
+	-- updating  doc_appl_last_dt and reg_dt based on prime contract original version
+	/*
+	UPDATE etl.stg_scntrc_details a
+	SET doc_appl_last_dt = c.date
+	FROM history_agreement b LEFT JOIN ref_date c ON b.source_updated_date_id = c.date_id
+	WHERE a.doc_cd || a.doc_dept_cd || a.doc_id = b.contract_number
+	AND b.original_version_flag = 'Y' ;
+	*/
+	
+	UPDATE etl.stg_scntrc_details a
+	SET doc_appl_last_dt =  now()::date ;
+	
+	
+	UPDATE etl.stg_scntrc_details a
+	SET reg_dt = c.date
+	FROM history_agreement b LEFT JOIN ref_date c ON b.registered_date_id = c.date_id
+	WHERE a.doc_cd || a.doc_dept_cd || a.doc_id = b.contract_number
+	AND b.original_version_flag = 'Y' ;
+	
+	
 	-- FK:Document_Code_id
 	
 	INSERT INTO tmp_sub_fk_values(uniq_id,document_code_id)
@@ -192,12 +212,13 @@ BEGIN
 	FROM etl.stg_scntrc_details;
 	
 	-- Identifying the versions of the agreements for update
-	CREATE TEMPORARY TABLE tmp_sub_old_ct_con(uniq_id bigint, agreement_id bigint);
+	CREATE TEMPORARY TABLE tmp_sub_old_ct_con(uniq_id bigint, agreement_id bigint) DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_sub_old_ct_con
 	SELECT  uniq_id,		
 		b.agreement_id
-	FROM etl.stg_scntrc_details a JOIN history_agreement b ON a.doc_id = b.document_id AND a.document_code_id = b.document_code_id AND a.scntrc_vers_no = b.document_version
+	FROM etl.stg_scntrc_details a JOIN subcontract_details b ON a.doc_id = b.document_id 
+	AND a.document_code_id = b.document_code_id AND a.scntrc_vers_no = b.document_version AND a.scntrc_id = b.sub_contract_id
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id
 		JOIN ref_agency_history d ON b.agency_history_id = d.agency_history_id and c.agency_id = d.agency_id;				
 	
@@ -211,9 +232,9 @@ BEGIN
 	
 	-- Identifying the versions of the agreements for update
 	
-	TRUNCATE etl.sub_agreement_id_seq ;
+	TRUNCATE etl.agreement_id_seq ;
 	
-	INSERT INTO etl.sub_agreement_id_seq
+	INSERT INTO etl.agreement_id_seq
 	SELECT uniq_id
 	FROM	tmp_sub_ct_con
 	WHERE	action_flag ='I' 
@@ -221,17 +242,17 @@ BEGIN
 
 	UPDATE tmp_sub_ct_con a
 	SET	agreement_id = b.agreement_id	
-	FROM	etl.sub_agreement_id_seq b
+	FROM	etl.agreement_id_seq b
 	WHERE	a.uniq_id = b.uniq_id;	
 
 	RAISE NOTICE '2';
 	
 	INSERT INTO subcontract_details(agreement_id,document_code_id,
 				agency_history_id,document_id,document_version,sub_contract_id,
-				scntrc_trkg_no,description,industry_type_id,is_mwbe_cert,
+				tracking_number,description,industry_type_id,is_mwbe_cert,
 				maximum_contract_amount_original,maximum_contract_amount,
 				effective_begin_date_id,effective_end_date_id,agreement_type_id,
-				source_updated_date_id,agreement_type_id,vendor_history_id,registered_date_id,created_load_id,created_date,
+				source_updated_date_id,vendor_history_id,prime_vendor_id,registered_date_id,created_load_id,created_date,
 				registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
 				registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
 				effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
@@ -240,10 +261,10 @@ BEGIN
 		   		source_updated_calendar_year_id,contract_number,rfed_amount_original, rfed_amount)
 	SELECT	d.agreement_id,a.document_code_id,
 		a.agency_history_id,a.doc_id,a.scntrc_vers_no,a.scntrc_id,
-		a.scntrc_trkg_no,a.scntrc_dscr,a.indus_cls,a.scntrc_mwbe_cert,
+		a.scntrc_trkg_no,a.scntrc_dscr,e.industry_type_id,a.scntrc_mwbe_cert,
 		a.scntrc_max_am, (CASE WHEN a.scntrc_max_am IS NULL THEN 0 ELSE a.scntrc_max_am END) as maximum_contract_amount,
 		a.effective_begin_date_id,a.effective_end_date_id,a.cntrc_typ,
-		a.source_updated_date_id,a.cntrc_typ,a.vendor_history_id,a.registered_date_id,p_load_id_in,now()::timestamp,
+		a.source_updated_date_id,a.vendor_history_id,f.vendor_id as prime_vendor_id,a.registered_date_id,p_load_id_in,now()::timestamp,
 		registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
 		registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
 		effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
@@ -252,7 +273,9 @@ BEGIN
 		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.tot_scntrc_pymt, (CASE WHEN a.tot_scntrc_pymt IS NULL THEN 0 ELSE a.tot_scntrc_pymt END) as rfed_amount
 	FROM	etl.stg_scntrc_details a 
 					 JOIN tmp_sub_ct_con d ON a.uniq_id = d.uniq_id
-	WHERE   action_flag='I';
+					 LEFT JOIN sub_industry_mappings e ON a.indus_cls = e.sub_industry_type_id
+					 LEFT JOIN (select vendor_customer_code, vendor_id from vendor where miscellaneous_vendor_flag = 0::bit) f ON a.vendor_cust_cd = f.vendor_customer_code
+	WHERE   action_flag='I' ;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			IF l_count > 0 THEN 
@@ -266,10 +289,10 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_sub_con_ct_update AS
 	SELECT d.agreement_id,a.document_code_id,
 			a.agency_history_id,a.doc_id,a.scntrc_vers_no,
-			a.scntrc_trkg_no,a.scntrc_dscr,a.indus_cls,a.scntrc_mwbe_cert,a.scntrc_max_am,
+			a.scntrc_trkg_no as tracking_number,a.scntrc_dscr,e.industry_type_id,a.scntrc_mwbe_cert,a.scntrc_max_am,
 			a.effective_begin_date_id,a.effective_end_date_id,a.cntrc_typ,
-			a.source_updated_date_id,a.cntrc_typ,a.vendor_history_id,
-			a.scntrc_max_am,a.registered_date_id,
+			a.source_updated_date_id,a.vendor_history_id,f.vendor_id as prime_vendor_id,
+			a.registered_date_id,
 			p_load_id_in as load_id,now()::timestamp as updated_date,
 			registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
 			registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
@@ -278,7 +301,9 @@ BEGIN
 			source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
 			source_updated_calendar_year_id,a.tot_scntrc_pymt			
 		FROM	etl.stg_scntrc_details a 
-						 JOIN tmp_sub_ct_con d ON a.uniq_id = d.uniq_id
+		JOIN tmp_sub_ct_con d ON a.uniq_id = d.uniq_id
+		LEFT JOIN sub_industry_mappings e ON a.indus_cls = e.sub_industry_type_id
+		LEFT JOIN (select vendor_customer_code, vendor_id from vendor where miscellaneous_vendor_flag = 0::bit) f ON a.vendor_cust_cd = f.vendor_customer_code
 	WHERE   action_flag='U'
 	DISTRIBUTED BY (agreement_id);				 
 
@@ -291,15 +316,18 @@ BEGIN
 		agency_history_id  = b.agency_history_id,
 		document_id  = b.doc_id,
 		document_version = b.scntrc_vers_no,
-		tracking_number = b.scntrc_trkg_no,
+		tracking_number = b.tracking_number,
 		description = b.scntrc_dscr,
+		industry_type_id = b.industry_type_id,
+		is_mwbe_cert = b.scntrc_mwbe_cert,
 		maximum_contract_amount_original = b.scntrc_max_am,
 		maximum_contract_amount = (CASE WHEN b.scntrc_max_am IS NULL THEN 0 ELSE b.scntrc_max_am END) ,
 		effective_begin_date_id = b.effective_begin_date_id,
 		effective_end_date_id = b.effective_end_date_id,
 		source_updated_date_id = b.source_updated_date_id,
-		agreement_type_id = a.cntrc_typ,
+		agreement_type_id = b.cntrc_typ,
 		vendor_history_id = b.vendor_history_id,
+		prime_vendor_id = b.prime_vendor_id,
 		registered_date_id = b.registered_date_id,
 		updated_load_id = b.load_id,		
 		updated_date = b.updated_date,
@@ -321,7 +349,7 @@ BEGIN
 		source_updated_calendar_year_id = b.source_updated_calendar_year_id,
 		rfed_amount_original = b.tot_scntrc_pymt,
 		rfed_amount = (CASE WHEN b.tot_scntrc_pymt IS NULL THEN 0 ELSE b.tot_scntrc_pymt END) 
-	FROM	tmp_con_ct_update b
+	FROM	tmp_sub_con_ct_update b
 	WHERE	a.agreement_id = b.agreement_id;
 
 	GET DIAGNOSTICS l_count = ROW_COUNT;
@@ -331,17 +359,35 @@ BEGIN
 		VALUES(p_load_file_id_in,'SC',l_count,'# of records updated in subcontract_details from General Contracts');
 	END IF;
 	
-		
+	
+	
 	RAISE NOTICE '5';
 	
-		IF l_status = 1 THEN 
-			l_status := etl.updateSubCONFlags(p_load_id_in);
+		IF l_fk_update = 1 THEN 
+			l_fk_update := etl.updateSubCONFlags(p_load_id_in);
 		ELSE 
 			RETURN 0;
 		END IF;	
 		
+		RAISE NOTICE '6';
 		
+	UPDATE subcontract_details a
+	SET  original_contract_amount = b.maximum_contract_amount,
+		original_contract_amount_original = b.maximum_contract_amount_original
+	FROM (select maximum_contract_amount, maximum_contract_amount_original, original_agreement_id FROM subcontract_details WHERE original_version_flag = 'Y') b
+	WHERE a.original_agreement_id = b.original_agreement_id;
+	
+	UPDATE subcontract_details a
+	SET  award_method_id = b.award_method_id,
+		award_category_id = b.award_category_id,
+		brd_awd_no = b.brd_awd_no,
+		number_solicitation = b.number_solicitation,
+		number_responses = b.number_responses
+	FROM (select contract_number, award_method_id, award_category_id_1 as award_category_id, brd_awd_no, number_solicitation, number_responses from history_agreement where latest_flag = 'Y') b
+	WHERE a.contract_number = b.contract_number;
 
+	RAISE NOTICE '7';
+	
 	RETURN 1;
 	
 EXCEPTION
@@ -476,9 +522,7 @@ DECLARE
 	l_end_time  timestamp;
 	l_load_id bigint;
 BEGIN
-	/* Common for all types 
-	Can be done once per etl
-	*/
+
 	
 	-- Get the contracts (key elements only without version) which have been created or updated
 	
@@ -506,7 +550,7 @@ BEGIN
 	INSERT INTO tmp_sub_loaded_agreements_1
 	SELECT a.document_id,a.document_code_id, a.sub_contract_id, c.agency_id, 
 	       max(a.document_version) as latest_version_no, min(a.document_version) as first_version_no
-	FROM subcontract_details a JOIN tmp_loaded_agreements b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+	FROM subcontract_details a JOIN tmp_sub_loaded_agreements b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
 	GROUP BY 1,2,3,4;	
 	
@@ -527,9 +571,9 @@ BEGIN
 		group_concat(CASE WHEN a.document_version <> b.latest_version_no THEN agreement_id ELSE 0 END) as non_latest_agreement_id,		
 		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN agreement_id ELSE 0 END) as non_first_agreement_id,
 		MAX(CASE WHEN a.document_version = b.latest_version_no THEN maximum_contract_amount END) as latest_current_amount
-	FROM   subcontract_details a JOIN tmp_sub_loaded_agreements_1 b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+	FROM   subcontract_details a JOIN tmp_sub_loaded_agreements_1 b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id AND a.sub_contract_id = b.sub_contract_id
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id	
-	GROUP BY 1,2,3;	
+	GROUP BY 1,2,3,4;	
 	
 	-- Updating the original flag for non first agreements 
 	
@@ -578,7 +622,7 @@ BEGIN
 	-- Populating the agreement_snapshot tables
 
 	
-	CREATE TEMPORARY TABLE tmp_agreement_snapshot(original_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
+	CREATE TEMPORARY TABLE tmp_sub_agreement_snapshot(original_agreement_id bigint,starting_year smallint,starting_year_id smallint,document_version smallint,
 						     ending_year smallint, ending_year_id smallint ,rank_value smallint,agreement_id bigint,
 						     effective_begin_fiscal_year smallint,effective_begin_fiscal_year_id smallint,effective_end_fiscal_year smallint,
 						     effective_end_fiscal_year_id smallint,registered_fiscal_year smallint,original_version_flag char(1))
@@ -634,7 +678,12 @@ BEGIN
 		AND registered_fiscal_year <= 2010;
 
 
-	
+		 UPDATE 	tmp_sub_agreement_snapshot
+		SET	starting_year = effective_begin_fiscal_year,
+		starting_year_id = effective_begin_fiscal_year_id
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
+		
+		
 	-- Updating the ending year to be ending year - 1 
 	-- Until this step ending year of a record is equivalent to the staring year of the sucessor. So -1 should be done to ensure no overlapping
 	
@@ -657,40 +706,40 @@ BEGIN
 	WHERE a.original_agreement_id = b.original_agreement_id;
 	
 	
-	DELETE FROM ONLY sub_agreement_snapshot a USING  sub_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
+	DELETE FROM ONLY sub_agreement_snapshot a USING  tmp_sub_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 	
 	INSERT INTO sub_agreement_snapshot(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
-				       agreement_id, ending_year,ending_year_id,contract_number,
+				       agreement_id, ending_year,ending_year_id,contract_number,sub_contract_id,
 				       original_contract_amount,maximum_contract_amount,description,
-					vendor_history_id,vendor_id,vendor_code,vendor_name,
+					vendor_history_id,vendor_id,vendor_code,vendor_name,prime_vendor_id,
 					dollar_difference,
 					percent_difference,
-					master_agreement_id, master_contract_number,agreement_type_id,
-					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,					
-					expenditure_object_names,industry_type_id, 
+					agreement_type_id,	agreement_type_code, agreement_type_name,
+					award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,
+					expenditure_object_codes,expenditure_object_names,industry_type_id, 
 					industry_type_name, award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
 					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
 					minority_type_id, minority_type_name,
-					master_agreement_yn,load_id,last_modified_date,job_id)
+					load_id,last_modified_date,job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year OR b.effective_end_fiscal_year IS NULL THEN a.starting_year
 	        		      ELSE b.effective_end_fiscal_year END),
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year OR b.effective_end_fiscal_year IS NULL THEN a.starting_year_id
-	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
+	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,b.sub_contract_id,
 	        b.original_contract_amount,b.maximum_contract_amount,b.description,
-		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),		
+		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, c.legal_name as vendor_name, b.prime_vendor_id, 		
 		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
 		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
-		b.master_agreement_id,d.contract_number,e.agreement_type_id,
-		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
-		g.expenditure_object_names, (CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id,  
-		(CASE WHEN e.agreement_type_code = '05' THEN 'Construction Services' ELSE l.industry_type_name END) as industry_type_name, (CASE WHEN b.maximum_contract_amount IS NULL THEN 5 WHEN b.maximum_contract_amount <= 5000 THEN 4 WHEN b.maximum_contract_amount > 5000 
+		e.agreement_type_id, e.agreement_type_code, e.agreement_type_name,
+		f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
+		g.expenditure_object_names, b.industry_type_id as industry_type_id,  
+		l.industry_type_name as industry_type_name, (CASE WHEN b.maximum_contract_amount IS NULL THEN 5 WHEN b.maximum_contract_amount <= 5000 THEN 4 WHEN b.maximum_contract_amount > 5000 
 		AND b.maximum_contract_amount <= 100000 THEN 3 		WHEN  b.maximum_contract_amount > 100000 AND b.maximum_contract_amount <= 1000000 THEN 2 WHEN b.maximum_contract_amount > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
@@ -698,61 +747,61 @@ BEGIN
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		m.minority_type_id, m.minority_type_name,
-		'N' as master_agreement_yn, coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
-	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
-		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
-		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id
+		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
+	FROM	tmp_sub_agreement_snapshot a JOIN subcontract_details b ON a.agreement_id = b.agreement_id 
+		LEFT JOIN subvendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN subvendor v ON c.vendor_id = v.vendor_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
 		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id
-		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
-		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN ref_award_category f ON b.award_category_id = f.award_category_id
 		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
-		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct y.expenditure_object_name) as expenditure_object_names, GROUP_CONCAT(distinct expenditure_object_code) as expenditure_object_codes
+		LEFT JOIN (SELECT x.agreement_id, GROUP_CONCAT(distinct y.expenditure_object_name) as expenditure_object_names, GROUP_CONCAT(distinct expenditure_object_code) as expenditure_object_codes
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
 			   JOIN ref_expenditure_object w ON y.expenditure_object_id = w.expenditure_object_id
-			   JOIN tmp_agreement_snapshot x ON x.agreement_id = z.agreement_id
+			   JOIN history_agreement ha ON z.agreement_id = ha.agreement_id
+			   JOIN subcontract_details sd ON ha.contract_number = sd.contract_number
+			   JOIN tmp_sub_agreement_snapshot x ON x.agreement_id = sd.agreement_id
+			   WHERE sd.latest_flag = 'Y'
 			   GROUP BY 1) g ON a.agreement_id = g.agreement_id
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
-		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
-		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
-		LEFT JOIN vendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
+		LEFT JOIN ref_industry_type l ON b.industry_type_id = l.industry_type_id
+		LEFT JOIN subvendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
 		WHERE b.source_updated_date_id IS NOT NULL;
 
 	
 	RAISE NOTICE 'PCON6';	
 	
-	UPDATE agreement_snapshot a
+	UPDATE sub_agreement_snapshot a
 	SET minority_type_id=11,
 		minority_type_name = 'Individuals & Others'
 	WHERE job_id = p_job_id_in AND agreement_type_code IN ('35','36','39','40','44','65','68','79','85') 
 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
 	
-	UPDATE agreement_snapshot a
+	UPDATE sub_agreement_snapshot a
 	SET minority_type_id=11,
 		minority_type_name = 'Individuals & Others'
 	WHERE job_id = p_job_id_in AND award_method_code IN ('07','08','09','17','18','44','45','55') 
 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
 	
-	UPDATE agreement_snapshot a
+	UPDATE sub_agreement_snapshot a
 	SET minority_type_id=7,
 		minority_type_name = 'Non-Minority'
 	WHERE job_id = p_job_id_in 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
+
 	
-	/* End of one time changes */
 	
 	-- Populating the agreement_snapshot tables related to the calendar year			      
 
 	-- Get the latest version for every year of modification
 
-	TRUNCATE tmp_agreement_snapshot;
+	TRUNCATE tmp_sub_agreement_snapshot;
 	
-	INSERT INTO tmp_agreement_snapshot 		
+	INSERT INTO tmp_sub_agreement_snapshot 		
 	SELECT  b.original_agreement_id, b.source_updated_calendar_year, b.source_updated_calendar_year_id,
 		max(b.document_version) as document_version,
-		max(b.master_agreement_id) as master_agreement_id,
 		lead(source_updated_calendar_year) over (partition by original_agreement_id ORDER BY source_updated_calendar_year),
 		lead(source_updated_calendar_year_id) over (partition by original_agreement_id ORDER BY source_updated_calendar_year),
 		rank() over (partition by original_agreement_id order by source_updated_calendar_year ASC) as rank_value,
@@ -763,33 +812,33 @@ BEGIN
 		max(effective_end_calendar_year_id) as effective_end_fiscal_year_id,
 		NULL as registered_fiscal_year,
 		'N' as original_version_flag
-	FROM	tmp_agreement_flag_changes a JOIN history_agreement b ON a.first_agreement_id = b.original_agreement_id
+	FROM	tmp_sub_agreement_flag_changes a JOIN subcontract_details b ON a.first_agreement_id = b.original_agreement_id
 	GROUP  BY 1,2,3;
 
 	-- Update the agreement id based on the version number and original agreeement if
 
-	UPDATE tmp_agreement_snapshot a
+	UPDATE tmp_sub_agreement_snapshot a
 	SET     agreement_id = b.agreement_id,
 		registered_fiscal_year = b.registered_calendar_year
-	FROM	history_agreement b
+	FROM	subcontract_details b
 	WHERE   a.original_agreement_id = b.original_agreement_id
 		AND a.document_version = b.document_version;
 
 	RAISE NOTICE 'PCON7';
 	
 	-- Updating the POP years from the latest version of the agreement
-	UPDATE tmp_agreement_snapshot a
+	UPDATE tmp_sub_agreement_snapshot a
 	SET	effective_begin_fiscal_year = b.effective_begin_calendar_year,
 		effective_begin_fiscal_year_id = b.effective_begin_calendar_year_id,
 		effective_end_fiscal_year = b.effective_end_calendar_year,
 		effective_end_fiscal_year_id = b.effective_end_calendar_year_id
-	FROM	history_agreement b
+	FROM	subcontract_details b
 	WHERE   a.original_agreement_id = b.original_agreement_id
 		AND b.latest_flag = 'Y';
 
 	-- Update the starting year to 2010 for the very first record of an agreement in the snapshot if starting year >2010 and pop start year prior to 2010
 
-	UPDATE 	tmp_agreement_snapshot
+	UPDATE 	tmp_sub_agreement_snapshot
 	SET	starting_year = 2010,
 		starting_year_id = year_id
 	FROM	ref_year 
@@ -800,45 +849,45 @@ BEGIN
 
 		-- Updating the starting_year to effective_begin_fiscal_year if starting_year > effective_begin_fiscal_year
 	
-		/*
-		 UPDATE 	tmp_agreement_snapshot
+		
+		 UPDATE 	tmp_sub_agreement_snapshot
 		SET	starting_year = effective_begin_fiscal_year,
 		starting_year_id = effective_begin_fiscal_year_id
 		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
-		 */
+		 
 		
 		
 	-- Updating the ending year to be ending year - 1 
 	-- Until this step ending year of a record is equivalent to the staring year of the sucessor. So -1 should be done to ensure no overlapping
 
-	UPDATE 	tmp_agreement_snapshot
+	UPDATE 	tmp_sub_agreement_snapshot
 	SET	ending_year = ending_year - 1,
 		ending_year_id  = year_id
 	FROM	ref_year 
 	WHERE	year_value = ending_year - 1
 		AND ending_year is not null;
 
-	UPDATE tmp_agreement_snapshot
+	UPDATE tmp_sub_agreement_snapshot
 	SET original_version_flag = 'Y'
 	WHERE rank_value = 1;
 	
 	RAISE NOTICE 'PCON8';
 	
-	INSERT INTO agreement_snapshot_cy_deleted(agreement_id, original_agreement_id, starting_year, master_agreement_yn, load_id, deleted_date, job_id)
-	SELECT distinct a.agreement_id, a.original_agreement_id, a.starting_year, a.master_agreement_yn, l_load_id, now()::timestamp, p_job_id_in
-	FROM agreement_snapshot_cy a , tmp_agreement_snapshot b
+	INSERT INTO sub_agreement_snapshot_cy_deleted(agreement_id, original_agreement_id, starting_year,  load_id, deleted_date, job_id)
+	SELECT distinct a.agreement_id, a.original_agreement_id, a.starting_year, l_load_id, now()::timestamp, p_job_id_in
+	FROM sub_agreement_snapshot_cy a , tmp_sub_agreement_snapshot b
 	WHERE a.original_agreement_id = b.original_agreement_id;
 	
-	DELETE FROM ONLY agreement_snapshot_cy a USING  tmp_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
+	DELETE FROM ONLY sub_agreement_snapshot_cy a USING  tmp_sub_agreement_snapshot b WHERE a.original_agreement_id = b.original_agreement_id;
 
-	INSERT INTO agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
-				       agreement_id, ending_year,ending_year_id,contract_number,
+	INSERT INTO sub_agreement_snapshot_cy(original_agreement_id, starting_year,starting_year_id,document_version,document_code_id,agency_history_id, agency_id,agency_code,agency_name,
+				       agreement_id, ending_year,ending_year_id,contract_number,sub_contract_id,
 				       original_contract_amount,maximum_contract_amount,description,
-					vendor_history_id,vendor_id,vendor_code,vendor_name,
+					vendor_history_id,vendor_id,vendor_code,vendor_name,prime_vendor_id,
 					dollar_difference,
 					percent_difference,
-					master_agreement_id, master_contract_number,agreement_type_id,
-					agreement_type_code, agreement_type_name,award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,
+					agreement_type_id,agreement_type_code, agreement_type_name,
+					award_category_id,award_category_code,award_category_name,award_method_id,award_method_code,award_method_name,expenditure_object_codes,
 					expenditure_object_names,industry_type_id, 
 					industry_type_name,award_size_id,effective_begin_date,effective_begin_date_id,
 					effective_end_date, effective_end_date_id,registered_date, 
@@ -846,23 +895,23 @@ BEGIN
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
 					minority_type_id, minority_type_name,
-					master_agreement_yn,load_id,last_modified_date, job_id)
+					load_id,last_modified_date, job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
 				      WHEN b.effective_end_calendar_year < a.starting_year  OR b.effective_end_calendar_year IS NULL THEN a.starting_year
 				      ELSE b.effective_end_calendar_year END),
 				(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
 				      WHEN b.effective_end_calendar_year < a.starting_year OR b.effective_end_calendar_year IS NULL THEN a.starting_year_id
-				      ELSE b.effective_end_calendar_year_id END),b.contract_number,
+				      ELSE b.effective_end_calendar_year_id END),b.contract_number,b.sub_contract_id,
 		b.original_contract_amount,b.maximum_contract_amount,b.description,
-		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, COALESCE(c.legal_name,c.alias_name),		
+		b.vendor_history_id,c.vendor_id, v.vendor_customer_code, c.legal_name as vendor_name,b.prime_vendor_id,		
 		coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0) as  dollar_difference,
 		(CASE WHEN coalesce(b.original_contract_amount,0) = 0 THEN 0 ELSE 
 		ROUND((( coalesce(b.maximum_contract_amount,0) - coalesce(b.original_contract_amount,0)) * 100 )::decimal / coalesce(b.original_contract_amount,0),2) END) as percent_difference,
-		b.master_agreement_id,d.contract_number,e.agreement_type_id,
-		e.agreement_type_code, e.agreement_type_name,f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
-		g.expenditure_object_names,	(CASE WHEN e.agreement_type_code = '05' THEN 1 ELSE k.industry_type_id END) as industry_type_id, 
-		(CASE WHEN e.agreement_type_code = '05' THEN 'Construction Services' ELSE l.industry_type_name END) as industry_type_name,(CASE WHEN b.maximum_contract_amount IS NULL THEN 5 WHEN b.maximum_contract_amount <= 5000 THEN 4 WHEN b.maximum_contract_amount > 5000 
+		e.agreement_type_id,e.agreement_type_code, e.agreement_type_name,
+		f.award_category_id, f.award_category_code, f.award_category_name,am.award_method_id,am.award_method_code,am.award_method_name,g.expenditure_object_codes,
+		g.expenditure_object_names,	b.industry_type_id as industry_type_id, 
+		industry_type_name as industry_type_name,(CASE WHEN b.maximum_contract_amount IS NULL THEN 5 WHEN b.maximum_contract_amount <= 5000 THEN 4 WHEN b.maximum_contract_amount > 5000 
 		AND b.maximum_contract_amount <= 100000 THEN 3 	WHEN  b.maximum_contract_amount > 100000 AND b.maximum_contract_amount <= 1000000 THEN 2 WHEN b.maximum_contract_amount > 1000000 THEN 1 
 		ELSE 5 END) as award_size_id,h.date as effective_begin_date, h.date_id as effective_begin_date_id,
 		i.date as effective_end_date, i.date_id as effective_end_date_id,j.date as registered_date, 
@@ -870,132 +919,122 @@ BEGIN
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
 		m.minority_type_id, m.minority_type_name,
-		'N' as master_agreement_yn,coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
-	FROM	tmp_agreement_snapshot a JOIN history_agreement b ON a.agreement_id = b.agreement_id 
-		LEFT JOIN vendor_history c ON b.vendor_history_id = c.vendor_history_id
-		LEFT JOIN vendor v ON c.vendor_id = v.vendor_id
+		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
+	FROM	tmp_sub_agreement_snapshot a JOIN subcontract_details b ON a.agreement_id = b.agreement_id 
+		LEFT JOIN subvendor_history c ON b.vendor_history_id = c.vendor_history_id
+		LEFT JOIN subvendor v ON c.vendor_id = v.vendor_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
-		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id
-		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id	
+		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id		
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
-		LEFT JOIN ref_award_category f ON b.award_category_id_1 = f.award_category_id
+		LEFT JOIN ref_award_category f ON b.award_category_id = f.award_category_id
 		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
-		LEFT JOIN (SELECT z.agreement_id, GROUP_CONCAT(distinct y.expenditure_object_name) as expenditure_object_names, GROUP_CONCAT(distinct expenditure_object_code) as expenditure_object_codes
+		LEFT JOIN (SELECT x.agreement_id, GROUP_CONCAT(distinct y.expenditure_object_name) as expenditure_object_names, GROUP_CONCAT(distinct expenditure_object_code) as expenditure_object_codes
 			   FROM history_agreement_accounting_line z JOIN ref_expenditure_object_history y ON z.expenditure_object_history_id = y.expenditure_object_history_id 
 			   JOIN ref_expenditure_object w ON y.expenditure_object_id = w.expenditure_object_id
-			   JOIN tmp_agreement_snapshot x ON x.agreement_id = z.agreement_id
+			   JOIN history_agreement ha ON z.agreement_id = ha.agreement_id
+			   JOIN subcontract_details sd ON ha.contract_number = sd.contract_number
+			   JOIN tmp_sub_agreement_snapshot x ON x.agreement_id = sd.agreement_id
+			   WHERE sd.latest_flag = 'Y'
 			   GROUP BY 1) g ON a.agreement_id = g.agreement_id
 		LEFT JOIN ref_date h ON h.date_id = b.effective_begin_date_id
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id		
-		LEFT JOIN ref_award_category_industry k ON k.award_category_code = f.award_category_code 
-		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id
-		LEFT JOIN vendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
+		LEFT JOIN ref_industry_type l ON b.industry_type_id = l.industry_type_id
+		LEFT JOIN subvendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
 		WHERE b.source_updated_date_id IS NOT NULL;
 
 	RAISE NOTICE 'PCON9';
 	
-	UPDATE agreement_snapshot_cy a
+	UPDATE sub_agreement_snapshot_cy a
 	SET minority_type_id=11,
 		minority_type_name = 'Individuals & Others'
 	WHERE job_id = p_job_id_in AND agreement_type_code IN ('35','36','39','40','44','65','68','79','85') 
 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
 	
-	UPDATE agreement_snapshot_cy a
+	UPDATE sub_agreement_snapshot_cy a
 	SET minority_type_id=11,
 		minority_type_name = 'Individuals & Others'
 	WHERE job_id = p_job_id_in AND award_method_code IN ('07','08','09','17','18','44','45','55') 
 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
 	
-	UPDATE agreement_snapshot_cy a
+	UPDATE sub_agreement_snapshot_cy a
 	SET minority_type_id=7,
 		minority_type_name = 'Non-Minority'
 	WHERE job_id = p_job_id_in 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
 	
 	-- Associate Disbursement line item to the original version of the agreement
 	
-	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
+	CREATE TEMPORARY TABLE tmp_sub_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))
 	DISTRIBUTED BY (disbursement_line_item_id);
 		
-	CREATE TEMPORARY TABLE tmp_agreement(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
+	CREATE TEMPORARY TABLE tmp_sub_agreement(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
 	DISTRIBUTED BY (agreement_id);
 	
-	INSERT INTO tmp_agreement
+	INSERT INTO tmp_sub_agreement
 	SELECT unnest(string_to_array(non_first_agreement_id,','))::int as agreement_id ,
 		first_agreement_id,
 		latest_maximum_contract_amount
-	FROM   tmp_agreement_flag_changes;
+	FROM   tmp_sub_agreement_flag_changes;
 	
-	CREATE TEMPORARY TABLE tmp_agreement_non_zero(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
+	CREATE TEMPORARY TABLE tmp_sub_agreement_non_zero(agreement_id bigint,first_agreement_id bigint,maximum_contract_amount numeric(16,2))
 	DISTRIBUTED BY (agreement_id);
 	
-	INSERT INTO tmp_agreement_non_zero
+	INSERT INTO tmp_sub_agreement_non_zero
 	SELECT agreement_id, first_agreement_id, maximum_contract_amount FROM 
-	tmp_agreement WHERE agreement_id > 0;
+	tmp_sub_agreement WHERE agreement_id > 0;
 	
 	
-	CREATE TEMPORARY TABLE tmp_ct_fms_non_partial_disbs(disbursement_line_item_id bigint, agreement_id bigint)
+	CREATE TEMPORARY TABLE tmp_sub_ct_fms_non_partial_disbs(disbursement_line_item_id bigint, agreement_id bigint)
 	DISTRIBUTED BY (agreement_id);
 	
-	INSERT INTO tmp_ct_fms_non_partial_disbs
+	INSERT INTO tmp_sub_ct_fms_non_partial_disbs
 	SELECT disbursement_line_item_id, agreement_id
-	FROM disbursement_line_item
-	WHERE coalesce(file_type,'F') = 'F';
+	FROM subcontract_spending;
 	
-	INSERT INTO tmp_ct_fms_line_item
+	INSERT INTO tmp_sub_ct_fms_line_item
 	SELECT disbursement_line_item_id, b.first_agreement_id
-	FROM tmp_ct_fms_non_partial_disbs a JOIN  tmp_agreement_non_zero b ON a.agreement_id = b.agreement_id;	
+	FROM tmp_sub_ct_fms_non_partial_disbs a JOIN  tmp_sub_agreement_non_zero b ON a.agreement_id = b.agreement_id;	
 	
 	
-	UPDATE disbursement_line_item a
+	UPDATE subcontract_spending a
 	SET	agreement_id = b.agreement_id
-	FROM	tmp_ct_fms_line_item b
+	FROM	tmp_sub_ct_fms_line_item b
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
-	UPDATE disbursement_line_item_details a
+	UPDATE subcontract_spending_details a
 	SET	agreement_id = b.agreement_id
-	FROM	tmp_ct_fms_line_item b
+	FROM	tmp_sub_ct_fms_line_item b
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id;
-	
-	UPDATE disbursement_line_item_details a
-	SET	master_agreement_id = c.master_agreement_id		
-	FROM	tmp_ct_fms_line_item b, history_agreement c
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-	 AND a.agreement_id = c.agreement_id;
+
 
 	 RAISE NOTICE 'PCON10';
 	 
 	 -- updating maximum_contract_amount in disbursement_line_item_details
 	 
-	UPDATE disbursement_line_item_details a
-	SET	maximum_contract_amount = c.maximum_contract_amount		
-	FROM	tmp_ct_fms_line_item b, agreement_snapshot c
+	UPDATE subcontract_spending_details a
+	SET	maximum_contract_amount = c.maximum_contract_amount,
+		industry_type_id = c.industry_type_id,
+		industry_type_name = c.industry_type_name,
+		agreement_type_code = c.agreement_type_code,
+		award_method_code = c.award_method_code,
+		contract_industry_type_id = c.industry_type_id,
+		contract_minority_type_id = c.minority_type_id,
+		purpose = c.description
+	FROM	tmp_sub_ct_fms_line_item b, sub_agreement_snapshot c
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-		AND a.agreement_id = c.original_agreement_id AND master_agreement_yn = 'N' AND a.fiscal_year between c.starting_year AND c.ending_year;
+		AND a.agreement_id = c.original_agreement_id AND a.fiscal_year between c.starting_year AND c.ending_year;
 	
 	 -- updating maximum_contract_amount_cy in disbursement_line_item_details
 	 
-	UPDATE disbursement_line_item_details a
-	SET	maximum_contract_amount_cy = c.maximum_contract_amount		
-	FROM	tmp_ct_fms_line_item b, agreement_snapshot_cy c
+	UPDATE subcontract_spending_details a
+	SET	maximum_contract_amount_cy = c.maximum_contract_amount,
+		contract_industry_type_id_cy = c.industry_type_id,
+		contract_minority_type_id_cy = c.minority_type_id,
+		purpose_cy = c.description
+	FROM	tmp_sub_ct_fms_line_item b, sub_agreement_snapshot_cy c
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-		AND a.agreement_id = c.original_agreement_id AND master_agreement_yn = 'N' AND a.fiscal_year between c.starting_year AND c.ending_year;
-	
-	 -- updating maximum_spending_limit in disbursement_line_item_details
-	 
-	UPDATE disbursement_line_item_details a
-	SET	maximum_spending_limit = c.maximum_contract_amount		
-	FROM	tmp_ct_fms_line_item b, agreement_snapshot c
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
-	
-	 -- updating maximum_spending_limit_cy in disbursement_line_item_details
-	 
-	UPDATE disbursement_line_item_details a
-	SET	maximum_spending_limit_cy = c.maximum_contract_amount		
-	FROM	tmp_ct_fms_line_item b, agreement_snapshot_cy c
-	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
+		AND a.agreement_id = c.original_agreement_id AND a.calendar_fiscal_year between c.starting_year AND c.ending_year;
+
 	
 	-- End of associating Disbursement line item to the original version of an agreement
 	
@@ -1039,15 +1078,17 @@ BEGIN
 	l_start_time := timeofday()::timestamp;
 	
 	
-	TRUNCATE agreement_snapshot_expanded;
+	TRUNCATE sub_agreement_snapshot_expanded;
 	
-	INSERT INTO agreement_snapshot_expanded
+	INSERT INTO sub_agreement_snapshot_expanded
 SELECT  original_agreement_id ,
 	agreement_id,
 	fiscal_year ,
 	description ,
 	contract_number ,
+	sub_contract_id,
 	vendor_id ,
+	prime_vendor_id, 
 	agency_id,
 	industry_type_id,
 	award_size_id,
@@ -1060,10 +1101,8 @@ SELECT  original_agreement_id ,
 	percent_difference ,
 	award_method_id,
 	document_code_id,
-	master_agreement_id,
 	minority_type_id, 
 	minority_type_name,
-	master_agreement_yn,
 	status_flag
 FROM	
 (SELECT original_agreement_id,
@@ -1071,7 +1110,9 @@ FROM
 	generate_series(effective_begin_year,effective_end_year,1) as fiscal_year,
 	description,
 	contract_number,
+	sub_contract_id,
 	vendor_id,
+	prime_vendor_id,
 	agency_id,
 	industry_type_id,
 	award_size_id,
@@ -1084,22 +1125,22 @@ FROM
 	percent_difference,
 	award_method_id,
 	document_code_id,
-	master_agreement_id,
 	minority_type_id, 
 	minority_type_name,
-	master_agreement_yn,
 	'A' as status_flag
-FROM	agreement_snapshot ) expanded_tbl  WHERE fiscal_year between starting_year AND ending_year
+FROM	sub_agreement_snapshot ) expanded_tbl  WHERE fiscal_year between starting_year AND ending_year
 AND fiscal_year >= 2010 AND ( (fiscal_year <= extract(year from now()::date) AND extract(month from now()::date) <= 6) OR
 		     (fiscal_year <= (extract(year from now()::date)::smallint)+1 AND extract(month from now()::date) > 6) );
 
-INSERT INTO agreement_snapshot_expanded
+INSERT INTO sub_agreement_snapshot_expanded
 SELECT original_agreement_id,
 	agreement_id,
 	registered_year,
 	description,
 	contract_number,
+	sub_contract_id,
 	vendor_id,
+	prime_vendor_id,
 	agency_id,
 	industry_type_id,
 	award_size_id,
@@ -1112,145 +1153,30 @@ SELECT original_agreement_id,
 	percent_difference,
 	award_method_id,
 	document_code_id,
-	master_agreement_id,
 	minority_type_id, 
 	minority_type_name,
-	master_agreement_yn,
 	'R' as status_flag
-FROM	agreement_snapshot
+FROM	sub_agreement_snapshot
 WHERE registered_year between starting_year AND ending_year
 AND registered_year >= 2010 ;
 	
 RAISE NOTICE 'PRE_CON_AGGR1';
 
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded AS
-SELECT * from agreement_snapshot_expanded
-WHERE master_agreement_yn = 'N';
-
-CREATE TEMPORARY TABLE tmp_ct_master_agreement_snapshot_expanded AS 
-SELECT * from agreement_snapshot_expanded 
-WHERE master_agreement_yn = 'Y';
-
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_maxyear(original_agreement_id bigint,max_fiscal_year smallint) 
-DISTRIBUTED BY (original_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_expanded_maxyear
-SELECT original_agreement_id, max(fiscal_year) 
-FROM tmp_ct_child_agreement_snapshot_expanded
-WHERE status_flag = 'A'
-GROUP BY 1;
-
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_active(agreement_id bigint, original_agreement_id bigint,rfed_amount numeric(16,2),status_flag character(1),fiscal_year smallint,max_fiscal_year smallint) 
-DISTRIBUTED BY (original_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_expanded_active
-SELECT agreement_id , a.original_agreement_id, rfed_amount, status_flag, fiscal_year, b.max_fiscal_year
-FROM tmp_ct_child_agreement_snapshot_expanded a LEFT JOIN tmp_ct_child_agreement_snapshot_expanded_maxyear b ON a.original_agreement_id = b.original_agreement_id ;
-
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot AS
-SELECT * FROM agreement_snapshot
-WHERE master_agreement_yn = 'N';
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_max_endingyear(original_agreement_id bigint,max_ending_year smallint) 
-DISTRIBUTED BY (original_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_max_endingyear
-SELECT original_agreement_id, max(ending_year)
-FROM tmp_ct_child_agreement_snapshot
-GROUP BY 1;
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_active(master_agreement_id bigint, rfed_amount numeric(16,2),starting_year smallint, ending_year smallint, max_ending_year smallint) 
-DISTRIBUTED BY (master_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_active
-SELECT master_agreement_id, rfed_amount,  starting_year, coalesce(ending_year,starting_year),  b.max_ending_year
-FROM tmp_ct_child_agreement_snapshot a LEFT JOIN tmp_ct_child_agreement_snapshot_max_endingyear b ON a.original_agreement_id = b.original_agreement_id ;
-
-RAISE NOTICE 'PRE_CON_AGGR2';
-
-CREATE TEMPORARY TABLE tmp_ct_master_agreements_rfed(original_master_agreement_id bigint, status_flag char(1), fiscal_year smallint, rfed_amount numeric(16,2)) DISTRIBUTED BY(original_master_agreement_id);
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
-FROM tmp_ct_child_agreement_snapshot_expanded_active cagse, tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
-WHERE magse.status_flag = 'A' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
-AND ha.master_agreement_id = magse.original_agreement_id AND (cagse.fiscal_year = magse.fiscal_year OR ( magse.fiscal_year > cagse.fiscal_year AND cagse.fiscal_year = cagse.max_fiscal_year))
-AND cagse.status_flag = magse.status_flag AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-RAISE NOTICE 'PRE_CON_AGGR2.1';
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
-FROM tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
-WHERE magse.status_flag = 'R' AND dc.document_code = 'MMA1' 
-AND ha.master_agreement_id = magse.original_agreement_id  AND ha.original_version_flag = 'Y'
-AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-RAISE NOTICE 'PRE_CON_AGGR2.2';
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
-FROM tmp_ct_master_agreement_snapshot_expanded magse, tmp_ct_child_agreement_snapshot_active ha, ref_document_code dc
-WHERE magse.status_flag = 'A' AND dc.document_code = 'MA1' 
-AND ha.master_agreement_id = magse.original_agreement_id AND (magse.fiscal_year between ha.starting_year and ha.ending_year OR (magse.fiscal_year > ha.ending_year AND ha.ending_year = ha.max_ending_year))
-AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-RAISE NOTICE 'PRE_CON_AGGR2.3';
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
-FROM tmp_ct_master_agreement_snapshot_expanded magse, history_agreement ha, ref_document_code dc
-WHERE magse.status_flag = 'R' AND dc.document_code = 'MA1' 
-AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
-AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-UPDATE agreement_snapshot_expanded a
-SET rfed_amount = b.rfed_amount
-FROM tmp_ct_master_agreements_rfed b
-WHERE a.original_agreement_id = b.original_master_agreement_id
-AND a.fiscal_year = b.fiscal_year
-AND a.status_flag = b.status_flag
-AND a.master_agreement_yn = 'Y';
-
-UPDATE agreement_snapshot_expanded 
-SET rfed_amount = 0
-WHERE rfed_amount IS NULL 
-AND master_agreement_yn = 'Y';
-
-UPDATE agreement_snapshot X
-SET rfed_amount = Y.rfed_amount
-FROM
-(select a.agreement_id, a.rfed_amount from  agreement_snapshot_expanded a,
-(select agreement_id, max(fiscal_year) as fiscal_year from agreement_snapshot_expanded where master_agreement_yn = 'Y' group by 1) b 
-WHERE a.agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year AND a.status_flag = 'A') Y
-WHERE X.agreement_id = Y.agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
-
-UPDATE agreement_snapshot 
-SET rfed_amount = 0
-WHERE rfed_amount IS NULL 
-AND master_agreement_yn = 'Y' AND latest_flag = 'Y' ;
-
-RAISE NOTICE 'PRE_CON_AGGR3';
 
 -- changes for agreement_snapshot_expanded_cy
 
-	TRUNCATE agreement_snapshot_expanded_cy;
+	TRUNCATE sub_agreement_snapshot_expanded_cy;
 	
 	
-INSERT INTO agreement_snapshot_expanded_cy
+INSERT INTO sub_agreement_snapshot_expanded_cy
 SELECT  original_agreement_id ,
 	agreement_id,
 	fiscal_year ,
 	description ,
 	contract_number ,
+	sub_contract_id,
 	vendor_id ,
+	prime_vendor_id ,
 	agency_id,
 	industry_type_id,
 	award_size_id,
@@ -1263,10 +1189,8 @@ SELECT  original_agreement_id ,
 	percent_difference ,
 	award_method_id,
 	document_code_id,
-	master_agreement_id,
 	minority_type_id, 
 	minority_type_name,
-	master_agreement_yn,
 	status_flag
 FROM	
 (SELECT original_agreement_id,
@@ -1274,7 +1198,9 @@ FROM
 	generate_series(effective_begin_year,effective_end_year,1) as fiscal_year,
 	description,
 	contract_number,
+	sub_contract_id,
 	vendor_id,
+	prime_vendor_id ,
 	agency_id,
 	industry_type_id,
 	award_size_id,
@@ -1287,21 +1213,21 @@ FROM
 	percent_difference,
 	award_method_id,
 	document_code_id,
-	master_agreement_id,
 	minority_type_id, 
 	minority_type_name,
-	master_agreement_yn,
 	'A' as status_flag
-FROM	agreement_snapshot_cy ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
+FROM	sub_agreement_snapshot_cy ) expanded_tbl WHERE fiscal_year between starting_year AND ending_year
 AND fiscal_year >= 2010 AND (fiscal_year <= extract(year from now()::date) ) ;
 
-INSERT INTO agreement_snapshot_expanded_cy
+INSERT INTO sub_agreement_snapshot_expanded_cy
 SELECT original_agreement_id,
 	agreement_id,
-	registered_year,
+	registered_year as fiscal_year,
 	description,
 	contract_number,
+	sub_contract_id,
 	vendor_id,
+	prime_vendor_id ,
 	agency_id,
 	industry_type_id,
 	award_size_id,
@@ -1314,116 +1240,15 @@ SELECT original_agreement_id,
 	percent_difference,
 	award_method_id,
 	document_code_id,
-	master_agreement_id,
 	minority_type_id, 
 	minority_type_name,
-	master_agreement_yn,
 	'R' as status_flag
-FROM	agreement_snapshot_cy
+FROM	sub_agreement_snapshot_cy
 WHERE registered_year between starting_year AND ending_year
 AND registered_year >= 2010 ;
 
 RAISE NOTICE 'PRE_CON_AGGR4';
 
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_cy AS 
-SELECT * from agreement_snapshot_expanded_cy 
-WHERE master_agreement_yn = 'N';
-
-CREATE TEMPORARY TABLE tmp_ct_master_agreement_snapshot_expanded_cy AS 
-SELECT * from agreement_snapshot_expanded_cy 
-WHERE master_agreement_yn = 'Y';
-
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_maxyear_cy(original_agreement_id bigint,max_fiscal_year smallint) 
-DISTRIBUTED BY (original_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_expanded_maxyear_cy
-SELECT original_agreement_id, max(fiscal_year) 
-FROM tmp_ct_child_agreement_snapshot_expanded_cy
-WHERE status_flag = 'A'
-GROUP BY 1;
-
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_expanded_active_cy(agreement_id bigint, original_agreement_id bigint,rfed_amount numeric(16,2),status_flag character(1),fiscal_year smallint,max_fiscal_year smallint) 
-DISTRIBUTED BY (original_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_expanded_active_cy
-SELECT agreement_id , a.original_agreement_id, rfed_amount, status_flag, fiscal_year, b.max_fiscal_year
-FROM tmp_ct_child_agreement_snapshot_expanded_cy a LEFT JOIN tmp_ct_child_agreement_snapshot_expanded_maxyear_cy b ON a.original_agreement_id = b.original_agreement_id ;
-
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_cy AS
-SELECT * FROM agreement_snapshot_cy
-WHERE master_agreement_yn = 'N';
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_max_endingyear_cy(original_agreement_id bigint,max_ending_year smallint) 
-DISTRIBUTED BY (original_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_max_endingyear_cy
-SELECT original_agreement_id, max(ending_year)
-FROM tmp_ct_child_agreement_snapshot_cy
-GROUP BY 1;
-
-CREATE TEMPORARY TABLE tmp_ct_child_agreement_snapshot_active_cy(master_agreement_id bigint, rfed_amount numeric(16,2),starting_year smallint, ending_year smallint, max_ending_year smallint) 
-DISTRIBUTED BY (master_agreement_id);
-
-INSERT INTO tmp_ct_child_agreement_snapshot_active_cy
-SELECT master_agreement_id, rfed_amount,  starting_year, coalesce(ending_year,starting_year),  b.max_ending_year
-FROM tmp_ct_child_agreement_snapshot_cy a LEFT JOIN tmp_ct_child_agreement_snapshot_max_endingyear_cy b ON a.original_agreement_id = b.original_agreement_id ;
-
-
-
-
-
-
-
-TRUNCATE tmp_ct_master_agreements_rfed;
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(cagse.rfed_amount) as rfed_amount
-FROM tmp_ct_child_agreement_snapshot_expanded_active_cy cagse, tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
-WHERE magse.status_flag = 'A' AND dc.document_code = 'MMA1' AND cagse.agreement_id = ha.agreement_id
-AND ha.master_agreement_id = magse.original_agreement_id AND (cagse.fiscal_year = magse.fiscal_year OR ( magse.fiscal_year > cagse.fiscal_year AND cagse.fiscal_year = cagse.max_fiscal_year))
-AND cagse.status_flag = magse.status_flag AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
-FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
-WHERE magse.status_flag = 'R' AND dc.document_code = 'MMA1' 
-AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
-AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
-FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, tmp_ct_child_agreement_snapshot_active_cy ha, ref_document_code dc
-WHERE magse.status_flag = 'A' AND dc.document_code = 'MA1' 
-AND ha.master_agreement_id = magse.original_agreement_id AND (magse.fiscal_year between ha.starting_year and ha.ending_year OR (magse.fiscal_year > ha.ending_year AND ha.ending_year = ha.max_ending_year))
-AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-INSERT INTO tmp_ct_master_agreements_rfed
-SELECT magse.original_agreement_id as original_master_agreement_id,magse.status_flag as status_flag, magse.fiscal_year as fiscal_year, sum(ha.rfed_amount) as rfed_amount
-FROM tmp_ct_master_agreement_snapshot_expanded_cy magse, history_agreement ha, ref_document_code dc
-WHERE magse.status_flag = 'R' AND dc.document_code = 'MA1' 
-AND ha.master_agreement_id = magse.original_agreement_id AND ha.original_version_flag = 'Y'
-AND magse.document_code_id = dc.document_code_id 
-GROUP BY 1,2,3;
-
-UPDATE agreement_snapshot_expanded_cy a
-SET rfed_amount = b.rfed_amount
-FROM tmp_ct_master_agreements_rfed b
-WHERE a.original_agreement_id = b.original_master_agreement_id
-AND a.fiscal_year = b.fiscal_year
-AND a.status_flag = b.status_flag
-AND a.master_agreement_yn = 'Y';
-
-UPDATE agreement_snapshot_expanded_cy
-SET rfed_amount = 0
-WHERE rfed_amount IS NULL 
-AND master_agreement_yn = 'Y';
-	RAISE NOTICE 'PRE_CON_AGGR5';
 	
 	l_end_time := timeofday()::timestamp;
 	
@@ -1443,6 +1268,310 @@ EXCEPTION
 	
 	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
 	VALUES(p_job_id_in,'etl.refreshSubContractsPreAggregateTables',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
+	
+	RETURN 0;
+	
+END;
+$$ language plpgsql;
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION etl.refreshCommonTransactionTables(p_job_id_in bigint) RETURNS INT AS $$
+DECLARE
+	l_start_time  timestamp;
+	l_end_time  timestamp;
+	
+BEGIN
+	
+	
+
+	l_start_time := timeofday()::timestamp;
+	
+	
+	DELETE FROM ONLY all_agreement_transactions a
+	USING agreement_snapshot_deleted b
+	WHERE a.original_agreement_id = b.original_agreement_id 
+	AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
+	
+	DELETE FROM all_agreement_transactions WHERE is_prime_or_sub = 'S';
+	
+	INSERT INTO all_agreement_transactions(original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            master_agreement_id, master_contract_number, agreement_type_id, 
+            agreement_type_code, agreement_type_name, award_category_id, 
+            award_category_code, award_category_name, award_method_id, award_method_code, 
+            award_method_name, expenditure_object_codes, expenditure_object_names, 
+            industry_type_id, industry_type_name, award_size_id, effective_begin_date, 
+            effective_begin_date_id, effective_begin_year, effective_begin_year_id, 
+            effective_end_date, effective_end_date_id, effective_end_year, 
+            effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
+            tracking_number, rfed_amount, minority_type_id, minority_type_name, 
+            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            load_id, last_modified_date, is_prime_or_sub, job_id)
+    SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            master_agreement_id, master_contract_number, agreement_type_id, 
+            agreement_type_code, agreement_type_name, award_category_id, 
+            award_category_code, award_category_name, award_method_id, award_method_code, 
+            award_method_name, expenditure_object_codes, expenditure_object_names, 
+            industry_type_id, industry_type_name, award_size_id, effective_begin_date, 
+            effective_begin_date_id, effective_begin_year, effective_begin_year_id, 
+            effective_end_date, effective_end_date_id, effective_end_year, 
+            effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
+            tracking_number, rfed_amount, minority_type_id, minority_type_name, 
+            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            load_id, last_modified_date, 'P' as is_prime_or_sub, job_id
+       FROM agreement_snapshot where job_id = p_job_id_in;
+       
+       
+      INSERT INTO all_agreement_transactions(original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
+            award_category_id, award_category_code, award_category_name, 
+            award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
+            expenditure_object_names, industry_type_id, industry_type_name, 
+            award_size_id, effective_begin_date, effective_begin_date_id, 
+            effective_begin_year, effective_begin_year_id, effective_end_date, 
+            effective_end_date_id, effective_end_year, effective_end_year_id, 
+            registered_date, registered_date_id, brd_awd_no, tracking_number, 
+            rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
+            latest_flag, load_id, last_modified_date, is_prime_or_sub, job_id)
+     SELECT original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
+            award_category_id, award_category_code, award_category_name, 
+            award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
+            expenditure_object_names, industry_type_id, industry_type_name, 
+            award_size_id, effective_begin_date, effective_begin_date_id, 
+            effective_begin_year, effective_begin_year_id, effective_end_date, 
+            effective_end_date_id, effective_end_year, effective_end_year_id, 
+            registered_date, registered_date_id, brd_awd_no, tracking_number, 
+            rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
+            latest_flag, load_id, last_modified_date, 'S' as is_prime_or_sub, job_id
+     FROM sub_agreement_snapshot;
+       
+       	
+
+RAISE NOTICE 'REF COMMON TT1';
+
+
+DELETE FROM ONLY all_agreement_transactions_cy a
+	USING agreement_snapshot_cy_deleted b
+	WHERE a.original_agreement_id = b.original_agreement_id 
+	AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
+	
+	DELETE FROM all_agreement_transactions_cy WHERE is_prime_or_sub = 'S';
+	
+	INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            master_agreement_id, master_contract_number, agreement_type_id, 
+            agreement_type_code, agreement_type_name, award_category_id, 
+            award_category_code, award_category_name, award_method_id, award_method_code, 
+            award_method_name, expenditure_object_codes, expenditure_object_names, 
+            industry_type_id, industry_type_name, award_size_id, effective_begin_date, 
+            effective_begin_date_id, effective_begin_year, effective_begin_year_id, 
+            effective_end_date, effective_end_date_id, effective_end_year, 
+            effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
+            tracking_number, rfed_amount, minority_type_id, minority_type_name, 
+            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            load_id, last_modified_date, is_prime_or_sub, job_id)
+    SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            master_agreement_id, master_contract_number, agreement_type_id, 
+            agreement_type_code, agreement_type_name, award_category_id, 
+            award_category_code, award_category_name, award_method_id, award_method_code, 
+            award_method_name, expenditure_object_codes, expenditure_object_names, 
+            industry_type_id, industry_type_name, award_size_id, effective_begin_date, 
+            effective_begin_date_id, effective_begin_year, effective_begin_year_id, 
+            effective_end_date, effective_end_date_id, effective_end_year, 
+            effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
+            tracking_number, rfed_amount, minority_type_id, minority_type_name, 
+            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            load_id, last_modified_date, 'P' as is_prime_or_sub, job_id
+       FROM agreement_snapshot_cy where job_id = p_job_id_in;
+       
+       
+      INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
+            award_category_id, award_category_code, award_category_name, 
+            award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
+            expenditure_object_names, industry_type_id, industry_type_name, 
+            award_size_id, effective_begin_date, effective_begin_date_id, 
+            effective_begin_year, effective_begin_year_id, effective_end_date, 
+            effective_end_date_id, effective_end_year, effective_end_year_id, 
+            registered_date, registered_date_id, brd_awd_no, tracking_number, 
+            rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
+            latest_flag, load_id, last_modified_date, is_prime_or_sub, job_id)
+     SELECT original_agreement_id, document_version, document_code_id, agency_history_id, 
+            agency_id, agency_code, agency_name, agreement_id, starting_year, 
+            starting_year_id, ending_year, ending_year_id, registered_year, 
+            registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
+            maximum_contract_amount, description, vendor_history_id, vendor_id, 
+            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
+            award_category_id, award_category_code, award_category_name, 
+            award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
+            expenditure_object_names, industry_type_id, industry_type_name, 
+            award_size_id, effective_begin_date, effective_begin_date_id, 
+            effective_begin_year, effective_begin_year_id, effective_end_date, 
+            effective_end_date_id, effective_end_year, effective_end_year_id, 
+            registered_date, registered_date_id, brd_awd_no, tracking_number, 
+            rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
+            latest_flag, load_id, last_modified_date, 'S' as is_prime_or_sub, job_id
+     FROM sub_agreement_snapshot_cy;
+       
+       	
+	RAISE NOTICE 'REF COMMON TT2';
+
+  DELETE FROM ONLY all_disbursement_transactions a
+  USING disbursement_line_item_deleted b
+  WHERE a.disbursement_line_item_id = b.disbursement_line_item_id
+  AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
+  
+  DELETE FROM  all_disbursement_transactions WHERE is_prime_or_sub = 'S';
+  
+  INSERT INTO all_disbursement_transactions(disbursement_line_item_id, disbursement_id, line_number, disbursement_number, 
+            check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
+            check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
+            fund_class_id, check_amount, agency_id, agency_history_id, agency_code, 
+            expenditure_object_id, vendor_id, department_id, maximum_contract_amount, 
+            maximum_contract_amount_cy, maximum_spending_limit, maximum_spending_limit_cy, 
+            document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
+            agency_name, agency_short_name, location_name, location_code, 
+            department_name, department_short_name, department_code, expenditure_object_name, 
+            expenditure_object_code, budget_code_id, budget_code, budget_name, 
+            contract_number, master_contract_number, master_child_contract_number, 
+            contract_vendor_id, contract_vendor_id_cy, master_contract_vendor_id, 
+            master_contract_vendor_id_cy, contract_agency_id, contract_agency_id_cy, 
+            master_contract_agency_id, master_contract_agency_id_cy, master_purpose, 
+            master_purpose_cy, purpose, purpose_cy, master_child_contract_agency_id, 
+            master_child_contract_agency_id_cy, master_child_contract_vendor_id, 
+            master_child_contract_vendor_id_cy, reporting_code, location_id, 
+            fund_class_name, fund_class_code, spending_category_id, spending_category_name, 
+            calendar_fiscal_year_id, calendar_fiscal_year, agreement_accounting_line_number, 
+            agreement_commodity_line_number, agreement_vendor_line_number, 
+            reference_document_number, reference_document_code, contract_document_code, 
+            master_contract_document_code, minority_type_id, minority_type_name, 
+            industry_type_id, industry_type_name, agreement_type_code, award_method_code, 
+            contract_industry_type_id, contract_industry_type_id_cy, master_contract_industry_type_id, 
+            master_contract_industry_type_id_cy, contract_minority_type_id, 
+            contract_minority_type_id_cy, master_contract_minority_type_id, 
+            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date,is_prime_or_sub, 
+            job_id)
+     SELECT disbursement_line_item_id, disbursement_id, line_number, disbursement_number, 
+            check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
+            check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
+            fund_class_id, check_amount, agency_id, agency_history_id, agency_code, 
+            expenditure_object_id, vendor_id, department_id, maximum_contract_amount, 
+            maximum_contract_amount_cy, maximum_spending_limit, maximum_spending_limit_cy, 
+            document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
+            agency_name, agency_short_name, location_name, location_code, 
+            department_name, department_short_name, department_code, expenditure_object_name, 
+            expenditure_object_code, budget_code_id, budget_code, budget_name, 
+            contract_number, master_contract_number, master_child_contract_number, 
+            contract_vendor_id, contract_vendor_id_cy, master_contract_vendor_id, 
+            master_contract_vendor_id_cy, contract_agency_id, contract_agency_id_cy, 
+            master_contract_agency_id, master_contract_agency_id_cy, master_purpose, 
+            master_purpose_cy, purpose, purpose_cy, master_child_contract_agency_id, 
+            master_child_contract_agency_id_cy, master_child_contract_vendor_id, 
+            master_child_contract_vendor_id_cy, reporting_code, location_id, 
+            fund_class_name, fund_class_code, spending_category_id, spending_category_name, 
+            calendar_fiscal_year_id, calendar_fiscal_year, agreement_accounting_line_number, 
+            agreement_commodity_line_number, agreement_vendor_line_number, 
+            reference_document_number, reference_document_code, contract_document_code, 
+            master_contract_document_code, minority_type_id, minority_type_name, 
+            industry_type_id, industry_type_name, agreement_type_code, award_method_code, 
+            contract_industry_type_id, contract_industry_type_id_cy, master_contract_industry_type_id, 
+            master_contract_industry_type_id_cy, contract_minority_type_id, 
+            contract_minority_type_id_cy, master_contract_minority_type_id, 
+            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date, 'P' as is_prime_or_sub,
+            job_id
+    FROM disbursement_line_item_details WHERE job_id = p_job_id_in;
+    
+    
+    INSERT INTO all_disbursement_transactions(disbursement_line_item_id, disbursement_number, payment_id, check_eft_issued_date_id, 
+            check_eft_issued_nyc_year_id, fiscal_year, check_eft_issued_cal_month_id, 
+            agreement_id, check_amount, agency_id, agency_history_id, agency_code, 
+            vendor_id, prime_vendor_id, maximum_contract_amount, maximum_contract_amount_cy, 
+            document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
+            agency_name, agency_short_name, expenditure_object_name, expenditure_object_code, 
+            contract_number, sub_contract_id, contract_vendor_id, contract_vendor_id_cy, 
+            contract_prime_vendor_id, contract_prime_vendor_id_cy, contract_agency_id, 
+            contract_agency_id_cy, purpose, purpose_cy, reporting_code, spending_category_id, 
+            spending_category_name, calendar_fiscal_year_id, calendar_fiscal_year, 
+            reference_document_number, reference_document_code, contract_document_code, 
+            minority_type_id, minority_type_name, industry_type_id, industry_type_name, 
+            agreement_type_code, award_method_code, contract_industry_type_id, 
+            contract_industry_type_id_cy, contract_minority_type_id, contract_minority_type_id_cy, 
+            file_type, load_id, last_modified_date, is_prime_or_sub, job_id)
+   SELECT  disbursement_line_item_id, disbursement_number, payment_id, check_eft_issued_date_id, 
+            check_eft_issued_nyc_year_id, fiscal_year, check_eft_issued_cal_month_id, 
+            agreement_id, check_amount, agency_id, agency_history_id, agency_code, 
+            vendor_id, prime_vendor_id, maximum_contract_amount, maximum_contract_amount_cy, 
+            document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
+            agency_name, agency_short_name, expenditure_object_name, expenditure_object_code, 
+            contract_number, sub_contract_id, contract_vendor_id, contract_vendor_id_cy, 
+            contract_prime_vendor_id, contract_prime_vendor_id_cy, contract_agency_id, 
+            contract_agency_id_cy, purpose, purpose_cy, reporting_code, spending_category_id, 
+            spending_category_name, calendar_fiscal_year_id, calendar_fiscal_year, 
+            reference_document_number, reference_document_code, contract_document_code, 
+            minority_type_id, minority_type_name, industry_type_id, industry_type_name, 
+            agreement_type_code, award_method_code, contract_industry_type_id, 
+            contract_industry_type_id_cy, contract_minority_type_id, contract_minority_type_id_cy, 
+            file_type, load_id, last_modified_date, 'S' as is_prime_or_sub, job_id
+    FROM subcontract_spending_details;
+            
+            
+	
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time)
+	VALUES(p_job_id_in,'etl.refreshCommonTransactionTables',1,l_start_time,l_end_time);
+	
+			RETURN 1;
+						
+	
+
+EXCEPTION
+	WHEN OTHERS THEN
+	RAISE NOTICE 'Exception Occurred in refreshCommonTransactionTables';
+	RAISE NOTICE 'SQL ERRROR % and Desc is %' ,SQLSTATE,SQLERRM;	
+
+	l_end_time := timeofday()::timestamp;
+	
+	INSERT INTO etl.etl_script_execution_status(job_id,script_name,completed_flag,start_time,end_time,errno,errmsg)
+	VALUES(p_job_id_in,'etl.refreshCommonTransactionTables',0,l_start_time,l_end_time,SQLSTATE,SQLERRM);
 	
 	RETURN 0;
 	

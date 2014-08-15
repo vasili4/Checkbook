@@ -267,7 +267,12 @@ INSERT INTO ref_industry_type(industry_type_id, industry_type_name,created_date)
 																						(2,'Goods',now()::timestamp),
 																						(3,'Professional Services',now()::timestamp),
 																						(4,'Standardized Services',now()::timestamp),
-																						(5,'Not Classified',now()::timestamp);
+																						(5,'Not Classified',now()::timestamp),
+																						(6,'Human Services',now()::timestamp),
+																						(7,'Arch and Engineerng',now()::timestamp);
+																						
+INSERT INTO sub_industry_mappings(industry_type_id, sub_industry_type_id) values(1,1),(2,4),(3,2),(4,3),(5,7),(6,5),(7,6);
+
 update ref_industry_type set created_date = now()::timestamp;
 
 INSERT INTO ref_award_size(award_size_id, award_size_name,created_date) VALUES(1,'Greater than $1 Million',now()::timestamp),
@@ -319,6 +324,11 @@ VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payro
 INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
 VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2014, 'Payroll Summary', now()::timestamp, 0);
 
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2015, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2016, 'Payroll Summary', now()::timestamp, 0);
 
 INSERT INTO ref_expenditure_object_history(expenditure_object_history_id, expenditure_object_id, expenditure_object_name, fiscal_year, created_date, load_id)
 SELECT nextval('seq_ref_expenditure_object_history_id'), expenditure_object_id, expenditure_object_name, fiscal_year, created_date, created_load_id

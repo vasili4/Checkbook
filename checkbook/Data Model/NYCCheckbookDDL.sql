@@ -623,7 +623,7 @@ ALTER TABLE vendor_business_type ADD constraint fk_vendor_business_type_ref_mino
 
 
 CREATE TABLE vendor_min_bus_type
-(
+( vendor_id integer,
   vendor_history_id integer,
   business_type_id smallint,
   minority_type_id smallint,
@@ -1951,6 +1951,8 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
 	award_category_id smallint,
 	industry_type_id smallint,
 	document_version smallint,
+	minority_type_id smallint,
+ 	minority_type_name character varying(50),
 	latest_flag char(1)
  ) DISTRIBUTED BY (document_code_id);
  
@@ -2402,12 +2404,19 @@ CREATE TABLE contracts_mwbe_spending_transactions(
 ---------------------------------------------------------------------------------------------------------
 
 -- Tables for Sub Contracts
-
+/*
 CREATE SEQUENCE seq_subvendor_vendor_id;
 CREATE SEQUENCE seq_subvendor_bus_type_vendor_bus_type_id;
 CREATE SEQUENCE seq_subvendor_history_vendor_history_id;
 CREATE SEQUENCE seq_sub_agreement_agreement_id;
 -- CREATE SEQUENCE seq_sub_disbursement_line_item_id;
+*/
+
+CREATE TABLE sub_industry_mappings(
+industry_type_id smallint, 
+sub_industry_type_id smallint
+)
+DISTRIBUTED BY (industry_type_id);
 
 CREATE TABLE subcontract_vendor_business_type (
 	vendor_customer_code character varying(20),
@@ -2442,7 +2451,7 @@ CREATE TABLE subcontract_business_type (
 DISTRIBUTED BY (contract_number);
 
 CREATE TABLE subvendor (
-    vendor_id integer PRIMARY KEY DEFAULT nextval('seq_subvendor_vendor_id'::regclass) NOT NULL,
+    vendor_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_vendor_id'::regclass) NOT NULL,
     vendor_customer_code character varying(20),
     legal_name character varying(60),
     display_flag CHAR(1) DEFAULT 'Y',
@@ -2454,7 +2463,7 @@ CREATE TABLE subvendor (
 
 
 CREATE TABLE subvendor_history (
-    vendor_history_id integer PRIMARY KEY DEFAULT nextval('seq_subvendor_history_vendor_history_id'::regclass) NOT NULL,
+    vendor_history_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_history_vendor_history_id'::regclass) NOT NULL,
     vendor_id integer,   
     legal_name character varying(60),
     load_id integer,
@@ -2464,7 +2473,7 @@ CREATE TABLE subvendor_history (
 
 
 CREATE TABLE subvendor_business_type (
-    vendor_business_type_id bigint PRIMARY KEY DEFAULT nextval('seq_subvendor_bus_type_vendor_bus_type_id') NOT NULL,
+    vendor_business_type_id bigint PRIMARY KEY DEFAULT nextval('seq_vendor_bus_type_vendor_bus_type_id') NOT NULL,
     vendor_history_id integer,
     business_type_id smallint,
     status smallint,
@@ -2474,14 +2483,25 @@ CREATE TABLE subvendor_business_type (
     updated_date timestamp without time zone
 ) distributed by (vendor_business_type_id);
 
+CREATE TABLE subvendor_min_bus_type
+( vendor_id integer,
+  vendor_history_id integer,
+  business_type_id smallint,
+  minority_type_id smallint,
+  business_type_code character varying(4),
+  business_type_name character varying(50),
+  minority_type_name character varying(50)
+)
+DISTRIBUTED BY (vendor_history_id);
+
 
 CREATE TABLE subcontract_status (
     contract_number varchar,
 	vendor_customer_code character varying(20), 
 	scntrc_status smallint, 
 	agreement_type_id smallint, 
-	total_scntrc_max_am numeric(16,2),, 
-	total_scntrc_pymt_am numeric(16,2),,
+	total_scntrc_max_am numeric(16,2),
+	total_scntrc_pymt_am numeric(16,2),
     created_load_id integer,
     created_date timestamp without time zone,
     updated_load_id integer,
@@ -2491,14 +2511,15 @@ DISTRIBUTED BY (contract_number);
 
 CREATE  TABLE subcontract_details
 (
-  agreement_id bigint NOT NULL DEFAULT nextval('seq_sub_agreement_agreement_id'::regclass),,
+  agreement_id bigint NOT NULL DEFAULT nextval('seq_agreement_agreement_id'::regclass),
   contract_number varchar,
   sub_contract_id character varying(20),
   agency_history_id smallint,
   document_id character varying(20),
+  document_code_id smallint,
   document_version integer,
   vendor_history_id integer,
-  prime_vendor_history_id integer,
+  prime_vendor_id integer,
   agreement_type_id smallint,  
   aprv_sta smallint,
   aprv_reas_id character varying(3),
@@ -2511,7 +2532,7 @@ CREATE  TABLE subcontract_details
   registered_date_id integer,
   source_updated_date_id integer,
   maximum_contract_amount_original numeric(16,2),
-  maximum_contract_amount numeric(16,2) numeric(16,2),
+  maximum_contract_amount  numeric(16,2),
   original_contract_amount_original numeric(16,2),
   original_contract_amount numeric(16,2),
   rfed_amount_original numeric(16,2), 
@@ -2519,7 +2540,12 @@ CREATE  TABLE subcontract_details
   total_scntrc_pymt numeric(16,2),
   is_scntrc_pymt_complete smallint,
   scntrc_mode smallint,
-  scntrc_trkg_no character varying(30),
+  tracking_number character varying(30),
+  award_method_id smallint,
+  award_category_id smallint,
+  brd_awd_no character varying,
+  number_responses integer,
+  number_solicitation integer,
   doc_ref character varying(75),
   registered_fiscal_year smallint,
   registered_fiscal_year_id smallint,
@@ -2548,7 +2574,7 @@ CREATE  TABLE subcontract_details
 )
 DISTRIBUTED BY (agreement_id);
 
-CREATE TABLE subcontract_spendings (
+CREATE TABLE subcontract_spending (
     disbursement_line_item_id bigint  PRIMARY KEY DEFAULT nextval('seq_disbursement_line_item_id'::regclass) NOT NULL,
     document_code_id smallint,
     agency_history_id smallint,
@@ -2568,15 +2594,563 @@ CREATE TABLE subcontract_spendings (
   	sub_contract_id character varying(20),
     agreement_id bigint,
     vendor_history_id integer,
-    prime_vendor_history_id integer,    
+    prime_vendor_id integer,    
     created_load_id integer,
     updated_load_id integer,
     created_date timestamp without time zone,
     updated_date timestamp without time zone
-) distributed by (disbursement_id);
+) distributed by (disbursement_line_item_id);
+
+
+CREATE TABLE sub_agreement_snapshot
+ (
+   original_agreement_id bigint,
+   document_version smallint,
+   document_code_id smallint,
+   agency_history_id smallint,
+   agency_id smallint,
+   agency_code character varying(20),
+   agency_name character varying(100),
+   agreement_id bigint,
+   starting_year smallint,
+   starting_year_id smallint,
+   ending_year smallint,
+   ending_year_id smallint,
+   registered_year smallint,
+   registered_year_id smallint,
+   contract_number character varying,
+   sub_contract_id character varying(20),
+   original_contract_amount numeric(16,2),
+   maximum_contract_amount numeric(16,2),
+   description character varying,
+   vendor_history_id integer,
+   vendor_id integer,
+   vendor_code character varying(20),
+   vendor_name character varying,
+   prime_vendor_id integer,
+   dollar_difference numeric(16,2),
+   percent_difference numeric(17,4),
+   agreement_type_id smallint,
+   agreement_type_code character varying(2),
+   agreement_type_name character varying,
+   award_category_id smallint,
+   award_category_code character varying(10),
+   award_category_name character varying,
+   award_method_id smallint,
+   award_method_code character varying(10) ,
+   award_method_name character varying,
+   expenditure_object_codes character varying,
+   expenditure_object_names character varying,
+   industry_type_id smallint,
+   industry_type_name character varying(50),
+   award_size_id smallint,
+   effective_begin_date date,
+   effective_begin_date_id integer,
+   effective_begin_year smallint,
+   effective_begin_year_id smallint,
+   effective_end_date date,
+   effective_end_date_id integer,
+   effective_end_year smallint,
+   effective_end_year_id smallint,
+   registered_date date,
+   registered_date_id integer,
+   brd_awd_no character varying,
+   tracking_number character varying,
+   rfed_amount numeric(16,2),
+   minority_type_id smallint,
+   minority_type_name character varying(50),
+   original_version_flag character(1),
+   latest_flag character(1),
+   load_id integer,
+   last_modified_date timestamp without time zone,
+   job_id bigint
+ ) DISTRIBUTED BY (original_agreement_id);
+ 
+ 
+ CREATE TABLE sub_agreement_snapshot_cy (LIKE sub_agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
+ 
+ CREATE TABLE sub_agreement_snapshot_expanded(
+	original_agreement_id bigint,
+	agreement_id bigint,
+	fiscal_year smallint,
+	description varchar,
+	contract_number varchar,
+	sub_contract_id character varying(20),
+	vendor_id int,
+	prime_vendor_id int,
+	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
+	original_contract_amount numeric(16,2) ,
+	maximum_contract_amount numeric(16,2),
+	rfed_amount numeric(16,2),
+	starting_year smallint,	
+	ending_year smallint,
+	dollar_difference numeric(16,2), 
+	percent_difference numeric(17,4),
+	award_method_id smallint,
+	document_code_id smallint,	
+	minority_type_id smallint,
+ 	minority_type_name character varying(50),
+	status_flag char(1)
+	)
+DISTRIBUTED BY (original_agreement_id);	
+
+
+CREATE TABLE sub_agreement_snapshot_expanded_cy(
+	original_agreement_id bigint,
+	agreement_id bigint,
+	fiscal_year smallint,
+	description varchar,
+	contract_number varchar,
+	sub_contract_id character varying(20),
+	vendor_id int,
+	prime_vendor_id int,
+	agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
+	original_contract_amount numeric(16,2) ,
+	maximum_contract_amount numeric(16,2),
+	rfed_amount numeric(16,2),
+	starting_year smallint,	
+	ending_year smallint,
+	dollar_difference numeric(16,2), 
+	percent_difference numeric(17,4),
+	award_method_id smallint,
+	document_code_id smallint,	
+	minority_type_id smallint,
+ 	minority_type_name character varying(50),
+	status_flag char(1)
+	)
+DISTRIBUTED BY (original_agreement_id);	
+
+CREATE TABLE sub_agreement_snapshot_deleted (
+  agreement_id bigint NOT NULL,
+  original_agreement_id bigint NOT NULL,
+  starting_year smallint,
+  load_id integer,
+  deleted_date timestamp without time zone,
+  job_id bigint
+) DISTRIBUTED BY (agreement_id);
+
+CREATE TABLE sub_agreement_snapshot_cy_deleted (
+  agreement_id bigint NOT NULL,
+  original_agreement_id bigint NOT NULL,
+  starting_year smallint,
+  load_id integer,
+  deleted_date timestamp without time zone,
+  job_id bigint
+) DISTRIBUTED BY (agreement_id);
+
+
+CREATE TABLE subcontract_spending_details(
+	disbursement_line_item_id bigint,
+	disbursement_number character varying(40),
+	payment_id character varying(10),
+	check_eft_issued_date_id int,
+	check_eft_issued_nyc_year_id smallint,
+	fiscal_year smallint,
+	check_eft_issued_cal_month_id int,
+	agreement_id bigint,
+	check_amount numeric(16,2),
+	agency_id smallint,
+	agency_history_id smallint,
+	agency_code varchar(20),
+	vendor_id integer,
+	prime_vendor_id integer,
+	maximum_contract_amount numeric(16,2),
+	maximum_contract_amount_cy numeric(16,2),	
+	document_id varchar(20),
+	vendor_name varchar,
+	vendor_customer_code varchar(20), 
+	check_eft_issued_date date,
+	agency_name varchar(100),	
+	agency_short_name character varying(15),  	
+	expenditure_object_name varchar(40),
+	expenditure_object_code varchar(4),
+	contract_number varchar,
+	sub_contract_id character varying(20),
+	contract_vendor_id integer,
+  	contract_vendor_id_cy integer,
+  	contract_prime_vendor_id integer,
+  	contract_prime_vendor_id_cy integer,
+  	contract_agency_id smallint,
+  	contract_agency_id_cy smallint,
+  	purpose varchar,
+	purpose_cy varchar,
+	reporting_code varchar(15),
+	spending_category_id smallint,
+	spending_category_name varchar,
+	calendar_fiscal_year_id smallint,
+	calendar_fiscal_year smallint,
+	reference_document_number character varying,
+	reference_document_code varchar(8),
+	contract_document_code varchar(8),
+	minority_type_id smallint,
+ 	minority_type_name character varying(50),
+ 	industry_type_id smallint,
+   	industry_type_name character varying(50),
+   	agreement_type_code character varying(2),
+   	award_method_code character varying(10),
+   	contract_industry_type_id smallint,
+	contract_industry_type_id_cy smallint,
+	contract_minority_type_id smallint,
+	contract_minority_type_id_cy smallint,	
+	file_type char(1),
+	load_id integer,
+	last_modified_date timestamp without time zone,
+	job_id bigint
+)
+DISTRIBUTED BY (disbursement_line_item_id);
+
+CREATE TABLE subcontract_spending_deleted (
+  disbursement_line_item_id bigint NOT NULL,
+  agency_id smallint,
+  load_id integer,
+  deleted_date timestamp without time zone,
+  job_id bigint
+) DISTRIBUTED BY (disbursement_line_item_id);
 
 
 
+CREATE TABLE all_agreement_transactions
+ (
+   original_agreement_id bigint,
+   document_version smallint,
+   document_code_id smallint,
+   agency_history_id smallint,
+   agency_id smallint,
+   agency_code character varying(20),
+   agency_name character varying(100),
+   agreement_id bigint,
+   starting_year smallint,
+   starting_year_id smallint,
+   ending_year smallint,
+   ending_year_id smallint,
+   registered_year smallint,
+   registered_year_id smallint,
+   contract_number character varying,
+   sub_contract_id character varying(20),
+   original_contract_amount numeric(16,2),
+   maximum_contract_amount numeric(16,2),
+   description character varying,
+   vendor_history_id integer,
+   vendor_id integer,
+   vendor_code character varying(20),
+   vendor_name character varying,
+   prime_vendor_id integer,
+   dollar_difference numeric(16,2),
+   percent_difference numeric(17,4),
+   master_agreement_id bigint,
+   master_contract_number character varying,
+   agreement_type_id smallint,
+   agreement_type_code character varying(2),
+   agreement_type_name character varying,
+   award_category_id smallint,
+   award_category_code character varying(10),
+   award_category_name character varying,
+   award_method_id smallint,
+   award_method_code character varying(10) ,
+   award_method_name character varying,
+   expenditure_object_codes character varying,
+   expenditure_object_names character varying,
+   industry_type_id smallint,
+   industry_type_name character varying(50),
+   award_size_id smallint,
+   effective_begin_date date,
+   effective_begin_date_id integer,
+   effective_begin_year smallint,
+   effective_begin_year_id smallint,
+   effective_end_date date,
+   effective_end_date_id integer,
+   effective_end_year smallint,
+   effective_end_year_id smallint,
+   registered_date date,
+   registered_date_id integer,
+   brd_awd_no character varying,
+   tracking_number character varying,
+   rfed_amount numeric(16,2),
+    minority_type_id smallint,
+ 	minority_type_name character varying(50),
+   master_agreement_yn character(1),  
+   has_children character(1),
+   original_version_flag character(1),
+   latest_flag character(1),
+   load_id integer,
+   last_modified_date timestamp without time zone,
+   is_prime_or_sub character(1),
+   job_id bigint
+ ) DISTRIBUTED BY (original_agreement_id);
+ 
+ 
+ CREATE TABLE all_agreement_transactions_cy (LIKE all_agreement_transactions) DISTRIBUTED BY (original_agreement_id);
+ 
+ 
+ CREATE TABLE all_disbursement_transactions(
+	disbursement_line_item_id bigint,
+	disbursement_id integer,
+	line_number integer,
+	disbursement_number character varying(40),
+	payment_id character varying(10),
+	check_eft_issued_date_id int,
+	check_eft_issued_nyc_year_id smallint,
+	fiscal_year smallint,
+	check_eft_issued_cal_month_id int,
+	agreement_id bigint,
+	master_agreement_id bigint,
+	fund_class_id smallint,
+	check_amount numeric(16,2),
+	agency_id smallint,
+	agency_history_id smallint,
+	agency_code varchar(20),
+	expenditure_object_id integer,
+	vendor_id integer,
+	prime_vendor_id integer,
+	department_id integer,
+	maximum_contract_amount numeric(16,2),
+	maximum_contract_amount_cy numeric(16,2),
+	maximum_spending_limit numeric(16,2),
+	maximum_spending_limit_cy numeric(16,2),
+	document_id varchar(20),
+	vendor_name varchar,
+	vendor_customer_code varchar(20), 
+	check_eft_issued_date date,
+	agency_name varchar(100),	
+	agency_short_name character varying(15),  	
+	location_name varchar,
+	location_code varchar(4),
+	department_name varchar(100),
+	department_short_name character varying(15),
+	department_code varchar(20),
+	expenditure_object_name varchar(40),
+	expenditure_object_code varchar(4),
+	budget_code_id integer,
+	budget_code varchar(10),
+	budget_name varchar(60),
+	contract_number varchar,
+	sub_contract_id character varying(20),
+	master_contract_number character varying,
+	master_child_contract_number character varying,
+  	contract_vendor_id integer,
+  	contract_vendor_id_cy integer,
+	contract_prime_vendor_id integer,
+  	contract_prime_vendor_id_cy integer,
+  	master_contract_vendor_id integer,
+  	master_contract_vendor_id_cy integer,
+  	contract_agency_id smallint,
+  	contract_agency_id_cy smallint,
+  	master_contract_agency_id smallint,
+  	master_contract_agency_id_cy smallint,
+  	master_purpose character varying,
+  	master_purpose_cy character varying,
+	purpose varchar,
+	purpose_cy varchar,
+	master_child_contract_agency_id smallint,
+	master_child_contract_agency_id_cy smallint,
+	master_child_contract_vendor_id integer,
+	master_child_contract_vendor_id_cy integer,
+	reporting_code varchar(15),
+	location_id integer,
+	fund_class_name varchar(50),
+	fund_class_code varchar(5),
+	spending_category_id smallint,
+	spending_category_name varchar,
+	calendar_fiscal_year_id smallint,
+	calendar_fiscal_year smallint,
+	agreement_accounting_line_number integer,
+	agreement_commodity_line_number integer,
+	agreement_vendor_line_number integer, 
+	reference_document_number character varying,
+	reference_document_code varchar(8),
+	contract_document_code varchar(8),
+	master_contract_document_code varchar(8),
+	minority_type_id smallint,
+ 	minority_type_name character varying(50),
+ 	industry_type_id smallint,
+   	industry_type_name character varying(50),
+   	agreement_type_code character varying(2),
+   	award_method_code character varying(10),
+   	contract_industry_type_id smallint,
+	contract_industry_type_id_cy smallint,
+	master_contract_industry_type_id smallint,
+	master_contract_industry_type_id_cy smallint,
+	contract_minority_type_id smallint,
+	contract_minority_type_id_cy smallint,
+	master_contract_minority_type_id smallint,
+	master_contract_minority_type_id_cy smallint,
+	file_type char(1),
+	load_id integer,
+	last_modified_date timestamp without time zone,
+	is_prime_or_sub character(1),
+	job_id bigint
+)
+DISTRIBUTED BY (disbursement_line_item_id);
+
+
+--  Aggregate Tables
+
+CREATE TABLE aggregateon_subven_spending_coa_entities (
+	agency_id smallint,
+	spending_category_id smallint,
+	vendor_id integer,
+	prime_vendor_id integer,
+	minority_type_id smallint,
+	industry_type_id smallint,
+	month_id int,
+	year_id smallint,
+	type_of_year char(1),
+	total_spending_amount numeric(16,2),
+	total_disbursements integer
+	) DISTRIBUTED BY (vendor_id);
+	
+CREATE TABLE aggregateon_subven_spending_contract (
+    agreement_id bigint,
+    document_id character varying(20),
+    sub_contract_id character varying(20),
+    document_code character varying(8),
+	vendor_id integer,
+	prime_vendor_id integer,
+	minority_type_id smallint,
+	industry_type_id smallint,
+	agency_id smallint,
+	description character varying(256),	
+	spending_category_id smallint,
+	year_id smallint,
+	type_of_year char(1),
+	total_spending_amount numeric(16,2), 
+	total_contract_amount numeric(16,2)
+	) DISTRIBUTED BY (agreement_id);
+	
+CREATE TABLE aggregateon_subven_spending_vendor (
+	vendor_id integer,
+	prime_vendor_id integer,
+	minority_type_id smallint,
+	industry_type_id smallint,
+	agency_id smallint,
+	spending_category_id smallint,
+	year_id smallint,
+	type_of_year char(1),
+	total_spending_amount numeric(16,2), 
+	total_contract_amount numeric(16,2),
+	is_all_categories char(1)
+	) DISTRIBUTED BY (vendor_id);
+	
+CREATE TABLE mid_aggregateon_subven_disbursement_spending_year(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	check_amount numeric(16,2),
+	type_of_year char(1))
+DISTRIBUTED BY (original_agreement_id);
+
+CREATE TABLE aggregateon_subven_contracts_cumulative_spending(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	description varchar,
+	contract_number varchar,
+	sub_contract_id character varying(20),
+	vendor_id int,
+	prime_vendor_id int,
+	minority_type_id smallint,
+	award_method_id smallint,
+	agency_id smallint,
+	industry_type_id smallint,
+	award_size_id smallint,
+	original_contract_amount numeric(16,2),
+	maximum_contract_amount numeric(16,2),
+	spending_amount_disb numeric(16,2),
+	spending_amount numeric(16,2),
+	current_year_spending_amount numeric(16,2),
+	dollar_difference numeric(16,2),
+	percent_difference numeric(16,2),
+	status_flag char(1),
+	type_of_year char(1)	
+) DISTRIBUTED BY (vendor_id);
+
+CREATE TABLE aggregateon_subven_contracts_spending_by_month(
+ original_agreement_id bigint,
+ fiscal_year smallint,
+ fiscal_year_id smallint,
+ document_code_id smallint,
+ month_id integer,
+ vendor_id int,
+ prime_vendor_id int,
+ minority_type_id smallint,
+ award_method_id smallint,
+ agency_id smallint,
+ industry_type_id smallint,
+ award_size_id smallint,
+ spending_amount numeric(16,2),
+ status_flag char(1),
+ type_of_year char(1) 
+) DISTRIBUTED BY (vendor_id);
+
+CREATE TABLE aggregateon_subven_total_contracts
+(
+fiscal_year smallint,
+fiscal_year_id smallint,
+vendor_id int,
+ prime_vendor_id int,
+ minority_type_id smallint,
+award_method_id smallint,
+agency_id smallint,
+industry_type_id smallint,
+award_size_id smallint,
+total_contracts bigint,
+total_commited_contracts bigint,
+total_master_agreements bigint,
+total_standalone_contracts bigint,
+total_revenue_contracts bigint,
+total_revenue_contracts_amount numeric(16,2),
+total_commited_contracts_amount numeric(16,2),
+total_contracts_amount numeric(16,2),
+total_spending_amount_disb numeric(16,2), 
+total_spending_amount numeric(16,2), 
+status_flag char(1),
+type_of_year char(1)
+) DISTRIBUTED BY (fiscal_year);
+
+
+CREATE TABLE contracts_subven_spending_transactions
+(
+disbursement_line_item_id bigint,
+original_agreement_id bigint,
+fiscal_year smallint,
+fiscal_year_id smallint,
+document_code_id smallint,
+vendor_id int,
+prime_vendor_id int,
+minority_type_id smallint,
+award_method_id smallint,
+document_agency_id smallint,
+industry_type_id smallint,
+award_size_id smallint,
+disb_document_id  character varying(20),
+disb_vendor_name  character varying,
+disb_check_eft_issued_date  date,
+disb_agency_name  character varying(100),
+disb_check_amount  numeric(16,2),
+disb_contract_number  character varying,
+disb_sub_contract_id  character varying,
+disb_purpose  character varying,
+disb_reporting_code  character varying(15),
+disb_spending_category_name  character varying,
+disb_agency_id  smallint,
+disb_vendor_id  integer,
+disb_spending_category_id  smallint,
+disb_agreement_id  bigint,
+disb_contract_document_code  character varying(8),
+disb_fiscal_year_id  smallint,
+disb_check_eft_issued_cal_month_id integer,
+disb_disbursement_number character varying(40),
+status_flag char(1),
+type_of_year char(1)
+) DISTRIBUTED BY (disbursement_line_item_id);
+	
+	
+	
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  
 

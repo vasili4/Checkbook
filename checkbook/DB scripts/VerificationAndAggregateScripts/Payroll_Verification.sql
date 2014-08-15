@@ -200,3 +200,42 @@ select count(*), pay_date, pay_cycle_code from payroll where pay_date > '2013-02
 7519;"2013-02-15";"A"
 111065;"2013-02-15";"Q"
 37441;"2013-02-20";"T"
+
+
+
+-- PAyroll summary data into disbursements table
+
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2015, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
+VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2016, 'Payroll Summary', now()::timestamp, 0);
+
+INSERT INTO ref_expenditure_object_history(expenditure_object_history_id, expenditure_object_id, expenditure_object_name, fiscal_year, created_date, load_id)
+SELECT nextval('seq_ref_expenditure_object_history_id'), expenditure_object_id, expenditure_object_name, fiscal_year, created_date, created_load_id
+FROM ref_expenditure_object WHERE expenditure_object_code = '!PS!' and fiscal_year in (2015,2016);
+
+DELETE FROM disbursement_line_item_details WHERE spending_category_id = 2 and fiscal_year = 2015 ;
+
+INSERT INTO disbursement_line_item_details(disbursement_line_item_id,check_eft_issued_date_id,check_eft_issued_nyc_year_id,check_eft_issued_cal_month_id,
+				fund_class_id,check_amount,agency_id,agency_code,expenditure_object_id,department_id,check_eft_issued_date,
+				agency_name,department_name,vendor_name,department_code,expenditure_object_name,expenditure_object_code,budget_code_id,
+				budget_code,budget_name,fund_class_code,spending_category_id,
+				spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,fiscal_year,
+				agency_short_name,department_short_name,load_id)
+	SELECT 	payroll_summary_id,pay_date_id,fiscal_year_id,b.calendar_month_id,
+		2 as fund_class_id,total_amount as check_amount,h.agency_id,h.agency_code,f.expenditure_object_id,j.department_id,b.date,
+		h.agency_name,j.department_name,j.department_name,j.department_code,f.expenditure_object_name,f.expenditure_object_code,a.budget_code_id,
+		k.budget_code,k.budget_code_name,'001',2 as spending_category_id,
+		'Payroll',calendar_fiscal_year_id,calendar_fiscal_year,a.fiscal_year,
+		h.agency_short_name,j.department_short_name,coalesce(a.updated_load_id, a.created_load_id)
+	FROM 	payroll_summary a 
+	JOIN ref_date b ON a.pay_date_id = b.date_id
+	JOIN (select * from ref_expenditure_object where expenditure_object_code = '!PS!') f ON  a.pms_fiscal_year = f.fiscal_year
+	JOIN ref_agency_history g ON a.agency_history_id = g.agency_history_id
+	JOIN ref_agency h ON g.agency_id = h.agency_id
+	JOIN ref_department_history i ON a.department_history_id = i.department_history_id
+	JOIN ref_department j ON i.department_id = j.department_id
+	JOIN ref_budget_code k ON a.budget_code_id = k.budget_code_id
+	WHERE a.fiscal_year = 2015 ;

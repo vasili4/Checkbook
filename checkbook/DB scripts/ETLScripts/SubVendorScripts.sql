@@ -36,7 +36,7 @@ BEGIN
 	l_vendor_stg_table :='etl.stg_scntrc_pymt';
 	
 	INSERT INTO etl.tmp_stg_scntrc_vendor(vend_cust_cd, lgl_nm, vendor_history_id, uniq_id)
-	SELECT vend_cust_cd, scntrc_lgl_nm, NULL as vendor_history_id, uniq_id
+	SELECT scntrc_vend_cd, scntrc_lgl_nm, NULL as vendor_history_id, uniq_id
 	FROM etl.stg_scntrc_pymt;
 	
 	ELSIF l_data_source_code = 'SC'  THEN
@@ -44,7 +44,7 @@ BEGIN
 	l_vendor_stg_table :='etl.stg_scntrc_details';
 	
 	INSERT INTO etl.tmp_stg_scntrc_vendor(vend_cust_cd, lgl_nm, vendor_history_id, uniq_id)
-	SELECT vend_cust_cd, scntrc_lgl_nm, NULL as vendor_history_id, uniq_id
+	SELECT scntrc_vend_cd, scntrc_lgl_nm, NULL as vendor_history_id, uniq_id
 	FROM etl.stg_scntrc_details;
 	
 	ELSE
@@ -137,9 +137,9 @@ BEGIN
 	
 	-- Inserting new Vendor records
 
-	TRUNCATE etl.scntrc_vendor_id_seq;
+	TRUNCATE etl.vendor_id_seq;
 	
-	INSERT INTO etl.scntrc_vendor_id_seq(uniq_id)
+	INSERT INTO etl.vendor_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM (SELECT vendor_customer_code, min(uniq_id) as uniq_id
 	      FROM   etl.tmp_scntrc_all_vendors
@@ -149,7 +149,7 @@ BEGIN
 	
 	INSERT INTO subvendor(vendor_id,vendor_customer_code,legal_name,created_load_id,created_date)
 	SELECT 	b.vendor_id,a.vendor_customer_code,a.lgl_nm,p_load_id_in as created_load_id, now()::timestamp
-	FROM	etl.tmp_scntrc_all_vendors a JOIN etl.scntrc_vendor_id_seq b ON a.uniq_id = b.uniq_id;
+	FROM	etl.tmp_scntrc_all_vendors a JOIN etl.vendor_id_seq b ON a.uniq_id = b.uniq_id;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
 			  	IF l_count >0 THEN
@@ -165,9 +165,9 @@ BEGIN
 
 	-- Inserting the records into vendor_history
 	
-	TRUNCATE etl.scntrc_vendor_history_id_seq;
+	TRUNCATE etl.vendor_history_id_seq;
 	
-	INSERT INTO etl.scntrc_vendor_history_id_seq(uniq_id)
+	INSERT INTO etl.vendor_history_id_seq(uniq_id)
 	SELECT uniq_id
 	FROM   etl.tmp_scntrc_all_vendors
 	WHERE  is_new_vendor ='Y' OR is_name_changed='Y'  OR is_bus_type_changed = 'Y';
@@ -176,7 +176,7 @@ BEGIN
 	INSERT INTO subvendor_history(vendor_history_id, vendor_id, legal_name,
 	    		load_id ,created_date)
 		SELECT 	b.vendor_history_id,c.vendor_id,a.lgl_nm,p_load_id_in as load_id, now()::timestamp
-		FROM	etl.tmp_scntrc_all_vendors a JOIN etl.scntrc_vendor_history_id_seq b ON a.uniq_id = b.uniq_id
+		FROM	etl.tmp_scntrc_all_vendors a JOIN etl.vendor_history_id_seq b ON a.uniq_id = b.uniq_id
 			JOIN subvendor c ON a.vendor_customer_code = c.vendor_customer_code ;
 	
 	GET DIAGNOSTICS l_count = ROW_COUNT;
@@ -193,8 +193,8 @@ BEGIN
 	TRUNCATE etl.tmp_scntrc_vendor_update ;
 	
 	INSERT INTO etl.tmp_scntrc_vendor_update (vendor_id, legal_name)
-	SELECT vendor_id, x.lgl_nm as legal_name , x.alias_nm as alias_name
-	FROM etl.tmp_scntrc_all_vendors x, etl.scntrc_vendor_history_id_seq y
+	SELECT vendor_id, x.lgl_nm as legal_name 
+	FROM etl.tmp_scntrc_all_vendors x, etl.vendor_history_id_seq y
 	WHERE	x.uniq_id = y.uniq_id AND x.is_new_vendor ='N' 
 	AND (x.is_name_changed='Y' OR x.is_bus_type_changed = 'Y') ;
 	
@@ -216,7 +216,7 @@ BEGIN
 	FROM
 	(select y.vendor_history_id, x.vendor_customer_code, x.lgl_nm, 
 						is_new_vendor, is_name_changed,  is_bus_type_changed
-	FROM etl.tmp_scntrc_all_vendors x, etl.scntrc_vendor_history_id_seq  y
+	FROM etl.tmp_scntrc_all_vendors x, etl.vendor_history_id_seq  y
 	WHERE x.uniq_id = y.uniq_id 
 	AND (x.is_new_vendor = 'Y' OR x.is_name_changed = 'Y'  OR x.is_bus_type_changed = 'Y')
 	) b
@@ -266,6 +266,27 @@ BEGIN
 					VALUES(p_load_file_id_in,'SV',l_count,'Number of records inserted into subvendor_business_type');
 	END IF;
 	
+
+	
+TRUNCATE  subvendor_min_bus_type;
+	
+INSERT INTO subvendor_min_bus_type(vendor_id, vendor_history_id, business_type_id, minority_type_id, business_type_code, business_type_name, minority_type_name ) 
+SELECT d.vendor_id, a.vendor_history_id, a.business_type_id as business_type_id,
+		(case when a.business_type_id = 2 then 11   when a.business_type_id = 5 then 9 else a.minority_type_id end) as minority_type_id,
+		c.business_type_code as business_type_code, 	c.business_type_name as business_type_name,
+		(case when a.business_type_id = 2 then 'Individuals & Others' when a.business_type_id = 5 then 'Caucasian Woman'  else b.minority_type_name end) as minority_type_name
+FROM
+(SELECT vendor_history_id , business_type_id ,minority_type_id 
+FROM subvendor_business_type 
+WHERE status =2 AND (business_type_id=2 or minority_type_id is not null or (vendor_history_id in 
+(SELECT DISTINCT vendor_history_id 
+FROM subvendor_business_type  WHERE  business_type_id = 5 AND status = 2 AND vendor_history_id not in 
+(SELECT DISTINCT vendor_history_id FROM subvendor_business_type WHERE minority_type_id is not null AND status = 2)) AND business_type_id=5))) a 
+LEFT JOIN ref_minority_type b ON a.minority_type_id = b.minority_type_id 
+LEFT JOIN ref_business_type c ON a.business_type_id = c.business_type_id
+LEFT JOIN subvendor_history d ON a.vendor_history_id = d.vendor_history_id;
+
+
 
 	
 	RETURN 1;

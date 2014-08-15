@@ -1978,7 +1978,14 @@ BEGIN
 	 -- updating maximum_contract_amount in disbursement_line_item_details
 	 
 	UPDATE disbursement_line_item_details a
-	SET	maximum_contract_amount = c.maximum_contract_amount		
+	SET	maximum_contract_amount = c.maximum_contract_amount,
+		industry_type_id = c.industry_type_id,
+		industry_type_name = c.industry_type_name,
+		agreement_type_code = c.agreement_type_code,
+		award_method_code = c.award_method_code,
+		contract_industry_type_id = c.industry_type_id,
+		contract_minority_type_id = c.minority_type_id,
+		purpose = c.description
 	FROM	tmp_ct_fms_line_item b, agreement_snapshot c
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
 		AND a.agreement_id = c.original_agreement_id AND master_agreement_yn = 'N' AND a.fiscal_year between c.starting_year AND c.ending_year;
@@ -1986,15 +1993,21 @@ BEGIN
 	 -- updating maximum_contract_amount_cy in disbursement_line_item_details
 	 
 	UPDATE disbursement_line_item_details a
-	SET	maximum_contract_amount_cy = c.maximum_contract_amount		
+	SET	maximum_contract_amount_cy = c.maximum_contract_amount,
+	contract_industry_type_id_cy = c.industry_type_id,
+	contract_minority_type_id_cy = c.minority_type_id,
+	purpose_cy = c.description
 	FROM	tmp_ct_fms_line_item b, agreement_snapshot_cy c
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-		AND a.agreement_id = c.original_agreement_id AND master_agreement_yn = 'N' AND a.fiscal_year between c.starting_year AND c.ending_year;
+		AND a.agreement_id = c.original_agreement_id AND master_agreement_yn = 'N' AND a.calendar_fiscal_year between c.starting_year AND c.ending_year;
 	
 	 -- updating maximum_spending_limit in disbursement_line_item_details
 	 
 	UPDATE disbursement_line_item_details a
-	SET	maximum_spending_limit = c.maximum_contract_amount		
+	SET	maximum_spending_limit = c.maximum_contract_amount,
+		master_contract_industry_type_id = c.industry_type_id,
+		master_contract_minority_type_id = c.minority_type_id,
+		master_purpose = c.description
 	FROM	tmp_ct_fms_line_item b, agreement_snapshot c
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
 		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
@@ -2002,10 +2015,13 @@ BEGIN
 	 -- updating maximum_spending_limit_cy in disbursement_line_item_details
 	 
 	UPDATE disbursement_line_item_details a
-	SET	maximum_spending_limit_cy = c.maximum_contract_amount		
+	SET	maximum_spending_limit_cy = c.maximum_contract_amount,
+		master_contract_industry_type_id_cy = c.industry_type_id,
+		master_contract_minority_type_id_cy = c.minority_type_id,
+		master_purpose_cy = c.description
 	FROM	tmp_ct_fms_line_item b, agreement_snapshot_cy c
 	WHERE	a.disbursement_line_item_id = b.disbursement_line_item_id
-		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.fiscal_year between c.starting_year AND c.ending_year;
+		AND a.master_agreement_id = c.original_agreement_id AND master_agreement_yn = 'Y' AND a.calendar_fiscal_year between c.starting_year AND c.ending_year;
 	
 	-- End of associating Disbursement line item to the original version of an agreement
 	
