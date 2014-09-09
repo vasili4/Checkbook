@@ -111,12 +111,14 @@ SubVenSpendingByVendorId,aggregateon_subven_spending_vendor,"CREATE TABLE aggreg
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2),
+	total_sub_contracts integer,
 	is_all_categories char(1)
 	) DISTRIBUTED BY (vendor_id)","SELECT X.vendor_id, X.prime_vendor_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id,   
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
        Y.total_contract_amount,
+       Y.total_sub_contracts,
        'N' as is_all_categories
   FROM (SELECT agency_id,
                vendor_id,
@@ -130,7 +132,8 @@ SubVenSpendingByVendorId,aggregateon_subven_spending_vendor,"CREATE TABLE aggreg
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
 GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'B' 
  GROUP BY 1,2,3,4,5,6,7) Y
  ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.agency_id = Y.agency_id 
@@ -142,6 +145,7 @@ LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id
        X.type_of_year,
        X.total_spending_amount,
        Y.total_contract_amount,
+       Y.total_sub_contracts,
        'Y' as is_all_categories
   FROM (SELECT agency_id,
                vendor_id,  
@@ -155,7 +159,8 @@ LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
 GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, year_id, SUM(total_contract_amount) as total_contract_amount
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+year_id, SUM(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
 FROM 
 (SELECT agreement_id, vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'B' 
@@ -167,6 +172,7 @@ FROM
        X.type_of_year,
        X.total_spending_amount,
        Y.total_contract_amount,
+       Y.total_sub_contracts,
        'N' as is_all_categories
   FROM (SELECT agency_id,
                vendor_id,
@@ -180,7 +186,8 @@ FROM
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
 GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'C' 
  GROUP BY 1,2,3,4,5,6,7) Y
  ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.agency_id = Y.agency_id 
@@ -192,6 +199,7 @@ LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id
        X.type_of_year,
        X.total_spending_amount,
        Y.total_contract_amount,
+       Y.total_sub_contracts,
        'Y' as is_all_categories
   FROM (SELECT agency_id,
                vendor_id,
@@ -205,7 +213,8 @@ LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
 GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, year_id, SUM(total_contract_amount) as total_contract_amount
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+year_id, SUM(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
 FROM 
 (SELECT agreement_id, vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'C' 
@@ -546,6 +555,7 @@ disb_contract_document_code  character varying(8),
 disb_fiscal_year_id  smallint,
 disb_check_eft_issued_cal_month_id integer,
 disb_disbursement_number character varying(40),
+disb_master_contract_number character varying,
 status_flag char(1),
 type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id)","SELECT 	d.disbursement_line_item_id, 
@@ -578,6 +588,7 @@ type_of_year char(1)
 		d.check_eft_issued_nyc_year_id,
 		d.check_eft_issued_cal_month_id,
 		d.disbursement_number,
+		d.master_contract_number,
 		'A' as status_flag,
 		'B' as type_of_year
 FROM   sub_agreement_snapshot_expanded a, ref_year b, subcontract_spending_details d
@@ -615,6 +626,7 @@ UNION ALL
 		d.check_eft_issued_nyc_year_id,
 		d.check_eft_issued_cal_month_id,
 		d.disbursement_number,
+		d.master_contract_number,
 		'R' as status_flag,
 		'B' as type_of_year
 FROM   sub_agreement_snapshot_expanded a, ref_year b, subcontract_spending_details d
@@ -650,6 +662,7 @@ AND a.status_flag='R' ","SELECT d.disbursement_line_item_id,
 		d.calendar_fiscal_year_id,
 		d.check_eft_issued_cal_month_id,
 		d.disbursement_number,
+		d.master_contract_number,
 		'A' as status_flag,
 		'C' as type_of_year
 FROM   sub_agreement_snapshot_expanded_cy a, ref_year b, subcontract_spending_details d
@@ -687,6 +700,7 @@ SELECT 	d.disbursement_line_item_id,
 		d.calendar_fiscal_year_id,
 		d.check_eft_issued_cal_month_id,
 		d.disbursement_number,
+		d.master_contract_number,
 		'R' as status_flag,
 		'C' as type_of_year
 FROM   sub_agreement_snapshot_expanded_cy a, ref_year b, subcontract_spending_details d

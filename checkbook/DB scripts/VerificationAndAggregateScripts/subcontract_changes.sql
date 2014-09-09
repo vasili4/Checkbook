@@ -184,6 +184,7 @@ CREATE  TABLE subcontract_details
   source_updated_calendar_year_id smallint,
   original_agreement_id bigint,
   original_version_flag character(1),
+  master_agreement_id bigint,
   latest_flag character(1),
   privacy_flag character(1),
   created_load_id integer,
@@ -282,6 +283,8 @@ CREATE TABLE sub_agreement_snapshot
    minority_type_id smallint,
    minority_type_name character varying(50),
    original_version_flag character(1),
+   master_agreement_id bigint,  
+   master_contract_number character varying,
    latest_flag character(1),
    load_id integer,
    last_modified_date timestamp without time zone,
@@ -427,6 +430,8 @@ CREATE TABLE subcontract_spending_details(
 	contract_industry_type_id_cy smallint,
 	contract_minority_type_id smallint,
 	contract_minority_type_id_cy smallint,	
+	master_agreement_id bigint,  
+    master_contract_number character varying,
 	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone,
@@ -511,7 +516,10 @@ CREATE TABLE all_agreement_transactions
    latest_flag character(1),
    load_id integer,
    last_modified_date timestamp without time zone,
+   last_modified_year_id smallint,
    is_prime_or_sub character(1),
+   is_minority_vendor character(1), 
+   vendor_type character(2),
    job_id bigint
  ) DISTRIBUTED BY (original_agreement_id);
  
@@ -618,7 +626,11 @@ CREATE TABLE all_agreement_transactions
 	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone,
+	last_modified_fiscal_year_id smallint,
+	last_modified_calendar_year_id smallint,
 	is_prime_or_sub character(1),
+	is_minority_vendor character(1), 
+    vendor_type character(2),
 	job_id bigint
 )
 DISTRIBUTED BY (disbursement_line_item_id);
@@ -640,7 +652,7 @@ INSERT INTO all_agreement_transactions(original_agreement_id, document_version, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, is_prime_or_sub, job_id)
+            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -657,8 +669,10 @@ INSERT INTO all_agreement_transactions(original_agreement_id, document_version, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, 'P' as is_prime_or_sub, job_id
-       FROM agreement_snapshot;
+            load_id, last_modified_date, b.nyc_year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,job_id
+       FROM agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date;
 
 
 INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_version, document_code_id, agency_history_id, 
@@ -677,7 +691,7 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, is_prime_or_sub, job_id)
+            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -694,8 +708,11 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, 'P' as is_prime_or_sub, job_id
-       FROM agreement_snapshot_cy;
+            load_id, last_modified_date, c.year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,job_id
+       FROM agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
        
        
    INSERT INTO all_disbursement_transactions(disbursement_line_item_id, disbursement_id, line_number, disbursement_number, 
@@ -724,8 +741,9 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             contract_industry_type_id, contract_industry_type_id_cy, master_contract_industry_type_id, 
             master_contract_industry_type_id_cy, contract_minority_type_id, 
             contract_minority_type_id_cy, master_contract_minority_type_id, 
-            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date,is_prime_or_sub, 
-            job_id)
+            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date,
+            last_modified_fiscal_year_id, last_modified_calendar_year_id,
+            is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
      SELECT disbursement_line_item_id, disbursement_id, line_number, disbursement_number, 
             check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
             check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
@@ -752,9 +770,13 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             contract_industry_type_id, contract_industry_type_id_cy, master_contract_industry_type_id, 
             master_contract_industry_type_id_cy, contract_minority_type_id, 
             contract_minority_type_id_cy, master_contract_minority_type_id, 
-            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date, 'P' as is_prime_or_sub,
-            job_id
-    FROM disbursement_line_item_details;
+            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date, 
+            b.nyc_year_id as last_modified_fiscal_year_id, c.year_id as last_modified_calendar_year_id,
+            'P' as is_prime_or_sub,
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type, job_id
+    FROM disbursement_line_item_details a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
     
     
 -- aggregate tables
@@ -807,6 +829,7 @@ CREATE TABLE aggregateon_subven_spending_vendor (
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2),
+	total_sub_contracts integer,
 	is_all_categories char(1)
 	) DISTRIBUTED BY (vendor_id);
 	
@@ -930,6 +953,7 @@ disb_contract_document_code  character varying(8),
 disb_fiscal_year_id  smallint,
 disb_check_eft_issued_cal_month_id integer,
 disb_disbursement_number character varying(40),
+disb_master_contract_number  character varying,
 status_flag char(1),
 type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);
@@ -1361,17 +1385,20 @@ psql -d checkbook_mwbe -f /home/gpadmin/TREDDY/SUB_CONTRACTS/CREATE_NEW_DATABASE
 
 /* Testing the script changes
  
- UPDATE etl.etl_data_load_file set processed_flag = 'N' where load_file_id in (11020, 11021, 11022, 11023);
+ -- UPDATE etl.etl_data_load_file set processed_flag = 'N' where load_file_id in (11020, 11021, 11022, 11023);
+ 
+ UPDATE etl.etl_data_load_file set processed_flag = 'N' where load_file_id in (11481, 11482, 11483, 11484);
  
 -- For business types
 
 select max(job_id) from etl.etl_data_load;
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(562, 'SV','2014-07-31 23:00:07.773','Y');
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11221,'AIEG_DLY_SCNTRC_BTY_20140515103710.txt','20140515103710','D','Y','Y','N','2014-07-31 11:36:22.03305');
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(600, 'SV','2014-07-31 23:00:07.773','Y');
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11981,'AIEG_DLY_SCNTRC_BTY_20140515103710.txt','20140515103710','D','Y','Y','N','2014-08-25 11:36:22.03305');
+load_file_id ===> 11481
 
-select etl.stageandarchivedata(11020);
-select etl.validatedata(11020);
-select etl.processdata(11020);
+select etl.stageandarchivedata(11481);
+select etl.validatedata(11481);
+select etl.processdata(11481);
 
 select count(*) from etl.stg_scntrc_bus_type; 
 select count(*) from subcontract_vendor_business_type;
@@ -1384,21 +1411,23 @@ select distinct scntrc_vend_cd, bus_typ, bus_typ_sta, min_typ from etl.stg_scntr
 
 -- For Sub Contracts status
 
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(562, 'SS','2014-07-31 23:00:07.773','Y');
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11222,'AIEG_DLY_SCNTRC_STA_20140515103710.txt','20140515103710','D','Y','Y','N','2014-07-31 11:36:22.03305');
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(600, 'SS','2014-08-25 23:00:07.773','Y');
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11982,'AIEG_DLY_SCNTRC_STA_20140515103710.txt','20140515103710','D','Y','Y','N','2014-08-25 11:36:22.03305');
+load_file_id ===> 11482
 
-select etl.stageandarchivedata(11021);
+
+select etl.stageandarchivedata(11482);
 
 select count(*) from etl.stg_scntrc_status ;
 wc -l /vol2share/NYC/FEEDS/GPFDIST_DIR/datafiles/scntrc_status_data_feed.txt
 
 
-select etl.validatedata(11021);
+select etl.validatedata(11482);
 
 select count(*) from etl.stg_scntrc_status ;
 
 
-select etl.processdata(11021);
+select etl.processdata(11482);
 
 select count(*) from subcontract_status ;
 select distinct doc_cd, doc_dept_cd, doc_id from etl.stg_scntrc_status;
@@ -1407,22 +1436,20 @@ select contract_number, count(*) from subcontract_status group by 1 having count
 -- For SubContract Contracts
 
 
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(562, 'SC','2014-07-31 23:00:07.773','Y');
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11223,'AIEG_DLY_SCNTRC_DET_20140515103710.txt','20140515103710','D','Y','Y','N','2014-07-31 11:36:22.03305');
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(600, 'SC','2014-08-25 23:00:07.773','Y');
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11983,'AIEG_DLY_SCNTRC_DET_20140515103710.txt','20140515103710','D','Y','Y','N','2014-08-25 11:36:22.03305');
+load_file_id ===> 11483
 
 
-select etl.stageandarchivedata(11022);
+select etl.stageandarchivedata(11483);
 
 select count(*) from etl.stg_scntrc_details;
  wc -l /vol2share/NYC/FEEDS/GPFDIST_DIR/datafiles/scntrc_details_data_feed.txt
 
-select etl.validatedata(11022);
+select etl.validatedata(11483);
 select count(*) from etl.stg_scntrc_details;
 
-select etl.processdata(11022);  or
-
-select etl.updateForeignKeysForSubContracts(11022, 11223);
-select etl.processsubvendor(11022, 11223);
+select etl.processdata(11483);  
 
 
 select count(*) from subcontract_details;
@@ -1432,18 +1459,19 @@ select distinct doc_cd, doc_dept_cd, doc_id, scntrc_vers_no, scntrc_id from etl.
 
 -- For SubContract Spending
 
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(562, 'SF','2014-08-01 23:00:07.773','Y');
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11224,'AIEG_DLY_SCNTRC_PMT_20140515103710.txt','20140515103710','D','Y','Y','N','2014-08-01 11:36:22.03305');
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(600, 'SF','2014-08-25 23:00:07.773','Y');
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(11984,'AIEG_DLY_SCNTRC_PMT_20140515103710.txt','20140515103710','D','Y','Y','N','2014-08-25 11:36:22.03305');
+load_file_id ===> 11484
 
 
-select etl.stageandarchivedata(11023);
+select etl.stageandarchivedata(11484);
 select count(*) from etl.stg_scntrc_pymt ;
  wc -l /vol2share/NYC/FEEDS/GPFDIST_DIR/datafiles/scntrc_pymt_data_feed.txt
  
- select etl.validatedata(11023);
+ select etl.validatedata(11484);
 select count(*) from etl.stg_scntrc_pymt;
 
-select etl.processdata(11023);
+select etl.processdata(11484);
 
 select count(*) from subcontract_spending;
 
@@ -1451,16 +1479,16 @@ select count(*) from subcontract_spending;
 
 -- post process sub contracts and sub contract spending
 
-select etl.postProcessSubContracts(562);
+select etl.postProcessSubContracts(600);
 select count(*) from sub_agreement_snapshot;
 select count(*) from sub_agreement_snapshot_cy;
 
 
-select etl.refreshFactsForSubPayments(562);
+select etl.refreshFactsForSubPayments(600);
 select count(*) from subcontract_spending_details ;
 select * from subcontract_spending_details order by vendor_customer_code;
 
-select etl.refreshSubContractsPreAggregateTables(562); 
+select etl.refreshSubContractsPreAggregateTables(600); 
 select count(*) from sub_agreement_snapshot_expanded;
 select count(*) from sub_agreement_snapshot_expanded_cy;
 select count(*), status_flag from sub_agreement_snapshot_expanded group by 2;
@@ -1468,7 +1496,7 @@ select count(*), status_flag from sub_agreement_snapshot_expanded_cy group by 2;
 select count(*), status_flag, fiscal_year from sub_agreement_snapshot_expanded group by 2,3 order by 2,3;
 select count(*), status_flag, fiscal_year from sub_agreement_snapshot_expanded_cy group by 2,3 order by 2,3;
 
-select etl.refreshCommonTransactionTables(562);
+select etl.refreshCommonTransactionTables(600);
 select count(*) from all_agreement_transactions where is_prime_or_sub = 'P';
 select count(*) from all_agreement_transactions where is_prime_or_sub = 'S';
 select count(*) from agreement_snapshot;
@@ -1482,7 +1510,9 @@ select count(*) from subcontract_spending_details;
 
 
 
-select etl.temprefreshsubvenaggregates(562);
+select etl.temprefreshsubvenaggregates(600);
+
+select etl.grantaccess('webuser1','SELECT');
 
 select count(*) from aggregateon_subven_spending_coa_entities;
 select type_of_year, count(*) from aggregateon_subven_spending_coa_entities group by 1;

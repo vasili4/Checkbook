@@ -1066,7 +1066,7 @@ BEGIN
 	l_create_sql :='';
 	
 	SELECT ARRAY(SELECT aggregate_table_name
-		FROM etl.aggregate_tables WHERE execution_order > 50 
+		FROM etl.aggregate_tables WHERE execution_order > 30 
 		ORDER BY execution_order) INTO l_aggregate_table_array;
 
 

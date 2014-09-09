@@ -984,6 +984,9 @@ CREATE TABLE history_agreement (
  ) DISTRIBUTED BY (original_agreement_id);
  
 
+ CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
+ 
+ 
 CREATE TABLE history_agreement_accounting_line (
     agreement_accounting_line_id bigint DEFAULT nextval('seq_agreement_accounting_line_id'::regclass) NOT NULL,
     agreement_id bigint,
@@ -1855,9 +1858,6 @@ CREATE TABLE aggregateon_payroll_year_and_month(
 DISTRIBUTED BY (fiscal_year_id);
 
 
-	
-CREATE TABLE agreement_snapshot_cy (LIKE agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
-
 CREATE TABLE agreement_snapshot_deleted (
   agreement_id bigint NOT NULL,
   original_agreement_id bigint NOT NULL,
@@ -2401,6 +2401,27 @@ CREATE TABLE contracts_mwbe_spending_transactions(
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);	
 
+
+CREATE TABLE contract_vendor_latest_mwbe_category (
+	vendor_id integer,
+	vendor_history_id integer,
+	agency_id smallint,
+	minority_type_id smallint,
+	year_id smallint,
+	type_of_year char(1)
+	) DISTRIBUTED BY (vendor_id) ;
+	
+	
+CREATE TABLE spending_vendor_latest_mwbe_category (
+	vendor_id integer,
+	vendor_history_id integer,
+	agency_id smallint,
+	minority_type_id smallint,
+	year_id smallint,
+	type_of_year char(1)
+	) DISTRIBUTED BY (vendor_id) ;
+	
+
 ---------------------------------------------------------------------------------------------------------
 
 -- Tables for Sub Contracts
@@ -2565,6 +2586,7 @@ CREATE  TABLE subcontract_details
   source_updated_calendar_year_id smallint,
   original_agreement_id bigint,
   original_version_flag character(1),
+  master_agreement_id bigint,
   latest_flag character(1),
   privacy_flag character(1),
   created_load_id integer,
@@ -2660,6 +2682,8 @@ CREATE TABLE sub_agreement_snapshot
    minority_type_id smallint,
    minority_type_name character varying(50),
    original_version_flag character(1),
+   master_agreement_id bigint,  
+   master_contract_number character varying,
    latest_flag character(1),
    load_id integer,
    last_modified_date timestamp without time zone,
@@ -2796,6 +2820,8 @@ CREATE TABLE subcontract_spending_details(
 	contract_industry_type_id_cy smallint,
 	contract_minority_type_id smallint,
 	contract_minority_type_id_cy smallint,	
+	master_agreement_id bigint,  
+    master_contract_number character varying,
 	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone,
@@ -2878,7 +2904,10 @@ CREATE TABLE all_agreement_transactions
    latest_flag character(1),
    load_id integer,
    last_modified_date timestamp without time zone,
+   last_modified_year_id smallint,
    is_prime_or_sub character(1),
+   is_minority_vendor character(1), 
+   vendor_type character(2),
    job_id bigint
  ) DISTRIBUTED BY (original_agreement_id);
  
@@ -2981,7 +3010,11 @@ CREATE TABLE all_agreement_transactions
 	file_type char(1),
 	load_id integer,
 	last_modified_date timestamp without time zone,
+	last_modified_fiscal_year_id smallint,
+	last_modified_calendar_year_id smallint,
 	is_prime_or_sub character(1),
+	is_minority_vendor character(1), 
+    vendor_type character(2),
 	job_id bigint
 )
 DISTRIBUTED BY (disbursement_line_item_id);
@@ -3032,6 +3065,7 @@ CREATE TABLE aggregateon_subven_spending_vendor (
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2),
+	total_sub_contracts integer,
 	is_all_categories char(1)
 	) DISTRIBUTED BY (vendor_id);
 	
@@ -3145,6 +3179,7 @@ disb_contract_document_code  character varying(8),
 disb_fiscal_year_id  smallint,
 disb_check_eft_issued_cal_month_id integer,
 disb_disbursement_number character varying(40),
+disb_master_contract_number  character varying,
 status_flag char(1),
 type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);

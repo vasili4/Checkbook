@@ -405,7 +405,8 @@ BEGIN
 												contract_document_code varchar, 
 												industry_type_id smallint, industry_type_name varchar, agreement_type_code varchar, award_method_code varchar,
 												contract_industry_type_id smallint, contract_industry_type_id_cy smallint,
-												contract_minority_type_id smallint, contract_minority_type_id_cy smallint)
+												contract_minority_type_id smallint, contract_minority_type_id_cy smallint,
+												master_agreement_id bigint,master_contract_number varchar)
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_sub_agreement_con(disbursement_line_item_id,agreement_id,fiscal_year,calendar_fiscal_year)
@@ -420,7 +421,8 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_sub_agreement_con_fy(disbursement_line_item_id bigint,agreement_id bigint, contract_number varchar,
 						maximum_contract_amount_fy numeric(16,2), purpose_fy varchar, contract_vendor_id_fy integer, contract_prime_vendor_id_fy integer, contract_agency_id_fy smallint, contract_document_code_fy varchar, 
 						industry_type_id smallint, industry_type_name varchar, agreement_type_code varchar, award_method_code varchar,
-						contract_industry_type_id_fy smallint, contract_minority_type_id_fy smallint)
+						contract_industry_type_id_fy smallint, contract_minority_type_id_fy smallint,
+						master_agreement_id bigint,master_contract_number varchar)
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_sub_agreement_con_fy
@@ -436,7 +438,9 @@ BEGIN
 	b.agreement_type_code as agreement_type_code,
 	b.award_method_code as award_method_code,
 	b.industry_type_id as contract_industry_type_id_fy,
-	b.minority_type_id as contract_minority_type_id_fy
+	b.minority_type_id as contract_minority_type_id_fy,
+	b.master_agreement_id,
+	b.master_contract_number
 		FROM tmp_sub_agreement_con a JOIN sub_agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND a.fiscal_year between b.starting_year and b.ending_year
 		JOIN subcontract_spending c ON a.disbursement_line_item_id = c.disbursement_line_item_id
 		JOIN ref_document_code e ON b.document_code_id = e.document_code_id ;
@@ -455,7 +459,9 @@ BEGIN
 	b.agreement_type_code as agreement_type_code,
 	b.award_method_code as award_method_code,
 	b.industry_type_id as contract_industry_type_id_fy,
-	b.minority_type_id as contract_minority_type_id_fy
+	b.minority_type_id as contract_minority_type_id_fy,
+	b.master_agreement_id,
+	b.master_contract_number
 		FROM tmp_sub_agreement_con a JOIN sub_agreement_snapshot b ON a.agreement_id = b.original_agreement_id AND b.latest_flag='Y'
 		JOIN subcontract_spending c ON a.disbursement_line_item_id = c.disbursement_line_item_id
 		JOIN ref_document_code e ON b.document_code_id = e.document_code_id 
@@ -475,7 +481,9 @@ BEGIN
 		agreement_type_code = b.agreement_type_code,
 		award_method_code = b.award_method_code,
 		contract_industry_type_id = b.contract_industry_type_id_fy,
-		contract_minority_type_id = b.contract_minority_type_id_fy
+		contract_minority_type_id = b.contract_minority_type_id_fy,
+		master_agreement_id = b.master_agreement_id,
+		master_contract_number = b.master_contract_number
 	FROM tmp_sub_agreement_con_fy b
 	WHERE a.disbursement_line_item_id = b.disbursement_line_item_id;
 	
@@ -557,7 +565,9 @@ BEGIN
 		contract_industry_type_id = b.contract_industry_type_id,
 		contract_industry_type_id_cy = b.contract_industry_type_id_cy,
 		contract_minority_type_id = b.contract_minority_type_id,
-		contract_minority_type_id_cy = b.contract_minority_type_id_cy
+		contract_minority_type_id_cy = b.contract_minority_type_id_cy,
+		master_agreement_id = b.master_agreement_id,
+		master_contract_number = b.master_contract_number
 	FROM	tmp_sub_agreement_con  b
 	WHERE   a.disbursement_line_item_id = b.disbursement_line_item_id;
 	

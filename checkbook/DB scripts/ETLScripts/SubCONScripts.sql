@@ -6,6 +6,7 @@ Functions defined
 	updateSubCONFlags
 	postProcessSubContracts
 	refreshSubContractsPreAggregateTables
+	refreshCommonTransactionTables
 
 */
 
@@ -251,7 +252,7 @@ BEGIN
 				agency_history_id,document_id,document_version,sub_contract_id,
 				tracking_number,description,industry_type_id,is_mwbe_cert,
 				maximum_contract_amount_original,maximum_contract_amount,
-				effective_begin_date_id,effective_end_date_id,agreement_type_id,
+				effective_begin_date_id,effective_end_date_id,
 				source_updated_date_id,vendor_history_id,prime_vendor_id,registered_date_id,created_load_id,created_date,
 				registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
 				registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
@@ -263,7 +264,7 @@ BEGIN
 		a.agency_history_id,a.doc_id,a.scntrc_vers_no,a.scntrc_id,
 		a.scntrc_trkg_no,a.scntrc_dscr,e.industry_type_id,a.scntrc_mwbe_cert,
 		a.scntrc_max_am, (CASE WHEN a.scntrc_max_am IS NULL THEN 0 ELSE a.scntrc_max_am END) as maximum_contract_amount,
-		a.effective_begin_date_id,a.effective_end_date_id,a.cntrc_typ,
+		a.effective_begin_date_id,a.effective_end_date_id,
 		a.source_updated_date_id,a.vendor_history_id,f.vendor_id as prime_vendor_id,a.registered_date_id,p_load_id_in,now()::timestamp,
 		registered_fiscal_year,registered_fiscal_year_id, registered_calendar_year,
 		registered_calendar_year_id,effective_end_fiscal_year,effective_end_fiscal_year_id, 
@@ -325,7 +326,6 @@ BEGIN
 		effective_begin_date_id = b.effective_begin_date_id,
 		effective_end_date_id = b.effective_end_date_id,
 		source_updated_date_id = b.source_updated_date_id,
-		agreement_type_id = b.cntrc_typ,
 		vendor_history_id = b.vendor_history_id,
 		prime_vendor_id = b.prime_vendor_id,
 		registered_date_id = b.registered_date_id,
@@ -382,8 +382,10 @@ BEGIN
 		award_category_id = b.award_category_id,
 		brd_awd_no = b.brd_awd_no,
 		number_solicitation = b.number_solicitation,
-		number_responses = b.number_responses
-	FROM (select contract_number, award_method_id, award_category_id_1 as award_category_id, brd_awd_no, number_solicitation, number_responses from history_agreement where latest_flag = 'Y') b
+		number_responses = b.number_responses,
+		master_agreement_id = b.master_agreement_id,
+		agreement_type_id = b.agreement_type_id
+	FROM (select contract_number, award_method_id, award_category_id_1 as award_category_id, brd_awd_no, number_solicitation, number_responses, master_agreement_id, agreement_type_id from history_agreement where latest_flag = 'Y') b
 	WHERE a.contract_number = b.contract_number;
 
 	RAISE NOTICE '7';
@@ -722,7 +724,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					minority_type_id, minority_type_name,
+					minority_type_id, minority_type_name,master_agreement_id,master_contract_number,
 					load_id,last_modified_date,job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
@@ -746,13 +748,14 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_fiscal_year, b.registered_fiscal_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		m.minority_type_id, m.minority_type_name,
+		m.minority_type_id, m.minority_type_name,b.master_agreement_id,d.contract_number, 
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_sub_agreement_snapshot a JOIN subcontract_details b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN subvendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN subvendor v ON c.vendor_id = v.vendor_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
 		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id
+		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id = f.award_category_id
 		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
@@ -894,7 +897,7 @@ BEGIN
 					registered_date_id,brd_awd_no,tracking_number,rfed_amount,
 					registered_year, registered_year_id,latest_flag,original_version_flag,
 					effective_begin_year,effective_begin_year_id,effective_end_year,effective_end_year_id,
-					minority_type_id, minority_type_name,
+					minority_type_id, minority_type_name,master_agreement_id,master_contract_number,
 					load_id,last_modified_date, job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
@@ -918,13 +921,14 @@ BEGIN
 		j.date_id as registered_date_id,b.brd_awd_no,b.tracking_number,b.rfed_amount,
 		b.registered_calendar_year, b.registered_calendar_year_id,b.latest_flag,a.original_version_flag,
 		a.effective_begin_fiscal_year,a.effective_begin_fiscal_year_id,a.effective_end_fiscal_year,a.effective_end_fiscal_year_id,
-		m.minority_type_id, m.minority_type_name,
+		m.minority_type_id, m.minority_type_name,b.master_agreement_id,d.contract_number,
 		coalesce(b.updated_load_id, b.created_load_id),coalesce(b.updated_date, b.created_date), p_job_id_in
 	FROM	tmp_sub_agreement_snapshot a JOIN subcontract_details b ON a.agreement_id = b.agreement_id 
 		LEFT JOIN subvendor_history c ON b.vendor_history_id = c.vendor_history_id
 		LEFT JOIN subvendor v ON c.vendor_id = v.vendor_id
 		LEFT JOIN ref_agency_history ah ON b.agency_history_id = ah.agency_history_id
-		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id		
+		LEFT JOIN ref_agency ag ON ah.agency_id = ag.agency_id
+		LEFT JOIN history_master_agreement d ON b.master_agreement_id = d.master_agreement_id
 		LEFT JOIN ref_agreement_type e ON b.agreement_type_id = e.agreement_type_id
 		LEFT JOIN ref_award_category f ON b.award_category_id = f.award_category_id
 		LEFT JOIN ref_award_method am ON b.award_method_id = am.award_method_id
@@ -1291,8 +1295,8 @@ BEGIN
 	
 	
 	DELETE FROM ONLY all_agreement_transactions a
-	USING agreement_snapshot_deleted b
-	WHERE a.original_agreement_id = b.original_agreement_id 
+	USING agreement_snapshot b
+	WHERE a.agreement_id = b.agreement_id 
 	AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
 	
 	DELETE FROM all_agreement_transactions WHERE is_prime_or_sub = 'S';
@@ -1313,7 +1317,7 @@ BEGIN
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, is_prime_or_sub, job_id)
+            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type, job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1330,8 +1334,11 @@ BEGIN
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, 'P' as is_prime_or_sub, job_id
-       FROM agreement_snapshot where job_id = p_job_id_in;
+            load_id, last_modified_date, b.nyc_year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,job_id
+       FROM agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+       where job_id = p_job_id_in;
        
        
       INSERT INTO all_agreement_transactions(original_agreement_id, document_version, document_code_id, agency_history_id, 
@@ -1349,7 +1356,8 @@ BEGIN
             effective_end_date_id, effective_end_year, effective_end_year_id, 
             registered_date, registered_date_id, brd_awd_no, tracking_number, 
             rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
-            latest_flag, load_id, last_modified_date, is_prime_or_sub, job_id)
+            master_agreement_id,master_contract_number,master_agreement_yn,
+            latest_flag, load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
      SELECT original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1365,8 +1373,11 @@ BEGIN
             effective_end_date_id, effective_end_year, effective_end_year_id, 
             registered_date, registered_date_id, brd_awd_no, tracking_number, 
             rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
-            latest_flag, load_id, last_modified_date, 'S' as is_prime_or_sub, job_id
-     FROM sub_agreement_snapshot;
+            master_agreement_id,master_contract_number,'N' as master_agreement_yn,
+            latest_flag, load_id, last_modified_date,  b.nyc_year_id as last_modified_year_id, 'S' as is_prime_or_sub, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type, job_id
+     FROM sub_agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date;
        
        	
 
@@ -1374,8 +1385,8 @@ RAISE NOTICE 'REF COMMON TT1';
 
 
 DELETE FROM ONLY all_agreement_transactions_cy a
-	USING agreement_snapshot_cy_deleted b
-	WHERE a.original_agreement_id = b.original_agreement_id 
+	USING agreement_snapshot_cy b
+	WHERE a.agreement_id = b.agreement_id 
 	AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
 	
 	DELETE FROM all_agreement_transactions_cy WHERE is_prime_or_sub = 'S';
@@ -1396,7 +1407,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, is_prime_or_sub, job_id)
+            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1413,8 +1424,12 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, 'P' as is_prime_or_sub, job_id
-       FROM agreement_snapshot_cy where job_id = p_job_id_in;
+            load_id, last_modified_date, c.year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,job_id
+       FROM agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
+       where job_id = p_job_id_in;
        
        
       INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_version, document_code_id, agency_history_id, 
@@ -1432,7 +1447,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             effective_end_date_id, effective_end_year, effective_end_year_id, 
             registered_date, registered_date_id, brd_awd_no, tracking_number, 
             rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
-            latest_flag, load_id, last_modified_date, is_prime_or_sub, job_id)
+            master_agreement_id,master_contract_number, master_agreement_yn,
+            latest_flag, load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
      SELECT original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1448,14 +1464,18 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             effective_end_date_id, effective_end_year, effective_end_year_id, 
             registered_date, registered_date_id, brd_awd_no, tracking_number, 
             rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
-            latest_flag, load_id, last_modified_date, 'S' as is_prime_or_sub, job_id
-     FROM sub_agreement_snapshot_cy;
+            master_agreement_id,master_contract_number,'N' as master_agreement_yn,
+            latest_flag, load_id, last_modified_date, c.year_id as last_modified_year_id,'S' as is_prime_or_sub, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type,job_id
+     FROM sub_agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
        
        	
 	RAISE NOTICE 'REF COMMON TT2';
 
   DELETE FROM ONLY all_disbursement_transactions a
-  USING disbursement_line_item_deleted b
+  USING disbursement_line_item_details b
   WHERE a.disbursement_line_item_id = b.disbursement_line_item_id
   AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
   
@@ -1487,8 +1507,9 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             contract_industry_type_id, contract_industry_type_id_cy, master_contract_industry_type_id, 
             master_contract_industry_type_id_cy, contract_minority_type_id, 
             contract_minority_type_id_cy, master_contract_minority_type_id, 
-            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date,is_prime_or_sub, 
-            job_id)
+            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date,
+            last_modified_fiscal_year_id, last_modified_calendar_year_id,
+            is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
      SELECT disbursement_line_item_id, disbursement_id, line_number, disbursement_number, 
             check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
             check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
@@ -1515,9 +1536,14 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             contract_industry_type_id, contract_industry_type_id_cy, master_contract_industry_type_id, 
             master_contract_industry_type_id_cy, contract_minority_type_id, 
             contract_minority_type_id_cy, master_contract_minority_type_id, 
-            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date, 'P' as is_prime_or_sub,
-            job_id
-    FROM disbursement_line_item_details WHERE job_id = p_job_id_in;
+            master_contract_minority_type_id_cy, file_type, load_id, last_modified_date, 
+            b.nyc_year_id as last_modified_fiscal_year_id, c.year_id as last_modified_calendar_year_id,
+            'P' as is_prime_or_sub,
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,job_id
+    FROM disbursement_line_item_details a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
+    WHERE job_id = p_job_id_in;
     
     
     INSERT INTO all_disbursement_transactions(disbursement_line_item_id, disbursement_number, payment_id, check_eft_issued_date_id, 
@@ -1534,7 +1560,10 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             minority_type_id, minority_type_name, industry_type_id, industry_type_name, 
             agreement_type_code, award_method_code, contract_industry_type_id, 
             contract_industry_type_id_cy, contract_minority_type_id, contract_minority_type_id_cy, 
-            file_type, load_id, last_modified_date, is_prime_or_sub, job_id)
+            master_agreement_id,master_contract_number,
+            file_type, load_id, last_modified_date, 
+            last_modified_fiscal_year_id, last_modified_calendar_year_id,
+            is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
    SELECT  disbursement_line_item_id, disbursement_number, payment_id, check_eft_issued_date_id, 
             check_eft_issued_nyc_year_id, fiscal_year, check_eft_issued_cal_month_id, 
             agreement_id, check_amount, agency_id, agency_history_id, agency_code, 
@@ -1549,8 +1578,14 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             minority_type_id, minority_type_name, industry_type_id, industry_type_name, 
             agreement_type_code, award_method_code, contract_industry_type_id, 
             contract_industry_type_id_cy, contract_minority_type_id, contract_minority_type_id_cy, 
-            file_type, load_id, last_modified_date, 'S' as is_prime_or_sub, job_id
-    FROM subcontract_spending_details;
+            master_agreement_id,master_contract_number,
+            file_type, load_id, last_modified_date, 
+            b.nyc_year_id as last_modified_fiscal_year_id, c.year_id as last_modified_calendar_year_id,
+            'S' as is_prime_or_sub, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type, job_id
+    FROM subcontract_spending_details a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
             
             
 	

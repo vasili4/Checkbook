@@ -199,7 +199,8 @@ FROM
 (SELECT agreement_id, minority_type_id, industry_type_id, vendor_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
  FROM aggregateon_mwbe_spending_contract WHERE type_of_year = 'C' 
  GROUP BY 1,2,3,4,5,6) Z GROUP BY 1,2,3,4,5) Y
- ON X.vendor_id = Y.vendor_id AND X.agency_id = Y.agency_id AND X.year_id = Y.year_id ",33
+ ON X.vendor_id = Y.vendor_id AND X.agency_id = Y.agency_id AND X.year_id = Y.year_id 
+ AND X.minority_type_id = Y.minority_type_id AND X.industry_type_id = Y.industry_type_id",33
 MWBESpendingByVendorExpObject,aggregateon_mwbe_spending_vendor_exp_object,"CREATE TABLE aggregateon_mwbe_spending_vendor_exp_object(
 	vendor_id integer,
 	minority_type_id smallint,
@@ -1037,3 +1038,115 @@ FROM   agreement_snapshot_expanded_cy a, ref_year b, disbursement_line_item_deta
 WHERE a.fiscal_year = b.year_value 
 AND a.original_agreement_id = d.master_agreement_id  AND a.fiscal_year >= d.calendar_fiscal_year
 AND a.status_flag='R' AND a.master_agreement_yn = 'Y' ",40
+MWBEContractVendorLatestMinority,contract_vendor_latest_mwbe_category,"CREATE TABLE contract_vendor_latest_mwbe_category (
+	vendor_id integer,
+	vendor_history_id integer,
+	agency_id smallint,
+	minority_type_id smallint,	
+	year_id smallint,
+	type_of_year char(1)
+	) DISTRIBUTED BY (vendor_id)  ","SELECT a.vendor_id, 
+	a.vendor_history_id, 
+	NULL as agency_id, 
+	(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+	year_id, 
+	'B' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, last_modified_year_id as year_id
+FROM all_agreement_transactions 
+WHERE is_prime_or_sub = 'P'
+GROUP BY 1,3 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id
+UNION ALL
+SELECT 	a.vendor_id, 
+		a.vendor_history_id, 
+		agency_id, 
+		(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+		year_id, 
+		'B' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, agency_id, last_modified_year_id as year_id
+FROM all_agreement_transactions 
+WHERE is_prime_or_sub = 'P'
+GROUP BY 1,3,4 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id","SELECT a.vendor_id, 
+	a.vendor_history_id, 
+	NULL as agency_id, 
+	(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+	year_id, 
+	'C' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, last_modified_year_id as year_id
+FROM all_agreement_transactions_cy 
+WHERE is_prime_or_sub = 'P'
+GROUP BY 1,3 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id
+UNION ALL
+SELECT 	a.vendor_id, 
+		a.vendor_history_id, 
+		agency_id, 
+		(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+		year_id, 
+		'C' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, agency_id, last_modified_year_id as year_id
+FROM all_agreement_transactions_cy 
+WHERE is_prime_or_sub = 'P'
+GROUP BY 1,3,4 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id",41
+MWBESpendingVendorLatestMinority,spending_vendor_latest_mwbe_category,"CREATE TABLE spending_vendor_latest_mwbe_category (
+	vendor_id integer,
+	vendor_history_id integer,
+	agency_id smallint,
+	minority_type_id smallint,
+	year_id smallint,
+	type_of_year char(1)
+	) DISTRIBUTED BY (vendor_id)  ","SELECT a.vendor_id, 
+	a.vendor_history_id, 
+	NULL as agency_id, 
+	(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+	year_id, 
+	'B' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, last_modified_fiscal_year_id as year_id
+FROM all_disbursement_transactions a JOIN disbursement b ON a.disbursement_id = b.disbursement_id
+WHERE is_prime_or_sub = 'P' AND spending_category_id !=2
+GROUP BY 1,3 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id
+UNION ALL
+SELECT a.vendor_id, 
+	a.vendor_history_id, 
+	agency_id, 
+	(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+	year_id, 
+	'B' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, agency_id, last_modified_fiscal_year_id as year_id
+FROM all_disbursement_transactions a JOIN disbursement b ON a.disbursement_id = b.disbursement_id
+WHERE is_prime_or_sub = 'P' AND spending_category_id !=2
+GROUP BY 1,3,4 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id","SELECT a.vendor_id, 
+	a.vendor_history_id, 
+	NULL as agency_id, 
+	(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+	year_id, 
+	'C' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, last_modified_calendar_year_id as year_id
+FROM all_disbursement_transactions a JOIN disbursement b ON a.disbursement_id = b.disbursement_id
+WHERE is_prime_or_sub = 'P' AND spending_category_id !=2
+GROUP BY 1,3 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id
+UNION ALL
+SELECT a.vendor_id, 
+	a.vendor_history_id, 
+	agency_id, 
+	(CASE WHEN b.vendor_history_id IS NULL THEN 7 ELSE b.minority_type_id END) as minority_type_id, 
+	year_id, 
+	'C' as type_of_year
+FROM
+(SELECT vendor_id, max(vendor_history_id) as vendor_history_id, agency_id, last_modified_calendar_year_id as year_id
+FROM all_disbursement_transactions a JOIN disbursement b ON a.disbursement_id = b.disbursement_id
+WHERE is_prime_or_sub = 'P' AND spending_category_id !=2
+GROUP BY 1,3,4 ) a
+LEFT JOIN vendor_min_bus_type b ON a.vendor_history_id = b.vendor_history_id",42

@@ -15,7 +15,89 @@ psql -d checkbook_mwbe -f PendingContracts.sql 1>1.out 2>2.err
 
 -- Aggregate table scripts changed
 
+---- start industry type reclassification changes ----
+
+INSERT INTO ref_award_category(award_category_code, award_category_name, created_date) values('028','CULTURAL RELATED SERVICES',now()::timestamp),('029','ECONOMIC DEVELOPMENT',now()::timestamp);
+UPDATE ref_award_category SET  created_date = now()::timestamp where award_category_code in ('028','029');
+
+
+INSERT INTO ref_award_category_industry(award_category_code, industry_type_id, created_date) SELECT '028' as award_category_code, industry_type_id, now()::timestamp from ref_industry_type where industry_type_name = 'Standardized Services'  ;
+INSERT INTO ref_award_category_industry(award_category_code, industry_type_id, created_date) SELECT '029' as award_category_code, industry_type_id, now()::timestamp from ref_industry_type where industry_type_name = 'Standardized Services' ;
+UPDATE ref_award_category_industry SET  created_date = now()::timestamp where award_category_code in ('028','029');
+
+
+update ref_award_category_industry a 
+set industry_type_id = b.industry_type_id
+FROM ref_industry_type b
+WHERE a.award_category_code in ('023','200','888') AND b.industry_type_name = 'Professional Services' ;
+
+
+update ref_award_category_industry a 
+set industry_type_id = b.industry_type_id
+FROM ref_industry_type b
+WHERE a.award_category_code in ('035','040') AND b.industry_type_name = 'Standardized Services' ;
+
+
+update ref_award_category_industry a 
+set industry_type_id = b.industry_type_id
+FROM ref_industry_type b
+WHERE a.award_category_code in ('041','042','043','050','051','052','054','055','056','057','058','059','060','061','062','063','064','065','066','067','068','100','101','102','103') 
+AND b.industry_type_name = 'Human Services' ;
+
+update ref_award_category_industry a 
+set industry_type_id = b.industry_type_id
+FROM ref_industry_type b
+WHERE a.award_category_code in ('099' ) AND b.industry_type_name = 'Not Classified' ;
+
+
+UPDATE 	agreement_snapshot a 
+SET  industry_type_id = b.industry_type_id,
+    industry_type_name = b.industry_type_name	
+	FROM (SELECT a.agreement_id, (CASE WHEN a.agreement_type_code in ('51','70') AND a.award_category_code = '23' THEN 3 
+      WHEN a.agreement_type_code = '70' AND a.award_category_code in ('30','40') THEN 4
+      WHEN a.agreement_type_code = '70' THEN 6
+	  WHEN a.agreement_type_code in ('05','48','52') THEN 1
+	  WHEN a.agreement_type_code in ('46','51','81','82') THEN 2
+	  ELSE k.industry_type_id END) as industry_type_id,
+	  (CASE WHEN a.agreement_type_code in ('51','70') AND a.award_category_code = '23' THEN 'Professional Services' 
+      WHEN a.agreement_type_code = '70' AND a.award_category_code in ('30','40') THEN 'Standardized Services'
+      WHEN a.agreement_type_code = '70' THEN 'Human Services'
+	  WHEN a.agreement_type_code in ('05','48','52') THEN 'Construction Services'
+	  WHEN a.agreement_type_code in ('46','51','81','82') THEN 'Goods'
+		ELSE l.industry_type_name END) as  industry_type_name
+FROM agreement_snapshot a LEFT JOIN ref_award_category_industry k ON k.award_category_code = a.award_category_code 
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id ) b
+WHERE a.agreement_id = b.agreement_id ;
+
+UPDATE 	agreement_snapshot_cy a 
+SET  industry_type_id = b.industry_type_id,
+    industry_type_name = b.industry_type_name	
+	FROM (SELECT a.agreement_id, (CASE WHEN a.agreement_type_code in ('51','70') AND a.award_category_code = '23' THEN 3 
+      WHEN a.agreement_type_code = '70' AND a.award_category_code in ('30','40') THEN 4
+      WHEN a.agreement_type_code = '70' THEN 6
+	  WHEN a.agreement_type_code in ('05','48','52') THEN 1
+	  WHEN a.agreement_type_code in ('46','51','81','82') THEN 2
+	  ELSE k.industry_type_id END) as industry_type_id,
+	  (CASE WHEN a.agreement_type_code in ('51','70') AND a.award_category_code = '23' THEN 'Professional Services' 
+      WHEN a.agreement_type_code = '70' AND a.award_category_code in ('30','40') THEN 'Standardized Services'
+      WHEN a.agreement_type_code = '70' THEN 'Human Services'
+	  WHEN a.agreement_type_code in ('05','48','52') THEN 'Construction Services'
+	  WHEN a.agreement_type_code in ('46','51','81','82') THEN 'Goods'
+		ELSE l.industry_type_name END) as  industry_type_name
+FROM agreement_snapshot_cy a LEFT JOIN ref_award_category_industry k ON k.award_category_code = a.award_category_code 
+		LEFT JOIN ref_industry_type l ON k.industry_type_id = l.industry_type_id ) b
+WHERE a.agreement_id = b.agreement_id ;
+
+
+
+---- end industry type reclassification changes -----
+
+
+TRUNCATE etl.aggregate_tables;
+COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/MWBE/CREATE_NEW_DATABASE/widget_aggregate_tables.csv' CSV HEADER QUOTE as '"';
 COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/MWBE/CREATE_NEW_DATABASE/widget_aggregate_tables_mwbe.csv' CSV HEADER QUOTE as '"';
+COPY etl.aggregate_tables FROM '/home/gpadmin/TREDDY/MWBE/CREATE_NEW_DATABASE/widget_aggregate_tables_subcontracts.csv' CSV HEADER QUOTE as '"';
+
 
 
 -- Vendor Script Changes
@@ -56,6 +138,7 @@ LEFT JOIN vendor_history d ON a.vendor_history_id = d.vendor_history_id;
  
  
 DROP TABLE IF EXISTS agreement_snapshot_mwbe;
+DROP TABLE IF EXISTS agreement_snapshot_backup;
 
 CREATE TABLE agreement_snapshot_mwbe as select * from agreement_snapshot;
 CREATE TABLE agreement_snapshot_backup as select * from agreement_snapshot;
@@ -195,7 +278,8 @@ CREATE TABLE agreement_snapshot
  -- scripts for agreement_snapshot_cy
  
  DROP TABLE IF EXISTS agreement_snapshot_cy_mwbe;
-
+ DROP TABLE IF EXISTS agreement_snapshot_cy_backup;
+ 
 CREATE TABLE agreement_snapshot_cy_mwbe as select * from agreement_snapshot_cy;
 CREATE TABLE agreement_snapshot_cy_backup as select * from agreement_snapshot_cy;
 
@@ -333,6 +417,8 @@ CREATE TABLE agreement_snapshot_cy
  
   -- scripts for agreement_snapshot_expanded
   
+DROP TABLE IF EXISTS agreement_snapshot_expanded_backup;
+
 CREATE TABLE agreement_snapshot_expanded_backup as select * from agreement_snapshot_expanded;
 
 DROP TABLE IF EXISTS agreement_snapshot_expanded;
@@ -365,6 +451,7 @@ DROP TABLE IF EXISTS agreement_snapshot_expanded;
 DISTRIBUTED BY (original_agreement_id);	
 
 
+DROP TABLE IF EXISTS agreement_snapshot_expanded_cy_backup;
 CREATE TABLE agreement_snapshot_expanded_cy_backup as select * from agreement_snapshot_expanded_cy;
 
 DROP TABLE IF EXISTS agreement_snapshot_expanded_cy;
@@ -404,6 +491,8 @@ DISTRIBUTED BY (original_agreement_id);
  -- FMS Script Changes
  
  DROP TABLE IF EXISTS disbursement_line_item_details_mwbe;
+  DROP TABLE IF EXISTS disbursement_line_item_details_backup;
+  
  
  CREATE TABLE disbursement_line_item_details_mwbe as select * from disbursement_line_item_details;
  
@@ -932,6 +1021,7 @@ DROP TABLE IF EXISTS disbursement_line_item_details_mwbe;
 
 
 DROP TABLE IF EXISTS pending_contracts_mwbe;
+ DROP TABLE IF EXISTS pending_contracts_backup;
  
  CREATE TABLE pending_contracts_mwbe as select * from pending_contracts ;
  
@@ -1093,6 +1183,7 @@ DROP TABLE IF EXISTS pending_contracts_mwbe;
 	
 -- aggregate tables Scripts
 
+DROP TABLE IF EXISTS aggregateon_mwbe_spending_coa_entities;
 CREATE TABLE aggregateon_mwbe_spending_coa_entities (
 	department_id integer,
 	agency_id smallint,
@@ -1108,6 +1199,7 @@ CREATE TABLE aggregateon_mwbe_spending_coa_entities (
 	total_disbursements integer
 	) DISTRIBUTED BY (department_id) ;
 
+DROP TABLE IF EXISTS aggregateon_mwbe_spending_contract;
 CREATE TABLE aggregateon_mwbe_spending_contract (
     agreement_id bigint,
     document_id character varying(20),
@@ -1125,6 +1217,7 @@ CREATE TABLE aggregateon_mwbe_spending_contract (
 	) DISTRIBUTED BY (agreement_id) ;
 
 	
+DROP TABLE IF EXISTS aggregateon_mwbe_spending_vendor;
 CREATE TABLE aggregateon_mwbe_spending_vendor (
 	vendor_id integer,
 	minority_type_id smallint,
@@ -1138,6 +1231,8 @@ CREATE TABLE aggregateon_mwbe_spending_vendor (
 	is_all_categories char(1)
 	) DISTRIBUTED BY (vendor_id) ;
 
+
+DROP TABLE IF EXISTS aggregateon_mwbe_spending_vendor_exp_object;
 CREATE TABLE aggregateon_mwbe_spending_vendor_exp_object(
 	vendor_id integer,
 	minority_type_id smallint,
@@ -1150,6 +1245,7 @@ CREATE TABLE aggregateon_mwbe_spending_vendor_exp_object(
 DISTRIBUTED BY (expenditure_object_id);	
 
 
+DROP TABLE IF EXISTS aggregateon_mwbe_contracts_cumulative_spending;
 CREATE TABLE aggregateon_mwbe_contracts_cumulative_spending(
 	original_agreement_id bigint,
 	fiscal_year smallint,
@@ -1176,6 +1272,7 @@ CREATE TABLE aggregateon_mwbe_contracts_cumulative_spending(
 ) DISTRIBUTED BY (vendor_id);	
 
 
+DROP TABLE IF EXISTS aggregateon_mwbe_contracts_spending_by_month;
 CREATE TABLE aggregateon_mwbe_contracts_spending_by_month(
 	original_agreement_id bigint,
 	fiscal_year smallint,
@@ -1194,7 +1291,7 @@ CREATE TABLE aggregateon_mwbe_contracts_spending_by_month(
 ) DISTRIBUTED BY (vendor_id);	
 
 
-
+DROP TABLE IF EXISTS aggregateon_mwbe_total_contracts;
 CREATE TABLE aggregateon_mwbe_total_contracts(
 	fiscal_year smallint,
 	fiscal_year_id smallint,
@@ -1219,6 +1316,7 @@ CREATE TABLE aggregateon_mwbe_total_contracts(
 ) DISTRIBUTED BY (fiscal_year);	
 
 
+DROP TABLE IF EXISTS aggregateon_mwbe_contracts_department;
 CREATE TABLE aggregateon_mwbe_contracts_department(
 	document_code_id smallint,
 	document_agency_id smallint,
@@ -1238,6 +1336,8 @@ CREATE TABLE aggregateon_mwbe_contracts_department(
 	type_of_year char(1)
 ) DISTRIBUTED BY (department_id);	
 
+
+DROP TABLE IF EXISTS contracts_mwbe_spending_transactions;
 CREATE TABLE contracts_mwbe_spending_transactions(
 	disbursement_line_item_id bigint,
 	original_agreement_id bigint,
@@ -1278,6 +1378,28 @@ CREATE TABLE contracts_mwbe_spending_transactions(
 ) DISTRIBUTED BY (disbursement_line_item_id);	
 
 
+DROP TABLE IF EXISTS contract_vendor_latest_mwbe_category;
+CREATE TABLE contract_vendor_latest_mwbe_category (
+	vendor_id integer,
+	vendor_history_id integer,
+	agency_id smallint,
+	minority_type_id smallint,
+	year_id smallint,
+	type_of_year char(1)
+	) DISTRIBUTED BY (vendor_id) ;
+	
+
+DROP TABLE IF EXISTS spending_vendor_latest_mwbe_category;
+CREATE TABLE spending_vendor_latest_mwbe_category (
+	vendor_id integer,
+	vendor_history_id integer,
+	agency_id smallint,
+	minority_type_id smallint,
+	year_id smallint,
+	type_of_year char(1)
+	) DISTRIBUTED BY (vendor_id) ;
+	
+	
 select etl.refreshaggregates(max_job_id);
 
 select etl.grantaccess('webuser1','SELECT');
