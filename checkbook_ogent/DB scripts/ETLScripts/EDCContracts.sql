@@ -9,7 +9,7 @@ BEGIN
 	
 	TRUNCATE etl.tmp_all_vendors;
 	
-	UPDATE etl.stg_edc_contract SET contractor_name = 'EDC To Provide' WHERE contractor_name IS NULL OR coalesce(contractor_name,'N/A') = 'N/A';
+	UPDATE etl.stg_edc_contract SET contractor_name = 'To Be Announced' WHERE contractor_name IS NULL OR coalesce(contractor_name,'N/A') = 'N/A';
 	
 	INSERT INTO etl.tmp_all_vendors (uniq_id, vendor_history_id, vendor_id, is_new_vendor, is_vendor_address_changed, is_address_new, lgl_nm, ad_ln_1, st, zip, city)
 	SELECT uniq_id, vendor_history_id, vendor_id, is_new_vendor, is_vendor_address_changed, is_address_new, lgl_nm, ad_ln_1, st, zip, city

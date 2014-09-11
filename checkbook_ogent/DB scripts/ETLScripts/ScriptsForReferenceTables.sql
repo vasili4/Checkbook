@@ -390,7 +390,7 @@ INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name
 INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'z81';
 
 
-INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name, is_display, is_oge_agency) VALUES(nextval('seq_ref_agency_agency_id'),'z82','NYC TECHNOLOGY DEVELOPMENT CORPORATION','NYC TECHNOLOGY DEVELOPMENT CORPORATION', now()::timestamp, 'NYC TDC','Y', 'Y');
+INSERT INTO ref_agency(agency_id, agency_code, agency_name, original_agency_name, created_date, agency_short_name, is_display, is_oge_agency) VALUES(nextval('seq_ref_agency_agency_id'),'z82','NYC TECHNOLOGY DEVELOPMENT CORPORATION','NYC TECHNOLOGY DEVELOPMENT CORPORATION', now()::timestamp, 'NYC TDC','N', 'Y');
 
 INSERT INTO ref_agency_history(agency_history_id, agency_id, agency_name, created_date) SELECT nextval('seq_ref_agency_history_id'),agency_id, agency_name,now()::timestamp FROM ref_agency WHERE agency_code = 'z82';
 
