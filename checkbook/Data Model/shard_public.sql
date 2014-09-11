@@ -2301,6 +2301,7 @@ CREATE TABLE contract_vendor_latest_mwbe_category (
 	vendor_history_id integer,
 	agency_id smallint,
 	minority_type_id smallint,
+	is_prime_or_sub character(1),
 	year_id smallint,
 	type_of_year char(1)
 	) DISTRIBUTED BY (vendor_id) ;
@@ -2311,6 +2312,7 @@ CREATE TABLE spending_vendor_latest_mwbe_category (
 	vendor_history_id integer,
 	agency_id smallint,
 	minority_type_id smallint,
+	is_prime_or_sub character(1),
 	year_id smallint,
 	type_of_year char(1)
 	) DISTRIBUTED BY (vendor_id) ;

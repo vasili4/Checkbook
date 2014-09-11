@@ -603,6 +603,7 @@ CREATE TABLE contract_vendor_latest_mwbe_category (
 	vendor_history_id integer,
 	agency_id smallint,
 	minority_type_id smallint,
+	is_prime_or_sub character(1),
 	year_id smallint,
 	type_of_year char(1)
 	) DISTRIBUTED BY (vendor_id) ;
@@ -614,6 +615,7 @@ CREATE TABLE spending_vendor_latest_mwbe_category (
 	vendor_history_id integer,
 	agency_id smallint,
 	minority_type_id smallint,
+	is_prime_or_sub character(1),
 	year_id smallint,
 	type_of_year char(1)
 	) DISTRIBUTED BY (vendor_id) ;
@@ -1517,6 +1519,7 @@ CREATE EXTERNAL WEB TABLE contract_vendor_latest_mwbe_category__0 (
 	vendor_history_id integer,
 	agency_id smallint,
 	minority_type_id smallint,
+	is_prime_or_sub character(1),
 	year_id smallint,
 	type_of_year char(1)
 	) 
@@ -1526,7 +1529,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contract_vendor_lates
 	
   CREATE VIEW contract_vendor_latest_mwbe_category AS
   	SELECT contract_vendor_latest_mwbe_category__0.vendor_id,contract_vendor_latest_mwbe_category__0.vendor_history_id,
-  	contract_vendor_latest_mwbe_category__0.agency_id,contract_vendor_latest_mwbe_category__0.minority_type_id,
+  	contract_vendor_latest_mwbe_category__0.agency_id,contract_vendor_latest_mwbe_category__0.minority_type_id,contract_vendor_latest_mwbe_category__0.is_prime_or_sub,
   	contract_vendor_latest_mwbe_category__0.year_id, contract_vendor_latest_mwbe_category__0.type_of_year
   	FROM   contract_vendor_latest_mwbe_category__0;	
   	
@@ -1539,6 +1542,7 @@ CREATE EXTERNAL WEB TABLE spending_vendor_latest_mwbe_category__0 (
 	vendor_history_id integer,
 	agency_id smallint,
 	minority_type_id smallint,
+	is_prime_or_sub character(1),
 	year_id smallint,
 	type_of_year char(1)
 	) 
@@ -1549,6 +1553,6 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.spending_vendor_lates
 
  CREATE VIEW spending_vendor_latest_mwbe_category AS
   	SELECT spending_vendor_latest_mwbe_category__0.vendor_id,spending_vendor_latest_mwbe_category__0.vendor_history_id,
-  	spending_vendor_latest_mwbe_category__0.agency_id,spending_vendor_latest_mwbe_category__0.minority_type_id,
+  	spending_vendor_latest_mwbe_category__0.agency_id,spending_vendor_latest_mwbe_category__0.minority_type_id, spending_vendor_latest_mwbe_category__0.is_prime_or_sub,
   	spending_vendor_latest_mwbe_category__0.year_id, spending_vendor_latest_mwbe_category__0.type_of_year
   	FROM   spending_vendor_latest_mwbe_category__0;	
