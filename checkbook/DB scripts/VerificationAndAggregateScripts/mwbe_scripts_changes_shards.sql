@@ -382,6 +382,9 @@ CREATE TABLE pending_contracts(
 	document_version smallint,
 	minority_type_id smallint,
  	minority_type_name character varying(50),
+ 	is_prime_or_sub character(1),
+  is_minority_vendor character(1),
+  vendor_type character(2),
 	latest_flag char(1)
  ) DISTRIBUTED BY (document_code_id);
 
@@ -1143,6 +1146,9 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
   	document_version smallint,
   	minority_type_id smallint,
  	minority_type_name character varying,
+ 	  is_prime_or_sub character(1),
+  is_minority_vendor character(1),
+  vendor_type character(2),
   	latest_flag char(1)
 	
  )
@@ -1173,7 +1179,8 @@ CREATE EXTERNAL WEB TABLE pending_contracts__0(
  		pending_contracts__0.funding_agency_short_name,pending_contracts__0.original_agreement_id,pending_contracts__0.original_master_agreement_id,pending_contracts__0.dollar_difference,
  		pending_contracts__0.percent_difference, pending_contracts__0.original_or_modified, pending_contracts__0.original_or_modified_desc, pending_contracts__0.award_size_id, 
  		pending_contracts__0.award_category_id, pending_contracts__0.industry_type_id, pending_contracts__0.document_version,	
- 		pending_contracts__0.minority_type_id, pending_contracts__0.minority_type_name, pending_contracts__0.latest_flag 		
+ 		pending_contracts__0.minority_type_id, pending_contracts__0.minority_type_name, 
+ 		pending_contracts__0.is_prime_or_sub, pending_contracts__0.is_minority_vendor, pending_contracts__0.vendor_type, pending_contracts__0.latest_flag 		
  	FROM pending_contracts__0;
  	
  	

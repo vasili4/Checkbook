@@ -375,7 +375,7 @@ BEGIN
 		e.vendor_id,b.prime_vendor_id, NULL as maximum_contract_amount, 
 		b.document_id,e.legal_name as vendor_name,q.vendor_customer_code,f.date,c.agency_name,c.agency_short_name,
 		1 as spending_category_id,
-		'Contract Spending' as spending_category_name,x.year_id,x.year_value,
+		'Contracts' as spending_category_name,x.year_id,x.year_value,
 		b.contract_number as reference_document_number,dc.document_code as reference_document_code,
 		 vmb.minority_type_id, vmb.minority_type_name,
 		 coalesce(b.updated_load_id, b.created_load_id), coalesce(b.updated_date, b.created_date),p_job_id_in

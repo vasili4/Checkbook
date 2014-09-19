@@ -1953,6 +1953,9 @@ ALTER TABLE deleted_agreement_accounting_line ADD COLUMN deleted_date timestamp,
 	document_version smallint,
 	minority_type_id smallint,
  	minority_type_name character varying(50),
+ 	is_prime_or_sub character(1),
+    is_minority_vendor character(1),
+    vendor_type character(2),
 	latest_flag char(1)
  ) DISTRIBUTED BY (document_code_id);
  
@@ -2867,6 +2870,7 @@ CREATE TABLE all_agreement_transactions
    vendor_code character varying(20),
    vendor_name character varying,
    prime_vendor_id integer,
+   prime_vendor_name character varying,
    dollar_difference numeric(16,2),
    percent_difference numeric(17,4),
    master_agreement_id bigint,
@@ -2937,6 +2941,7 @@ CREATE TABLE all_agreement_transactions
 	expenditure_object_id integer,
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_vendor_name character varying,
 	department_id integer,
 	maximum_contract_amount numeric(16,2),
 	maximum_contract_amount_cy numeric(16,2),
@@ -3186,7 +3191,33 @@ status_flag char(1),
 type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);
 	
-	
+
+CREATE TABLE aggregateon_all_contracts_cumulative_spending(
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	master_agreement_yn character(1),
+	description varchar,
+	contract_number varchar,
+	sub_contract_id character varying(20),
+	vendor_id int,
+	prime_vendor_id int,
+	minority_type_id smallint,
+	award_method_id smallint,
+	agency_id smallint,
+	industry_type_id smallint,
+	award_size_id smallint,
+	original_contract_amount numeric(16,2),
+	maximum_contract_amount numeric(16,2),
+	spending_amount_disb numeric(16,2),
+	spending_amount numeric(16,2),
+	current_year_spending_amount numeric(16,2),
+	dollar_difference numeric(16,2),
+	percent_difference numeric(16,2),
+	status_flag char(1),
+	type_of_year char(1)	
+) DISTRIBUTED BY (vendor_id) ;
 	
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  

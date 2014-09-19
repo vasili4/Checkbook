@@ -1100,6 +1100,9 @@ CREATE TABLE pending_contracts(
 	document_version smallint,
 	minority_type_id smallint,
  	minority_type_name character varying(50),
+ 	is_prime_or_sub character(1),
+    is_minority_vendor character(1),
+    vendor_type character(2),
 	latest_flag char(1)
  ) DISTRIBUTED BY (document_code_id);
 
@@ -1124,7 +1127,8 @@ INSERT INTO pending_contracts(
             funding_agency_name, funding_agency_short_name, original_agreement_id, 
             original_master_agreement_id, dollar_difference, percent_difference, 
             original_or_modified, original_or_modified_desc, award_size_id, 
-            award_category_id, industry_type_id, document_version, minority_type_id, minority_type_name, latest_flag)
+            award_category_id, industry_type_id, document_version, minority_type_id, minority_type_name, 
+            is_prime_or_sub, is_minority_vendor, vendor_type, latest_flag)
     SELECT document_code_id, document_agency_id, document_id, parent_document_code_id, 
             parent_document_agency_id, parent_document_id, encumbrance_amount_original, 
             encumbrance_amount, original_maximum_amount_original, original_maximum_amount, 
@@ -1144,7 +1148,8 @@ INSERT INTO pending_contracts(
             funding_agency_name, funding_agency_short_name, original_agreement_id, 
             original_master_agreement_id, dollar_difference, percent_difference, 
             original_or_modified, original_or_modified_desc, award_size_id, 
-            award_category_id, industry_type_id, document_version, NULL as minority_type_id, NULL as minority_type_name, latest_flag
+            award_category_id, industry_type_id, document_version, NULL as minority_type_id, NULL as minority_type_name, 
+            'P' as is_prime_or_sub, NULL as is_minority_vendor, NULL as vendor_type, latest_flag
     FROM pending_contracts_mwbe;
 
 
@@ -1179,8 +1184,11 @@ DROP TABLE IF EXISTS pending_contracts_mwbe;
 		minority_type_name = 'Non-Minority'
 	WHERE ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
 
-	
-	
+	UPDATE pending_contracts
+	SET is_minority_vendor = (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END),
+		vendor_type = (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) ;
+		
+		
 -- aggregate tables Scripts
 
 DROP TABLE IF EXISTS aggregateon_mwbe_spending_coa_entities;

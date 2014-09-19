@@ -1346,7 +1346,7 @@ BEGIN
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
             maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            vendor_code, vendor_name, prime_vendor_id, prime_vendor_name, dollar_difference, 
             percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
             award_category_id, award_category_code, award_category_name, 
             award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
@@ -1362,8 +1362,8 @@ BEGIN
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
-            maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            maximum_contract_amount, description, vendor_history_id, a.vendor_id, 
+            vendor_code, vendor_name, prime_vendor_id, c.legal_name as prime_vendor_name, dollar_difference, 
             percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
             award_category_id, award_category_code, award_category_name, 
             award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
@@ -1377,7 +1377,8 @@ BEGIN
             latest_flag, load_id, last_modified_date,  b.nyc_year_id as last_modified_year_id, 'S' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type, job_id
-     FROM sub_agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date;
+     FROM sub_agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
+     LEFT JOIN vendor c ON a.prime_vendor_id = c.vendor_id;
        
        	
 
@@ -1437,7 +1438,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
             maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            vendor_code, vendor_name, prime_vendor_id, prime_vendor_name, dollar_difference, 
             percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
             award_category_id, award_category_code, award_category_name, 
             award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
@@ -1453,8 +1454,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, sub_contract_id, original_contract_amount, 
-            maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, prime_vendor_id, dollar_difference, 
+            maximum_contract_amount, description, vendor_history_id, a.vendor_id, 
+            vendor_code, vendor_name, prime_vendor_id, d.legal_name as prime_vendor_name, dollar_difference, 
             percent_difference, agreement_type_id, agreement_type_code, agreement_type_name, 
             award_category_id, award_category_code, award_category_name, 
             award_method_id, award_method_code, award_method_name, expenditure_object_codes, 
@@ -1469,7 +1470,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type,job_id
      FROM sub_agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
-        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
+        LEFT JOIN vendor d ON a.prime_vendor_id = d.vendor_id;
        
        	
 	RAISE NOTICE 'REF COMMON TT2';
@@ -1549,7 +1551,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
     INSERT INTO all_disbursement_transactions(disbursement_line_item_id, disbursement_number, payment_id, check_eft_issued_date_id, 
             check_eft_issued_nyc_year_id, fiscal_year, check_eft_issued_cal_month_id, 
             agreement_id, check_amount, agency_id, agency_history_id, agency_code, 
-            vendor_id, prime_vendor_id, maximum_contract_amount, maximum_contract_amount_cy, 
+            vendor_id, prime_vendor_id, prime_vendor_name, maximum_contract_amount, maximum_contract_amount_cy, 
             document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
             agency_name, agency_short_name, expenditure_object_name, expenditure_object_code, 
             contract_number, sub_contract_id, contract_vendor_id, contract_vendor_id_cy, 
@@ -1567,8 +1569,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
    SELECT  disbursement_line_item_id, disbursement_number, payment_id, check_eft_issued_date_id, 
             check_eft_issued_nyc_year_id, fiscal_year, check_eft_issued_cal_month_id, 
             agreement_id, check_amount, agency_id, agency_history_id, agency_code, 
-            vendor_id, prime_vendor_id, maximum_contract_amount, maximum_contract_amount_cy, 
-            document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
+            a.vendor_id, prime_vendor_id, d.legal_name as prime_vendor_name, maximum_contract_amount, maximum_contract_amount_cy, 
+            document_id, vendor_name, a.vendor_customer_code, check_eft_issued_date, 
             agency_name, agency_short_name, expenditure_object_name, expenditure_object_code, 
             contract_number, sub_contract_id, contract_vendor_id, contract_vendor_id_cy, 
             contract_prime_vendor_id, contract_prime_vendor_id_cy, contract_agency_id, 
@@ -1585,7 +1587,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type, job_id
     FROM subcontract_spending_details a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
-        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
+        LEFT JOIN vendor d ON a.prime_vendor_id = d.vendor_id;
             
             
 	
