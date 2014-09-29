@@ -9,6 +9,8 @@ BEGIN
 	
 	--  processing data to insert/update in subcontract_vendor_business_type table
 	
+	UPDATE etl.stg_scntrc_status SET vendor_cust_cd = 'N/A' WHERE vendor_cust_cd ='N/A (PRIVACY/SECURITY)';
+	
 	CREATE TEMPORARY TABLE tmp_scntrc_status(uniq_id bigint, doc_cd varchar, doc_dept_cd varchar, doc_id varchar,  action_flag char(1))
 	DISTRIBUTED BY (uniq_id);
 	
@@ -22,7 +24,8 @@ BEGIN
 	FROM subcontract_status b 
 	WHERE a.doc_cd || a.doc_dept_cd || a.doc_id = b.contract_number ;
 	
-		
+	
+	
 	INSERT INTO subcontract_status(contract_number,vendor_customer_code, scntrc_status, agreement_type_id, total_scntrc_max_am, total_scntrc_pymt_am, created_load_id, created_date)
     	SELECT  a.doc_cd || a.doc_dept_cd || a.doc_id as contract_number, vendor_cust_cd as vendor_customer_code, scntrc_sta as scntrc_status,
     	cntrc_typ as agreement_type_id, tot_scntrc_max_am as total_scntrc_max_am, tot_scntrc_pymt as total_scntrc_pymt_am,  p_load_id_in as created_load_id, now()::timestamp

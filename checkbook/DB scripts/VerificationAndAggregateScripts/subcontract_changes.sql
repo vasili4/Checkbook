@@ -13,6 +13,7 @@ CREATE SEQUENCE seq_sub_agreement_agreement_id;
 */
 
 -- only one time
+
 DELETE FROM ref_industry_type WHERE industry_type_id in (6,7);
 INSERT INTO ref_industry_type(industry_type_id, industry_type_name,created_date) VALUES(6,'Human Services',now()::timestamp),(7,'Arch and Engineerng',now()::timestamp);
 UPDATE ref_industry_type SET created_date = now()::timestamp WHERE industry_type_id in (6,7);
@@ -25,6 +26,7 @@ sub_industry_type_id smallint
 DISTRIBUTED BY (industry_type_id);
 
 INSERT INTO sub_industry_mappings(industry_type_id, sub_industry_type_id) values(1,1),(2,4),(3,2),(4,3),(5,7),(6,5),(7,6);
+
 
 
 DROP  TABLE  IF EXISTS subcontract_vendor_business_type;	
@@ -83,6 +85,14 @@ CREATE TABLE subvendor_history (
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (vendor_history_id);
+
+
+INSERT INTO subvendor(vendor_id,vendor_customer_code,legal_name,display_flag) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)','N');
+
+INSERT INTO vendor_history(vendor_history_id,vendor_id,legal_name) 
+SELECT nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
+FROM vendor WHERE vendor_customer_code='N/A'
+AND legal_name='N/A (PRIVACY/SECURITY)';
 
 
 DROP  TABLE  IF EXISTS subvendor_business_type;
@@ -521,6 +531,7 @@ CREATE TABLE all_agreement_transactions
    is_prime_or_sub character(1),
    is_minority_vendor character(1), 
    vendor_type character(2),
+   contract_original_agreement_id bigint,
    job_id bigint
  ) DISTRIBUTED BY (original_agreement_id);
  
@@ -633,6 +644,7 @@ CREATE TABLE all_agreement_transactions
 	is_prime_or_sub character(1),
 	is_minority_vendor character(1), 
     vendor_type character(2),
+    contract_original_agreement_id bigint,
 	job_id bigint
 )
 DISTRIBUTED BY (disbursement_line_item_id);
@@ -654,7 +666,8 @@ INSERT INTO all_agreement_transactions(original_agreement_id, document_version, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
+            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
+            is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -673,7 +686,8 @@ INSERT INTO all_agreement_transactions(original_agreement_id, document_version, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, b.nyc_year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
-            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,job_id
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
+            original_agreement_id as contract_original_agreement_id, job_id
        FROM agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date;
 
 
@@ -693,7 +707,8 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
-            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
+            load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
+            is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -712,7 +727,8 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             master_agreement_yn, has_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, c.year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
-            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,job_id
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
+            original_agreement_id as contract_original_agreement_id, job_id
        FROM agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
         LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
        
@@ -745,7 +761,7 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             contract_minority_type_id_cy, master_contract_minority_type_id, 
             master_contract_minority_type_id_cy, file_type, load_id, last_modified_date,
             last_modified_fiscal_year_id, last_modified_calendar_year_id,
-            is_prime_or_sub, is_minority_vendor, vendor_type,job_id)
+            is_prime_or_sub, is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
      SELECT disbursement_line_item_id, disbursement_id, line_number, disbursement_number, 
             check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
             check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
@@ -776,7 +792,7 @@ INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_versio
             b.nyc_year_id as last_modified_fiscal_year_id, c.year_id as last_modified_calendar_year_id,
             'P' as is_prime_or_sub,
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
-            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type, job_id
+            (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type, agreement_id as contract_original_agreement_id, job_id
     FROM disbursement_line_item_details a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
         LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
     
@@ -955,13 +971,16 @@ disb_contract_document_code  character varying(8),
 disb_fiscal_year_id  smallint,
 disb_check_eft_issued_cal_month_id integer,
 disb_disbursement_number character varying(40),
+disb_minority_type_id smallint,
+disb_minority_type_name character varying(50),
+disb_vendor_type character(2),
 disb_master_contract_number  character varying,
 status_flag char(1),
 type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);
 
 
-
+DROP TABLE IF EXISTS aggregateon_all_contracts_cumulative_spending;
 CREATE TABLE aggregateon_all_contracts_cumulative_spending(
 	original_agreement_id bigint,
 	fiscal_year smallint,
@@ -1510,16 +1529,16 @@ select count(*) from subcontract_spending;
 
 -- post process sub contracts and sub contract spending
 
-select etl.postProcessSubContracts(600);
+select etl.postProcessSubContracts(733);
 select count(*) from sub_agreement_snapshot;
 select count(*) from sub_agreement_snapshot_cy;
 
 
-select etl.refreshFactsForSubPayments(600);
+select etl.refreshFactsForSubPayments(733);
 select count(*) from subcontract_spending_details ;
 select * from subcontract_spending_details order by vendor_customer_code;
 
-select etl.refreshSubContractsPreAggregateTables(600); 
+select etl.refreshSubContractsPreAggregateTables(733); 
 select count(*) from sub_agreement_snapshot_expanded;
 select count(*) from sub_agreement_snapshot_expanded_cy;
 select count(*), status_flag from sub_agreement_snapshot_expanded group by 2;
@@ -1527,7 +1546,7 @@ select count(*), status_flag from sub_agreement_snapshot_expanded_cy group by 2;
 select count(*), status_flag, fiscal_year from sub_agreement_snapshot_expanded group by 2,3 order by 2,3;
 select count(*), status_flag, fiscal_year from sub_agreement_snapshot_expanded_cy group by 2,3 order by 2,3;
 
-select etl.refreshCommonTransactionTables(600);
+select etl.refreshCommonTransactionTables(733);
 select count(*) from all_agreement_transactions where is_prime_or_sub = 'P';
 select count(*) from all_agreement_transactions where is_prime_or_sub = 'S';
 select count(*) from agreement_snapshot;
@@ -1541,7 +1560,7 @@ select count(*) from subcontract_spending_details;
 
 
 
-select etl.temprefreshsubvenaggregates(600);
+select etl.temprefreshsubvenaggregates(733);
 
 select etl.grantaccess('webuser1','SELECT');
 

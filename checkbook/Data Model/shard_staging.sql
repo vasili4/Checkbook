@@ -3415,6 +3415,9 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_mwbe_cont
 	disb_fiscal_year_id  smallint,
 	disb_check_eft_issued_cal_month_id integer,
 	disb_disbursement_number character varying(40),
+	disb_minority_type_id smallint,
+	disb_minority_type_name character varying(50),
+	disb_vendor_type character(2),
 	status_flag char(1),
 	type_of_year char(1)
 ) 	
@@ -3433,6 +3436,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contracts_mwbe_spendi
   	contracts_mwbe_spending_transactions__0.disb_spending_category_name,contracts_mwbe_spending_transactions__0.disb_agency_id,contracts_mwbe_spending_transactions__0.disb_vendor_id,contracts_mwbe_spending_transactions__0.disb_expenditure_object_id,
   	contracts_mwbe_spending_transactions__0.disb_department_id,contracts_mwbe_spending_transactions__0.disb_spending_category_id,contracts_mwbe_spending_transactions__0.disb_agreement_id,contracts_mwbe_spending_transactions__0.disb_contract_document_code,
   	contracts_mwbe_spending_transactions__0.disb_master_agreement_id,contracts_mwbe_spending_transactions__0.disb_fiscal_year_id,contracts_mwbe_spending_transactions__0.disb_check_eft_issued_cal_month_id,contracts_mwbe_spending_transactions__0.disb_disbursement_number,
+  	contracts_mwbe_spending_transactions__0.disb_minority_type_id,contracts_mwbe_spending_transactions__0.disb_minority_type_name,contracts_mwbe_spending_transactions__0.disb_vendor_type,
   	contracts_mwbe_spending_transactions__0.status_flag,contracts_mwbe_spending_transactions__0.type_of_year
   	FROM   contracts_mwbe_spending_transactions__0;	
   	
@@ -4406,6 +4410,9 @@ disb_contract_document_code  character varying,
 disb_fiscal_year_id  smallint,
 disb_check_eft_issued_cal_month_id integer,
 disb_disbursement_number character varying,
+disb_minority_type_id smallint,
+disb_minority_type_name character varying(50),
+disb_vendor_type character(2),
 disb_master_contract_number character varying,
 status_flag char(1),
 type_of_year char(1)
@@ -4424,6 +4431,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contracts_subven_spen
   	contracts_subven_spending_transactions__0.disb_purpose, contracts_subven_spending_transactions__0.disb_reporting_code,   	contracts_subven_spending_transactions__0.disb_spending_category_name,contracts_subven_spending_transactions__0.disb_agency_id,
   	contracts_subven_spending_transactions__0.disb_vendor_id, contracts_subven_spending_transactions__0.disb_spending_category_id,contracts_subven_spending_transactions__0.disb_agreement_id,contracts_subven_spending_transactions__0.disb_contract_document_code,
   	contracts_subven_spending_transactions__0.disb_fiscal_year_id,contracts_subven_spending_transactions__0.disb_check_eft_issued_cal_month_id,contracts_subven_spending_transactions__0.disb_disbursement_number,
+  	contracts_subven_spending_transactions__0.disb_minority_type_id,contracts_subven_spending_transactions__0.disb_minority_type_name,contracts_subven_spending_transactions__0.disb_vendor_type,
   	contracts_subven_spending_transactions__0.disb_master_contract_number,contracts_subven_spending_transactions__0.status_flag,contracts_subven_spending_transactions__0.type_of_year
   	FROM   contracts_subven_spending_transactions__0;	
 
@@ -4543,6 +4551,7 @@ CREATE EXTERNAL WEB TABLE all_agreement_transactions__0(
       is_prime_or_sub character(1),
       is_minority_vendor character(1), 
       vendor_type character(2),
+      contract_original_agreement_id bigint,
       job_id bigint
 ) 
 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transactions to stdout csv"' ON SEGMENT 0 
@@ -4567,7 +4576,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
   		all_agreement_transactions__0.minority_type_id,all_agreement_transactions__0.minority_type_name,
   		all_agreement_transactions__0.master_agreement_yn,all_agreement_transactions__0.has_children,all_agreement_transactions__0.original_version_flag,all_agreement_transactions__0.latest_flag,
   		all_agreement_transactions__0.load_id,all_agreement_transactions__0.last_modified_date,all_agreement_transactions__0.last_modified_year_id,all_agreement_transactions__0.is_prime_or_sub,
-  		all_agreement_transactions__0.is_minority_vendor, all_agreement_transactions__0.vendor_type, all_agreement_transactions__0.job_id
+  		all_agreement_transactions__0.is_minority_vendor, all_agreement_transactions__0.vendor_type, all_agreement_transactions__0.contract_original_agreement_id, all_agreement_transactions__0.job_id
   	FROM  all_agreement_transactions__0;
 
 
@@ -4642,6 +4651,7 @@ CREATE EXTERNAL WEB TABLE all_agreement_transactions_cy__0(
       is_prime_or_sub character(1),
       is_minority_vendor character(1), 
       vendor_type character(2),
+      contract_original_agreement_id bigint,
       job_id bigint
 ) 
 EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transactions_cy to stdout csv"' ON SEGMENT 0 
@@ -4666,7 +4676,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
   		all_agreement_transactions_cy__0.minority_type_id,all_agreement_transactions_cy__0.minority_type_name,
   		all_agreement_transactions_cy__0.master_agreement_yn,all_agreement_transactions_cy__0.has_children,all_agreement_transactions_cy__0.original_version_flag,all_agreement_transactions_cy__0.latest_flag,
   		all_agreement_transactions_cy__0.load_id,all_agreement_transactions_cy__0.last_modified_date,all_agreement_transactions_cy__0.last_modified_year_id,all_agreement_transactions_cy__0.is_prime_or_sub,
-  		all_agreement_transactions_cy__0.is_minority_vendor, all_agreement_transactions_cy__0.vendor_type, all_agreement_transactions_cy__0.job_id
+  		all_agreement_transactions_cy__0.is_minority_vendor, all_agreement_transactions_cy__0.vendor_type, all_agreement_transactions_cy__0.contract_original_agreement_id, all_agreement_transactions_cy__0.job_id
   	FROM  all_agreement_transactions_cy__0; 
   	
   	
@@ -4773,6 +4783,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
 	is_prime_or_sub character(1),
 	is_minority_vendor character(1), 
     vendor_type character(2),
+    contract_original_agreement_id bigint,
 	job_id bigint
 ) EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_disbursement_transactions to stdout csv"' ON SEGMENT 0 
  FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
@@ -4811,5 +4822,5 @@ CREATE VIEW all_disbursement_transactions AS
     all_disbursement_transactions__0.master_contract_minority_type_id,all_disbursement_transactions__0.master_contract_minority_type_id_cy,
     all_disbursement_transactions__0.file_type,all_disbursement_transactions__0.load_id, all_disbursement_transactions__0.last_modified_date, 
     all_disbursement_transactions__0.last_modified_fiscal_year_id, all_disbursement_transactions__0.last_modified_calendar_year_id, all_disbursement_transactions__0.is_prime_or_sub, 
-    all_disbursement_transactions__0.is_minority_vendor, all_disbursement_transactions__0.vendor_type, all_disbursement_transactions__0.job_id
+    all_disbursement_transactions__0.is_minority_vendor, all_disbursement_transactions__0.vendor_type,  all_disbursement_transactions__0.contract_original_agreement_id, all_disbursement_transactions__0.job_id
 FROM ONLY all_disbursement_transactions__0; 

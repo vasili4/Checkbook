@@ -2400,6 +2400,9 @@ CREATE TABLE contracts_mwbe_spending_transactions(
 	disb_fiscal_year_id  smallint,
 	disb_check_eft_issued_cal_month_id integer,
 	disb_disbursement_number character varying(40),
+	disb_minority_type_id smallint,
+	disb_minority_type_name character varying(50),
+	disb_vendor_type character(2),
 	status_flag char(1),
 	type_of_year char(1)
 ) DISTRIBUTED BY (disbursement_line_item_id);	
@@ -2914,6 +2917,7 @@ CREATE TABLE all_agreement_transactions
    is_prime_or_sub character(1),
    is_minority_vendor character(1), 
    vendor_type character(2),
+   contract_original_agreement_id bigint,
    job_id bigint
  ) DISTRIBUTED BY (original_agreement_id);
  
@@ -3022,6 +3026,7 @@ CREATE TABLE all_agreement_transactions
 	is_prime_or_sub character(1),
 	is_minority_vendor character(1), 
     vendor_type character(2),
+    contract_original_agreement_id bigint,
 	job_id bigint
 )
 DISTRIBUTED BY (disbursement_line_item_id);
@@ -3186,6 +3191,9 @@ disb_contract_document_code  character varying(8),
 disb_fiscal_year_id  smallint,
 disb_check_eft_issued_cal_month_id integer,
 disb_disbursement_number character varying(40),
+disb_minority_type_id smallint,
+disb_minority_type_name character varying(50),
+disb_vendor_type character(2),
 disb_master_contract_number  character varying,
 status_flag char(1),
 type_of_year char(1)

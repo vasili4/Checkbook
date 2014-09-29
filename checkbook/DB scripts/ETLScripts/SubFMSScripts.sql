@@ -255,7 +255,7 @@ BEGIN
 	       a.doc_id,a.doc_cd || a.doc_dept_cd || a.doc_id as contract_number, a.scntrc_id as sub_contract_id, a.scntrc_pymt_id as payment_id,
 	       a.scntrc_pymt_am,coalesce(a.scntrc_pymt_am,0) as check_eft_amount,a.check_eft_issued_date_id,a.check_eft_issued_nyc_year_id,
 	       a.scntrc_pymt_dscr as payment_description, a.scntrc_prf_pymt as payment_proof, a.scntrc_fnl_pymt_fl as is_final_payment,
-	        a.vendor_history_id, f.vendor_id as prime_vendor_id,a.agreement_id,
+	        a.vendor_history_id, (CASE WHEN a.vendor_cust_cd = 'N/A' THEN 0 ELSE f.vendor_id END)  as prime_vendor_id,a.agreement_id,
 	       p_load_id_in,now()::timestamp
 	FROM	etl.stg_scntrc_pymt a 
 		JOIN tmp_sub_all_disbs d ON a.uniq_id = d.uniq_id
@@ -277,7 +277,7 @@ BEGIN
 	       a.doc_id,a.doc_cd || a.doc_dept_cd || a.doc_id as contract_number, a.scntrc_id as sub_contract_id, a.scntrc_pymt_id as payment_id,
 	       a.scntrc_pymt_am,a.check_eft_issued_date_id,a.check_eft_issued_nyc_year_id,
 	       a.scntrc_pymt_dscr as payment_description, a.scntrc_prf_pymt as payment_proof, a.scntrc_fnl_pymt_fl as is_final_payment,
-	        a.vendor_history_id, f.vendor_id as prime_vendor_id, a.agreement_id	    
+	        a.vendor_history_id, (CASE WHEN a.vendor_cust_cd = 'N/A' THEN 0 ELSE f.vendor_id END) as prime_vendor_id, a.agreement_id	    
 	FROM	etl.stg_scntrc_pymt a 
 		JOIN tmp_sub_all_disbs d ON a.uniq_id = d.uniq_id
 		LEFT JOIN (select vendor_customer_code, vendor_id from vendor where miscellaneous_vendor_flag = 0::bit) f ON a.vendor_cust_cd = f.vendor_customer_code

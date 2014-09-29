@@ -31,9 +31,10 @@ BEGIN
 	
 	IF l_data_source_code = 'SF' THEN
 	
-	UPDATE etl.tmp_stg_scntrc_vendor SET vend_cust_cd = 'N/A' WHERE vend_cust_cd ='N/A (PRIVACY/SECURITY)';
-	
 	l_vendor_stg_table :='etl.stg_scntrc_pymt';
+	
+	UPDATE etl.stg_scntrc_pymt SET vendor_cust_cd = 'N/A' WHERE vendor_cust_cd ='N/A (PRIVACY/SECURITY)';
+	UPDATE etl.stg_scntrc_pymt SET scntrc_vend_cd = 'N/A' WHERE scntrc_vend_cd ='N/A (PRIVACY/SECURITY)';
 	
 	INSERT INTO etl.tmp_stg_scntrc_vendor(vend_cust_cd, lgl_nm, vendor_history_id, uniq_id)
 	SELECT scntrc_vend_cd, scntrc_lgl_nm, NULL as vendor_history_id, uniq_id
@@ -42,6 +43,9 @@ BEGIN
 	ELSIF l_data_source_code = 'SC'  THEN
 	
 	l_vendor_stg_table :='etl.stg_scntrc_details';
+	
+	UPDATE etl.stg_scntrc_details SET vendor_cust_cd = 'N/A' WHERE vendor_cust_cd ='N/A (PRIVACY/SECURITY)';
+	UPDATE etl.stg_scntrc_details SET scntrc_vend_cd = 'N/A' WHERE scntrc_vend_cd ='N/A (PRIVACY/SECURITY)';
 	
 	INSERT INTO etl.tmp_stg_scntrc_vendor(vend_cust_cd, lgl_nm, vendor_history_id, uniq_id)
 	SELECT scntrc_vend_cd, scntrc_lgl_nm, NULL as vendor_history_id, uniq_id
@@ -53,6 +57,8 @@ BEGIN
 	
 	END IF;
 
+	
+	
 	RAISE NOTICE 'SUB VENDOR 0';
 
 	

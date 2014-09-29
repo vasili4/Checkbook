@@ -9,6 +9,9 @@ BEGIN
 	
 	--  processing data to insert/update in subcontract_vendor_business_type table
 	
+	UPDATE etl.stg_scntrc_bus_type SET vendor_cust_cd = 'N/A' WHERE vendor_cust_cd ='N/A (PRIVACY/SECURITY)';
+	UPDATE etl.stg_scntrc_bus_type SET scntrc_vend_cd = 'N/A' WHERE scntrc_vend_cd ='N/A (PRIVACY/SECURITY)';
+	
 	CREATE TEMPORARY TABLE tmp_scntrc_ven_bus_type(uniq_id bigint, scntrc_vend_cd varchar, bus_typ varchar, bus_typ_sta integer, min_typ integer,  action_flag char(1))
 	DISTRIBUTED BY (uniq_id);
 	

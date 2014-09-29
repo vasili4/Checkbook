@@ -591,6 +591,9 @@ CREATE TABLE contracts_mwbe_spending_transactions(
 	disb_fiscal_year_id  smallint,
 	disb_check_eft_issued_cal_month_id integer,
 	disb_disbursement_number character varying(40),
+	disb_minority_type_id smallint,
+	disb_minority_type_name character varying(50),
+	disb_vendor_type character(2),
 	status_flag char(1),
 	type_of_year char(1)
 )WITH (appendonly=true,orientation=column)
@@ -1495,6 +1498,9 @@ DROP EXTERNAL WEB TABLE IF EXISTS contracts_mwbe_spending_transactions__0 ;
 	disb_fiscal_year_id  smallint,
 	disb_check_eft_issued_cal_month_id integer,
 	disb_disbursement_number character varying(40),
+	disb_minority_type_id smallint,
+	disb_minority_type_name character varying(50),
+	disb_vendor_type character(2),
 	status_flag char(1),
 	type_of_year char(1)
 ) 	
@@ -1513,6 +1519,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contracts_mwbe_spendi
   	contracts_mwbe_spending_transactions__0.disb_spending_category_name,contracts_mwbe_spending_transactions__0.disb_agency_id,contracts_mwbe_spending_transactions__0.disb_vendor_id,contracts_mwbe_spending_transactions__0.disb_expenditure_object_id,
   	contracts_mwbe_spending_transactions__0.disb_department_id,contracts_mwbe_spending_transactions__0.disb_spending_category_id,contracts_mwbe_spending_transactions__0.disb_agreement_id,contracts_mwbe_spending_transactions__0.disb_contract_document_code,
   	contracts_mwbe_spending_transactions__0.disb_master_agreement_id,contracts_mwbe_spending_transactions__0.disb_fiscal_year_id,contracts_mwbe_spending_transactions__0.disb_check_eft_issued_cal_month_id,contracts_mwbe_spending_transactions__0.disb_disbursement_number,
+  	contracts_mwbe_spending_transactions__0.disb_minority_type_id,contracts_mwbe_spending_transactions__0.disb_minority_type_name,contracts_mwbe_spending_transactions__0.disb_vendor_type,
   	contracts_mwbe_spending_transactions__0.status_flag,contracts_mwbe_spending_transactions__0.type_of_year
   	FROM   contracts_mwbe_spending_transactions__0;	
   	

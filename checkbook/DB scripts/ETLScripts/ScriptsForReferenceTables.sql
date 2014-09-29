@@ -308,6 +308,14 @@ UPDATE vendor_address a
 SET vendor_history_id = b.vendor_history_id
 FROM vendor_history b WHERE b.legal_name = 'N/A (PRIVACY/SECURITY)';
 
+
+insert into subvendor(vendor_id,vendor_customer_code,legal_name,display_flag) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)','N');
+insert into vendor_history(vendor_history_id,vendor_id,legal_name) 
+select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
+from vendor where vendor_customer_code='N/A'
+and legal_name='N/A (PRIVACY/SECURITY)';
+
+
 INSERT INTO ref_expenditure_object(expenditure_object_id, expenditure_object_code, expenditure_object_name, fiscal_year, original_expenditure_object_name, created_date, created_load_id)
 VALUES(nextval('seq_ref_expenditure_object_expendtiure_object_id'),'!PS!','Payroll Summary',2009, 'Payroll Summary', now()::timestamp, 0);
 
