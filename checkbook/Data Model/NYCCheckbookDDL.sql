@@ -2460,6 +2460,9 @@ CREATE TABLE subcontract_vendor_business_type (
 )
 DISTRIBUTED BY (vendor_customer_code);
 
+ALTER TABLE  subcontract_vendor_business_type ADD constraint fk_subcontract_vendor_business_type_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+ALTER TABLE  subcontract_vendor_business_type ADD constraint fk_subcontract_vendor_business_type_business_type_id foreign key (business_type_id) references ref_business_type (business_type_id);
+
 
 CREATE TABLE subcontract_business_type (
     contract_number varchar,
@@ -2478,6 +2481,10 @@ CREATE TABLE subcontract_business_type (
     created_date timestamp without time zone
 )
 DISTRIBUTED BY (contract_number);
+
+ALTER TABLE  subcontract_business_type ADD constraint fk_subvendor_business_type_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+ALTER TABLE  subcontract_business_type ADD constraint fk_subvendor_business_type_business_type_id foreign key (business_type_id) references ref_business_type (business_type_id);
+
 
 CREATE TABLE subvendor (
     vendor_id integer PRIMARY KEY DEFAULT nextval('seq_vendor_vendor_id'::regclass) NOT NULL,
@@ -2500,6 +2507,7 @@ CREATE TABLE subvendor_history (
     updated_date timestamp without time zone
 ) distributed by (vendor_history_id);
 
+ALTER TABLE  subvendor_history ADD constraint fk_subvendor_history_vendor_id foreign key (vendor_id) references subvendor (vendor_id);
 
 CREATE TABLE subvendor_business_type (
     vendor_business_type_id bigint PRIMARY KEY DEFAULT nextval('seq_vendor_bus_type_vendor_bus_type_id') NOT NULL,
@@ -2512,6 +2520,9 @@ CREATE TABLE subvendor_business_type (
     updated_date timestamp without time zone
 ) distributed by (vendor_business_type_id);
 
+ALTER TABLE  subvendor_business_type ADD constraint fk_subvendor_business_type_vendor_history_id foreign key (vendor_history_id) references subvendor_history (vendor_history_id);
+ALTER TABLE  subvendor_business_type ADD constraint fk_subvendor_business_type_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+
 CREATE TABLE subvendor_min_bus_type
 ( vendor_id integer,
   vendor_history_id integer,
@@ -2523,6 +2534,7 @@ CREATE TABLE subvendor_min_bus_type
 )
 DISTRIBUTED BY (vendor_history_id);
 
+ALTER TABLE  subvendor_min_bus_type ADD constraint fk_subvendor_min_bus_type_vendor_history_id foreign key (vendor_history_id) references subvendor_history (vendor_history_id);
 
 CREATE TABLE subcontract_status (
     contract_number varchar,
@@ -2604,6 +2616,11 @@ CREATE  TABLE subcontract_details
 )
 DISTRIBUTED BY (agreement_id);
 
+
+ALTER TABLE  subcontract_details ADD constraint fk_subcontract_details_agency_history_id foreign key (agency_history_id) references ref_agency_history (agency_history_id);
+ALTER TABLE  subcontract_details ADD constraint fk_subcontract_details_prime_vendor_id foreign key (prime_vendor_id) references vendor (vendor_id);
+ALTER TABLE  subcontract_details ADD constraint fk_subcontract_details_vendor_history_id foreign key (vendor_history_id) references subvendor_history (vendor_history_id);
+
 CREATE TABLE subcontract_spending (
     disbursement_line_item_id bigint  PRIMARY KEY DEFAULT nextval('seq_disbursement_line_item_id'::regclass) NOT NULL,
     document_code_id smallint,
@@ -2630,6 +2647,11 @@ CREATE TABLE subcontract_spending (
     created_date timestamp without time zone,
     updated_date timestamp without time zone
 ) distributed by (disbursement_line_item_id);
+
+
+ALTER TABLE  subcontract_spending ADD constraint fk_subcontract_spending_agency_history_id foreign key (agency_history_id) references ref_agency_history (agency_history_id);
+ALTER TABLE  subcontract_spending ADD constraint fk_subcontract_spending_prime_vendor_id foreign key (prime_vendor_id) references vendor (vendor_id);
+ALTER TABLE  subcontract_spending ADD constraint fk_subcontract_spending_vendor_history_id foreign key (vendor_history_id) references subvendor_history (vendor_history_id);
 
 
 CREATE TABLE sub_agreement_snapshot
@@ -2699,7 +2721,21 @@ CREATE TABLE sub_agreement_snapshot
  ) DISTRIBUTED BY (original_agreement_id);
  
  
+ 
  CREATE TABLE sub_agreement_snapshot_cy (LIKE sub_agreement_snapshot) DISTRIBUTED BY (original_agreement_id);
+ 
+ 
+ALTER TABLE  sub_agreement_snapshot ADD constraint fk_sub_agreement_snapshot_agency_id foreign key (agency_id) references ref_agency (agency_id);
+ALTER TABLE  sub_agreement_snapshot ADD constraint fk_sub_agreement_snapshot_prime_vendor_id foreign key (prime_vendor_id) references vendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot ADD constraint fk_sub_agreement_snapshot_vendor_id foreign key (vendor_id) references subvendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot ADD constraint fk_sub_agreement_snapshot_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+
+
+ALTER TABLE  sub_agreement_snapshot_cy ADD constraint fk_sub_agreement_snapshot_cy_agency_id foreign key (agency_id) references ref_agency (agency_id);
+ALTER TABLE  sub_agreement_snapshot_cy ADD constraint fk_sub_agreement_snapshot_cy_prime_vendor_id foreign key (prime_vendor_id) references vendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot_cy ADD constraint fk_sub_agreement_snapshot_cy_vendor_id foreign key (vendor_id) references subvendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot_cy ADD constraint fk_sub_agreement_snapshot_cy_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+
  
  CREATE TABLE sub_agreement_snapshot_expanded(
 	original_agreement_id bigint,
@@ -2728,6 +2764,12 @@ CREATE TABLE sub_agreement_snapshot
 	)
 DISTRIBUTED BY (original_agreement_id);	
 
+ALTER TABLE  sub_agreement_snapshot_expanded ADD constraint fk_sub_agreement_snapshot_expanded_agency_id foreign key (agency_id) references ref_agency (agency_id);
+ALTER TABLE  sub_agreement_snapshot_expanded ADD constraint fk_sub_agreement_snapshot_expanded_prime_vendor_id foreign key (prime_vendor_id) references vendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot_expanded ADD constraint fk_sub_agreement_snapshot_expanded_vendor_id foreign key (vendor_id) references subvendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot_expanded ADD constraint fk_sub_agreement_snapshot_expanded_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+
+
 
 CREATE TABLE sub_agreement_snapshot_expanded_cy(
 	original_agreement_id bigint,
@@ -2755,6 +2797,14 @@ CREATE TABLE sub_agreement_snapshot_expanded_cy(
 	status_flag char(1)
 	)
 DISTRIBUTED BY (original_agreement_id);	
+
+
+ALTER TABLE  sub_agreement_snapshot_expanded_cy ADD constraint fk_sub_agreement_snapshot_expanded_cy_agency_id foreign key (agency_id) references ref_agency (agency_id);
+ALTER TABLE  sub_agreement_snapshot_expanded_cy ADD constraint fk_sub_agreement_snapshot_expanded_cy_prime_vendor_id foreign key (prime_vendor_id) references vendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot_expanded_cy ADD constraint fk_sub_agreement_snapshot_expanded_cy_vendor_id foreign key (vendor_id) references subvendor (vendor_id);
+ALTER TABLE  sub_agreement_snapshot_expanded_cy ADD constraint fk_sub_agreement_snapshot_expanded_cy_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+
+
 
 CREATE TABLE sub_agreement_snapshot_deleted (
   agreement_id bigint NOT NULL,
@@ -2837,6 +2887,12 @@ CREATE TABLE subcontract_spending_details(
 )
 DISTRIBUTED BY (disbursement_line_item_id);
 
+ALTER TABLE  subcontract_spending_details ADD constraint fk_subcontract_spending_details_agency_id foreign key (agency_id) references ref_agency (agency_id);
+ALTER TABLE  subcontract_spending_details ADD constraint fk_subcontract_spending_details_prime_vendor_id foreign key (prime_vendor_id) references vendor (vendor_id);
+ALTER TABLE  subcontract_spending_details ADD constraint fk_subcontract_spending_details_vendor_id foreign key (vendor_id) references subvendor (vendor_id);
+ALTER TABLE  subcontract_spending_details ADD constraint fk_subcontract_spending_details_minority_type_id foreign key (minority_type_id) references ref_minority_type (minority_type_id);
+
+
 CREATE TABLE subcontract_spending_deleted (
   disbursement_line_item_id bigint NOT NULL,
   agency_id smallint,
@@ -2844,6 +2900,8 @@ CREATE TABLE subcontract_spending_deleted (
   deleted_date timestamp without time zone,
   job_id bigint
 ) DISTRIBUTED BY (disbursement_line_item_id);
+
+ALTER TABLE  subcontract_spending_deleted ADD constraint fk_subcontract_spending_deleted_agency_id foreign key (agency_id) references ref_agency (agency_id);
 
 
 
