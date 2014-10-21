@@ -1293,20 +1293,24 @@ BEGIN
 
 	l_start_time := timeofday()::timestamp;
 	
-	
+	/*
 	DELETE FROM ONLY all_agreement_transactions a
 	USING agreement_snapshot b
 	WHERE a.agreement_id = b.agreement_id 
 	AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
 	
+	
 	DELETE FROM all_agreement_transactions WHERE is_prime_or_sub = 'S';
+	*/
+	
+	TRUNCATE TABLE all_agreement_transactions;
 	
 	INSERT INTO all_agreement_transactions(original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, original_contract_amount, 
             maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            vendor_code, vendor_name, prime_vendor_id, prime_vendor_name, dollar_difference, percent_difference, 
             master_agreement_id, master_contract_number, agreement_type_id, 
             agreement_type_code, agreement_type_name, award_category_id, 
             award_category_code, award_category_name, award_method_id, award_method_code, 
@@ -1324,7 +1328,7 @@ BEGIN
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, original_contract_amount, 
             maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            vendor_code, vendor_name, vendor_id as prime_vendor_id, vendor_name as prime_vendor_name, dollar_difference, percent_difference, 
             master_agreement_id, master_contract_number, agreement_type_id, 
             agreement_type_code, agreement_type_name, award_category_id, 
             award_category_code, award_category_name, award_method_id, award_method_code, 
@@ -1339,8 +1343,7 @@ BEGIN
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
             original_agreement_id as contract_original_agreement_id, job_id
-       FROM agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
-       where job_id = p_job_id_in;
+       FROM agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date;
        
        
       INSERT INTO all_agreement_transactions(original_agreement_id, document_version, document_code_id, agency_history_id, 
@@ -1389,20 +1392,21 @@ BEGIN
 
 RAISE NOTICE 'REF COMMON TT1';
 
-
+/*
 DELETE FROM ONLY all_agreement_transactions_cy a
 	USING agreement_snapshot_cy b
 	WHERE a.agreement_id = b.agreement_id 
 	AND b.job_id = p_job_id_in AND a.is_prime_or_sub = 'P';
-	
-	DELETE FROM all_agreement_transactions_cy WHERE is_prime_or_sub = 'S';
+	*/
+
+	TRUNCATE TABLE all_agreement_transactions_cy ;
 	
 	INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, original_contract_amount, 
             maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            vendor_code, vendor_name, prime_vendor_id, prime_vendor_name, dollar_difference, percent_difference, 
             master_agreement_id, master_contract_number, agreement_type_id, 
             agreement_type_code, agreement_type_name, award_category_id, 
             award_category_code, award_category_name, award_method_id, award_method_code, 
@@ -1420,7 +1424,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             starting_year_id, ending_year, ending_year_id, registered_year, 
             registered_year_id, contract_number, original_contract_amount, 
             maximum_contract_amount, description, vendor_history_id, vendor_id, 
-            vendor_code, vendor_name, dollar_difference, percent_difference, 
+            vendor_code, vendor_name, vendor_id as prime_vendor_id, vendor_name as prime_vendor_name, dollar_difference, percent_difference, 
             master_agreement_id, master_contract_number, agreement_type_id, 
             agreement_type_code, agreement_type_name, award_category_id, 
             award_category_code, award_category_name, award_method_id, award_method_code, 
@@ -1436,8 +1440,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
             original_agreement_id as contract_original_agreement_id, job_id
        FROM agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
-        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
-       where job_id = p_job_id_in;
+        LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
        
        
       INSERT INTO all_agreement_transactions_cy(original_agreement_id, document_version, document_code_id, agency_history_id, 
@@ -1497,7 +1500,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
             check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
             fund_class_id, check_amount, agency_id, agency_history_id, agency_code, 
-            expenditure_object_id, vendor_id, department_id, maximum_contract_amount, 
+            expenditure_object_id, vendor_id,  prime_vendor_id, prime_vendor_name, department_id, maximum_contract_amount, 
             maximum_contract_amount_cy, maximum_spending_limit, maximum_spending_limit_cy, 
             document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
             agency_name, agency_short_name, location_name, location_code, 
@@ -1526,7 +1529,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
             check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
             fund_class_id, check_amount, agency_id, agency_history_id, agency_code, 
-            expenditure_object_id, vendor_id, department_id, maximum_contract_amount, 
+            expenditure_object_id, vendor_id, vendor_id as prime_vendor_id, vendor_name as prime_vendor_name, department_id, maximum_contract_amount, 
             maximum_contract_amount_cy, maximum_spending_limit, maximum_spending_limit_cy, 
             document_id, vendor_name, vendor_customer_code, check_eft_issued_date, 
             agency_name, agency_short_name, location_name, location_code, 

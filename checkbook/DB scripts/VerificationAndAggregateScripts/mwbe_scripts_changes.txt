@@ -677,7 +677,49 @@ BEGIN
 		minority_type_name = 'Individuals & Others'
 	WHERE spending_category_id = 2;
 	
+	-- new changes for updating minority type of old records from mwbe database
 	
+	DROP TABLE IF EXISTS mwbe_spend_data;
+
+CREATE TABLE mwbe_spend_data
+(
+  DocID varchar,
+  DocVersion varchar,
+  DocDeptCode varchar,
+  DocCode varchar,
+  VendorCode varchar,
+  CategoryName varchar,
+  CategoryID smallint,
+  check_eft_date date
+) DISTRIBUTED BY (DocID);
+
+COPY mwbe_spend_data FROM '/home/gpadmin/TREDDY/MWBE/CREATE_NEW_DATABASE/mwbe_spend_dump.csv' CSV HEADER QUOTE as '"';
+
+update mwbe_spend_data set categoryname = 'African American', categoryid = 2 where categoryid = 2;
+update mwbe_spend_data set categoryname = 'Hispanic American', categoryid = 3 where categoryid = 3;
+update mwbe_spend_data set categoryname = 'Asian-Indian', categoryid = 5 where categoryid = 4;
+update mwbe_spend_data set categoryname = 'Non-Minority', categoryid = 7 where categoryid = 7;
+update mwbe_spend_data set categoryname = 'Caucasian Woman', categoryid = 9 where categoryid = 1;
+update mwbe_spend_data set categoryname = 'Individuals & Others', categoryid = 11 where categoryid = 6;
+
+
+UPDATE disbursement_line_item_details b
+SET minority_type_id = a.categoryid,
+minority_type_name = a.categoryname
+FROM mwbe_spend_data a
+WHERE b.disbursement_number = a.DocID||'-'||a.DocVersion||'-'|| a.DocDeptCode || '-' || a.DocCode AND b.vendor_customer_code = a.VendorCode 
+AND b.check_eft_issued_date = a.check_eft_date AND b.file_type = 'F'  and b.check_eft_issued_date between '2009-12-22' and  '2013-01-12' 
+and b.minority_type_id != a.categoryid and a.categoryid not in (5);
+
+UPDATE disbursement_line_item_details b
+SET minority_type_id = a.categoryid,
+minority_type_name = a.categoryname
+FROM mwbe_spend_data a
+WHERE b.disbursement_number = a.DocID||'-'||a.DocVersion||'-'|| a.DocDeptCode || '-' || a.DocCode AND b.vendor_customer_code = a.VendorCode 
+AND b.check_eft_issued_date = a.check_eft_date AND b.file_type = 'F'  and b.check_eft_issued_date between '2009-12-22' and  '2013-01-12' 
+AND b.minority_type_id != a.categoryid AND a.categoryid in (5) and b.minority_type_id not in (4,5);
+
+
 	
 	
 		UPDATE disbursement_line_item_details a
