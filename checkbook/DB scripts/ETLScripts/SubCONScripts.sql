@@ -679,7 +679,8 @@ BEGIN
 		AND rank_value = 1
 		AND registered_fiscal_year <= 2010;
 
-
+     -- Updating the starting year to POP start year if starting year > POP start year
+     
 		 UPDATE 	tmp_sub_agreement_snapshot
 		SET	starting_year = effective_begin_fiscal_year,
 		starting_year_id = effective_begin_fiscal_year_id
@@ -771,7 +772,7 @@ BEGIN
 		LEFT JOIN ref_date i ON i.date_id = b.effective_end_date_id
 		LEFT JOIN ref_date j ON j.date_id = b.registered_date_id
 		LEFT JOIN ref_industry_type l ON b.industry_type_id = l.industry_type_id
-		LEFT JOIN subvendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
+		LEFT JOIN subvendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id		
 		WHERE b.source_updated_date_id IS NOT NULL;
 
 	
