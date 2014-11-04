@@ -3825,6 +3825,8 @@ CREATE EXTERNAL WEB TABLE sub_agreement_snapshot__0
    vendor_code character varying,
    vendor_name character varying,
    prime_vendor_id integer,
+   prime_minority_type_id smallint,
+   prime_minority_type_name character varying(50),
    dollar_difference numeric(16,2),
    percent_difference numeric(17,4),
    agreement_type_id smallint,
@@ -3875,7 +3877,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.sub_agreement_snapsho
   		sub_agreement_snapshot__0.ending_year_id,sub_agreement_snapshot__0.registered_year,sub_agreement_snapshot__0.registered_year_id,sub_agreement_snapshot__0.contract_number,
   		sub_agreement_snapshot__0.sub_contract_id,sub_agreement_snapshot__0.original_contract_amount,sub_agreement_snapshot__0.maximum_contract_amount,sub_agreement_snapshot__0.description,
   		sub_agreement_snapshot__0.vendor_history_id,sub_agreement_snapshot__0.vendor_id,sub_agreement_snapshot__0.vendor_code,sub_agreement_snapshot__0.vendor_name,sub_agreement_snapshot__0.prime_vendor_id,
-  		sub_agreement_snapshot__0.dollar_difference,sub_agreement_snapshot__0.percent_difference,
+  		sub_agreement_snapshot__0.prime_minority_type_id,sub_agreement_snapshot__0.prime_minority_type_name,sub_agreement_snapshot__0.dollar_difference,sub_agreement_snapshot__0.percent_difference,
   		sub_agreement_snapshot__0.agreement_type_id,sub_agreement_snapshot__0.agreement_type_code,sub_agreement_snapshot__0.agreement_type_name,sub_agreement_snapshot__0.award_category_id,sub_agreement_snapshot__0.award_category_code,
   		sub_agreement_snapshot__0.award_category_name,sub_agreement_snapshot__0.award_method_id,sub_agreement_snapshot__0.award_method_code,sub_agreement_snapshot__0.award_method_name,
   		sub_agreement_snapshot__0.expenditure_object_codes,sub_agreement_snapshot__0.expenditure_object_names,sub_agreement_snapshot__0.industry_type_id,sub_agreement_snapshot__0.industry_type_name,sub_agreement_snapshot__0.award_size_id,
@@ -3919,6 +3921,8 @@ CREATE EXTERNAL WEB TABLE sub_agreement_snapshot_cy__0
    vendor_code character varying,
    vendor_name character varying,
    prime_vendor_id integer,
+   prime_minority_type_id smallint,
+   prime_minority_type_name character varying(50),
    dollar_difference numeric(16,2),
    percent_difference numeric(17,4),
    agreement_type_id smallint,
@@ -3969,7 +3973,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.sub_agreement_snapsho
   		sub_agreement_snapshot_cy__0.ending_year_id,sub_agreement_snapshot_cy__0.registered_year,sub_agreement_snapshot_cy__0.registered_year_id,sub_agreement_snapshot_cy__0.contract_number,
   		sub_agreement_snapshot_cy__0.sub_contract_id,sub_agreement_snapshot_cy__0.original_contract_amount,sub_agreement_snapshot_cy__0.maximum_contract_amount,sub_agreement_snapshot_cy__0.description,
   		sub_agreement_snapshot_cy__0.vendor_history_id,sub_agreement_snapshot_cy__0.vendor_id,sub_agreement_snapshot_cy__0.vendor_code,sub_agreement_snapshot_cy__0.vendor_name,sub_agreement_snapshot_cy__0.prime_vendor_id,
-  		sub_agreement_snapshot_cy__0.dollar_difference,sub_agreement_snapshot_cy__0.percent_difference,
+  		sub_agreement_snapshot_cy__0.prime_minority_type_id,sub_agreement_snapshot_cy__0.prime_minority_type_name,sub_agreement_snapshot_cy__0.dollar_difference,sub_agreement_snapshot_cy__0.percent_difference,
   		sub_agreement_snapshot_cy__0.agreement_type_id,sub_agreement_snapshot_cy__0.agreement_type_code,sub_agreement_snapshot_cy__0.agreement_type_name,sub_agreement_snapshot_cy__0.award_category_id,sub_agreement_snapshot_cy__0.award_category_code,
   		sub_agreement_snapshot_cy__0.award_category_name,sub_agreement_snapshot_cy__0.award_method_id,sub_agreement_snapshot_cy__0.award_method_code,sub_agreement_snapshot_cy__0.award_method_name,
    		sub_agreement_snapshot_cy__0.expenditure_object_codes,sub_agreement_snapshot_cy__0.expenditure_object_names,sub_agreement_snapshot_cy__0.industry_type_id,sub_agreement_snapshot_cy__0.industry_type_name,sub_agreement_snapshot_cy__0.award_size_id,
@@ -3995,6 +3999,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.sub_agreement_snapsho
 	sub_contract_id character varying,
 	vendor_id int,
 	prime_vendor_id int,
+	prime_minority_type_id smallint,
 	agency_id smallint,
 	industry_type_id smallint,
     award_size_id smallint,
@@ -4018,7 +4023,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.sub_agreement_snapsho
 CREATE VIEW sub_agreement_snapshot_expanded AS
 	 SELECT sub_agreement_snapshot_expanded__0.original_agreement_id,sub_agreement_snapshot_expanded__0.agreement_id,sub_agreement_snapshot_expanded__0.fiscal_year,sub_agreement_snapshot_expanded__0.description,
 	 	sub_agreement_snapshot_expanded__0.contract_number,sub_agreement_snapshot_expanded__0.sub_contract_id,sub_agreement_snapshot_expanded__0.vendor_id,sub_agreement_snapshot_expanded__0.prime_vendor_id,
-	 	sub_agreement_snapshot_expanded__0.agency_id,sub_agreement_snapshot_expanded__0.industry_type_id,sub_agreement_snapshot_expanded__0.award_size_id,
+	 	sub_agreement_snapshot_expanded__0.prime_minority_type_id,sub_agreement_snapshot_expanded__0.agency_id,sub_agreement_snapshot_expanded__0.industry_type_id,sub_agreement_snapshot_expanded__0.award_size_id,
 	 	sub_agreement_snapshot_expanded__0.original_contract_amount,sub_agreement_snapshot_expanded__0.maximum_contract_amount,sub_agreement_snapshot_expanded__0.rfed_amount,
 	 	sub_agreement_snapshot_expanded__0.starting_year,sub_agreement_snapshot_expanded__0.ending_year,sub_agreement_snapshot_expanded__0.dollar_difference,
 	 	sub_agreement_snapshot_expanded__0.percent_difference,sub_agreement_snapshot_expanded__0.award_method_id,sub_agreement_snapshot_expanded__0.document_code_id,
@@ -4037,6 +4042,7 @@ CREATE EXTERNAL WEB TABLE sub_agreement_snapshot_expanded_cy__0 (
 	sub_contract_id character varying,
 	vendor_id int,
 	prime_vendor_id int,
+	prime_minority_type_id smallint,
 	agency_id smallint,
 	industry_type_id smallint,
     award_size_id smallint,
@@ -4060,7 +4066,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.sub_agreement_snapsho
   CREATE VIEW sub_agreement_snapshot_expanded_cy AS
   	SELECT sub_agreement_snapshot_expanded_cy__0.original_agreement_id,sub_agreement_snapshot_expanded_cy__0.agreement_id,sub_agreement_snapshot_expanded_cy__0.fiscal_year,sub_agreement_snapshot_expanded_cy__0.description,
   		sub_agreement_snapshot_expanded_cy__0.contract_number,sub_agreement_snapshot_expanded_cy__0.sub_contract_id,sub_agreement_snapshot_expanded_cy__0.vendor_id,sub_agreement_snapshot_expanded_cy__0.prime_vendor_id,
-  		sub_agreement_snapshot_expanded_cy__0.agency_id,sub_agreement_snapshot_expanded_cy__0.industry_type_id,sub_agreement_snapshot_expanded_cy__0.award_size_id,
+  		sub_agreement_snapshot_expanded_cy__0.prime_minority_type_id,sub_agreement_snapshot_expanded_cy__0.agency_id,sub_agreement_snapshot_expanded_cy__0.industry_type_id,sub_agreement_snapshot_expanded_cy__0.award_size_id,
   		sub_agreement_snapshot_expanded_cy__0.original_contract_amount,sub_agreement_snapshot_expanded_cy__0.maximum_contract_amount,sub_agreement_snapshot_expanded_cy__0.rfed_amount,
   		sub_agreement_snapshot_expanded_cy__0.starting_year,sub_agreement_snapshot_expanded_cy__0.ending_year,sub_agreement_snapshot_expanded_cy__0.dollar_difference,
   		sub_agreement_snapshot_expanded_cy__0.percent_difference,sub_agreement_snapshot_expanded_cy__0.award_method_id,sub_agreement_snapshot_expanded_cy__0.document_code_id,
@@ -4085,6 +4091,8 @@ CREATE EXTERNAL WEB TABLE subcontract_spending_details__0 (
 	agency_code varchar(20),
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_minority_type_id smallint,
+    prime_minority_type_name character varying(50),
 	maximum_contract_amount numeric(16,2),
 	maximum_contract_amount_cy numeric(16,2),	
 	document_id varchar,
@@ -4123,6 +4131,8 @@ CREATE EXTERNAL WEB TABLE subcontract_spending_details__0 (
 	contract_industry_type_id_cy smallint,
 	contract_minority_type_id smallint,
 	contract_minority_type_id_cy smallint,	
+	contract_prime_minority_type_id smallint,
+    contract_prime_minority_type_id_cy smallint,
 	master_agreement_id bigint,  
     master_contract_number character varying,
 	file_type char(1),
@@ -4141,7 +4151,7 @@ CREATE VIEW subcontract_spending_details AS
     subcontract_spending_details__0.check_eft_issued_nyc_year_id, subcontract_spending_details__0.fiscal_year, subcontract_spending_details__0.check_eft_issued_cal_month_id, subcontract_spending_details__0.agreement_id,
     subcontract_spending_details__0.check_amount, subcontract_spending_details__0.agency_id,
     subcontract_spending_details__0.agency_history_id,subcontract_spending_details__0.agency_code,  subcontract_spending_details__0.vendor_id, subcontract_spending_details__0.prime_vendor_id,
-    subcontract_spending_details__0.maximum_contract_amount, subcontract_spending_details__0.maximum_contract_amount_cy,
+    subcontract_spending_details__0.prime_minority_type_id,subcontract_spending_details__0.prime_minority_type_name,subcontract_spending_details__0.maximum_contract_amount, subcontract_spending_details__0.maximum_contract_amount_cy,
     subcontract_spending_details__0.document_id, subcontract_spending_details__0.vendor_name,subcontract_spending_details__0.vendor_customer_code, subcontract_spending_details__0.check_eft_issued_date, 
     subcontract_spending_details__0.agency_name,subcontract_spending_details__0.agency_short_name,
     subcontract_spending_details__0.expenditure_object_name,subcontract_spending_details__0.expenditure_object_code, 
@@ -4156,6 +4166,7 @@ CREATE VIEW subcontract_spending_details AS
     subcontract_spending_details__0.industry_type_name,subcontract_spending_details__0.agreement_type_code,subcontract_spending_details__0.award_method_code,
     subcontract_spending_details__0.contract_industry_type_id,subcontract_spending_details__0.contract_industry_type_id_cy,
     subcontract_spending_details__0.contract_minority_type_id,subcontract_spending_details__0.contract_minority_type_id_cy,
+    subcontract_spending_details__0.contract_prime_minority_type_id,subcontract_spending_details__0.contract_prime_minority_type_id_cy,
     subcontract_spending_details__0.master_agreement_id,subcontract_spending_details__0.master_contract_number,
     subcontract_spending_details__0.file_type,subcontract_spending_details__0.load_id, subcontract_spending_details__0.last_modified_date, subcontract_spending_details__0.job_id
 FROM ONLY subcontract_spending_details__0;
@@ -4169,6 +4180,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_subven_spending_coa_entities__0 (
 	spending_category_id smallint,
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	industry_type_id smallint,
 	month_id int,
@@ -4184,7 +4196,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_subven_sp
 
 CREATE VIEW aggregateon_subven_spending_coa_entities AS
     SELECT aggregateon_subven_spending_coa_entities__0.agency_id, aggregateon_subven_spending_coa_entities__0.spending_category_id, 
-    	aggregateon_subven_spending_coa_entities__0.vendor_id, aggregateon_subven_spending_coa_entities__0.prime_vendor_id, 
+    	aggregateon_subven_spending_coa_entities__0.vendor_id, aggregateon_subven_spending_coa_entities__0.prime_vendor_id, aggregateon_subven_spending_coa_entities__0.prime_minority_type_id,
     	aggregateon_subven_spending_coa_entities__0.minority_type_id, aggregateon_subven_spending_coa_entities__0.industry_type_id, 
     	aggregateon_subven_spending_coa_entities__0.month_id, aggregateon_subven_spending_coa_entities__0.year_id, 
     	aggregateon_subven_spending_coa_entities__0.type_of_year, aggregateon_subven_spending_coa_entities__0.total_spending_amount,aggregateon_subven_spending_coa_entities__0.total_disbursements 
@@ -4201,6 +4213,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_subven_spending_contract__0 (
     document_code character varying(8),
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	industry_type_id smallint,
 	agency_id smallint,
@@ -4219,7 +4232,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_subven_sp
 CREATE VIEW aggregateon_subven_spending_contract AS
     SELECT aggregateon_subven_spending_contract__0.agreement_id, aggregateon_subven_spending_contract__0.document_id, aggregateon_subven_spending_contract__0.sub_contract_id, 
     aggregateon_subven_spending_contract__0.document_code,aggregateon_subven_spending_contract__0.vendor_id, aggregateon_subven_spending_contract__0.prime_vendor_id,
-    aggregateon_subven_spending_contract__0.minority_type_id, aggregateon_subven_spending_contract__0.industry_type_id,
+    aggregateon_subven_spending_contract__0.prime_minority_type_id,aggregateon_subven_spending_contract__0.minority_type_id, aggregateon_subven_spending_contract__0.industry_type_id,
     aggregateon_subven_spending_contract__0.agency_id, aggregateon_subven_spending_contract__0.description, aggregateon_subven_spending_contract__0.spending_category_id, 
     aggregateon_subven_spending_contract__0.year_id,aggregateon_subven_spending_contract__0.type_of_year, 
     aggregateon_subven_spending_contract__0.total_spending_amount, aggregateon_subven_spending_contract__0.total_contract_amount 
@@ -4231,6 +4244,7 @@ CREATE VIEW aggregateon_subven_spending_contract AS
 CREATE EXTERNAL WEB TABLE aggregateon_subven_spending_vendor__0 (
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	industry_type_id smallint,
 	agency_id smallint,
@@ -4248,7 +4262,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_subven_sp
 	
 
 CREATE VIEW aggregateon_subven_spending_vendor AS
-    SELECT aggregateon_subven_spending_vendor__0.vendor_id, aggregateon_subven_spending_vendor__0.prime_vendor_id, 
+    SELECT aggregateon_subven_spending_vendor__0.vendor_id, aggregateon_subven_spending_vendor__0.prime_vendor_id, aggregateon_subven_spending_vendor__0.prime_minority_type_id,
     aggregateon_subven_spending_vendor__0.minority_type_id, aggregateon_subven_spending_vendor__0.industry_type_id,
     aggregateon_subven_spending_vendor__0.agency_id, aggregateon_subven_spending_vendor__0.spending_category_id, aggregateon_subven_spending_vendor__0.year_id,
     aggregateon_subven_spending_vendor__0.type_of_year, aggregateon_subven_spending_vendor__0.total_spending_amount, 
@@ -4269,6 +4283,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_subven_contracts_cumulative_spending__0 (
 	sub_contract_id character varying,
 	vendor_id int,
 	prime_vendor_id int,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	award_method_id smallint,
 	agency_id smallint,
@@ -4294,7 +4309,8 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_subven_co
   		aggregateon_subven_contracts_cumulative_spending__0.fiscal_year_id,
   		aggregateon_subven_contracts_cumulative_spending__0.document_code_id,
   		aggregateon_subven_contracts_cumulative_spending__0.description,aggregateon_subven_contracts_cumulative_spending__0.contract_number,aggregateon_subven_contracts_cumulative_spending__0.sub_contract_id,
-  		aggregateon_subven_contracts_cumulative_spending__0.vendor_id,aggregateon_subven_contracts_cumulative_spending__0.prime_vendor_id,aggregateon_subven_contracts_cumulative_spending__0.minority_type_id,aggregateon_subven_contracts_cumulative_spending__0.award_method_id,
+  		aggregateon_subven_contracts_cumulative_spending__0.vendor_id,aggregateon_subven_contracts_cumulative_spending__0.prime_vendor_id,aggregateon_subven_contracts_cumulative_spending__0.prime_minority_type_id,
+  		aggregateon_subven_contracts_cumulative_spending__0.minority_type_id,aggregateon_subven_contracts_cumulative_spending__0.award_method_id,
   		aggregateon_subven_contracts_cumulative_spending__0.agency_id,aggregateon_subven_contracts_cumulative_spending__0.industry_type_id,aggregateon_subven_contracts_cumulative_spending__0.award_size_id,
   		aggregateon_subven_contracts_cumulative_spending__0.original_contract_amount,aggregateon_subven_contracts_cumulative_spending__0.maximum_contract_amount,aggregateon_subven_contracts_cumulative_spending__0.spending_amount_disb,
   		aggregateon_subven_contracts_cumulative_spending__0.spending_amount,aggregateon_subven_contracts_cumulative_spending__0.current_year_spending_amount,
@@ -4313,6 +4329,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_subven_contracts_spending_by_month__0 (
  month_id integer,
  vendor_id int,
  prime_vendor_id int,
+ prime_minority_type_id smallint,
  minority_type_id smallint,
  award_method_id smallint,
  agency_id smallint,
@@ -4330,7 +4347,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_subven_co
    CREATE VIEW aggregateon_subven_contracts_spending_by_month AS
   	SELECT aggregateon_subven_contracts_spending_by_month__0.original_agreement_id,aggregateon_subven_contracts_spending_by_month__0.fiscal_year,aggregateon_subven_contracts_spending_by_month__0.fiscal_year_id,
   		aggregateon_subven_contracts_spending_by_month__0.document_code_id,aggregateon_subven_contracts_spending_by_month__0.month_id,aggregateon_subven_contracts_spending_by_month__0.vendor_id,
-  		aggregateon_subven_contracts_spending_by_month__0.prime_vendor_id,aggregateon_subven_contracts_spending_by_month__0.minority_type_id,aggregateon_subven_contracts_spending_by_month__0.award_method_id,
+  		aggregateon_subven_contracts_spending_by_month__0.prime_vendor_id,aggregateon_subven_contracts_spending_by_month__0.prime_minority_type_id,aggregateon_subven_contracts_spending_by_month__0.minority_type_id,aggregateon_subven_contracts_spending_by_month__0.award_method_id,
   		aggregateon_subven_contracts_spending_by_month__0.agency_id,aggregateon_subven_contracts_spending_by_month__0.industry_type_id, aggregateon_subven_contracts_spending_by_month__0.award_size_id,
   		aggregateon_subven_contracts_spending_by_month__0.spending_amount,	aggregateon_subven_contracts_spending_by_month__0.status_flag,aggregateon_subven_contracts_spending_by_month__0.type_of_year
   	FROM  aggregateon_subven_contracts_spending_by_month__0;
@@ -4343,6 +4360,7 @@ fiscal_year smallint,
 fiscal_year_id smallint,
 vendor_id int,
  prime_vendor_id int,
+ prime_minority_type_id smallint,
  minority_type_id smallint,
 award_method_id smallint,
 agency_id smallint,
@@ -4367,7 +4385,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_subven_to
 
 
   CREATE VIEW aggregateon_subven_total_contracts AS
-  	SELECT aggregateon_subven_total_contracts__0.fiscal_year,aggregateon_subven_total_contracts__0.fiscal_year_id,aggregateon_subven_total_contracts__0.vendor_id, aggregateon_subven_total_contracts__0.prime_vendor_id,
+  	SELECT aggregateon_subven_total_contracts__0.fiscal_year,aggregateon_subven_total_contracts__0.fiscal_year_id,aggregateon_subven_total_contracts__0.vendor_id, aggregateon_subven_total_contracts__0.prime_vendor_id, aggregateon_subven_total_contracts__0.prime_minority_type_id,
   	aggregateon_subven_total_contracts__0.minority_type_id,  	aggregateon_subven_total_contracts__0.award_method_id,  	aggregateon_subven_total_contracts__0.agency_id, aggregateon_subven_total_contracts__0.industry_type_id, 
   	aggregateon_subven_total_contracts__0.award_size_id,   	aggregateon_subven_total_contracts__0.total_contracts,aggregateon_subven_total_contracts__0.total_commited_contracts,	aggregateon_subven_total_contracts__0.total_master_agreements,
   	aggregateon_subven_total_contracts__0.total_standalone_contracts,aggregateon_subven_total_contracts__0.total_revenue_contracts,aggregateon_subven_total_contracts__0.total_revenue_contracts_amount,
@@ -4387,6 +4405,7 @@ fiscal_year_id smallint,
 document_code_id smallint,
 vendor_id int,
 prime_vendor_id int,
+prime_minority_type_id smallint,
 minority_type_id smallint,
 award_method_id smallint,
 document_agency_id smallint,
@@ -4424,7 +4443,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contracts_subven_spen
 
   CREATE VIEW contracts_subven_spending_transactions AS
   	SELECT contracts_subven_spending_transactions__0.disbursement_line_item_id,contracts_subven_spending_transactions__0.original_agreement_id,contracts_subven_spending_transactions__0.fiscal_year,
-  	contracts_subven_spending_transactions__0.fiscal_year_id,contracts_subven_spending_transactions__0.document_code_id, contracts_subven_spending_transactions__0.vendor_id, contracts_subven_spending_transactions__0.prime_vendor_id, 
+  	contracts_subven_spending_transactions__0.fiscal_year_id,contracts_subven_spending_transactions__0.document_code_id, contracts_subven_spending_transactions__0.vendor_id, contracts_subven_spending_transactions__0.prime_vendor_id, contracts_subven_spending_transactions__0.prime_minority_type_id,
   	contracts_subven_spending_transactions__0.minority_type_id,  	contracts_subven_spending_transactions__0.award_method_id, contracts_subven_spending_transactions__0.document_agency_id, contracts_subven_spending_transactions__0.industry_type_id, 
   	contracts_subven_spending_transactions__0.award_size_id, 	contracts_subven_spending_transactions__0.disb_document_id,contracts_subven_spending_transactions__0.disb_vendor_name,contracts_subven_spending_transactions__0.disb_check_eft_issued_date,
   	contracts_subven_spending_transactions__0.disb_agency_name,  	contracts_subven_spending_transactions__0.disb_check_amount,  contracts_subven_spending_transactions__0.disb_contract_number,contracts_subven_spending_transactions__0.disb_sub_contract_id,
@@ -4436,16 +4455,18 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contracts_subven_spen
   	FROM   contracts_subven_spending_transactions__0;	
 
   	
-CREATE EXTERNAL WEB TABLE aggregateon_subven_contracts_cumulative_spending__0 (
+CREATE EXTERNAL WEB TABLE aggregateon_all_contracts_cumulative_spending__0 (
 	original_agreement_id bigint,
 	fiscal_year smallint,
 	fiscal_year_id smallint,
 	document_code_id smallint,
+	master_agreement_yn character(1),
 	description varchar,
 	contract_number varchar,
 	sub_contract_id character varying,
 	vendor_id int,
 	prime_vendor_id int,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	award_method_id smallint,
 	agency_id smallint,
@@ -4461,23 +4482,24 @@ CREATE EXTERNAL WEB TABLE aggregateon_subven_contracts_cumulative_spending__0 (
 	status_flag char(1),
 	type_of_year char(1)	
 ) 
-EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_subven_contracts_cumulative_spending to stdout csv"' ON SEGMENT 0 
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_all_contracts_cumulative_spending to stdout csv"' ON SEGMENT 0 
      FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
   ENCODING 'UTF8';
 
 
-  CREATE VIEW aggregateon_subven_contracts_cumulative_spending AS
-  	SELECT aggregateon_subven_contracts_cumulative_spending__0.original_agreement_id,aggregateon_subven_contracts_cumulative_spending__0.fiscal_year,
-  		aggregateon_subven_contracts_cumulative_spending__0.fiscal_year_id,
-  		aggregateon_subven_contracts_cumulative_spending__0.document_code_id,
-  		aggregateon_subven_contracts_cumulative_spending__0.description,aggregateon_subven_contracts_cumulative_spending__0.contract_number,aggregateon_subven_contracts_cumulative_spending__0.sub_contract_id,
-  		aggregateon_subven_contracts_cumulative_spending__0.vendor_id,aggregateon_subven_contracts_cumulative_spending__0.prime_vendor_id,aggregateon_subven_contracts_cumulative_spending__0.minority_type_id,aggregateon_subven_contracts_cumulative_spending__0.award_method_id,
-  		aggregateon_subven_contracts_cumulative_spending__0.agency_id,aggregateon_subven_contracts_cumulative_spending__0.industry_type_id,aggregateon_subven_contracts_cumulative_spending__0.award_size_id,
-  		aggregateon_subven_contracts_cumulative_spending__0.original_contract_amount,aggregateon_subven_contracts_cumulative_spending__0.maximum_contract_amount,aggregateon_subven_contracts_cumulative_spending__0.spending_amount_disb,
-  		aggregateon_subven_contracts_cumulative_spending__0.spending_amount,aggregateon_subven_contracts_cumulative_spending__0.current_year_spending_amount,
-  		aggregateon_subven_contracts_cumulative_spending__0.dollar_difference,aggregateon_subven_contracts_cumulative_spending__0.percent_difference,
-  		aggregateon_subven_contracts_cumulative_spending__0.status_flag,aggregateon_subven_contracts_cumulative_spending__0.type_of_year
-  	FROM 	  aggregateon_subven_contracts_cumulative_spending__0; 
+  CREATE VIEW aggregateon_all_contracts_cumulative_spending AS
+  	SELECT aggregateon_all_contracts_cumulative_spending__0.original_agreement_id,aggregateon_all_contracts_cumulative_spending__0.fiscal_year,
+  		aggregateon_all_contracts_cumulative_spending__0.fiscal_year_id,
+  		aggregateon_all_contracts_cumulative_spending__0.document_code_id, aggregateon_all_contracts_cumulative_spending__0.master_agreement_yn,
+  		aggregateon_all_contracts_cumulative_spending__0.description,aggregateon_all_contracts_cumulative_spending__0.contract_number,aggregateon_all_contracts_cumulative_spending__0.sub_contract_id,
+  		aggregateon_all_contracts_cumulative_spending__0.vendor_id,aggregateon_all_contracts_cumulative_spending__0.prime_vendor_id,aggregateon_all_contracts_cumulative_spending__0.prime_minority_type_id,
+  		aggregateon_all_contracts_cumulative_spending__0.minority_type_id,aggregateon_all_contracts_cumulative_spending__0.award_method_id,
+  		aggregateon_all_contracts_cumulative_spending__0.agency_id,aggregateon_all_contracts_cumulative_spending__0.industry_type_id,aggregateon_all_contracts_cumulative_spending__0.award_size_id,
+  		aggregateon_all_contracts_cumulative_spending__0.original_contract_amount,aggregateon_all_contracts_cumulative_spending__0.maximum_contract_amount,aggregateon_all_contracts_cumulative_spending__0.spending_amount_disb,
+  		aggregateon_all_contracts_cumulative_spending__0.spending_amount,aggregateon_all_contracts_cumulative_spending__0.current_year_spending_amount,
+  		aggregateon_all_contracts_cumulative_spending__0.dollar_difference,aggregateon_all_contracts_cumulative_spending__0.percent_difference,
+  		aggregateon_all_contracts_cumulative_spending__0.status_flag,aggregateon_all_contracts_cumulative_spending__0.type_of_year
+  	FROM 	  aggregateon_all_contracts_cumulative_spending__0;  
   	
   	
 -- Common transaction Tables
@@ -4508,6 +4530,8 @@ CREATE EXTERNAL WEB TABLE all_agreement_transactions__0(
 	   vendor_name character varying,
 	   prime_vendor_id integer,
 	   prime_vendor_name character varying,
+	   prime_minority_type_id smallint,
+       prime_minority_type_name character varying(50),
 	   dollar_difference numeric(16,2),
 	   percent_difference numeric(17,4),
 	   master_agreement_id bigint,
@@ -4565,7 +4589,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
   		all_agreement_transactions__0.ending_year_id,all_agreement_transactions__0.registered_year,all_agreement_transactions__0.registered_year_id,all_agreement_transactions__0.contract_number,all_agreement_transactions__0.sub_contract_id,
   		all_agreement_transactions__0.original_contract_amount,all_agreement_transactions__0.maximum_contract_amount,all_agreement_transactions__0.description,
   		all_agreement_transactions__0.vendor_history_id,all_agreement_transactions__0.vendor_id,all_agreement_transactions__0.vendor_code,all_agreement_transactions__0.vendor_name,all_agreement_transactions__0.prime_vendor_id,all_agreement_transactions__0.prime_vendor_name,
-  		all_agreement_transactions__0.dollar_difference,all_agreement_transactions__0.percent_difference,all_agreement_transactions__0.master_agreement_id,all_agreement_transactions__0.master_contract_number,
+  		all_agreement_transactions__0.prime_minority_type_id, all_agreement_transactions__0.prime_minority_type_name,	all_agreement_transactions__0.dollar_difference,all_agreement_transactions__0.percent_difference,all_agreement_transactions__0.master_agreement_id,all_agreement_transactions__0.master_contract_number,
   		all_agreement_transactions__0.agreement_type_id,all_agreement_transactions__0.agreement_type_code,all_agreement_transactions__0.agreement_type_name,all_agreement_transactions__0.award_category_id,all_agreement_transactions__0.award_category_code,
   		all_agreement_transactions__0.award_category_name,all_agreement_transactions__0.award_method_id,all_agreement_transactions__0.award_method_code,all_agreement_transactions__0.award_method_name,
   		all_agreement_transactions__0.expenditure_object_codes,all_agreement_transactions__0.expenditure_object_names,all_agreement_transactions__0.industry_type_id,all_agreement_transactions__0.industry_type_name,all_agreement_transactions__0.award_size_id,
@@ -4608,6 +4632,8 @@ CREATE EXTERNAL WEB TABLE all_agreement_transactions_cy__0(
 	  vendor_name character varying,
 	  prime_vendor_id integer,
 	  prime_vendor_name character varying,
+	  prime_minority_type_id smallint,
+      prime_minority_type_name character varying(50),
 	  dollar_difference numeric(16,2),
 	  percent_difference numeric(17,4),
 	  master_agreement_id bigint,
@@ -4665,7 +4691,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
   		all_agreement_transactions_cy__0.ending_year_id,all_agreement_transactions_cy__0.registered_year,all_agreement_transactions_cy__0.registered_year_id,all_agreement_transactions_cy__0.contract_number,all_agreement_transactions_cy__0.sub_contract_id,
   		all_agreement_transactions_cy__0.original_contract_amount,all_agreement_transactions_cy__0.maximum_contract_amount,all_agreement_transactions_cy__0.description,
   		all_agreement_transactions_cy__0.vendor_history_id,all_agreement_transactions_cy__0.vendor_id,all_agreement_transactions_cy__0.vendor_code,all_agreement_transactions_cy__0.vendor_name,all_agreement_transactions_cy__0.prime_vendor_id,all_agreement_transactions_cy__0.prime_vendor_name,
-  		all_agreement_transactions_cy__0.dollar_difference,all_agreement_transactions_cy__0.percent_difference,all_agreement_transactions_cy__0.master_agreement_id,all_agreement_transactions_cy__0.master_contract_number,
+  		all_agreement_transactions_cy__0.prime_minority_type_id, all_agreement_transactions_cy__0.prime_minority_type_name,	all_agreement_transactions_cy__0.dollar_difference,all_agreement_transactions_cy__0.percent_difference,all_agreement_transactions_cy__0.master_agreement_id,all_agreement_transactions_cy__0.master_contract_number,
   		all_agreement_transactions_cy__0.agreement_type_id,all_agreement_transactions_cy__0.agreement_type_code,all_agreement_transactions_cy__0.agreement_type_name,all_agreement_transactions_cy__0.award_category_id,all_agreement_transactions_cy__0.award_category_code,
   		all_agreement_transactions_cy__0.award_category_name,all_agreement_transactions_cy__0.award_method_id,all_agreement_transactions_cy__0.award_method_code,all_agreement_transactions_cy__0.award_method_name,
    		all_agreement_transactions_cy__0.expenditure_object_codes,all_agreement_transactions_cy__0.expenditure_object_names,all_agreement_transactions_cy__0.industry_type_id,all_agreement_transactions_cy__0.industry_type_name,all_agreement_transactions_cy__0.award_size_id,
@@ -4703,6 +4729,8 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
 	vendor_id integer,
 	prime_vendor_id integer, 
 	prime_vendor_name character varying,
+	prime_minority_type_id smallint,
+    prime_minority_type_name character varying(50),
 	department_id integer,
 	maximum_contract_amount numeric(16,2),
 	maximum_contract_amount_cy numeric(16,2),
@@ -4797,7 +4825,8 @@ CREATE VIEW all_disbursement_transactions AS
     all_disbursement_transactions__0.check_eft_issued_nyc_year_id, all_disbursement_transactions__0.fiscal_year, all_disbursement_transactions__0.check_eft_issued_cal_month_id, all_disbursement_transactions__0.agreement_id,
     all_disbursement_transactions__0.master_agreement_id, all_disbursement_transactions__0.fund_class_id, all_disbursement_transactions__0.check_amount, all_disbursement_transactions__0.agency_id,
     all_disbursement_transactions__0.agency_history_id,all_disbursement_transactions__0.agency_code, all_disbursement_transactions__0.expenditure_object_id, all_disbursement_transactions__0.vendor_id, 
-    all_disbursement_transactions__0.prime_vendor_id, all_disbursement_transactions__0.prime_vendor_name,all_disbursement_transactions__0.department_id,all_disbursement_transactions__0.maximum_contract_amount, all_disbursement_transactions__0.maximum_contract_amount_cy,
+    all_disbursement_transactions__0.prime_vendor_id, all_disbursement_transactions__0.prime_vendor_name,all_disbursement_transactions__0.prime_minority_type_id, all_disbursement_transactions__0.prime_minority_type_name,
+    all_disbursement_transactions__0.department_id,all_disbursement_transactions__0.maximum_contract_amount, all_disbursement_transactions__0.maximum_contract_amount_cy,
     all_disbursement_transactions__0.maximum_spending_limit,all_disbursement_transactions__0.maximum_spending_limit_cy,
     all_disbursement_transactions__0.document_id, all_disbursement_transactions__0.vendor_name,all_disbursement_transactions__0.vendor_customer_code, all_disbursement_transactions__0.check_eft_issued_date, 
     all_disbursement_transactions__0.agency_name,all_disbursement_transactions__0.agency_short_name,

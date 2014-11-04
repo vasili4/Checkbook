@@ -4,6 +4,7 @@ SubVenSpendingByCOAEntitiesAndFiscalYear,aggregateon_subven_spending_coa_entitie
 	spending_category_id smallint,
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	industry_type_id smallint,
 	month_id int,
@@ -15,6 +16,7 @@ SubVenSpendingByCOAEntitiesAndFiscalYear,aggregateon_subven_spending_coa_entitie
        	spending_category_id, 
        	vendor_id,
        	prime_vendor_id,
+       	prime_minority_type_id,
        	minority_type_id,
        	industry_type_id,
        	check_eft_issued_cal_month_id as month_id,
@@ -23,10 +25,11 @@ SubVenSpendingByCOAEntitiesAndFiscalYear,aggregateon_subven_spending_coa_entitie
        	sum(check_amount) total_spending_amount,
        	count(*) as total_disbursements
   FROM subcontract_spending_details 
-  GROUP BY 1,2,3,4,5,6,7,8,9","SELECT 	agency_id,
+  GROUP BY 1,2,3,4,5,6,7,8,9,10","SELECT 	agency_id,
        	spending_category_id,   
        	vendor_id,
        	prime_vendor_id,
+       	prime_minority_type_id,
        	minority_type_id,
        	industry_type_id,
        	check_eft_issued_cal_month_id AS month_id,
@@ -35,7 +38,7 @@ SubVenSpendingByCOAEntitiesAndFiscalYear,aggregateon_subven_spending_coa_entitie
        	sum(check_amount) total_spending_amount,
        	count(*) as total_disbursements
   FROM subcontract_spending_details
-  GROUP BY 1,2,3,4,5,6,7,8,9",51
+  GROUP BY 1,2,3,4,5,6,7,8,9,10",51
 SubVenSpendingByContractId,aggregateon_subven_spending_contract,"CREATE TABLE aggregateon_subven_spending_contract (
     agreement_id bigint,
     document_id character varying(20),
@@ -43,6 +46,7 @@ SubVenSpendingByContractId,aggregateon_subven_spending_contract,"CREATE TABLE ag
     document_code character varying(8),
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	industry_type_id smallint,
 	agency_id smallint,
@@ -52,7 +56,7 @@ SubVenSpendingByContractId,aggregateon_subven_spending_contract,"CREATE TABLE ag
 	type_of_year char(1),
 	total_spending_amount numeric(16,2), 
 	total_contract_amount numeric(16,2)
-	) DISTRIBUTED BY (agreement_id)","SELECT agreement_id, contract_number, sub_contract_id, contract_document_code, vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, description,  
+	) DISTRIBUTED BY (agreement_id)","SELECT agreement_id, contract_number, sub_contract_id, contract_document_code, vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, description,  
 spending_category_id, year_id, type_of_year,
  sum(total_spending_amount) total_spending_amount,
   sum(contract_amount) total_contract_amount
@@ -63,6 +67,7 @@ FROM
        contract_document_code as contract_document_code,
        contract_vendor_id as vendor_id,
        contract_prime_vendor_id as prime_vendor_id,
+       contract_prime_minority_type_id as prime_minority_type_id,
        contract_minority_type_id as minority_type_id,
        contract_industry_type_id as industry_type_id,
        contract_agency_id as agency_id,
@@ -74,9 +79,9 @@ FROM
        MIN(maximum_contract_amount) AS contract_amount
   FROM subcontract_spending_details 
   WHERE agreement_id IS NOT NULL AND contract_number IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14
 ) X
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13 ","SELECT agreement_id, contract_number, sub_contract_id, contract_document_code, vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, description,  
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ","SELECT agreement_id, contract_number, sub_contract_id, contract_document_code, vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, description,  
  spending_category_id, year_id, type_of_year,
  sum(total_spending_amount) total_spending_amount,
   sum(contract_amount) total_contract_amount
@@ -87,6 +92,7 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13 ","SELECT agreement_id, contract_number, 
        contract_document_code as contract_document_code,
        contract_vendor_id_cy as vendor_id,
        contract_prime_vendor_id_cy as prime_vendor_id,
+       contract_prime_minority_type_id_cy as prime_minority_type_id,
        contract_minority_type_id_cy as minority_type_id,
        contract_industry_type_id_cy as industry_type_id,
        contract_agency_id_cy as agency_id,
@@ -98,11 +104,12 @@ GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13 ","SELECT agreement_id, contract_number, 
        MIN(maximum_contract_amount_cy) AS contract_amount
   FROM subcontract_spending_details
   WHERE agreement_id IS NOT NULL AND contract_number IS NOT NULL
-GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13 ) X
- GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13 ",52
+GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ) X
+ GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14 ",52
 SubVenSpendingByVendorId,aggregateon_subven_spending_vendor,"CREATE TABLE aggregateon_subven_spending_vendor (
 	vendor_id integer,
 	prime_vendor_id integer,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	industry_type_id smallint,
 	agency_id smallint,
@@ -113,7 +120,7 @@ SubVenSpendingByVendorId,aggregateon_subven_spending_vendor,"CREATE TABLE aggreg
 	total_contract_amount numeric(16,2),
 	total_sub_contracts integer,
 	is_all_categories char(1)
-	) DISTRIBUTED BY (vendor_id)","SELECT X.vendor_id, X.prime_vendor_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id,   
+	) DISTRIBUTED BY (vendor_id)","SELECT X.vendor_id, X.prime_vendor_id, X.prime_minority_type_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id,   
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
@@ -123,6 +130,7 @@ SubVenSpendingByVendorId,aggregateon_subven_spending_vendor,"CREATE TABLE aggreg
   FROM (SELECT agency_id,
                vendor_id,
                prime_vendor_id,
+               prime_minority_type_id,
                minority_type_id,
                industry_type_id,
                spending_category_id,
@@ -131,16 +139,16 @@ SubVenSpendingByVendorId,aggregateon_subven_spending_vendor,"CREATE TABLE aggreg
                sum(check_amount) AS total_spending_amount
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+GROUP BY 1,2,3,4,5,6,7,8,9) X
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, 
 spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'B' 
- GROUP BY 1,2,3,4,5,6,7) Y
- ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.agency_id = Y.agency_id 
- AND X.spending_category_id = Y.spending_category_id AND X.year_id = Y.year_id 
+ GROUP BY 1,2,3,4,5,6,7,8) Y
+ ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.prime_minority_type_id = Y.prime_minority_type_id
+ AND X.agency_id = Y.agency_id  AND X.spending_category_id = Y.spending_category_id AND X.year_id = Y.year_id 
  AND X.minority_type_id = Y.minority_type_id AND X.industry_type_id = Y.industry_type_id
  UNION ALL
-   SELECT X.vendor_id, X.prime_vendor_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id::smallint,     
+   SELECT X.vendor_id, X.prime_vendor_id, X.prime_minority_type_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id::smallint,     
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
@@ -149,7 +157,8 @@ spending_category_id, year_id, sum(total_contract_amount) as total_contract_amou
        'Y' as is_all_categories
   FROM (SELECT agency_id,
                vendor_id,  
-               prime_vendor_id, 
+               prime_vendor_id,
+               prime_minority_type_id, 
                minority_type_id,  
                industry_type_id,           
                check_eft_issued_nyc_year_id AS year_id,
@@ -158,16 +167,16 @@ spending_category_id, year_id, sum(total_contract_amount) as total_contract_amou
                sum(check_amount) AS total_spending_amount
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+GROUP BY 1,2,3,4,5,6,7,8,9) X
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, 
 year_id, SUM(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
 FROM 
-(SELECT agreement_id, vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
+(SELECT agreement_id, vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'B' 
- GROUP BY 1,2,3,4,5,6,7) Z GROUP BY 1,2,3,4,5,6) Y
- ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id 
+ GROUP BY 1,2,3,4,5,6,7,8) Z GROUP BY 1,2,3,4,5,6,7) Y
+ ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.prime_minority_type_id = Y.prime_minority_type_id
  AND X.agency_id = Y.agency_id  AND X.year_id = Y.year_id 
- AND X.minority_type_id = Y.minority_type_id AND X.industry_type_id = Y.industry_type_id ","SELECT X.vendor_id, X.prime_vendor_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id, 
+ AND X.minority_type_id = Y.minority_type_id AND X.industry_type_id = Y.industry_type_id ","SELECT X.vendor_id, X.prime_vendor_id, X.prime_minority_type_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id, 
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
@@ -177,6 +186,7 @@ FROM
   FROM (SELECT agency_id,
                vendor_id,
                prime_vendor_id,
+               prime_minority_type_id,
                minority_type_id,
                industry_type_id, 
                spending_category_id,
@@ -185,16 +195,16 @@ FROM
                sum(check_amount) AS total_spending_amount
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+GROUP BY 1,2,3,4,5,6,7,8,9) X
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, 
 spending_category_id, year_id, sum(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'C' 
- GROUP BY 1,2,3,4,5,6,7) Y
- ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.agency_id = Y.agency_id 
- AND X.spending_category_id = Y.spending_category_id  AND X.year_id = Y.year_id 
+ GROUP BY 1,2,3,4,5,6,7,8) Y
+ ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.prime_minority_type_id = Y.prime_minority_type_id
+ AND X.agency_id = Y.agency_id AND X.spending_category_id = Y.spending_category_id  AND X.year_id = Y.year_id 
  AND X.minority_type_id = Y.minority_type_id AND X.industry_type_id = Y.industry_type_id
  UNION ALL
-   SELECT X.vendor_id, X.prime_vendor_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id::smallint,  
+   SELECT X.vendor_id, X.prime_vendor_id, X.prime_minority_type_id, X.minority_type_id, X.industry_type_id, X.agency_id, X.spending_category_id::smallint,  
        X.year_id,
        X.type_of_year,
        X.total_spending_amount,
@@ -204,6 +214,7 @@ spending_category_id, year_id, sum(total_contract_amount) as total_contract_amou
   FROM (SELECT agency_id,
                vendor_id,
                prime_vendor_id,
+               prime_minority_type_id,
                minority_type_id,
                industry_type_id,
                calendar_fiscal_year_id AS year_id,
@@ -212,14 +223,14 @@ spending_category_id, year_id, sum(total_contract_amount) as total_contract_amou
                sum(check_amount) AS total_spending_amount
           FROM    subcontract_spending_details a 
 		  WHERE  a.spending_category_id <> 2
-GROUP BY 1,2,3,4,5,6,7,8) X
-LEFT JOIN (SELECT vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, 
+GROUP BY 1,2,3,4,5,6,7,8,9) X
+LEFT JOIN (SELECT vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, 
 year_id, SUM(total_contract_amount) as total_contract_amount, count(*) as total_sub_contracts
 FROM 
-(SELECT agreement_id, vendor_id, prime_vendor_id, minority_type_id, industry_type_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
+(SELECT agreement_id, vendor_id, prime_vendor_id, prime_minority_type_id, minority_type_id, industry_type_id, agency_id, year_id, MIN(total_contract_amount) as total_contract_amount
  FROM aggregateon_subven_spending_contract WHERE type_of_year = 'C' 
- GROUP BY 1,2,3,4,5,6,7) Z GROUP BY 1,2,3,4,5,6) Y
- ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id 
+ GROUP BY 1,2,3,4,5,6,7,8) Z GROUP BY 1,2,3,4,5,6,7) Y
+ ON X.vendor_id = Y.vendor_id AND X.prime_vendor_id = Y.prime_vendor_id AND X.prime_minority_type_id = Y.prime_minority_type_id
  AND X.agency_id = Y.agency_id AND X.year_id = Y.year_id  
  AND X.minority_type_id = Y.minority_type_id AND X.industry_type_id = Y.industry_type_id",53
 SubVenPopulateContractSpendingByYear,mid_aggregateon_subven_disbursement_spending_year,"CREATE TABLE mid_aggregateon_subven_disbursement_spending_year(
@@ -253,6 +264,7 @@ SubVenContractLandingWidgets,aggregateon_subven_contracts_cumulative_spending,"C
 	sub_contract_id character varying(20),
 	vendor_id int,
 	prime_vendor_id int,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	award_method_id smallint,
 	agency_id smallint,
@@ -276,6 +288,7 @@ SubVenContractLandingWidgets,aggregateon_subven_contracts_cumulative_spending,"C
 		MIN(sub_contract_id),
 		MIN(vendor_id),
 		MIN(prime_vendor_id),
+		MIN(prime_minority_type_id),
 		MIN(minority_type_id),
 		MIN(award_method_id),
 		MIN(a.agency_id) ,
@@ -305,6 +318,7 @@ SELECT a.original_agreement_id,
 	MIN(sub_contract_id),
 	MIN(vendor_id),
 	MIN(prime_vendor_id),
+	MIN(prime_minority_type_id),
 	MIN(minority_type_id),
 	MIN(award_method_id),
 	MIN(a.agency_id) ,
@@ -332,6 +346,7 @@ SELECT a.original_agreement_id,
 		MIN(sub_contract_id),
 		MIN(vendor_id),
 		MIN(prime_vendor_id),
+		MIN(prime_minority_type_id),
 		MIN(minority_type_id),
 		MIN(award_method_id),
 		MIN(a.agency_id) ,
@@ -361,6 +376,7 @@ SELECT a.original_agreement_id,
 	MIN(sub_contract_id),
 	MIN(vendor_id),
 	MIN(prime_vendor_id),
+	MIN(prime_minority_type_id),
 	MIN(minority_type_id),
 	MIN(award_method_id),
 	MIN(a.agency_id),
@@ -388,6 +404,7 @@ SubVenContractLandingTopGraph,aggregateon_subven_contracts_spending_by_month,"CR
  month_id integer,
  vendor_id int,
  prime_vendor_id int,
+ prime_minority_type_id smallint,
  minority_type_id smallint,
  award_method_id smallint,
  agency_id smallint,
@@ -403,6 +420,7 @@ SubVenContractLandingTopGraph,aggregateon_subven_contracts_spending_by_month,"CR
 		b.check_eft_issued_cal_month_id as month_id,		
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id ,
@@ -415,7 +433,7 @@ SubVenContractLandingTopGraph,aggregateon_subven_contracts_spending_by_month,"CR
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN subcontract_spending_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
 	WHERE  a.status_flag='A' 
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
 UNION ALL
 SELECT a.original_agreement_id,
 		a.fiscal_year,
@@ -424,6 +442,7 @@ SELECT a.original_agreement_id,
 		b.check_eft_issued_cal_month_id as month_id,		
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id ,	
@@ -436,13 +455,14 @@ SELECT a.original_agreement_id,
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN subcontract_spending_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year 
 	WHERE   a.status_flag='R' 
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12 ","SELECT  a.original_agreement_id,
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13 ","SELECT  a.original_agreement_id,
 		a.fiscal_year,
 		ry.year_id,
 		document_code_id,
 		b.check_eft_issued_cal_month_id as month_id,		
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id ,	
@@ -455,7 +475,7 @@ SELECT a.original_agreement_id,
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN subcontract_spending_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
 	WHERE  a.status_flag='A' 
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13
 UNION ALL
 SELECT  a.original_agreement_id,
 		a.fiscal_year,
@@ -464,6 +484,7 @@ SELECT  a.original_agreement_id,
 		b.check_eft_issued_cal_month_id as month_id,		
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id ,	
@@ -476,14 +497,15 @@ SELECT  a.original_agreement_id,
 	LEFT JOIN ref_year ry ON a.fiscal_year = ry.year_value 
 	LEFT JOIN subcontract_spending_details b ON a.original_agreement_id = b.agreement_id AND a.fiscal_year = b.calendar_fiscal_year 
 	WHERE   a.status_flag='R' 
-	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12 ",57
+	GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13 ",57
 SubVenContractsForSumAndTotals,aggregateon_subven_total_contracts,"CREATE TABLE aggregateon_subven_total_contracts
 (
 fiscal_year smallint,
 fiscal_year_id smallint,
 vendor_id int,
- prime_vendor_id int,
- minority_type_id smallint,
+prime_vendor_id int,
+prime_minority_type_id smallint,
+minority_type_id smallint,
 award_method_id smallint,
 agency_id smallint,
 industry_type_id smallint,
@@ -504,6 +526,7 @@ type_of_year char(1)
 		fiscal_year_id,
 		vendor_id,
 		prime_vendor_id,
+		prime_minority_type_id,
 		minority_type_id,
 		award_method_id,
 		agency_id,
@@ -522,7 +545,7 @@ type_of_year char(1)
 		status_flag,
 		type_of_year
 FROM aggregateon_subven_contracts_cumulative_spending a LEFT JOIN ref_document_code b ON a.document_code_id = b.document_code_id
-GROUP BY 1,2,3,4,5,6,7,8,9,20,21",,58
+GROUP BY 1,2,3,4,5,6,7,8,9,10,21,22",,58
 SubVenContractsSpendingTransactions,contracts_subven_spending_transactions,"CREATE TABLE contracts_subven_spending_transactions
 (
 disbursement_line_item_id bigint,
@@ -532,6 +555,7 @@ fiscal_year_id smallint,
 document_code_id smallint,
 vendor_id int,
 prime_vendor_id int,
+prime_minority_type_id smallint,
 minority_type_id smallint,
 award_method_id smallint,
 document_agency_id smallint,
@@ -568,6 +592,7 @@ type_of_year char(1)
 		a.document_code_id,
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id as document_agency_id,
@@ -609,6 +634,7 @@ UNION ALL
 		a.document_code_id,
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id as document_agency_id,
@@ -648,6 +674,7 @@ AND a.status_flag='R' ","SELECT d.disbursement_line_item_id,
 		a.document_code_id,
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id as document_agency_id,
@@ -689,6 +716,7 @@ SELECT 	d.disbursement_line_item_id,
 		a.document_code_id,
 		a.vendor_id,
 		a.prime_vendor_id,
+		a.prime_minority_type_id,
 		a.minority_type_id,
 		a.award_method_id,
 		a.agency_id as document_agency_id,
@@ -733,6 +761,7 @@ AllContractLandingWidgets,aggregateon_all_contracts_cumulative_spending,"CREATE 
 	sub_contract_id character varying(20),
 	vendor_id int,
 	prime_vendor_id int,
+	prime_minority_type_id smallint,
 	minority_type_id smallint,
 	award_method_id smallint,
 	agency_id smallint,
@@ -758,6 +787,7 @@ AllContractLandingWidgets,aggregateon_all_contracts_cumulative_spending,"CREATE 
             NULL as sub_contract_id,
             vendor_id, 
             NULL as prime_vendor_id,
+            NULL as prime_minority_type_id,
             minority_type_id, 
             award_method_id, 
             agency_id, 
@@ -782,6 +812,7 @@ AllContractLandingWidgets,aggregateon_all_contracts_cumulative_spending,"CREATE 
             sub_contract_id,
             vendor_id, 
             prime_vendor_id,
+            prime_minority_type_id,
             minority_type_id, 
             award_method_id, 
             agency_id, 

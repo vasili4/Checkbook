@@ -362,7 +362,7 @@ BEGIN
 						check_eft_issued_nyc_year_id,fiscal_year, check_eft_issued_cal_month_id,
 						agreement_id,sub_contract_id,
 						check_amount,agency_id,agency_history_id,agency_code,
-						vendor_id,prime_vendor_id,maximum_contract_amount,						
+						vendor_id,prime_vendor_id,prime_minority_type_id, prime_minority_type_name,maximum_contract_amount,						
 						document_id,vendor_name,vendor_customer_code,check_eft_issued_date,agency_name,agency_short_name,
 						spending_category_id,spending_category_name,calendar_fiscal_year_id,calendar_fiscal_year,
 						reference_document_number,reference_document_code,
@@ -372,7 +372,7 @@ BEGIN
 		f.nyc_year_id,l.year_value,f.calendar_month_id,
 		b.agreement_id,b.sub_contract_id,
 		b.check_eft_amount as check_amount,c.agency_id,b.agency_history_id,m.agency_code,
-		e.vendor_id,b.prime_vendor_id, NULL as maximum_contract_amount, 
+		e.vendor_id,b.prime_vendor_id, (CASE WHEN pm.minority_type_id IS NULL THEN 7 else pm.minority_type_id END) as prime_minority_type_id, (CASE WHEN pm.minority_type_id IS NULL THEN 'Non-Minority' else pm.minority_type_name END) as prime_minority_type_name, NULL as maximum_contract_amount, 
 		b.document_id,e.legal_name as vendor_name,q.vendor_customer_code,f.date,c.agency_name,c.agency_short_name,
 		1 as spending_category_id,
 		'Contracts' as spending_category_name,x.year_id,x.year_value,
@@ -391,6 +391,16 @@ BEGIN
 			JOIN ref_document_code dc ON b.document_code_id = dc.document_code_id
 			JOIN etl.etl_data_load z ON coalesce(b.updated_load_id, b.created_load_id) = z.load_id
 			LEFT JOIN subvendor_min_bus_type vmb ON e.vendor_history_id = vmb.vendor_history_id
+			LEFT JOIN (SELECT a.vendor_id,	 
+						(CASE WHEN a.minority_type_id IS NULL OR a.minority_type_id = 11 THEN 7 ELSE a.minority_type_id END) as minority_type_id, 	
+						(CASE WHEN a.minority_type_id IS NULL OR a.minority_type_id = 11 THEN 'Non-Minority' ELSE b.minority_type_name END) as minority_type_name,year_id 	
+						FROM
+						(SELECT a.vendor_id, a.year_id, a.max_check_eft_issued_date, max(b.minority_type_id) as minority_type_id
+							FROM (SELECT vendor_id, max(check_eft_issued_date) as max_check_eft_issued_date, check_eft_issued_nyc_year_id as year_id
+									FROM disbursement_line_item_details  WHERE spending_category_id !=2 AND fiscal_year > 2011
+									GROUP BY 1,3 ) a
+							JOIN disbursement_line_item_details b ON a.vendor_id = b.vendor_id AND a.year_id = b.check_eft_issued_nyc_year_id AND a.max_check_eft_issued_date = b.check_eft_issued_date
+							GROUP BY 1,2,3) a JOIN ref_minority_type b ON a.minority_type_id = b.minority_type_id) pm ON b.prime_vendor_id = pm.vendor_id AND f.nyc_year_id = pm.year_id
 		WHERE z.job_id = p_job_id_in AND z.data_source_code IN ('SC','SF');
 		
 		
@@ -401,8 +411,8 @@ BEGIN
 	CREATE TEMPORARY TABLE tmp_sub_agreement_con(disbursement_line_item_id bigint,agreement_id bigint,fiscal_year smallint,calendar_fiscal_year smallint,maximum_contract_amount numeric(16,2),
 												maximum_contract_amount_cy numeric(16,2), 
 												purpose varchar, purpose_cy varchar, contract_number varchar, contract_vendor_id integer, contract_vendor_id_cy integer,
-												contract_prime_vendor_id integer, contract_prime_vendor_id_cy integer, contract_agency_id smallint, contract_agency_id_cy smallint,
-												contract_document_code varchar, 
+												contract_prime_vendor_id integer, contract_prime_vendor_id_cy integer, contract_prime_minority_type_id smallint, contract_prime_minority_type_id_cy smallint,
+												contract_agency_id smallint, contract_agency_id_cy smallint,contract_document_code varchar, 
 												industry_type_id smallint, industry_type_name varchar, agreement_type_code varchar, award_method_code varchar,
 												contract_industry_type_id smallint, contract_industry_type_id_cy smallint,
 												contract_minority_type_id smallint, contract_minority_type_id_cy smallint,
@@ -419,7 +429,8 @@ BEGIN
 	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for FY from non master contracts.
 	
 	CREATE TEMPORARY TABLE tmp_sub_agreement_con_fy(disbursement_line_item_id bigint,agreement_id bigint, contract_number varchar,
-						maximum_contract_amount_fy numeric(16,2), purpose_fy varchar, contract_vendor_id_fy integer, contract_prime_vendor_id_fy integer, contract_agency_id_fy smallint, contract_document_code_fy varchar, 
+						maximum_contract_amount_fy numeric(16,2), purpose_fy varchar, contract_vendor_id_fy integer, contract_prime_vendor_id_fy integer,contract_prime_minority_type_id_fy smallint, 
+						contract_agency_id_fy smallint, contract_document_code_fy varchar, 
 						industry_type_id smallint, industry_type_name varchar, agreement_type_code varchar, award_method_code varchar,
 						contract_industry_type_id_fy smallint, contract_minority_type_id_fy smallint,
 						master_agreement_id bigint,master_contract_number varchar)
@@ -431,6 +442,7 @@ BEGIN
 	b.description as purpose_fy ,
 	b.vendor_id as contract_vendor_id_fy,
 	b.prime_vendor_id as contract_prime_vendor_id_fy,
+	b.prime_minority_type_id as contract_prime_minority_type_id_fy,
 	b.agency_id as contract_agency_id_fy,
 	e.document_code as contract_document_code_fy,
 	b.industry_type_id as industry_type_id,
@@ -452,6 +464,7 @@ BEGIN
 	b.description as purpose_fy ,
 	b.vendor_id as contract_vendor_id_fy,
 	b.prime_vendor_id as contract_prime_vendor_id_fy,
+	b.prime_minority_type_id as contract_prime_minority_type_id_fy,
 	b.agency_id as contract_agency_id_fy,
 	e.document_code as contract_document_code_fy,
 	b.industry_type_id as industry_type_id,
@@ -474,6 +487,7 @@ BEGIN
 		contract_number = b.contract_number,
 		contract_vendor_id = b.contract_vendor_id_fy,
 		contract_prime_vendor_id = b.contract_prime_vendor_id_fy,
+		contract_prime_minority_type_id = b.contract_prime_minority_type_id_fy,
 		contract_agency_id = b.contract_agency_id_fy,
 		contract_document_code = b.contract_document_code_fy,
 		industry_type_id = b.industry_type_id,
@@ -496,8 +510,8 @@ BEGIN
 	-- Getting maximum_contract_amount, master_agreement_id, purpose, contract_number,  contract_vendor_id, contract_agency_id for CY from non master contracts.
 	
 	CREATE TEMPORARY TABLE tmp_sub_agreement_con_cy(disbursement_line_item_id bigint,agreement_id bigint,
-						maximum_contract_amount_cy numeric(16,2), purpose_cy varchar, contract_vendor_id_cy integer, contract_prime_vendor_id_cy integer, contract_agency_id_cy smallint, 
-						contract_industry_type_id_cy smallint, contract_minority_type_id_cy smallint)
+						maximum_contract_amount_cy numeric(16,2), purpose_cy varchar, contract_vendor_id_cy integer, contract_prime_vendor_id_cy integer, contract_prime_minority_type_id_cy smallint,
+						contract_agency_id_cy smallint,	contract_industry_type_id_cy smallint, contract_minority_type_id_cy smallint)
 	DISTRIBUTED  BY (disbursement_line_item_id);
 	
 	INSERT INTO tmp_sub_agreement_con_cy
@@ -506,6 +520,7 @@ BEGIN
 	b.description as purpose_cy ,
 	b.vendor_id as contract_vendor_id_cy,
 	b.prime_vendor_id as contract_prime_vendor_id_cy,
+	b.prime_minority_type_id as contract_prime_minority_type_id_cy,
 	b.agency_id as contract_agency_id_cy,
 	b.industry_type_id as contract_industry_type_id_cy,
 	b.minority_type_id as contract_minority_type_id_cy
@@ -520,6 +535,7 @@ BEGIN
 	b.description as purpose_cy ,
 	b.vendor_id as contract_vendor_id_cy,
 	b.prime_vendor_id as contract_prime_vendor_id_cy,
+	b.prime_minority_type_id as contract_prime_minority_type_id_cy,
 	b.agency_id as contract_agency_id_cy,
 	b.industry_type_id as contract_industry_type_id_cy,
 	b.minority_type_id as contract_minority_type_id_cy
@@ -533,6 +549,7 @@ BEGIN
 	SET maximum_contract_amount_cy = b.maximum_contract_amount_cy,
 		purpose_cy = b.purpose_cy,
 		contract_vendor_id_cy = b.contract_vendor_id_cy,
+		contract_prime_minority_type_id_cy = b.contract_prime_minority_type_id_cy,
 		contract_prime_vendor_id_cy = b.contract_prime_vendor_id_cy,
 		contract_agency_id_cy = b.contract_agency_id_cy,
 		contract_industry_type_id_cy = b.contract_industry_type_id_cy,
@@ -552,6 +569,8 @@ BEGIN
 		contract_agency_id  = b.contract_agency_id ,
 		contract_vendor_id  = b.contract_vendor_id ,
 		contract_prime_vendor_id  = b.contract_prime_vendor_id,
+		contract_prime_minority_type_id = b.contract_prime_minority_type_id,
+		contract_prime_minority_type_id_cy = b.contract_prime_minority_type_id_cy,
 		maximum_contract_amount_cy =b.maximum_contract_amount_cy,
 		purpose_cy = b.purpose_cy,
 		contract_agency_id_cy  = b.contract_agency_id_cy ,
