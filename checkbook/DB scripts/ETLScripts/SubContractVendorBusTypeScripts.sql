@@ -80,9 +80,9 @@ BEGIN
 	
 		
 	INSERT INTO subcontract_business_type(prime_vendor_customer_code, vendor_customer_code,contract_number, subcontract_id, business_type_id,status,
-    				       minority_type_id, load_id, created_date)
+    				       minority_type_id, certification_start_date, load_id, created_date)
     	SELECT  a.vendor_cust_cd, a.scntrc_vend_cd,a.doc_cd || a.doc_dept_cd || a.doc_id, a.scntrc_id, c.business_type_id,a.bus_typ_sta,
-    		a.min_typ, p_load_id_in as created_load_id, now()::timestamp
+    		a.min_typ, a.cert_strt_dt, p_load_id_in as created_load_id, now()::timestamp
     	FROM	etl.stg_scntrc_bus_type a JOIN tmp_scntrc_bus_type b ON a.uniq_id = b.uniq_id LEFT JOIN ref_business_type c ON b.bus_typ = c.business_type_code
     	WHERE b.action_flag = 'I';
     
