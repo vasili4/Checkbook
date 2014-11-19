@@ -1946,6 +1946,41 @@ BEGIN
 		minority_type_name = 'Non-Minority'
 	WHERE job_id = p_job_id_in 	AND ( minority_type_id IS NULL OR minority_type_id IN (1,6,7,8));
 	
+	
+	
+	CREATE TEMPORARY TABLE tmp_master_has_mwbe_children (original_master_agreement_id bigint, total_children int)
+	DISTRIBUTED BY (original_master_agreement_id);
+	
+	INSERT INTO tmp_master_has_mwbe_children
+	SELECT distinct original_master_agreement_id, 0 as total_children
+	FROM history_master_agreement ;
+	
+	CREATE TEMPORARY TABLE tmp_master_has_mwbe_children_1 (original_master_agreement_id bigint, total_children int)
+	DISTRIBUTED BY (original_master_agreement_id);
+	
+	INSERT INTO tmp_master_has_mwbe_children_1
+	SELECT b.original_master_agreement_id, count(distinct original_agreement_id) as total_children
+	FROM agreement_snapshot a JOIN tmp_master_has_mwbe_children b 
+	ON a.master_agreement_id = b.original_master_agreement_id
+	WHERE a.master_agreement_yn = 'N' and a.latest_flag = 'Y' AND a.minority_type_id in (2,3,4,5,9)
+	GROUP BY 1;
+	
+	UPDATE tmp_master_has_mwbe_children a
+	SET total_children =  b.total_children 
+	FROM tmp_master_has_mwbe_children_1 b
+	WHERE a.original_master_agreement_id = b.original_master_agreement_id ;
+	
+	
+	UPDATE 	agreement_snapshot a
+	SET has_mwbe_children = (CASE WHEN b.total_children > 0 THEN 'Y' ELSE 'N' END)
+	FROM tmp_master_has_mwbe_children b
+	WHERE a.master_agreement_yn = 'Y' AND a.original_agreement_id = b.original_master_agreement_id;
+	
+	UPDATE 	agreement_snapshot_cy a
+	SET has_mwbe_children = (CASE WHEN b.total_children > 0 THEN 'Y' ELSE 'N' END)
+	FROM tmp_master_has_mwbe_children b
+	WHERE a.master_agreement_yn = 'Y' AND a.original_agreement_id = b.original_master_agreement_id; 
+	
 	-- Associate Disbursement line item to the original version of the agreement
 	
 	CREATE TEMPORARY TABLE tmp_ct_fms_line_item(disbursement_line_item_id bigint, agreement_id bigint,maximum_contract_amount numeric(16,2))

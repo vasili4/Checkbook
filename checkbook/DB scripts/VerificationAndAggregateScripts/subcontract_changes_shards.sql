@@ -740,6 +740,7 @@ CREATE TABLE all_agreement_transactions  (
  	minority_type_name character varying(50),
    master_agreement_yn character(1),  
    has_children character(1),
+   has_mwbe_children character(1),
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
@@ -818,6 +819,7 @@ CREATE TABLE all_agreement_transactions_cy  (
  	minority_type_name character varying(50),
    master_agreement_yn character(1),  
    has_children character(1),
+   has_mwbe_children character(1),
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
@@ -944,6 +946,59 @@ PARTITION BY RANGE (fiscal_year)
 (START (2010) END (2014) EVERY (1),
 DEFAULT PARTITION outlying_years);
 
+
+DROP TABLE IF EXISTS contracts_all_spending_transactions ;
+CREATE TABLE contracts_all_spending_transactions(
+	disbursement_line_item_id bigint,
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	vendor_id int,
+	prime_vendor_id integer,
+	prime_minority_type_id smallint,
+	minority_type_id smallint,
+	award_method_id smallint,
+	document_agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
+	disb_document_id  character varying(20),
+	disb_vendor_name  character varying,
+	disb_check_eft_issued_date  date,
+	disb_agency_name  character varying(100),
+	disb_department_short_name  character varying(15),
+	disb_check_amount  numeric(16,2),
+	disb_expenditure_object_name  character varying(40),
+	disb_budget_name  character varying(60),
+	disb_contract_number  character varying,
+	disb_sub_contract_id character varying,
+	disb_purpose  character varying,
+	disb_reporting_code  character varying(15),
+	disb_spending_category_name  character varying,
+	disb_agency_id  smallint,
+	disb_vendor_id  integer,
+	disb_expenditure_object_id  integer,
+	disb_department_id  integer,
+	disb_spending_category_id  smallint,
+	disb_agreement_id  bigint,
+	disb_contract_document_code  character varying(8),
+	disb_master_agreement_id  bigint,
+	disb_fiscal_year_id  smallint,
+	disb_check_eft_issued_cal_month_id integer,
+	disb_disbursement_number character varying(40),
+	disb_minority_type_id smallint,
+	disb_minority_type_name character varying(50),
+	disb_vendor_type character(2),
+	status_flag char(1),
+	type_of_year char(1),
+	is_prime_or_sub character(1)
+)WITH (appendonly=true,orientation=column)
+DISTRIBUTED BY (disbursement_line_item_id)
+PARTITION BY RANGE (fiscal_year) 
+(START (2010) END (2015) EVERY (1),
+DEFAULT PARTITION outlying_years);
+
+
 -- indexes
 
 CREATE INDEX idx_agreement_id_all_disb_trans ON all_disbursement_transactions(agreement_id); 
@@ -951,6 +1006,15 @@ CREATE INDEX idx_agency_id_all_disb_trans ON all_disbursement_transactions USING
 CREATE INDEX idx_nyc_year_id_all_disb_trans ON all_disbursement_transactions USING btree (check_eft_issued_nyc_year_id);
 CREATE INDEX idx_ma_agreement_id_all_disb_trans ON all_disbursement_transactions(master_agreement_id);
 
+
+ CREATE INDEX idx_disb_agr_id_cont_all_spen_trans ON contracts_all_spending_transactions(disb_agreement_id);
+ CREATE INDEX idx_fiscal_year_id_cont_all_spen_trans ON contracts_all_spending_transactions(fiscal_year_id);
+ CREATE INDEX idx_disb_fis_year_id_cont_all_spen_trans ON contracts_all_spending_transactions(disb_fiscal_year_id);
+ CREATE INDEX idx_disb_cont_doc_code_cont_all_spen_trans ON contracts_all_spending_transactions(disb_contract_document_code);
+ CREATE INDEX idx_document_agency_id_cont_all_spen_trans ON contracts_all_spending_transactions(document_agency_id);
+ CREATE INDEX idx_disb_cal_month_id_cont_all_spen_trans ON contracts_all_spending_transactions(disb_check_eft_issued_cal_month_id);
+ CREATE INDEX idx_document_code_id_cont_all_spen_trans ON contracts_all_spending_transactions(document_code_id);
+ 
 
  SET search_path = staging;
  
@@ -2070,6 +2134,7 @@ CREATE EXTERNAL WEB TABLE all_agreement_transactions__0(
  	   minority_type_name character varying,
 	   master_agreement_yn character(1),
 	   has_children character(1),
+	   has_mwbe_children character(1),
 	   original_version_flag character(1),
    	   latest_flag character(1),
    	  load_id integer,
@@ -2101,7 +2166,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
   		all_agreement_transactions__0.effective_end_date_id,all_agreement_transactions__0.effective_end_year,all_agreement_transactions__0.effective_end_year_id,
   		all_agreement_transactions__0.registered_date,all_agreement_transactions__0.registered_date_id,all_agreement_transactions__0.brd_awd_no,all_agreement_transactions__0.tracking_number,all_agreement_transactions__0.rfed_amount,
   		all_agreement_transactions__0.minority_type_id,all_agreement_transactions__0.minority_type_name,
-  		all_agreement_transactions__0.master_agreement_yn,all_agreement_transactions__0.has_children,all_agreement_transactions__0.original_version_flag,all_agreement_transactions__0.latest_flag,
+  		all_agreement_transactions__0.master_agreement_yn,all_agreement_transactions__0.has_children,all_agreement_transactions__0.has_mwbe_children,all_agreement_transactions__0.original_version_flag,all_agreement_transactions__0.latest_flag,
   		all_agreement_transactions__0.load_id,all_agreement_transactions__0.last_modified_date,all_agreement_transactions__0.last_modified_year_id,all_agreement_transactions__0.is_prime_or_sub,
   		all_agreement_transactions__0.is_minority_vendor, all_agreement_transactions__0.vendor_type, all_agreement_transactions__0.contract_original_agreement_id, all_agreement_transactions__0.job_id
   	FROM  all_agreement_transactions__0;
@@ -2173,6 +2238,7 @@ CREATE EXTERNAL WEB TABLE all_agreement_transactions_cy__0(
  	  minority_type_name character varying,
 	  master_agreement_yn character(1),
 	  has_children character(1),
+	  has_mwbe_children character(1),
 	  original_version_flag character(1),
   	  latest_flag character(1),
   	  load_id integer,
@@ -2204,7 +2270,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.all_agreement_transac
   		all_agreement_transactions_cy__0.effective_end_date_id,all_agreement_transactions_cy__0.effective_end_year,all_agreement_transactions_cy__0.effective_end_year_id,
   		all_agreement_transactions_cy__0.registered_date,all_agreement_transactions_cy__0.registered_date_id,all_agreement_transactions_cy__0.brd_awd_no,all_agreement_transactions_cy__0.tracking_number,all_agreement_transactions_cy__0.rfed_amount,
   		all_agreement_transactions_cy__0.minority_type_id,all_agreement_transactions_cy__0.minority_type_name,
-  		all_agreement_transactions_cy__0.master_agreement_yn,all_agreement_transactions_cy__0.has_children,all_agreement_transactions_cy__0.original_version_flag,all_agreement_transactions_cy__0.latest_flag,
+  		all_agreement_transactions_cy__0.master_agreement_yn,all_agreement_transactions_cy__0.has_children,all_agreement_transactions_cy__0.has_mwbe_children,all_agreement_transactions_cy__0.original_version_flag,all_agreement_transactions_cy__0.latest_flag,
   		all_agreement_transactions_cy__0.load_id,all_agreement_transactions_cy__0.last_modified_date,all_agreement_transactions_cy__0.last_modified_year_id,all_agreement_transactions_cy__0.is_prime_or_sub,
   		all_agreement_transactions_cy__0.is_minority_vendor, all_agreement_transactions_cy__0.vendor_type, all_agreement_transactions_cy__0.contract_original_agreement_id, all_agreement_transactions_cy__0.job_id
   	FROM  all_agreement_transactions_cy__0; 
@@ -2358,4 +2424,74 @@ CREATE VIEW all_disbursement_transactions AS
     all_disbursement_transactions__0.file_type,all_disbursement_transactions__0.load_id, all_disbursement_transactions__0.last_modified_date, 
     all_disbursement_transactions__0.last_modified_fiscal_year_id, all_disbursement_transactions__0.last_modified_calendar_year_id, all_disbursement_transactions__0.is_prime_or_sub, 
     all_disbursement_transactions__0.is_minority_vendor, all_disbursement_transactions__0.vendor_type, all_disbursement_transactions__0.contract_original_agreement_id, all_disbursement_transactions__0.job_id
-FROM ONLY all_disbursement_transactions__0; 	
+FROM ONLY all_disbursement_transactions__0; 
+
+
+
+DROP VIEW IF EXISTS contracts_all_spending_transactions;
+DROP EXTERNAL WEB TABLE IF EXISTS contracts_all_spending_transactions__0 ;
+	
+   CREATE EXTERNAL WEB TABLE contracts_all_spending_transactions__0(
+ 	disbursement_line_item_id bigint,
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	vendor_id int,
+	prime_vendor_id integer,
+	prime_minority_type_id smallint,
+	minority_type_id smallint,
+	award_method_id smallint,
+	document_agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
+	disb_document_id  character varying(20),
+	disb_vendor_name  character varying,
+	disb_check_eft_issued_date  date,
+	disb_agency_name  character varying(100),
+	disb_department_short_name  character varying(15),
+	disb_check_amount  numeric(16,2),
+	disb_expenditure_object_name  character varying(40),
+	disb_budget_name  character varying(60),
+	disb_contract_number  character varying,
+	disb_sub_contract_id character varying,
+	disb_purpose  character varying,
+	disb_reporting_code  character varying(15),
+	disb_spending_category_name  character varying,
+	disb_agency_id  smallint,
+	disb_vendor_id  integer,
+	disb_expenditure_object_id  integer,
+	disb_department_id  integer,
+	disb_spending_category_id  smallint,
+	disb_agreement_id  bigint,
+	disb_contract_document_code  character varying(8),
+	disb_master_agreement_id  bigint,
+	disb_fiscal_year_id  smallint,
+	disb_check_eft_issued_cal_month_id integer,
+	disb_disbursement_number character varying(40),
+	disb_minority_type_id smallint,
+	disb_minority_type_name character varying(50),
+	disb_vendor_type character(2),
+	status_flag char(1),
+	type_of_year char(1),
+	is_prime_or_sub character(1)
+) 	
+EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.contracts_all_spending_transactions to stdout csv"' ON SEGMENT 0 
+     FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
+  ENCODING 'UTF8';
+  
+
+  CREATE VIEW contracts_all_spending_transactions AS
+  	SELECT contracts_all_spending_transactions__0.disbursement_line_item_id,contracts_all_spending_transactions__0.original_agreement_id,contracts_all_spending_transactions__0.fiscal_year,
+  	contracts_all_spending_transactions__0.fiscal_year_id,contracts_all_spending_transactions__0.document_code_id, contracts_all_spending_transactions__0.vendor_id, 
+  	contracts_all_spending_transactions__0.prime_vendor_id,contracts_all_spending_transactions__0.prime_minority_type_id,contracts_all_spending_transactions__0.minority_type_id,
+  	contracts_all_spending_transactions__0.award_method_id, contracts_all_spending_transactions__0.document_agency_id, contracts_all_spending_transactions__0.industry_type_id, contracts_all_spending_transactions__0.award_size_id,
+  	contracts_all_spending_transactions__0.disb_document_id,contracts_all_spending_transactions__0.disb_vendor_name,contracts_all_spending_transactions__0.disb_check_eft_issued_date,contracts_all_spending_transactions__0.disb_agency_name,
+  	contracts_all_spending_transactions__0.disb_department_short_name,contracts_all_spending_transactions__0.disb_check_amount,contracts_all_spending_transactions__0.disb_expenditure_object_name,
+  	contracts_all_spending_transactions__0.disb_budget_name,contracts_all_spending_transactions__0.disb_contract_number,contracts_all_spending_transactions__0.disb_sub_contract_id,contracts_all_spending_transactions__0.disb_purpose,contracts_all_spending_transactions__0.disb_reporting_code,
+  	contracts_all_spending_transactions__0.disb_spending_category_name,contracts_all_spending_transactions__0.disb_agency_id,contracts_all_spending_transactions__0.disb_vendor_id,contracts_all_spending_transactions__0.disb_expenditure_object_id,
+  	contracts_all_spending_transactions__0.disb_department_id,contracts_all_spending_transactions__0.disb_spending_category_id,contracts_all_spending_transactions__0.disb_agreement_id,contracts_all_spending_transactions__0.disb_contract_document_code,
+  	contracts_all_spending_transactions__0.disb_master_agreement_id,contracts_all_spending_transactions__0.disb_fiscal_year_id,contracts_all_spending_transactions__0.disb_check_eft_issued_cal_month_id,contracts_all_spending_transactions__0.disb_disbursement_number,
+  	contracts_all_spending_transactions__0.disb_minority_type_id,contracts_all_spending_transactions__0.disb_minority_type_name,contracts_all_spending_transactions__0.disb_vendor_type,
+  	contracts_all_spending_transactions__0.status_flag,contracts_all_spending_transactions__0.type_of_year,contracts_all_spending_transactions__0.is_prime_or_sub
+  	FROM   contracts_all_spending_transactions__0;

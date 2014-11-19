@@ -1960,6 +1960,7 @@ CREATE TABLE agreement_snapshot  (
  	minority_type_name character varying(50),
    master_agreement_yn character(1),  
    has_children character(1),
+   has_mwbe_children character(1),
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
@@ -3265,7 +3266,56 @@ PARTITION BY RANGE (fiscal_year)
 DEFAULT PARTITION outlying_years);
 
 	
-	
+CREATE TABLE contracts_all_spending_transactions(
+	disbursement_line_item_id bigint,
+	original_agreement_id bigint,
+	fiscal_year smallint,
+	fiscal_year_id smallint,
+	document_code_id smallint,
+	vendor_id int,
+	prime_vendor_id integer,
+	prime_minority_type_id smallint,
+	minority_type_id smallint,
+	award_method_id smallint,
+	document_agency_id smallint,
+	industry_type_id smallint,
+    award_size_id smallint,
+	disb_document_id  character varying(20),
+	disb_vendor_name  character varying,
+	disb_check_eft_issued_date  date,
+	disb_agency_name  character varying(100),
+	disb_department_short_name  character varying(15),
+	disb_check_amount  numeric(16,2),
+	disb_expenditure_object_name  character varying(40),
+	disb_budget_name  character varying(60),
+	disb_contract_number  character varying,
+	disb_sub_contract_id character varying,
+	disb_purpose  character varying,
+	disb_reporting_code  character varying(15),
+	disb_spending_category_name  character varying,
+	disb_agency_id  smallint,
+	disb_vendor_id  integer,
+	disb_expenditure_object_id  integer,
+	disb_department_id  integer,
+	disb_spending_category_id  smallint,
+	disb_agreement_id  bigint,
+	disb_contract_document_code  character varying(8),
+	disb_master_agreement_id  bigint,
+	disb_fiscal_year_id  smallint,
+	disb_check_eft_issued_cal_month_id integer,
+	disb_disbursement_number character varying(40),
+	disb_minority_type_id smallint,
+	disb_minority_type_name character varying(50),
+	disb_vendor_type character(2),
+	status_flag char(1),
+	type_of_year char(1),
+	is_prime_or_sub character(1)
+)WITH (appendonly=true,orientation=column)
+DISTRIBUTED BY (disbursement_line_item_id)
+PARTITION BY RANGE (fiscal_year) 
+(START (2010) END (2015) EVERY (1),
+DEFAULT PARTITION outlying_years);
+
  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  -- creating indexes
  
@@ -3347,3 +3397,12 @@ CREATE INDEX idx_agreement_id_all_disb_trans ON all_disbursement_transactions(ag
 CREATE INDEX idx_agency_id_all_disb_trans ON all_disbursement_transactions USING btree (agency_id);
 CREATE INDEX idx_nyc_year_id_all_disb_trans ON all_disbursement_transactions USING btree (check_eft_issued_nyc_year_id);
 CREATE INDEX idx_ma_agreement_id_all_disb_trans ON all_disbursement_transactions(master_agreement_id);
+
+
+ CREATE INDEX idx_disb_agr_id_cont_all_spen_trans ON contracts_all_spending_transactions(disb_agreement_id);
+ CREATE INDEX idx_fiscal_year_id_cont_all_spen_trans ON contracts_all_spending_transactions(fiscal_year_id);
+ CREATE INDEX idx_disb_fis_year_id_cont_all_spen_trans ON contracts_all_spending_transactions(disb_fiscal_year_id);
+ CREATE INDEX idx_disb_cont_doc_code_cont_all_spen_trans ON contracts_all_spending_transactions(disb_contract_document_code);
+ CREATE INDEX idx_document_agency_id_cont_all_spen_trans ON contracts_all_spending_transactions(document_agency_id);
+ CREATE INDEX idx_disb_cal_month_id_cont_all_spen_trans ON contracts_all_spending_transactions(disb_check_eft_issued_cal_month_id);
+ CREATE INDEX idx_document_code_id_cont_all_spen_trans ON contracts_all_spending_transactions(document_code_id);

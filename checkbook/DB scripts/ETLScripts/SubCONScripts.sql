@@ -429,7 +429,7 @@ BEGIN
 	INSERT INTO tmp_sub_loaded_agreements_1_flags
 	SELECT a.document_id,a.document_code_id, a.sub_contract_id, c.agency_id, 
 	       max(a.document_version) as latest_version_no, min(a.document_version) as first_version_no
-	FROM subcontract_details a JOIN tmp_sub_loaded_agreements_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+	FROM subcontract_details a JOIN tmp_sub_loaded_agreements_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id AND a.sub_contract_id = b.sub_contract_id
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
 	GROUP BY 1,2,3,4;	
 	
@@ -450,7 +450,7 @@ BEGIN
 		group_concat(CASE WHEN a.document_version <> b.latest_version_no THEN agreement_id ELSE 0 END) as non_latest_agreement_id,		
 		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN agreement_id ELSE 0 END) as non_first_agreement_id,
 		MAX(CASE WHEN a.document_version = b.latest_version_no THEN maximum_contract_amount END) as latest_current_amount
-	FROM   subcontract_details a JOIN tmp_sub_loaded_agreements_1_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+	FROM   subcontract_details a JOIN tmp_sub_loaded_agreements_1_flags b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id AND a.sub_contract_id = b.sub_contract_id
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id	
 	GROUP BY 1,2,3,4;	
 	
@@ -552,7 +552,7 @@ BEGIN
 	INSERT INTO tmp_sub_loaded_agreements_1
 	SELECT a.document_id,a.document_code_id, a.sub_contract_id, c.agency_id, 
 	       max(a.document_version) as latest_version_no, min(a.document_version) as first_version_no
-	FROM subcontract_details a JOIN tmp_sub_loaded_agreements b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id
+	FROM subcontract_details a JOIN tmp_sub_loaded_agreements b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id AND a.sub_contract_id = b.sub_contract_id
 		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
 	GROUP BY 1,2,3,4;	
 	
@@ -1332,7 +1332,7 @@ BEGIN
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
-            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            master_agreement_yn, has_children, has_mwbe_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
             is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
@@ -1351,7 +1351,7 @@ BEGIN
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
-            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            master_agreement_yn, has_children, has_mwbe_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, b.nyc_year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
@@ -1432,7 +1432,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
-            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            master_agreement_yn, has_children, has_mwbe_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
             is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
@@ -1451,7 +1451,7 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             effective_end_date, effective_end_date_id, effective_end_year, 
             effective_end_year_id, registered_date, registered_date_id, brd_awd_no, 
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
-            master_agreement_yn, has_children, original_version_flag, latest_flag, 
+            master_agreement_yn, has_children, has_mwbe_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, c.year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,

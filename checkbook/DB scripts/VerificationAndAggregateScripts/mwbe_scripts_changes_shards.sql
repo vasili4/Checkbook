@@ -72,6 +72,7 @@ CREATE TABLE agreement_snapshot  (
  	minority_type_name character varying(50),
    master_agreement_yn character(1),  
    has_children character(1),
+   has_mwbe_children character(1),
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
@@ -142,6 +143,7 @@ CREATE TABLE agreement_snapshot_cy  (
  	minority_type_name character varying(50),
    master_agreement_yn character(1),  
    has_children character(1),
+   has_mwbe_children character(1),
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
@@ -730,6 +732,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot__0(
  	   minority_type_name character varying,
 	   master_agreement_yn character(1),
 	   has_children character(1),
+	   has_mwbe_children character(1),
 	   original_version_flag character(1),
    	   latest_flag character(1),
    	  load_id integer,
@@ -756,7 +759,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.agreement_snapshot to
   		agreement_snapshot__0.effective_end_date_id,agreement_snapshot__0.effective_end_year,agreement_snapshot__0.effective_end_year_id,
   		agreement_snapshot__0.registered_date,agreement_snapshot__0.registered_date_id,agreement_snapshot__0.brd_awd_no,agreement_snapshot__0.tracking_number,agreement_snapshot__0.rfed_amount,
   		agreement_snapshot__0.minority_type_id,agreement_snapshot__0.minority_type_name,
-  		agreement_snapshot__0.master_agreement_yn,agreement_snapshot__0.has_children,agreement_snapshot__0.original_version_flag,agreement_snapshot__0.latest_flag,
+  		agreement_snapshot__0.master_agreement_yn,agreement_snapshot__0.has_children,agreement_snapshot__0.has_mwbe_children,agreement_snapshot__0.original_version_flag,agreement_snapshot__0.latest_flag,
   		agreement_snapshot__0.load_id,agreement_snapshot__0.last_modified_date,agreement_snapshot__0.job_id
   	FROM  agreement_snapshot__0;
 
@@ -822,6 +825,7 @@ CREATE EXTERNAL WEB TABLE agreement_snapshot_cy__0(
  	minority_type_name character varying,
 	  master_agreement_yn character(1),
 	  has_children character(1),
+	  has_mwbe_children character(1),
 	  original_version_flag character(1),
   	  latest_flag character(1),
   	  load_id integer,
@@ -848,7 +852,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.agreement_snapshot_cy
   		agreement_snapshot_cy__0.effective_end_date_id,agreement_snapshot_cy__0.effective_end_year,agreement_snapshot_cy__0.effective_end_year_id,
   		agreement_snapshot_cy__0.registered_date,agreement_snapshot_cy__0.registered_date_id,agreement_snapshot_cy__0.brd_awd_no,agreement_snapshot_cy__0.tracking_number,agreement_snapshot_cy__0.rfed_amount,
   		agreement_snapshot_cy__0.minority_type_id,agreement_snapshot_cy__0.minority_type_name,
-  		agreement_snapshot_cy__0.master_agreement_yn,agreement_snapshot_cy__0.has_children,agreement_snapshot_cy__0.original_version_flag,agreement_snapshot_cy__0.latest_flag,
+  		agreement_snapshot_cy__0.master_agreement_yn,agreement_snapshot_cy__0.has_children,agreement_snapshot_cy__0.has_mwbe_children,agreement_snapshot_cy__0.original_version_flag,agreement_snapshot_cy__0.latest_flag,
   		agreement_snapshot_cy__0.load_id,agreement_snapshot_cy__0.last_modified_date,agreement_snapshot_cy__0.job_id
   	FROM  agreement_snapshot_cy__0;  
 
