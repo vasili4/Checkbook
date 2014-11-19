@@ -33,15 +33,15 @@ Apache Tomcat requires the java runtime environment.
  `/var/lib/pgsql/9.3/data/pg_hba.conf` if CentOS 6.4) and apply the 
  changes listed below: 
  
- **'local' is for Unix domain socket connections only**
+ **'local' is for Unix domain socket connections only:**
 
         local     all         all              md5
 
- **IPv4 local connections: **
+ **IPv4 local connections:**
 
         host      all       0.0.0.0/0          md5
 
- **IPv6 local connection: **
+ **IPv6 local connection:**
 
         host      all          all             md5
        

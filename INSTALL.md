@@ -217,10 +217,9 @@ Steps to install:
     need to adjust these instructions in the appropriate way.  Also,
     all of this assumes that directory `/var/www/` already exists and
     is owned by user `www-data` and group `www-data`.  If that's not
-    the case, you may need to properly create and set root permissions
-    for the www-data user with the following command. 
-     `sudo chown -R www-data.www-data /var/www` would be one
-    way to do that on Ubuntu 12.04.)
+    the case, you may need to properly create and set permissions
+    for the `www-data` user, for example like this:
+    `sudo chown -R www-data.www-data /var/www`.)
 
     Make sure the `sites/default/files/` directory has read, write,
     *and* execute permissions for the web server user:
