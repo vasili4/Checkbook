@@ -1016,6 +1016,35 @@ CREATE INDEX idx_ma_agreement_id_all_disb_trans ON all_disbursement_transactions
  CREATE INDEX idx_document_code_id_cont_all_spen_trans ON contracts_all_spending_transactions(document_code_id);
  
 
+CREATE INDEX idx_vendor_id_all_disb_trans ON all_disbursement_transactions(vendor_id);
+CREATE INDEX idx_vendor_name_all_disb_trans ON all_disbursement_transactions(vendor_name);
+CREATE INDEX idx_pri_vendor_id_all_disb_trans ON all_disbursement_transactions(prime_vendor_id);
+CREATE INDEX idx_pr_vendor_name_all_disb_trans ON all_disbursement_transactions(prime_vendor_name);
+CREATE INDEX idx_department_id_all_disb_trans ON all_disbursement_transactions(department_id);
+CREATE INDEX idx_department_name_all_disb_trans ON all_disbursement_transactions(department_name);
+CREATE INDEX idx_exp_object_name_all_disb_trans ON all_disbursement_transactions(expenditure_object_name);
+CREATE INDEX idx_chk_eft_iss_date_all_disb_trans ON all_disbursement_transactions(check_eft_issued_date);
+
+CREATE INDEX idx_vendor_id_all_agreement_trans ON all_agreement_transactions(vendor_id);
+CREATE INDEX idx_vendor_name_all_agreement_trans ON all_agreement_transactions(vendor_name);
+CREATE INDEX idx_pri_vendor_id_all_agreement_trans ON all_agreement_transactions(prime_vendor_id);
+CREATE INDEX idx_pri_vendor_name_all_agreement_trans ON all_agreement_transactions(prime_vendor_name);
+CREATE INDEX idx_agency_id_all_agreement_trans ON all_agreement_transactions(agency_id);
+CREATE INDEX idx_award_method_id_all_agreement_trans ON all_agreement_transactions(award_method_id);
+CREATE INDEX idx_award_category_id_all_agreement_trans ON all_agreement_transactions(award_category_id);
+
+CREATE INDEX idx_vendor_id_all_agreement_trans_cy ON all_agreement_transactions_cy(vendor_id);
+CREATE INDEX idx_vendor_name_all_agreement_trans_cy ON all_agreement_transactions_cy(vendor_name);
+CREATE INDEX idx_pri_vendor_id_all_agreement_trans_cy ON all_agreement_transactions_cy(prime_vendor_id);
+CREATE INDEX idx_pri_vendor_name_all_agreement_trans_cy ON all_agreement_transactions_cy(prime_vendor_name);
+CREATE INDEX idx_agency_id_all_agreement_trans_cy ON all_agreement_transactions_cy(agency_id);
+CREATE INDEX idx_award_method_id_all_agreement_trans_cy ON all_agreement_transactions_cy(award_method_id);
+CREATE INDEX idx_award_category_id_all_agreement_trans_cy ON all_agreement_transactions_cy(award_category_id);
+
+CREATE INDEX idx_vendor_id_cont_all_spen_trans ON contracts_all_spending_transactions(vendor_id);
+CREATE INDEX idx_award_method_id_cont_all_spen_trans ON contracts_all_spending_transactions(award_method_id);
+
+
  SET search_path = staging;
  
 DROP  VIEW  IF EXISTS subcontract_vendor_business_type;
