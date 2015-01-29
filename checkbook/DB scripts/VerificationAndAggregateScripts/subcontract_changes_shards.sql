@@ -943,7 +943,7 @@ CREATE TABLE all_agreement_transactions_cy  (
 	)WITH(appendonly=true,orientation=column)
 DISTRIBUTED BY (disbursement_line_item_id)
 PARTITION BY RANGE (fiscal_year) 
-(START (2010) END (2014) EVERY (1),
+(START (2010) END (2015) EVERY (1),
 DEFAULT PARTITION outlying_years);
 
 

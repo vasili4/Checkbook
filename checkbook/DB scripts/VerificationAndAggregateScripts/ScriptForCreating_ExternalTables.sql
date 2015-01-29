@@ -1253,3 +1253,68 @@ ENCODING 'UTF8';
 ALTER TABLE etl.ext_stg_revenue_budget OWNER TO gpadmin;
 GRANT SELECT ON TABLE etl.ext_stg_revenue_budget TO gpadmin;
 GRANT SELECT ON TABLE etl.ext_stg_revenue_budget TO webuser1;
+
+
+
+
+DROP EXTERNAL TABLE etl.ext_stg_edc_contract_data_feed;
+
+CREATE EXTERNAL TABLE etl.ext_stg_edc_contract_data_feed
+(
+  agency_code character varying(4),
+  agency_name character varying,
+  department_code character varying(4),
+  department_name character varying,
+  contract_number character varying,
+  commodity_line character varying,
+  edc_contract_number character varying(15),
+  is_sandy_related character varying(3),
+  purpose character varying,
+  budget_name character varying,
+  edc_registered_amount character varying,
+  contractor_name character varying,
+  contractor_address character varying,
+  contractor_city character varying,
+  contractor_state character varying,
+  contractor_zip character varying
+)
+ LOCATION (
+    'gpfdist://mdw1:8082/datafiles/EDC_feed.csv'
+)
+ FORMAT 'csv' (delimiter ',' null '' escape '~' quote '"' fill missing fields)
+ENCODING 'UTF8';
+ALTER TABLE etl.ext_stg_edc_contract_data_feed OWNER TO gpadmin;
+GRANT SELECT ON TABLE etl.ext_stg_edc_contract_data_feed TO gpadmin;
+GRANT SELECT ON TABLE etl.ext_stg_edc_contract_data_feed TO webuser1;
+
+
+
+DROP EXTERNAL TABLE etl.ext_stg_tdc_contract_data_feed;
+
+CREATE EXTERNAL TABLE etl.ext_stg_tdc_contract_data_feed
+(
+  agency_code character varying(4),
+  agency_name character varying,
+  department_code character varying(4),
+  department_name character varying,
+  contract_number character varying,
+  commodity_line character varying,
+  tdc_contract_number character varying(15),
+  is_sandy_related character varying(3),
+  purpose character varying,
+  budget_name character varying,
+  tdc_registered_amount character varying,
+  contractor_name character varying,
+  contractor_address character varying,
+  contractor_city character varying,
+  contractor_state character varying,
+  contractor_zip character varying
+)
+ LOCATION (
+    'gpfdist://mdw1:8082/datafiles/TDC_feed.csv'
+)
+ FORMAT 'csv' (delimiter ',' null '' escape '~' quote '"' fill missing fields)
+ENCODING 'UTF8';
+ALTER TABLE etl.ext_stg_tdc_contract_data_feed OWNER TO gpadmin;
+GRANT SELECT ON TABLE etl.ext_stg_tdc_contract_data_feed TO gpadmin;
+GRANT SELECT ON TABLE etl.ext_stg_tdc_contract_data_feed TO webuser1;

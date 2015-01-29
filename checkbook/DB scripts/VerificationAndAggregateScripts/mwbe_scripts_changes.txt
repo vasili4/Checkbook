@@ -17,6 +17,13 @@ psql -d checkbook_mwbe -f PendingContracts.sql 1>1.out 2>2.err
 
 ---- start industry type reclassification changes ----
 
+DELETE FROM ref_industry_type WHERE industry_type_id in (6,7);
+INSERT INTO ref_industry_type(industry_type_id, industry_type_name,created_date) VALUES(6,'Human Services',now()::timestamp),
+																						(7,'Arch and Engineerng',now()::timestamp);
+																						
+update ref_industry_type set created_date = now()::timestamp where industry_type_name in ('Human Services','Arch and Engineerng');
+
+
 INSERT INTO ref_award_category(award_category_code, award_category_name, created_date) values('028','CULTURAL RELATED SERVICES',now()::timestamp),('029','ECONOMIC DEVELOPMENT',now()::timestamp);
 UPDATE ref_award_category SET  created_date = now()::timestamp where award_category_code in ('028','029');
 
