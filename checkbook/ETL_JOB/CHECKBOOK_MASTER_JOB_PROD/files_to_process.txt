@@ -1,0 +1,18 @@
+l_load_file_id,l_file_name,l_standard_file_name
+ 14424,AIEE_DLY_COA_DEPT_20150201005440.txt,COA_agency_feed.txt
+ 14433,AIE8_DLY_COA_OBJ_20150201005647.txt,COA_expenditure_object_feed.txt
+ 14426,AIED_DLY_COA_FUNCATTR_20150201005440.txt,COA_budget_code_feed.txt
+ 14436,AIE6_DLY_VEND_BTYP_20150201005440.txt,FMSV_feed.txt
+ 14435,AIE7_DLY_COA_APPR_20150201005455.txt,COA_department_feed.txt
+ 14423,AIE9_DLY_COA_LOC_20150201005657.txt,COA_location_object_feed.txt
+ 14438,AIEC_DLY_COA_RSFCLS_20150201005706.txt,COA_funding_class_feed.txt
+ 14432,AIEC_DLY_COA_RSCAT_20150201005706.txt,COA_revenue_category_feed.txt
+ 14425,AIEC_DLY_COA_RSCLS_20150201005706.txt,COA_revenue_class_feed.txt
+ 14428,AIEA_DLY_COA_OCLS_20150201005712.txt,COA_object_class_feed.txt
+ 14431,AIEB_DLY_COA_RSRC_20150201005629.txt,COA_revenue_source_feed.txt
+ 14422,AIE3_DLY_BUD_92L3_20150201005440.txt,BUDGET_feed.txt
+ 14427,AIE2_DLY_PCO_MA_20150201005440.txt,MAG_feed.txt
+ 14437,AIE4_DLY_BUD_93L1_20150201005500.txt,revenue_budget.txt
+ 14429,AIE5_DLY_JL_REV_20150201005507.txt,Revenue_feed.txt
+ 14430,AIE2_DLY_PCO_PO_20150201005440.txt,CON_feed.txt
+ 14434,checkbookpendingcontracts.txt,OAISIS_feed.txt

@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+
+<lst name="responseHeader">
+  <int name="status">0</int>
+  <int name="QTime">1294</int>
+  <lst name="params">
+    <str name="indent">on</str>
+    <str name="start">0</str>
+    <str name="q">*:*</str>
+    <str name="rows">10</str>
+    <str name="version">2.2</str>
+  </lst>
+</lst>
+<result name="response" numFound="62773308" start="0">
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">positive promotions inc[ 0000768716 ]</str>
+    <str name="vendor_name_code_autocomplete">positive promotions inc[ 0000768716 ]</str>
+    <double name="check_amount">165.95</double>
+    <str name="vendor_name_id">POSITIVE PROMOTIONS INC[25287]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">61129</str>
+    <str name="expenditure_object_name_id">SUPPLIES + MATERIALS - GENERAL[12069]</str>
+    <str name="vendor_customer_code">0000768716</str>
+    <str name="expenditure_object_name_code">supplies + materials - general[1000]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8085565</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">78954</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">4301</str>
+    <str name="budget_code_text">4301</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">GE INST &amp; SCHOOL SUPERVISION ELE/MIDDLE</str>
+    <str name="budget_code_name_text">GE INST &amp; SCHOOL SUPERVISION ELE/MIDDLE</str>
+    <str name="budget_code_name_autocomplete">GE INST &amp; SCHOOL SUPERVISION ELE/MIDDLE</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">402</str>
+    <str name="department_name">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="department_name_text">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="vendor_name">POSITIVE PROMOTIONS INC</str>
+    <str name="vendor_name_text">POSITIVE PROMOTIONS INC</str>
+    <str name="vendor_name_autocomplete">POSITIVE PROMOTIONS INC</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130405844-1-DSB-EFT</str>
+    <str name="spending_transaction_id">8085565</str>
+    <str name="department_name_code">ge instr &amp; sch leadership - otps[402]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">25287</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">1000</str>
+    <str name="budget_code_name_code">ge inst &amp; school supervision ele/middle[4301]</str>
+    <str name="budget_code_name_code_autocomplete">ge inst &amp; school supervision ele/middle[4301]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">12069</str>
+    <long name="_version_">1491425354662805504</long>
+    <date name="timestamp">2015-01-27T04:47:35.579Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <str name="vendor_name_code_autocomplete">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <double name="check_amount">151.2</double>
+    <str name="vendor_name_id">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT[30529]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">61129</str>
+    <str name="expenditure_object_name_id">NON OVERNIGHT TRVL EXP-GENERAL[12095]</str>
+    <str name="vendor_customer_code">040POOL001</str>
+    <str name="expenditure_object_name_code">non overnight trvl exp-general[4510]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8089171</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>NON OVERNIGHT TRVL EXP-GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>NON OVERNIGHT TRVL EXP-GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>NON OVERNIGHT TRVL EXP-GENERAL</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">152113</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">8489</str>
+    <str name="budget_code_text">8489</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">GE Reimbursable Support</str>
+    <str name="budget_code_name_text">GE Reimbursable Support</str>
+    <str name="budget_code_name_autocomplete">GE Reimbursable Support</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">402</str>
+    <str name="department_name">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="department_name_text">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="vendor_name">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_text">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_autocomplete">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130405073-1-DSB-EFT</str>
+    <str name="spending_transaction_id">8089171</str>
+    <str name="department_name_code">ge instr &amp; sch leadership - otps[402]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">30529</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">4510</str>
+    <str name="budget_code_name_code">ge reimbursable support[8489]</str>
+    <str name="budget_code_name_code_autocomplete">ge reimbursable support[8489]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">12095</str>
+    <long name="_version_">1491425354663854080</long>
+    <date name="timestamp">2015-01-27T04:47:35.58Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <str name="vendor_name_code_autocomplete">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <double name="check_amount">12.0</double>
+    <str name="vendor_name_id">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT[30529]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">72436</str>
+    <str name="expenditure_object_name_id">OTHR SERV AND CHRGS-GENERAL[15338]</str>
+    <str name="vendor_customer_code">040POOL001</str>
+    <str name="expenditure_object_name_code">othr serv and chrgs-general[4000]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8091444</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>OTHR SERV AND CHRGS-GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>OTHR SERV AND CHRGS-GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>OTHR SERV AND CHRGS-GENERAL</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">118246</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">8843</str>
+    <str name="budget_code_text">8843</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">REIMBURSEABLE SUPPORT-GE INST ELE/MID/HS</str>
+    <str name="budget_code_name_text">REIMBURSEABLE SUPPORT-GE INST ELE/MID/HS</str>
+    <str name="budget_code_name_autocomplete">REIMBURSEABLE SUPPORT-GE INST ELE/MID/HS</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">482</str>
+    <str name="department_name">CATEGORICAL PROGRAMS - OTPS</str>
+    <str name="department_name_text">CATEGORICAL PROGRAMS - OTPS</str>
+    <str name="vendor_name">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_text">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_autocomplete">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130405085-1-DSB-EFT</str>
+    <str name="spending_transaction_id">8091444</str>
+    <str name="department_name_code">categorical programs - otps[482]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">30529</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">4000</str>
+    <str name="budget_code_name_code">reimburseable support-ge inst ele/mid/hs[8843]</str>
+    <str name="budget_code_name_code_autocomplete">reimburseable support-ge inst ele/mid/hs[8843]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">15338</str>
+    <long name="_version_">1491425354664902656</long>
+    <date name="timestamp">2015-01-27T04:47:35.581Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <str name="vendor_name_code_autocomplete">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <double name="check_amount">152.24</double>
+    <str name="vendor_name_id">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT[30529]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">72436</str>
+    <str name="expenditure_object_name_id">SUPPLIES + MATERIALS - GENERAL[12069]</str>
+    <str name="vendor_customer_code">040POOL001</str>
+    <str name="expenditure_object_name_code">supplies + materials - general[1000]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8095315</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">118246</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">8843</str>
+    <str name="budget_code_text">8843</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">REIMBURSEABLE SUPPORT-GE INST ELE/MID/HS</str>
+    <str name="budget_code_name_text">REIMBURSEABLE SUPPORT-GE INST ELE/MID/HS</str>
+    <str name="budget_code_name_autocomplete">REIMBURSEABLE SUPPORT-GE INST ELE/MID/HS</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">482</str>
+    <str name="department_name">CATEGORICAL PROGRAMS - OTPS</str>
+    <str name="department_name_text">CATEGORICAL PROGRAMS - OTPS</str>
+    <str name="vendor_name">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_text">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_autocomplete">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130405080-1-DSB-EFT</str>
+    <str name="spending_transaction_id">8095315</str>
+    <str name="department_name_code">categorical programs - otps[482]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">30529</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">1000</str>
+    <str name="budget_code_name_code">reimburseable support-ge inst ele/mid/hs[8843]</str>
+    <str name="budget_code_name_code_autocomplete">reimburseable support-ge inst ele/mid/hs[8843]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">12069</str>
+    <long name="_version_">1491425354664902657</long>
+    <date name="timestamp">2015-01-27T04:47:35.581Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <str name="vendor_name_code_autocomplete">nyc finance - pool account re: boe vip #1 account[ 040POOL001 ]</str>
+    <double name="check_amount">56.01</double>
+    <str name="vendor_name_id">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT[30529]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">72436</str>
+    <str name="expenditure_object_name_id">SUPPLIES + MATERIALS - GENERAL[12069]</str>
+    <str name="vendor_customer_code">040POOL001</str>
+    <str name="expenditure_object_name_code">supplies + materials - general[1000]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8091199</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">124768</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">8848</str>
+    <str name="budget_code_text">8848</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">REIMBUR SUPPORT-SE INSTRUCTION EL/MID/HS</str>
+    <str name="budget_code_name_text">REIMBUR SUPPORT-SE INSTRUCTION EL/MID/HS</str>
+    <str name="budget_code_name_autocomplete">REIMBUR SUPPORT-SE INSTRUCTION EL/MID/HS</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">482</str>
+    <str name="department_name">CATEGORICAL PROGRAMS - OTPS</str>
+    <str name="department_name_text">CATEGORICAL PROGRAMS - OTPS</str>
+    <str name="vendor_name">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_text">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="vendor_name_autocomplete">NYC FINANCE - POOL ACCOUNT RE: BOE VIP #1 ACCOUNT</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130405080-1-DSB-EFT</str>
+    <str name="spending_transaction_id">8091199</str>
+    <str name="department_name_code">categorical programs - otps[482]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">30529</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">1000</str>
+    <str name="budget_code_name_code">reimbur support-se instruction el/mid/hs[8848]</str>
+    <str name="budget_code_name_code_autocomplete">reimbur support-se instruction el/mid/hs[8848]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">12069</str>
+    <long name="_version_">1491425354664902658</long>
+    <date name="timestamp">2015-01-27T04:47:35.581Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">gary s mayerson &amp; associates pc[ 0002630813 ]</str>
+    <str name="vendor_name_code_autocomplete">gary s mayerson &amp; associates pc[ 0002630813 ]</str>
+    <double name="check_amount">2635.0</double>
+    <str name="vendor_name_id">GARY S MAYERSON &amp; ASSOCIATES PC[38330]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">72692</str>
+    <str name="expenditure_object_name_id">PROF SERV DIRECT EDUC SERV - REIMBURS[1206]</str>
+    <str name="vendor_customer_code">0002630813</str>
+    <str name="expenditure_object_name_code">prof serv direct educ serv - reimburs[6851]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8090902</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>PROF SERV DIRECT EDUC SERV - REIMBURS</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>PROF SERV DIRECT EDUC SERV - REIMBURS</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>PROF SERV DIRECT EDUC SERV - REIMBURS</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">69216</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">2127</str>
+    <str name="budget_code_text">2127</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">Carter Cases</str>
+    <str name="budget_code_name_text">Carter Cases</str>
+    <str name="budget_code_name_autocomplete">Carter Cases</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">472</str>
+    <str name="department_name">CHARTER/CONTRACT/FOSTER CARE PMTS - OTPS</str>
+    <str name="department_name_text">CHARTER/CONTRACT/FOSTER CARE PMTS - OTPS</str>
+    <str name="vendor_name">GARY S MAYERSON &amp; ASSOCIATES PC</str>
+    <str name="vendor_name_text">GARY S MAYERSON &amp; ASSOCIATES PC</str>
+    <str name="vendor_name_autocomplete">GARY S MAYERSON &amp; ASSOCIATES PC</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130206938-1-DSB-AD</str>
+    <str name="spending_transaction_id">8090902</str>
+    <str name="department_name_code">charter/contract/foster care pmts - otps[472]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">38330</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">6851</str>
+    <str name="budget_code_name_code">carter cases[2127]</str>
+    <str name="budget_code_name_code_autocomplete">carter cases[2127]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">1206</str>
+    <long name="_version_">1491425354665951232</long>
+    <date name="timestamp">2015-01-27T04:47:35.582Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">204 avenue a tennants association[ VC00138648 ]</str>
+    <str name="vendor_name_code_autocomplete">204 avenue a tennants association[ VC00138648 ]</str>
+    <double name="check_amount">1827.0</double>
+    <str name="vendor_name_id">204 AVENUE A TENNANTS ASSOCIATION[38837]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">74467</str>
+    <str name="expenditure_object_name_id">CONTRACTUAL SERVICES GENERAL[17389]</str>
+    <str name="vendor_customer_code">VC00138648</str>
+    <str name="expenditure_object_name_code">contractual services general[6000]</str>
+    <str name="spending_category_name_code">contracts[c]</str>
+    <str name="id">spending:124:8086263</str>
+    <str name="agency_id">124</str>
+    <arr name="expenditure_object_name">
+      <str>CONTRACTUAL SERVICES GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>CONTRACTUAL SERVICES GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>CONTRACTUAL SERVICES GENERAL</str>
+    </arr>
+    <str name="spending_category_id">1</str>
+    <str name="budget_code_id">109796</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">6029</str>
+    <str name="budget_code_text">6029</str>
+    <str name="spending_category_name">Contracts</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">TENANT INTERIM LEASE</str>
+    <str name="budget_code_name_text">TENANT INTERIM LEASE</str>
+    <str name="budget_code_name_autocomplete">TENANT INTERIM LEASE</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">010</str>
+    <str name="department_name">HOUSING MANAGEMENT AND SALES</str>
+    <str name="department_name_text">HOUSING MANAGEMENT AND SALES</str>
+    <str name="vendor_name">204 AVENUE A TENNANTS ASSOCIATION</str>
+    <str name="vendor_name_text">204 AVENUE A TENNANTS ASSOCIATION</str>
+    <str name="vendor_name_autocomplete">204 AVENUE A TENNANTS ASSOCIATION</str>
+    <str name="agency_code">806</str>
+    <str name="agency_name_id">Housing Preservation and Development[124]</str>
+    <str name="expense_id">20130407797-1-DSB-EFT</str>
+    <str name="spending_transaction_id">8086263</str>
+    <str name="department_name_code">housing management and sales[010]</str>
+    <str name="agency_name_export">Housing Preservation and Development</str>
+    <str name="agency_name">Housing Preservation and Development</str>
+    <str name="agency_name_text">Housing Preservation and Development</str>
+    <str name="vendor_id">38837</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">6000</str>
+    <str name="budget_code_name_code">tenant interim lease[6029]</str>
+    <str name="budget_code_name_code_autocomplete">tenant interim lease[6029]</str>
+    <str name="domain">spending</str>
+    <str name="contract_number">PON180620132000951</str>
+    <str name="expenditure_object_id">17389</str>
+    <long name="_version_">1491425354665951233</long>
+    <date name="timestamp">2015-01-27T04:47:35.582Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">b &amp; h foto &amp; electronics corp[ 0002543590 ]</str>
+    <str name="vendor_name_code_autocomplete">b &amp; h foto &amp; electronics corp[ 0002543590 ]</str>
+    <double name="check_amount">548.0</double>
+    <str name="vendor_name_id">B &amp; H FOTO &amp; ELECTRONICS CORP[5066]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">61129</str>
+    <str name="expenditure_object_name_id">SUPPLIES + MATERIALS - GENERAL[12069]</str>
+    <str name="vendor_customer_code">0002543590</str>
+    <str name="expenditure_object_name_code">supplies + materials - general[1000]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8092773</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">78989</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">4648</str>
+    <str name="budget_code_text">4648</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">GE Central Managed Sch Supp-HS</str>
+    <str name="budget_code_name_text">GE Central Managed Sch Supp-HS</str>
+    <str name="budget_code_name_autocomplete">GE Central Managed Sch Supp-HS</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">402</str>
+    <str name="department_name">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="department_name_text">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="vendor_name">B &amp; H FOTO &amp; ELECTRONICS CORP</str>
+    <str name="vendor_name_text">B &amp; H FOTO &amp; ELECTRONICS CORP</str>
+    <str name="vendor_name_autocomplete">B &amp; H FOTO &amp; ELECTRONICS CORP</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130407185-1-DSB-EFT</str>
+    <str name="spending_transaction_id">8092773</str>
+    <str name="department_name_code">ge instr &amp; sch leadership - otps[402]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">5066</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">1000</str>
+    <str name="budget_code_name_code">ge central managed sch supp-hs[4648]</str>
+    <str name="budget_code_name_code_autocomplete">ge central managed sch supp-hs[4648]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">12069</str>
+    <long name="_version_">1491425354665951234</long>
+    <date name="timestamp">2015-01-27T04:47:35.582Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">john &amp; dave wholesale bagels inc[ 0003352523 ]</str>
+    <str name="vendor_name_code_autocomplete">john &amp; dave wholesale bagels inc[ 0003352523 ]</str>
+    <double name="check_amount">368.0</double>
+    <str name="vendor_name_id">JOHN &amp; DAVE WHOLESALE BAGELS INC[23135]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">61129</str>
+    <str name="expenditure_object_name_id">OTHR SERV AND CHRGS-GENERAL[15338]</str>
+    <str name="vendor_customer_code">0003352523</str>
+    <str name="expenditure_object_name_code">othr serv and chrgs-general[4000]</str>
+    <str name="spending_category_name_code">others[o]</str>
+    <str name="id">spending:18:8094010</str>
+    <str name="agency_id">18</str>
+    <arr name="expenditure_object_name">
+      <str>OTHR SERV AND CHRGS-GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>OTHR SERV AND CHRGS-GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>OTHR SERV AND CHRGS-GENERAL</str>
+    </arr>
+    <str name="spending_category_id">4</str>
+    <str name="budget_code_id">152113</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="budget_code">8489</str>
+    <str name="budget_code_text">8489</str>
+    <str name="spending_category_name">Others</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="budget_code_name">GE Reimbursable Support</str>
+    <str name="budget_code_name_text">GE Reimbursable Support</str>
+    <str name="budget_code_name_autocomplete">GE Reimbursable Support</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">402</str>
+    <str name="department_name">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="department_name_text">GE INSTR &amp; SCH LEADERSHIP - OTPS</str>
+    <str name="vendor_name">JOHN &amp; DAVE WHOLESALE BAGELS INC</str>
+    <str name="vendor_name_text">JOHN &amp; DAVE WHOLESALE BAGELS INC</str>
+    <str name="vendor_name_autocomplete">JOHN &amp; DAVE WHOLESALE BAGELS INC</str>
+    <str name="agency_code">040</str>
+    <str name="agency_name_id">Department of Education[18]</str>
+    <str name="expense_id">20130207126-1-DSB-AD</str>
+    <str name="spending_transaction_id">8094010</str>
+    <str name="department_name_code">ge instr &amp; sch leadership - otps[402]</str>
+    <str name="agency_name_export">Department of Education</str>
+    <str name="agency_name">Department of Education</str>
+    <str name="agency_name_text">Department of Education</str>
+    <str name="vendor_id">23135</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">4000</str>
+    <str name="budget_code_name_code">ge reimbursable support[8489]</str>
+    <str name="budget_code_name_code_autocomplete">ge reimbursable support[8489]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">15338</str>
+    <long name="_version_">1491425354665951235</long>
+    <date name="timestamp">2015-01-27T04:47:35.583Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">114</str>
+    <str name="fund_class_code">001</str>
+    <str name="vendor_name_code">canarsie lumber incorporated[ 0000525730 ]</str>
+    <str name="vendor_name_code_autocomplete">canarsie lumber incorporated[ 0000525730 ]</str>
+    <double name="check_amount">147.5</double>
+    <str name="vendor_name_id">CANARSIE LUMBER INCORPORATED[3491]</str>
+    <str name="fund_class_name">General Fund</str>
+    <str name="fund_class_name_text">General Fund</str>
+    <str name="department_id">345674</str>
+    <str name="expenditure_object_name_id">SUPPLIES + MATERIALS - GENERAL[12069]</str>
+    <str name="vendor_customer_code">0000525730</str>
+    <str name="expenditure_object_name_code">supplies + materials - general[1000]</str>
+    <str name="spending_category_name_code">contracts[c]</str>
+    <str name="id">spending:161:8091569</str>
+    <str name="agency_id">161</str>
+    <arr name="expenditure_object_name">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>SUPPLIES + MATERIALS - GENERAL</str>
+    </arr>
+    <str name="spending_category_id">1</str>
+    <str name="budget_code_id">142388</str>
+    <str name="reporting_code"/>
+    <str name="reporting_code_autocomplete"/>
+    <str name="master_agreement_id">6093</str>
+    <str name="budget_code">4400</str>
+    <str name="budget_code_text">4400</str>
+    <str name="spending_category_name">Contracts</str>
+    <str name="fund_class_name_code">general fund[001]</str>
+    <str name="check_eft_issued_date_export">2013-05-06</str>
+    <date name="check_eft_issued_date">2013-05-06T05:00:00Z</date>
+    <str name="agreement_id">1550503</str>
+    <str name="budget_code_name">DMSS/CENTRAL STOREHOUSE</str>
+    <str name="budget_code_name_text">DMSS/CENTRAL STOREHOUSE</str>
+    <str name="budget_code_name_autocomplete">DMSS/CENTRAL STOREHOUSE</str>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">490</str>
+    <str name="department_name">DIV. OF MUNI SUPPLIES-OTPS</str>
+    <str name="department_name_text">DIV. OF MUNI SUPPLIES-OTPS</str>
+    <str name="vendor_name">CANARSIE LUMBER INCORPORATED</str>
+    <str name="vendor_name_text">CANARSIE LUMBER INCORPORATED</str>
+    <str name="vendor_name_autocomplete">CANARSIE LUMBER INCORPORATED</str>
+    <str name="agency_code">856</str>
+    <str name="agency_name_id">Department of Citywide Administrative Services[161]</str>
+    <str name="expense_id">20130206482-1-DSB-AD</str>
+    <str name="spending_transaction_id">8091569</str>
+    <str name="department_name_code">div. of muni supplies-otps[490]</str>
+    <str name="agency_name_export">Department of Citywide Administrative Services</str>
+    <str name="agency_name">Department of Citywide Administrative Services</str>
+    <str name="agency_name_text">Department of Citywide Administrative Services</str>
+    <str name="vendor_id">3491</str>
+    <str name="fiscal_year">2013</str>
+    <str name="expenditure_object_code">1000</str>
+    <str name="budget_code_name_code">dmss/central storehouse[4400]</str>
+    <str name="budget_code_name_code_autocomplete">dmss/central storehouse[4400]</str>
+    <str name="domain">spending</str>
+    <str name="contract_number">DO185620131002161</str>
+    <str name="expenditure_object_id">12069</str>
+    <long name="_version_">1491425354666999808</long>
+    <date name="timestamp">2015-01-27T04:47:35.583Z</date></doc>
+</result>
+</response>

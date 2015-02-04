@@ -1,0 +1,233 @@
+UPDATE 1
+INSERT 0 1
+[mdw4] real	13m39.550s
+[mdw4] user	0m0.098s
+[mdw4] sys	0m0.271s
+[mdw4] UPDATE 1
+[mdw4] SQL Ran successfully - nothing to do
+[mdw4] /home/gpadmin/ETL/QA/refresh_fix_log.sh: line 18: [: =: unary operator expected
+[mdw4] nothing to do
+UPDATE 2
+INSERT 0 1
+[mdw4] real	13m48.624s
+[mdw4] user	0m0.097s
+[mdw4] sys	0m0.273s
+[mdw4] UPDATE 1
+[mdw4] SQL Ran successfully - nothing to do
+[mdw4] /home/gpadmin/ETL/UAT/refresh_fix_log.sh: line 18: [: =: unary operator expected
+[mdw4] nothing to do
+UPDATE 320
+INSERT 0 1
+20130604:18:29:56:077891 gpstop:shard1:gpadmin-[INFO]:-Starting gpstop with args: -ia
+20130604:18:29:56:077891 gpstop:shard1:gpadmin-[INFO]:-Gathering information and validating the environment...
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-Obtaining Segment details from master...
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 4.2.2.0 build 6'
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-There are 0 connections to the database
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-Commencing Master instance shutdown with mode='immediate'
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-Master host=shard1.checkbook.comptroller.nyc.gov
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-Commencing Master instance shutdown with mode=immediate
+20130604:18:29:57:077891 gpstop:shard1:gpadmin-[INFO]:-Master segment instance directory=/data/gpsne-1
+20130604:18:29:58:077891 gpstop:shard1:gpadmin-[INFO]:-No standby master host configured
+20130604:18:29:58:077891 gpstop:shard1:gpadmin-[INFO]:-Commencing parallel segment instance shutdown, please wait...
+........... 
+20130604:18:30:09:077891 gpstop:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:18:30:09:077891 gpstop:shard1:gpadmin-[INFO]:-   Segments stopped successfully      = 10
+20130604:18:30:09:077891 gpstop:shard1:gpadmin-[INFO]:-   Segments with errors during stop   = 0
+20130604:18:30:09:077891 gpstop:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:18:30:09:077891 gpstop:shard1:gpadmin-[INFO]:-Successfully shutdown 10 of 10 segment instances 
+20130604:18:30:09:077891 gpstop:shard1:gpadmin-[INFO]:-Database successfully shutdown with no errors reported
+20130604:18:30:39:078119 gpstart:shard1:gpadmin-[INFO]:-Starting gpstart with args: -a
+20130604:18:30:39:078119 gpstart:shard1:gpadmin-[INFO]:-Gathering information and validating the environment...
+20130604:18:30:39:078119 gpstart:shard1:gpadmin-[INFO]:-Greenplum Binary Version: 'postgres (Greenplum Database) 4.2.2.0 build 6'
+20130604:18:30:39:078119 gpstart:shard1:gpadmin-[INFO]:-Greenplum Catalog Version: '201109210'
+20130604:18:30:39:078119 gpstart:shard1:gpadmin-[INFO]:-Starting Master instance in admin mode
+20130604:18:30:40:078119 gpstart:shard1:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+20130604:18:30:40:078119 gpstart:shard1:gpadmin-[INFO]:-Obtaining Segment details from master...
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-Setting new master era
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-Master Started...
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-Checking for filespace consistency
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-Obtaining current filespace entries used by TRANSACTION_FILES
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-TRANSACTION_FILES OIDs are consistent for pg_system filespace
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-TRANSACTION_FILES entries are consistent for pg_system filespace
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-Checking for filespace consistency
+20130604:18:30:41:078119 gpstart:shard1:gpadmin-[INFO]:-Obtaining current filespace entries used by TEMPORARY_FILES
+20130604:18:30:42:078119 gpstart:shard1:gpadmin-[INFO]:-TEMPORARY_FILES OIDs are consistent for pg_system filespace
+20130604:18:30:42:078119 gpstart:shard1:gpadmin-[INFO]:-TEMPORARY_FILES entries are consistent for pg_system filespace
+20130604:18:30:42:078119 gpstart:shard1:gpadmin-[INFO]:-Shutting down master
+20130604:18:30:44:078119 gpstart:shard1:gpadmin-[INFO]:-No standby master configured.  skipping...
+20130604:18:30:44:078119 gpstart:shard1:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+... 
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-Process results...
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-   Successful segment starts                                            = 10
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-   Failed segment starts                                                = 0
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-   Skipped segment starts (segments are marked down in configuration)   = 0
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-Successfully started 10 of 10 segment instances 
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:18:30:47:078119 gpstart:shard1:gpadmin-[INFO]:-Starting Master instance shard1.checkbook.comptroller.nyc.gov directory /data/gpsne-1 
+20130604:18:30:48:078119 gpstart:shard1:gpadmin-[INFO]:-Command pg_ctl reports Master shard1.checkbook.comptroller.nyc.gov instance active
+20130604:18:30:48:078119 gpstart:shard1:gpadmin-[INFO]:-Database successfully started
+[shard1] real	21m0.790s
+[shard1] user	0m0.280s
+[shard1] sys	0m0.470s
+[shard1] UPDATE 1
+[shard1] /home/gpadmin/ETL/refresh_fix.sh
+[shard1] SQL Ran successfully - nothing to do
+[shard1] /home/gpadmin/ETL/refresh_fix_log.sh
+[shard1] /home/gpadmin/ETL/refresh_fix_log.sh: line 16: [: =: unary operator expected
+[shard1] nothing to do
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Starting gpstop with args: -ia
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Gathering information and validating the environment...
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Obtaining Segment details from master...
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 4.2.2.0 build 6'
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-There are 0 connections to the database
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Commencing Master instance shutdown with mode='immediate'
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Master host=shard1.checkbook.comptroller.nyc.gov
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Commencing Master instance shutdown with mode=immediate
+20130604:18:52:24:033208 gpstop:shard1:gpadmin-[INFO]:-Master segment instance directory=/data/gpsne-1
+20130604:18:52:25:033208 gpstop:shard1:gpadmin-[INFO]:-No standby master host configured
+20130604:18:52:25:033208 gpstop:shard1:gpadmin-[INFO]:-Commencing parallel segment instance shutdown, please wait...
+........... 
+20130604:18:52:36:033208 gpstop:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:18:52:36:033208 gpstop:shard1:gpadmin-[INFO]:-   Segments stopped successfully      = 10
+20130604:18:52:36:033208 gpstop:shard1:gpadmin-[INFO]:-   Segments with errors during stop   = 0
+20130604:18:52:36:033208 gpstop:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:18:52:36:033208 gpstop:shard1:gpadmin-[INFO]:-Successfully shutdown 10 of 10 segment instances 
+20130604:18:52:36:033208 gpstop:shard1:gpadmin-[INFO]:-Database successfully shutdown with no errors reported
+[shard2] 20130604:19:01:18:035344 gpstart:shard2:gpadmin-[INFO]:-Starting gpstart with args: -a
+[shard2] 20130604:19:01:18:035344 gpstart:shard2:gpadmin-[INFO]:-Gathering information and validating the environment...
+[shard2] 20130604:19:01:18:035344 gpstart:shard2:gpadmin-[INFO]:-Greenplum Binary Version: 'postgres (Greenplum Database) 4.2.2.0 build 6'
+[shard2] 20130604:19:01:19:035344 gpstart:shard2:gpadmin-[INFO]:-Greenplum Catalog Version: '201109210'
+[shard2] 20130604:19:01:19:035344 gpstart:shard2:gpadmin-[INFO]:-Starting Master instance in admin mode
+[shard2] 20130604:19:01:20:035344 gpstart:shard2:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[shard2] 20130604:19:01:20:035344 gpstart:shard2:gpadmin-[INFO]:-Obtaining Segment details from master...
+[shard2] 20130604:19:01:20:035344 gpstart:shard2:gpadmin-[INFO]:-Setting new master era
+[shard2] 20130604:19:01:20:035344 gpstart:shard2:gpadmin-[INFO]:-Master Started...
+[shard2] 20130604:19:01:20:035344 gpstart:shard2:gpadmin-[INFO]:-Checking for filespace consistency
+[shard2] 20130604:19:01:20:035344 gpstart:shard2:gpadmin-[INFO]:-Obtaining current filespace entries used by TRANSACTION_FILES
+[shard2] 20130604:19:01:20:035344 gpstart:shard2:gpadmin-[INFO]:-TRANSACTION_FILES OIDs are consistent for pg_system filespace
+[shard2] 20130604:19:01:21:035344 gpstart:shard2:gpadmin-[INFO]:-TRANSACTION_FILES entries are consistent for pg_system filespace
+[shard2] 20130604:19:01:21:035344 gpstart:shard2:gpadmin-[INFO]:-Checking for filespace consistency
+[shard2] 20130604:19:01:21:035344 gpstart:shard2:gpadmin-[INFO]:-Obtaining current filespace entries used by TEMPORARY_FILES
+[shard2] 20130604:19:01:23:035344 gpstart:shard2:gpadmin-[INFO]:-TEMPORARY_FILES OIDs are consistent for pg_system filespace
+[shard2] 20130604:19:01:23:035344 gpstart:shard2:gpadmin-[INFO]:-TEMPORARY_FILES entries are consistent for pg_system filespace
+[shard2] 20130604:19:01:23:035344 gpstart:shard2:gpadmin-[INFO]:-Shutting down master
+[shard2] 20130604:19:01:25:035344 gpstart:shard2:gpadmin-[INFO]:-No standby master configured.  skipping...
+[shard2] 20130604:19:01:25:035344 gpstart:shard2:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+[shard2] ...................... 
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-Process results...
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-----------------------------------------------------
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-   Successful segment starts                                            = 10
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-   Failed segment starts                                                = 0
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-   Skipped segment starts (segments are marked down in configuration)   = 0
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-----------------------------------------------------
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-Successfully started 10 of 10 segment instances 
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-----------------------------------------------------
+[shard2] 20130604:19:01:47:035344 gpstart:shard2:gpadmin-[INFO]:-Starting Master instance shard2.checkbook.comptroller.nyc.gov directory /data/gpsne-1 
+[shard2] 20130604:19:01:48:035344 gpstart:shard2:gpadmin-[INFO]:-Command pg_ctl reports Master shard2.checkbook.comptroller.nyc.gov instance active
+[shard2] 20130604:19:01:50:035344 gpstart:shard2:gpadmin-[INFO]:-Database successfully started
+[shard2] 2
+[shard2] Started successfully in 2 attempt 
+[shard2] 3
+[shard2] Started successfully in 3 attempt 
+[shard2] UPDATE 1
+[shard2] /home/gpadmin/ETL/clean_sync.sh
+[shard2] removing /data/gpsne-1.old
+[shard2] removing /vol0/gpsne0.old
+[shard2] removing /vol0/gpsne5.old
+[shard2] removing /vol1/gpsne1.old
+[shard2] removing /vol1/gpsne6.old
+[shard2] removing /vol2/gpsne2.old
+[shard2] removing /vol2/gpsne7.old
+[shard2] removing /vol3/gpsne3.old
+[shard2] removing /vol3/gpsne8.old
+[shard2] removing /vol4/gpsne4.old
+[shard2] removing /vol4/gpsne9.old
+[shard3] 20130604:19:16:30:059275 gpstart:shard3:gpadmin-[INFO]:-Starting gpstart with args: -a
+[shard3] 20130604:19:16:30:059275 gpstart:shard3:gpadmin-[INFO]:-Gathering information and validating the environment...
+[shard3] 20130604:19:16:30:059275 gpstart:shard3:gpadmin-[INFO]:-Greenplum Binary Version: 'postgres (Greenplum Database) 4.2.2.0 build 6'
+[shard3] 20130604:19:16:30:059275 gpstart:shard3:gpadmin-[INFO]:-Greenplum Catalog Version: '201109210'
+[shard3] 20130604:19:16:30:059275 gpstart:shard3:gpadmin-[INFO]:-Starting Master instance in admin mode
+[shard3] 20130604:19:16:32:059275 gpstart:shard3:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+[shard3] 20130604:19:16:32:059275 gpstart:shard3:gpadmin-[INFO]:-Obtaining Segment details from master...
+[shard3] 20130604:19:16:32:059275 gpstart:shard3:gpadmin-[INFO]:-Setting new master era
+[shard3] 20130604:19:16:32:059275 gpstart:shard3:gpadmin-[INFO]:-Master Started...
+[shard3] 20130604:19:16:32:059275 gpstart:shard3:gpadmin-[INFO]:-Checking for filespace consistency
+[shard3] 20130604:19:16:32:059275 gpstart:shard3:gpadmin-[INFO]:-Obtaining current filespace entries used by TRANSACTION_FILES
+[shard3] 20130604:19:16:33:059275 gpstart:shard3:gpadmin-[INFO]:-TRANSACTION_FILES OIDs are consistent for pg_system filespace
+[shard3] 20130604:19:16:35:059275 gpstart:shard3:gpadmin-[INFO]:-TRANSACTION_FILES entries are consistent for pg_system filespace
+[shard3] 20130604:19:16:35:059275 gpstart:shard3:gpadmin-[INFO]:-Checking for filespace consistency
+[shard3] 20130604:19:16:35:059275 gpstart:shard3:gpadmin-[INFO]:-Obtaining current filespace entries used by TEMPORARY_FILES
+[shard3] 20130604:19:16:37:059275 gpstart:shard3:gpadmin-[INFO]:-TEMPORARY_FILES OIDs are consistent for pg_system filespace
+[shard3] 20130604:19:16:38:059275 gpstart:shard3:gpadmin-[INFO]:-TEMPORARY_FILES entries are consistent for pg_system filespace
+[shard3] 20130604:19:16:38:059275 gpstart:shard3:gpadmin-[INFO]:-Shutting down master
+[shard3] 20130604:19:16:40:059275 gpstart:shard3:gpadmin-[INFO]:-No standby master configured.  skipping...
+[shard3] 20130604:19:16:40:059275 gpstart:shard3:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+[shard3] ........................ 
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-Process results...
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-----------------------------------------------------
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-   Successful segment starts                                            = 10
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-   Failed segment starts                                                = 0
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-   Skipped segment starts (segments are marked down in configuration)   = 0
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-----------------------------------------------------
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-Successfully started 10 of 10 segment instances 
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-----------------------------------------------------
+[shard3] 20130604:19:17:04:059275 gpstart:shard3:gpadmin-[INFO]:-Starting Master instance shard3.checkbook.comptroller.nyc.gov directory /data/gpsne-1 
+[shard3] 20130604:19:17:05:059275 gpstart:shard3:gpadmin-[INFO]:-Command pg_ctl reports Master shard3.checkbook.comptroller.nyc.gov instance active
+[shard3] 20130604:19:17:09:059275 gpstart:shard3:gpadmin-[INFO]:-Database successfully started
+[shard3] 2
+[shard3] Started successfully in 2 attempt 
+[shard3] 3
+[shard3] Started successfully in 3 attempt 
+[shard3] UPDATE 1
+20130604:19:17:10:034418 gpstart:shard1:gpadmin-[INFO]:-Starting gpstart with args: -a
+20130604:19:17:10:034418 gpstart:shard1:gpadmin-[INFO]:-Gathering information and validating the environment...
+20130604:19:17:10:034418 gpstart:shard1:gpadmin-[INFO]:-Greenplum Binary Version: 'postgres (Greenplum Database) 4.2.2.0 build 6'
+20130604:19:17:10:034418 gpstart:shard1:gpadmin-[INFO]:-Greenplum Catalog Version: '201109210'
+20130604:19:17:10:034418 gpstart:shard1:gpadmin-[INFO]:-Starting Master instance in admin mode
+20130604:19:17:11:034418 gpstart:shard1:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+20130604:19:17:11:034418 gpstart:shard1:gpadmin-[INFO]:-Obtaining Segment details from master...
+20130604:19:17:12:034418 gpstart:shard1:gpadmin-[INFO]:-Setting new master era
+20130604:19:17:12:034418 gpstart:shard1:gpadmin-[INFO]:-Master Started...
+20130604:19:17:12:034418 gpstart:shard1:gpadmin-[INFO]:-Checking for filespace consistency
+20130604:19:17:12:034418 gpstart:shard1:gpadmin-[INFO]:-Obtaining current filespace entries used by TRANSACTION_FILES
+20130604:19:17:12:034418 gpstart:shard1:gpadmin-[INFO]:-TRANSACTION_FILES OIDs are consistent for pg_system filespace
+20130604:19:17:13:034418 gpstart:shard1:gpadmin-[INFO]:-TRANSACTION_FILES entries are consistent for pg_system filespace
+20130604:19:17:13:034418 gpstart:shard1:gpadmin-[INFO]:-Checking for filespace consistency
+20130604:19:17:13:034418 gpstart:shard1:gpadmin-[INFO]:-Obtaining current filespace entries used by TEMPORARY_FILES
+20130604:19:17:13:034418 gpstart:shard1:gpadmin-[INFO]:-TEMPORARY_FILES OIDs are consistent for pg_system filespace
+20130604:19:17:14:034418 gpstart:shard1:gpadmin-[INFO]:-TEMPORARY_FILES entries are consistent for pg_system filespace
+20130604:19:17:14:034418 gpstart:shard1:gpadmin-[INFO]:-Shutting down master
+20130604:19:17:15:034418 gpstart:shard1:gpadmin-[INFO]:-No standby master configured.  skipping...
+20130604:19:17:15:034418 gpstart:shard1:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+................. 
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-Process results...
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-   Successful segment starts                                            = 10
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-   Failed segment starts                                                = 0
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-   Skipped segment starts (segments are marked down in configuration)   = 0
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-Successfully started 10 of 10 segment instances 
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-----------------------------------------------------
+20130604:19:17:32:034418 gpstart:shard1:gpadmin-[INFO]:-Starting Master instance shard1.checkbook.comptroller.nyc.gov directory /data/gpsne-1 
+20130604:19:17:34:034418 gpstart:shard1:gpadmin-[INFO]:-Command pg_ctl reports Master shard1.checkbook.comptroller.nyc.gov instance active
+20130604:19:17:34:034418 gpstart:shard1:gpadmin-[INFO]:-Database successfully started
+[shard3] /home/gpadmin/ETL/clean_sync.sh
+[shard3] removing /data/gpsne-1.old
+[shard3] removing /vol0/gpsne0.old
+[shard3] removing /vol0/gpsne5.old
+[shard3] removing /vol1/gpsne1.old
+[shard3] removing /vol1/gpsne6.old
+[shard3] removing /vol2/gpsne2.old
+[shard3] removing /vol2/gpsne7.old
+[shard3] removing /vol3/gpsne3.old
+[shard3] removing /vol3/gpsne8.old
+[shard3] removing /vol4/gpsne4.old
+[shard3] removing /vol4/gpsne9.old

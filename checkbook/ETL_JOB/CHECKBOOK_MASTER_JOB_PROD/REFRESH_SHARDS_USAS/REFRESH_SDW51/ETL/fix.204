@@ -1,0 +1,66 @@
+Timing is on.
+SET
+Time: 48.292 ms
+BEGIN
+Time: 0.384 ms
+TRUNCATE TABLE
+Time: 1214.085 ms
+DROP INDEX
+Time: 2.939 ms
+DROP INDEX
+Time: 0.891 ms
+DROP INDEX
+Time: 0.668 ms
+DROP INDEX
+Time: 0.922 ms
+DROP INDEX
+Time: 0.594 ms
+DROP INDEX
+Time: 0.578 ms
+DROP INDEX
+Time: 0.580 ms
+DROP INDEX
+Time: 0.633 ms
+DROP INDEX
+Time: 0.519 ms
+DROP INDEX
+Time: 0.475 ms
+DROP INDEX
+Time: 0.472 ms
+DROP INDEX
+Time: 0.460 ms
+DROP INDEX
+Time: 0.508 ms
+DROP INDEX
+Time: 0.515 ms
+DROP INDEX
+Time: 0.576 ms
+DROP INDEX
+Time: 0.585 ms
+INSERT 0 39651084
+Time: 599949.187 ms
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2000"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2001"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2002"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2003"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2004"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2005"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2006"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2007"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2008"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2009"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2010"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2011"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2012"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_2013"
+psql:./tmp/etl.sql.204:24: NOTICE:  building index for child partition "aggregateonpop_cdandaward_1_prt_yr_other"
+CREATE INDEX
+Time: 40195.723 ms
+COMMIT
+Time: 5648.206 ms
+VACUUM
+Time: 21736.072 ms
+
+real	11m8.828s
+user	0m0.006s
+sys	0m0.001s

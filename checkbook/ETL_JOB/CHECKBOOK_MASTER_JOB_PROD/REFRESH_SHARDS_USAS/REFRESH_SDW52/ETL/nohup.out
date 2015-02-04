@@ -1,0 +1,59 @@
+WARNING:  Master mirroring is not synchronized as of 2011-04-07 09:26:23 EDT (Standby master too far behind).  The GPDB system is currently not highly-available
+INSERT 0 1
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Starting gpstop with args: '-ia'
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Gathering information and validating the environment...
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Obtaining Segment details from master...
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-There are 0 connections to the database
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Commencing Master instance shutdown with mode='immediate'
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Master host=localhost
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Commencing Master instance shutdown with mode=immediate
+20110407:09:39:37:gpstop:sdw52:gpadmin-[INFO]:-Master segment instance directory=/data/gpdb_master/gp-1
+20110407:09:39:38:gpstop:sdw52:gpadmin-[INFO]:-No standby master host configured
+20110407:09:39:38:gpstop:sdw52:gpadmin-[INFO]:-Commencing parallel segment instance shutdown, please wait...
+..... 
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-------------------------------------------------
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-Parallel process exit status
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-------------------------------------------------
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-Total processes marked as completed         = 4
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-Total processes marked as failed            = 0 
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-------------------------------------------------
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-Total instances marked invalid and bypassed = 0 
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-Successfully shutdown 4 of 4 segment instances 
+20110407:09:39:43:gpstop:sdw52:gpadmin-[INFO]:-Database successfully shutdown with no errors reported
+mv /data/gpdb_master/gp-1 /data/gpdb_master/gp-1.old
+rsync -a sdw51-1:/data/gpdb_master/gp-1 /data/gpdb_master
+mv /data/gpdb_p1/gp0 /data/gpdb_p1/gp0.old
+rsync -a sdw51-2:/data/gpdb_p1/gp0 /data/gpdb_p1
+mv /data/gpdb_p2/gp1 /data/gpdb_p2/gp1.old
+rsync -a sdw51-3:/data/gpdb_p2/gp1 /data/gpdb_p2
+mv /data/gpdb_p3/gp2 /data/gpdb_p3/gp2.old
+rsync -a sdw51-4:/data/gpdb_p3/gp2 /data/gpdb_p3
+mv /data/gpdb_p4/gp3 /data/gpdb_p4/gp3.old
+rsync -a sdw51-1:/data/gpdb_p4/gp3 /data/gpdb_p4
+20110407:10:00:42:gpstart:sdw52:gpadmin-[INFO]:-Starting gpstart with args: '-a'
+20110407:10:00:42:gpstart:sdw52:gpadmin-[INFO]:-Gathering information and validating the environment...
+20110407:10:00:42:gpstart:sdw52:gpadmin-[INFO]:-local Greenplum Version: 'postgres (Greenplum Database) 3.3.6.1 build 1'
+20110407:10:00:42:gpstart:sdw52:gpadmin-[INFO]:-Starting Master instance in admin mode
+20110407:10:00:44:gpstart:sdw52:gpadmin-[INFO]:-Obtaining Greenplum Master catalog information
+20110407:10:00:44:gpstart:sdw52:gpadmin-[INFO]:-Obtaining Segment details from master...
+20110407:10:00:45:gpstart:sdw52:gpadmin-[INFO]:-Master Started...
+20110407:10:00:45:gpstart:sdw52:gpadmin-[INFO]:-Shutting down master
+20110407:10:00:46:gpstart:sdw52:gpadmin-[INFO]:-No standby master configured.  skipping...
+20110407:10:00:46:gpstart:sdw52:gpadmin-[INFO]:-Commencing parallel segment instance startup, please wait...
+........ 
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-Process results...
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-----------------------------------------------------
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-Total processes marked as completed             = 4
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-Total processes marked as failed                = 0 
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-----------------------------------------------------
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-Total instances marked invalid and bypassed     = 0 
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-Successfully started 4 of 4 segment instances 
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-----------------------------------------------------
+20110407:10:00:54:gpstart:sdw52:gpadmin-[INFO]:-Starting Master instance localhost directory /data/gpdb_master/gp-1 
+20110407:10:00:55:gpstart:sdw52:gpadmin-[INFO]:-Command pg_ctl reports Master localhost instance active
+INFO:  Crash recovery broadcast of the distributed transaction 'Commit Prepared' broadcast succeeded for gid = 1301975906-0000090718.
+20110407:10:00:55:gpstart:sdw52:gpadmin-[INFO]:-Database successfully started with no errors reported
+WARNING:  Master mirroring is not synchronized as of 2011-04-07 09:26:23 EDT (Standby master too far behind).  The GPDB system is currently not highly-available
+UPDATE 1
