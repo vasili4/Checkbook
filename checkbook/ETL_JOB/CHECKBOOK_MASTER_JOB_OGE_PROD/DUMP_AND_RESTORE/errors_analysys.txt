@@ -1,0 +1,8 @@
+checkbook_oge_oge_contract_dump.err:0
+checkbook_oge_oge_contract_restore.err:0
+dump_ref_data.err:0
+dump_transaction_data.err:0
+restore_ref_data.err:0
+restore_transaction_data.err:0
+Truncate_CB_oge_contract.err:0
+truncate_data.err:0

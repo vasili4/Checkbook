@@ -1,0 +1,2 @@
+Data Source Name,Data File Name,Total Records Received,Total Records Staged,Total Malformed Records,Total Invalid Records,Total Records Inserted/Updated in Transaction Tables
+NYCEDC,NYCEDC_CheckBook_07_02_2014_12_01_30.csv, 961.0, 961.0, 0.0, 0.0, 961.0
