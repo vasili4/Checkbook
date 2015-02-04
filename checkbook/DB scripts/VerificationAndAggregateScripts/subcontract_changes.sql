@@ -1515,21 +1515,35 @@ psql -d checkbook_mwbe -f /home/gpadmin/TREDDY/SUB_CONTRACTS/CREATE_NEW_DATABASE
  
  UPDATE etl.etl_data_load_file set processed_flag = 'N' where load_file_id in (11481, 11482, 11483, 11484);
  
+ 
+select a.* from etl.etl_data_load_file a JOIN etl.etl_data_load b ON a.load_id = b.load_id WHERE b.data_source_code IN ('SC','SF','SV','SS') AND b.job_id in (720,721)
+
+update etl.etl_data_load_file a
+SET processed_flag = 'N'
+FROM etl.etl_data_load b
+WHERE a.load_id = b.load_id 
+AND b.data_source_code IN ('SC','SF','SV','SS') AND b.job_id in (736,737,738, 739,740, 741, 742)
+
+select * from etl.etl_data_load_file where load_id in (select load_id from etl.etl_data_load where job_id in (720,721) AND data_source_code IN ('SC','SF','SV','SS')) order by processed_flag
+
+
+/usr/bin/nohup /bin/sh /vol1/data-integration-4.2.0/kitchen.sh -file /vol2share/NYC/NYC_ETL_JOBS/CHECKBOOK_MASTER_JOB_MWBE_TEST/NYC_Master_DEVELOPMENT.kjb -norep -level:Minimal > /vol1/data-integration-4.2.0/NYCETLMaster_MWBE.out &
+
 -- For business types
 
 select max(job_id) from etl.etl_data_load;
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(720, 'SV','2015-01-26 23:00:07.773','Y');
-select load_id from etl.etl_data_load where job_id = 720 and data_source_code = 'SV'; -- 14381
-select * from etl.etl_data_load where load_id = 14381;
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14381,'AIEG_DLY_SCNTRC_BTY_20141101010152.txt','20141101010152','D','Y','Y','N','2015-01-26 11:36:22.03305');
-select * from etl.etl_data_load_file where load_id = 14381;
-load_file_id ===> 14107
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(736, 'SV','2015-02-02 23:00:07.773','Y');
+select load_id from etl.etl_data_load where job_id = 736 and data_source_code = 'SV'; -- 14701
+select * from etl.etl_data_load where load_id = 14701;
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14701,'AIEG_DLY_SCNTRC_BTY_20141101010152.txt','20141101010152','D','Y','Y','N','2015-02-02 11:36:22.03305');
+select * from etl.etl_data_load_file where load_id = 14701;
+load_file_id ===> 14439
 
 cp AIEG_DLY_SCNTRC_BTY_20141101010152.txt ../GPFDIST_DIR/datafiles/scntrc_bus_type_data_feed.txt
 
-select etl.stageandarchivedata(14107);
-select etl.validatedata(14107);
-select etl.processdata(14107);
+select etl.stageandarchivedata(14439);
+select etl.validatedata(14439);
+select etl.processdata(14439);
 
 select count(*) from etl.stg_scntrc_bus_type; 
 select count(*) from subcontract_vendor_business_type;
@@ -1542,26 +1556,26 @@ select distinct scntrc_vend_cd, bus_typ, bus_typ_sta, min_typ from etl.stg_scntr
 
 -- For Sub Contracts status
 
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(720, 'SS','2015-01-26 23:00:07.773','Y');
-select load_id from etl.etl_data_load where job_id = 720 and data_source_code = 'SS';
-select * from etl.etl_data_load where load_id = 14382;
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14382,'AIEG_DLY_SCNTRC_STA_20141101010152.txt','20141101010152','D','Y','Y','N','2015-01-26 11:36:22.03305');
-select * from etl.etl_data_load_file where load_id = 14382;
-load_file_id ===> 14108
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(736, 'SS','2015-02-02 23:00:07.773','Y');
+select load_id from etl.etl_data_load where job_id = 736 and data_source_code = 'SS';
+select * from etl.etl_data_load where load_id = 14702;
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14702,'AIEG_DLY_SCNTRC_STA_20141101010152.txt','20141101010152','D','Y','Y','N','2015-02-02 11:36:22.03305');
+select * from etl.etl_data_load_file where load_id = 14702;
+load_file_id ===> 14440
 cp AIEG_DLY_SCNTRC_STA_20141101010152.txt ../GPFDIST_DIR/datafiles/scntrc_status_data_feed.txt
 
-select etl.stageandarchivedata(14108);
+select etl.stageandarchivedata(14440);
 
 select count(*) from etl.stg_scntrc_status ;
 wc -l /vol2share/NYC/FEEDS/GPFDIST_DIR/datafiles/scntrc_status_data_feed.txt
 
 
-select etl.validatedata(14108);
+select etl.validatedata(14440);
 
 select count(*) from etl.stg_scntrc_status ;
 
 
-select etl.processdata(14108);
+select etl.processdata(14440);
 
 select count(*) from subcontract_status ;
 select distinct doc_cd, doc_dept_cd, doc_id from etl.stg_scntrc_status;
@@ -1570,12 +1584,12 @@ select contract_number, count(*) from subcontract_status group by 1 having count
 -- For SubContract Contracts
 
 
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(720, 'SC','2015-01-26 23:00:07.773','Y');
-select load_id from etl.etl_data_load where job_id = 720 and data_source_code = 'SC';
-select * from etl.etl_data_load where load_id = 14383;
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14383,'AIEG_DLY_SCNTRC_DET_20141101010152.txt','20141101010152','D','Y','Y','N','2015-01-26 11:36:22.03305');
-select * from etl.etl_data_load_file where load_id = 14383;
-load_file_id ===> 14109
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(736, 'SC','2015-02-02 23:00:07.773','Y');
+select load_id from etl.etl_data_load where job_id = 736 and data_source_code = 'SC';
+select * from etl.etl_data_load where load_id = 14703;
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14703,'AIEG_DLY_SCNTRC_DET_20141101010152.txt','20141101010152','D','Y','Y','N','2015-02-02 11:36:22.03305');
+select * from etl.etl_data_load_file where load_id = 14703;
+load_file_id ===> 14441
 cp AIEG_DLY_SCNTRC_DET_20141101010152.txt ../GPFDIST_DIR/datafiles/scntrc_details_data_feed.txt
 
 iconv -f ISO88592 -t UTF8 < scntrc_details_data_feed.txt > scntrc_details_data_feed1.txt
@@ -1583,15 +1597,15 @@ rm -rf scntrc_details_data_feed.txt
 mv scntrc_details_data_feed1.txt scntrc_details_data_feed.txt
 rm -rf scntrc_details_data_feed1.txt
 
-select etl.stageandarchivedata(14109);
+select etl.stageandarchivedata(14441);
 
 select count(*) from etl.stg_scntrc_details;
  wc -l /vol2share/NYC/FEEDS/GPFDIST_DIR/datafiles/scntrc_details_data_feed.txt
 
-select etl.validatedata(14109);
+select etl.validatedata(14441);
 select count(*) from etl.stg_scntrc_details;
 
-select etl.processdata(14109);  
+select etl.processdata(14441);  
 
 
 select count(*) from subcontract_details;
@@ -1601,12 +1615,12 @@ select count(*) from (select distinct doc_cd, doc_dept_cd, doc_id, scntrc_vers_n
 
 -- For SubContract Spending
 
-insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(720, 'SF','2015-01-26 23:00:07.773','Y');
-select load_id from etl.etl_data_load where job_id = 720 and data_source_code = 'SF';
-select * from etl.etl_data_load where load_id = 14384;
-insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14384,'AIEG_DLY_SCNTRC_PMT_20141101010152.txt','20141101010152','D','Y','Y','N','2015-01-26 11:36:22.03305');
-select * from etl.etl_data_load_file where load_id = 14384;
-load_file_id ===> 14110
+insert into etl.etl_data_load(job_id,data_source_code,publish_start_time,files_available_flag) values(736, 'SF','2015-02-02 23:00:07.773','Y');
+select load_id from etl.etl_data_load where job_id = 736 and data_source_code = 'SF';
+select * from etl.etl_data_load where load_id = 14704;
+insert into etl.etl_data_load_file(load_id, file_name,file_timestamp,type_of_feed,consume_flag,pattern_matched_flag,processed_flag,publish_start_time) values(14704,'AIEG_DLY_SCNTRC_PMT_20141101010152.txt','20141101010152','D','Y','Y','N','2015-02-02 11:36:22.03305');
+select * from etl.etl_data_load_file where load_id = 14704;
+load_file_id ===> 14442
 
 cp AIEG_DLY_SCNTRC_PMT_20141101010152.txt ../GPFDIST_DIR/datafiles/scntrc_pymt_data_feed.txt
 
@@ -1617,14 +1631,14 @@ mv scntrc_pymt_data_feed1.txt scntrc_pymt_data_feed.txt
 rm -rf scntrc_pymt_data_feed1.txt
 
 
-select etl.stageandarchivedata(14110);
+select etl.stageandarchivedata(14442);
 select count(*) from etl.stg_scntrc_pymt ;
  wc -l /vol2share/NYC/FEEDS/GPFDIST_DIR/datafiles/scntrc_pymt_data_feed.txt
  
- select etl.validatedata(14110);
+ select etl.validatedata(14442);
 select count(*) from etl.stg_scntrc_pymt;
 
-select etl.processdata(14110);
+select etl.processdata(14442);
 
 select count(*) from subcontract_spending;
 
@@ -1632,16 +1646,16 @@ select count(*) from subcontract_spending;
 
 -- post process sub contracts and sub contract spending
 
-select etl.postProcessSubContracts(720);
+select etl.postProcessSubContracts(736);
 select count(*) from sub_agreement_snapshot;
 select count(*) from sub_agreement_snapshot_cy;
 
 
-select etl.refreshFactsForSubPayments(720);
+select etl.refreshFactsForSubPayments(736);
 select count(*) from subcontract_spending_details ;
 select * from subcontract_spending_details order by vendor_customer_code;
 
-select etl.refreshSubContractsPreAggregateTables(720); 
+select etl.refreshSubContractsPreAggregateTables(736); 
 select count(*) from sub_agreement_snapshot_expanded;
 select count(*) from sub_agreement_snapshot_expanded_cy;
 select count(*), status_flag from sub_agreement_snapshot_expanded group by 2;
@@ -1649,7 +1663,7 @@ select count(*), status_flag from sub_agreement_snapshot_expanded_cy group by 2;
 select count(*), status_flag, fiscal_year from sub_agreement_snapshot_expanded group by 2,3 order by 2,3;
 select count(*), status_flag, fiscal_year from sub_agreement_snapshot_expanded_cy group by 2,3 order by 2,3;
 
-select etl.refreshCommonTransactionTables(720);
+select etl.refreshCommonTransactionTables(736);
 select count(*) from all_agreement_transactions where is_prime_or_sub = 'P';
 select count(*) from all_agreement_transactions where is_prime_or_sub = 'S';
 select count(*) from agreement_snapshot;
@@ -1662,8 +1676,8 @@ select count(*) from subcontract_spending_details;
   
 
 
-
-select etl.temprefreshsubvenaggregates(720);
+select etl.refreshaggregates(736);
+select etl.temprefreshsubvenaggregates(736);
 
 select etl.grantaccess('webuser1','SELECT');
 
@@ -1716,5 +1730,82 @@ select count(*) from aggregateon_subven_contracts_spending_by_month;
 select count(*) from aggregateon_subven_total_contracts;
  select fiscal_year, type_of_year, status_flag, sum(total_contracts), sum(total_master_agreements), sum(total_contracts_amount), sum(total_spending_amount) from aggregateon_subven_total_contracts group by 1,2,3 order by 1,2,3;
 
+
+select count(*) from sub_agreement_snapshot_cy  where registered_year = 2014
+
+select count(*) from subcontract_details where latest_flag = 'Y'
+
+select contract_number, count(*) from sub_agreement_snapshot_cy  group by 1 order by 1
+
+select contract_number, original_agreement_id, document_version, agency_name, starting_year, ending_year, registered_year,  
+sub_contract_id, original_contract_amount, maximum_contract_amount, vendor_name, prime_vendor_id, effective_begin_year, effective_end_year, original_version_flag, latest_flag
+from sub_agreement_snapshot where contract_number = 'CT184620141404681' order by contract_number, document_version  , sub_contract_id 
+
+
+
+select contract_number, original_agreement_id, document_version, agency_name, starting_year, ending_year, registered_year,  
+sub_contract_id, original_contract_amount, maximum_contract_amount, vendor_name, prime_vendor_id, effective_begin_year, effective_end_year, original_version_flag, latest_flag
+from sub_agreement_snapshot_cy where contract_number = 'CT184620141404681' order by contract_number, document_version  , sub_contract_id 
+
+select contract_number, original_agreement_id, document_version, agency_name, starting_year, ending_year, registered_year,  
+sub_contract_id, original_contract_amount, maximum_contract_amount, vendor_name, prime_vendor_id, effective_begin_year, effective_end_year, original_version_flag, latest_flag
+from sub_agreement_snapshot_cy where contract_number = 'CT184620141404681' and sub_contract_id = '001' order by contract_number, document_version  , sub_contract_id 
+
+
+select * from subcontract_details where contract_number = 'CT184620141404681' and sub_contract_id = '001'
+
+
+select contract_number, starting_year, ending_year, registered_year, effective_begin_year, effective_end_year from sub_agreement_snapshot where registered_year = 2015 order by ending_year
+
+
+"CT180620151402947";2014;2014;2015;2014;2014
+"CT180620150002612";2014;2014;2015;2014;2014
+"CT180620151402794";2014;2014;2015;2014;2014
+"CT180620151402794";2014;2014;2015;2014;2014
+"CT180620151402947";2014;2014;2015;2014;2014
+"CT180620151403981";2014;2014;2015;2014;2014
+"CT180620151403815";2014;2014;2015;2014;2014
+"CT180620151402794";2014;2014;2015;2014;2014
+"CT180620150002612";2014;2014;2015;2014;2014
+"CT180620151402946";2014;2014;2015;2014;2014
+"CT180620151400755";2014;2014;2015;2014;2014
+"CT180620150002612";2014;2014;2015;2014;2014
+"CT180620151400755";2014;2014;2015;2014;2014
+"CT180620151402794";2014;2014;2015;2014;2014
+"CT180620151403815";2014;2014;2015;2014;2014
+"CT180620151402046";2014;2014;2015;2014;2014
+"CT180620151403815";2014;2014;2015;2014;2014
+"CT180620151402046";2014;2014;2015;2014;2014
+"CT180620151403981";2014;2014;2015;2014;2014
+"CT180620151402947";2014;2014;2015;2014;2014
+"CT180620150002612";2014;2014;2015;2014;2014
+"CT180620151400755";2014;2014;2015;2014;2014
+"CT180620151403981";2014;2014;2015;2014;2014
+"CT185020141427601";2015;2016;2015;2015;2016
+"CT185020151410113";2015;2016;2015;2015;2016
+"CT185020141427946";2015;2016;2015;2015;2016
+"CT184620151406722";2015;2016;2015;2015;2016
+"CT184620141429281";2015;2016;2015;2015;2016
+"CTA185020157200977";2015;2016;2015;2015;2016
+"CT184620151406722";2015;2016;2015;2015;2016
+"CT184620151411807";2015;2016;2015;2015;2016
+
+
+select contract_number, starting_year, ending_year, registered_year, effective_begin_year, effective_end_year,
+(CASE     			  WHEN (effective_end_year IS NULL OR effective_end_year < registered_year) 
+		              AND registered_year IS NOT NULL AND starting_year < registered_year THEN registered_year
+	        		      WHEN effective_end_year < starting_year OR effective_end_year IS NULL THEN starting_year
+	        		      ELSE effective_end_year END) as mod_ending_year
+from sub_agreement_snapshot where registered_year IS NULL order by ending_year
+
+
+
 process all sub contract files, pending contract file and all other files from 20150111  
+
+1) restore the dumps checkbook_prod__2015-02-02.dump in checkbook and/or checkbook_ogent_prod__2015-02-02.dump in checkbook_ogent
+2) make required changes to SOLR_STATUS_EMAIL.ktr, STAGE_AND_ARCHIVE.ktr, NYC_Master.kjb and EXIT_CONDITION.ktr of checkbook etl job
+3) make changes in kettle.properties for emails (FMS_ or OASIS_)
+4) Copy all the files from february 1st into SOURCE_DIR folder
+5) run the ETL job in master
+
 */
