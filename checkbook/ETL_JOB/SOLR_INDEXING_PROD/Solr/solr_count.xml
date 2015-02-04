@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+
+<lst name="responseHeader">
+  <int name="status">0</int>
+  <int name="QTime">2</int>
+  <lst name="params">
+    <str name="indent">on</str>
+    <str name="start">0</str>
+    <str name="q">*:*</str>
+    <str name="rows">10</str>
+    <str name="version">2.2</str>
+  </lst>
+</lst>
+<result name="response" numFound="62672560" start="0">
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">4226.09</double>
+    <str name="department_id">103744</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:86:8532188</str>
+    <str name="agency_id">86</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">111307</str>
+    <str name="budget_code">0441</str>
+    <str name="budget_code_text">0441</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">003</str>
+    <str name="department_name">WATER SUP. &amp; WASTEWATER COLL</str>
+    <str name="department_name_text">WATER SUP. &amp; WASTEWATER COLL</str>
+    <str name="vendor_name">WATER SUP. &amp; WASTEWATER COLL</str>
+    <str name="vendor_name_text">WATER SUP. &amp; WASTEWATER COLL</str>
+    <str name="vendor_name_autocomplete">WATER SUP. &amp; WASTEWATER COLL</str>
+    <str name="agency_code">826</str>
+    <str name="agency_name_id">Department of Environmental Protection[86]</str>
+    <str name="spending_transaction_id">8532188</str>
+    <str name="department_name_code">water sup. &amp; wastewater coll[003]</str>
+    <str name="agency_name">Department of Environmental Protection</str>
+    <str name="agency_name_text">Department of Environmental Protection</str>
+    <str name="agency_name_export">Department of Environmental Protection</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[0441]</str>
+    <str name="budget_code_name_code_autocomplete">[0441]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708010758144</long>
+    <date name="timestamp">2015-01-20T03:52:28.344Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">3141.48</double>
+    <str name="department_id">106869</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:151:8527534</str>
+    <str name="agency_id">151</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">214713</str>
+    <str name="budget_code">3955</str>
+    <str name="budget_code_text">3955</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">102</str>
+    <str name="department_name">DISEASE CONTROL AND EPIDEMIOLOGY - PS</str>
+    <str name="department_name_text">DISEASE CONTROL AND EPIDEMIOLOGY - PS</str>
+    <str name="vendor_name">DISEASE CONTROL AND EPIDEMIOLOGY - PS</str>
+    <str name="vendor_name_text">DISEASE CONTROL AND EPIDEMIOLOGY - PS</str>
+    <str name="vendor_name_autocomplete">DISEASE CONTROL AND EPIDEMIOLOGY - PS</str>
+    <str name="agency_code">816</str>
+    <str name="agency_name_id">Department of Health and Mental Hygiene[151]</str>
+    <str name="spending_transaction_id">8527534</str>
+    <str name="department_name_code">disease control and epidemiology - ps[102]</str>
+    <str name="agency_name">Department of Health and Mental Hygiene</str>
+    <str name="agency_name_text">Department of Health and Mental Hygiene</str>
+    <str name="agency_name_export">Department of Health and Mental Hygiene</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[3955]</str>
+    <str name="budget_code_name_code_autocomplete">[3955]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708011806720</long>
+    <date name="timestamp">2015-01-20T03:52:28.345Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">245.1</double>
+    <str name="department_id">180411</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:212:8529179</str>
+    <str name="agency_id">212</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">56630</str>
+    <str name="budget_code">5160</str>
+    <str name="budget_code_text">5160</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">001</str>
+    <str name="department_name">PERSONAL SERVICES</str>
+    <str name="department_name_text">PERSONAL SERVICES</str>
+    <str name="vendor_name">PERSONAL SERVICES</str>
+    <str name="vendor_name_text">PERSONAL SERVICES</str>
+    <str name="vendor_name_autocomplete">PERSONAL SERVICES</str>
+    <str name="agency_code">810</str>
+    <str name="agency_name_id">Department of Buildings[212]</str>
+    <str name="spending_transaction_id">8529179</str>
+    <str name="department_name_code">personal services[001]</str>
+    <str name="agency_name">Department of Buildings</str>
+    <str name="agency_name_text">Department of Buildings</str>
+    <str name="agency_name_export">Department of Buildings</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[5160]</str>
+    <str name="budget_code_name_code_autocomplete">[5160]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708011806721</long>
+    <date name="timestamp">2015-01-20T03:52:28.345Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">10750.31</double>
+    <str name="department_id">103417</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:51:8532100</str>
+    <str name="agency_id">51</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">162233</str>
+    <str name="budget_code">3100</str>
+    <str name="budget_code_text">3100</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">003</str>
+    <str name="department_name">SCHOOL SAFETY- P.S.</str>
+    <str name="department_name_text">SCHOOL SAFETY- P.S.</str>
+    <str name="vendor_name">SCHOOL SAFETY- P.S.</str>
+    <str name="vendor_name_text">SCHOOL SAFETY- P.S.</str>
+    <str name="vendor_name_autocomplete">SCHOOL SAFETY- P.S.</str>
+    <str name="agency_code">056</str>
+    <str name="agency_name_id">Police Department[51]</str>
+    <str name="spending_transaction_id">8532100</str>
+    <str name="department_name_code">school safety- p.s.[003]</str>
+    <str name="agency_name">Police Department</str>
+    <str name="agency_name_text">Police Department</str>
+    <str name="agency_name_export">Police Department</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[3100]</str>
+    <str name="budget_code_name_code_autocomplete">[3100]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708011806722</long>
+    <date name="timestamp">2015-01-20T03:52:28.345Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">13941.03</double>
+    <str name="department_id">299705</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:209:8532630</str>
+    <str name="agency_id">209</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">250106</str>
+    <str name="budget_code">1220</str>
+    <str name="budget_code_text">1220</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">001</str>
+    <str name="department_name">EXEC MGMT &amp; ADMIN</str>
+    <str name="department_name_text">EXEC MGMT &amp; ADMIN</str>
+    <str name="vendor_name">EXEC MGMT &amp; ADMIN</str>
+    <str name="vendor_name_text">EXEC MGMT &amp; ADMIN</str>
+    <str name="vendor_name_autocomplete">EXEC MGMT &amp; ADMIN</str>
+    <str name="agency_code">846</str>
+    <str name="agency_name_id">Department of Parks and Recreation[209]</str>
+    <str name="spending_transaction_id">8532630</str>
+    <str name="department_name_code">exec mgmt &amp; admin[001]</str>
+    <str name="agency_name">Department of Parks and Recreation</str>
+    <str name="agency_name_text">Department of Parks and Recreation</str>
+    <str name="agency_name_export">Department of Parks and Recreation</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[1220]</str>
+    <str name="budget_code_name_code_autocomplete">[1220]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708012855296</long>
+    <date name="timestamp">2015-01-20T03:52:28.346Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">1294.66</double>
+    <str name="department_id">246627</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:197:8529454</str>
+    <str name="agency_id">197</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">179049</str>
+    <str name="budget_code">3087</str>
+    <str name="budget_code_text">3087</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">102</str>
+    <str name="department_name">CLEANING &amp; COLLECTION</str>
+    <str name="department_name_text">CLEANING &amp; COLLECTION</str>
+    <str name="vendor_name">CLEANING &amp; COLLECTION</str>
+    <str name="vendor_name_text">CLEANING &amp; COLLECTION</str>
+    <str name="vendor_name_autocomplete">CLEANING &amp; COLLECTION</str>
+    <str name="agency_code">827</str>
+    <str name="agency_name_id">Department of Sanitation[197]</str>
+    <str name="spending_transaction_id">8529454</str>
+    <str name="department_name_code">cleaning &amp; collection[102]</str>
+    <str name="agency_name">Department of Sanitation</str>
+    <str name="agency_name_text">Department of Sanitation</str>
+    <str name="agency_name_export">Department of Sanitation</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[3087]</str>
+    <str name="budget_code_name_code_autocomplete">[3087]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708012855297</long>
+    <date name="timestamp">2015-01-20T03:52:28.346Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">8.25</double>
+    <str name="department_id">180411</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:212:8536296</str>
+    <str name="agency_id">212</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">71692</str>
+    <str name="budget_code">5051</str>
+    <str name="budget_code_text">5051</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">001</str>
+    <str name="department_name">PERSONAL SERVICES</str>
+    <str name="department_name_text">PERSONAL SERVICES</str>
+    <str name="vendor_name">PERSONAL SERVICES</str>
+    <str name="vendor_name_text">PERSONAL SERVICES</str>
+    <str name="vendor_name_autocomplete">PERSONAL SERVICES</str>
+    <str name="agency_code">810</str>
+    <str name="agency_name_id">Department of Buildings[212]</str>
+    <str name="spending_transaction_id">8536296</str>
+    <str name="department_name_code">personal services[001]</str>
+    <str name="agency_name">Department of Buildings</str>
+    <str name="agency_name_text">Department of Buildings</str>
+    <str name="agency_name_export">Department of Buildings</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[5051]</str>
+    <str name="budget_code_name_code_autocomplete">[5051]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708086255616</long>
+    <date name="timestamp">2015-01-20T03:52:28.417Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">163.4</double>
+    <str name="department_id">323577</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:197:8534972</str>
+    <str name="agency_id">197</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">250402</str>
+    <str name="budget_code">1017</str>
+    <str name="budget_code_text">1017</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">101</str>
+    <str name="department_name">EXECUTIVE ADMINISTRATIVE</str>
+    <str name="department_name_text">EXECUTIVE ADMINISTRATIVE</str>
+    <str name="vendor_name">EXECUTIVE ADMINISTRATIVE</str>
+    <str name="vendor_name_text">EXECUTIVE ADMINISTRATIVE</str>
+    <str name="vendor_name_autocomplete">EXECUTIVE ADMINISTRATIVE</str>
+    <str name="agency_code">827</str>
+    <str name="agency_name_id">Department of Sanitation[197]</str>
+    <str name="spending_transaction_id">8534972</str>
+    <str name="department_name_code">executive administrative[101]</str>
+    <str name="agency_name">Department of Sanitation</str>
+    <str name="agency_name_text">Department of Sanitation</str>
+    <str name="agency_name_export">Department of Sanitation</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[1017]</str>
+    <str name="budget_code_name_code_autocomplete">[1017]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708087304192</long>
+    <date name="timestamp">2015-01-20T03:52:28.417Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">141787.77</double>
+    <str name="department_id">98196</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:124:8530527</str>
+    <str name="agency_id">124</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">88536</str>
+    <str name="budget_code">1400</str>
+    <str name="budget_code_text">1400</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">001</str>
+    <str name="department_name">OFFICE OF ADMINISTRATION</str>
+    <str name="department_name_text">OFFICE OF ADMINISTRATION</str>
+    <str name="vendor_name">OFFICE OF ADMINISTRATION</str>
+    <str name="vendor_name_text">OFFICE OF ADMINISTRATION</str>
+    <str name="vendor_name_autocomplete">OFFICE OF ADMINISTRATION</str>
+    <str name="agency_code">806</str>
+    <str name="agency_name_id">Housing Preservation and Development[124]</str>
+    <str name="spending_transaction_id">8530527</str>
+    <str name="department_name_code">office of administration[001]</str>
+    <str name="agency_name">Housing Preservation and Development</str>
+    <str name="agency_name_text">Housing Preservation and Development</str>
+    <str name="agency_name_export">Housing Preservation and Development</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[1400]</str>
+    <str name="budget_code_name_code_autocomplete">[1400]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708087304193</long>
+    <date name="timestamp">2015-01-20T03:52:28.417Z</date></doc>
+  <doc>
+    <str name="fiscal_year_id">115</str>
+    <str name="fund_class_code">001</str>
+    <double name="check_amount">18623.72</double>
+    <str name="department_id">63736</str>
+    <str name="expenditure_object_name_id">Payroll Summary[5]</str>
+    <str name="expenditure_object_name_code">payroll summary[!PS!]</str>
+    <str name="spending_category_name_code">payroll[p]</str>
+    <str name="id">spending:9:8529423</str>
+    <str name="agency_id">9</str>
+    <arr name="expenditure_object_name">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_text">
+      <str>Payroll Summary</str>
+    </arr>
+    <arr name="expenditure_object_name_autocomplete">
+      <str>Payroll Summary</str>
+    </arr>
+    <str name="spending_category_id">2</str>
+    <str name="budget_code_id">133325</str>
+    <str name="budget_code">0253</str>
+    <str name="budget_code_text">0253</str>
+    <str name="spending_category_name">Payroll</str>
+    <date name="check_eft_issued_date">2013-07-05T05:00:00Z</date>
+    <str name="check_eft_issued_date_export">2013-07-05</str>
+    <str name="budget_code_name"/>
+    <str name="budget_code_name_text"/>
+    <str name="budget_code_name_autocomplete"/>
+    <str name="fund_class_id">2</str>
+    <str name="department_code">020</str>
+    <str name="department_name">OFFICE OF THE MAYOR-PS</str>
+    <str name="department_name_text">OFFICE OF THE MAYOR-PS</str>
+    <str name="vendor_name">OFFICE OF THE MAYOR-PS</str>
+    <str name="vendor_name_text">OFFICE OF THE MAYOR-PS</str>
+    <str name="vendor_name_autocomplete">OFFICE OF THE MAYOR-PS</str>
+    <str name="agency_code">002</str>
+    <str name="agency_name_id">Mayoralty[9]</str>
+    <str name="spending_transaction_id">8529423</str>
+    <str name="department_name_code">office of the mayor-ps[020]</str>
+    <str name="agency_name">Mayoralty</str>
+    <str name="agency_name_text">Mayoralty</str>
+    <str name="agency_name_export">Mayoralty</str>
+    <str name="fiscal_year">2014</str>
+    <str name="expenditure_object_code">!PS!</str>
+    <str name="budget_code_name_code">[0253]</str>
+    <str name="budget_code_name_code_autocomplete">[0253]</str>
+    <str name="domain">spending</str>
+    <str name="expenditure_object_id">5</str>
+    <long name="_version_">1490787708087304194</long>
+    <date name="timestamp">2015-01-20T03:52:28.417Z</date></doc>
+</result>
+</response>
