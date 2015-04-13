@@ -349,7 +349,14 @@ namespace { //global
                       GROUP BY vendor_id, agency_id, year_id, type_of_year, minority_type_id, is_prime_or_sub LIMIT 1";
 
                 $results = _checkbook_project_execute_sql_by_data_source($query,'checkbook');
-
+                if(!$results){
+                    $query = "SELECT year_id, minority_type_id
+                              FROM contract_vendor_latest_mwbe_category
+                              WHERE  vendor_id = ".$vendor_id
+                        ."AND type_of_year ='".$year_type."'"
+                        ." ORDER BY year_id DESC LIMIT 1 ";
+                    $results = _checkbook_project_execute_sql_by_data_source($query,'checkbook');
+                }
                 if($results[0]['minority_type_id'] != ''){
                    return $results[0]['minority_type_id'];
                 }
