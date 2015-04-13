@@ -255,6 +255,7 @@ function _checkbook_alerts_unsubscribe() {
  */
 function _checkbook_alerts_activate() {
     $arg = arg(2);
+    $GLOBALS['conf']['cache'] = FALSE;
 
     //Un-subscribed
     $message = 'Your alert activation link is no longer active. You have unsubscribed from this alert.';
