@@ -75,16 +75,17 @@ function _checkbook_alerts_transactions(){
         'un_subscribed_date'=>null
     );
 
-  if(($a=$alerts->fetchObject())!=null) {
-      $alert['checkbook_alerts_sysid']=$a->checkbook_alerts_sysid;
-      $alert['active']=$a->active;
-      $alert['active_date']=$a->active_date;
-      $alert['un_subscribed_date']=$a->null;
-      drupal_write_record('checkbook_alerts',$alert,array("checkbook_alerts_sysid"));
-  }
-  else {
-      drupal_write_record('checkbook_alerts',$alert);
-  }
+//  if(($a=$alerts->fetchObject())!=null) {
+//      $alert['checkbook_alerts_sysid']=$a->checkbook_alerts_sysid;
+//      $alert['active']=$a->active;
+//      $alert['active_date']=$a->active_date;
+//      $alert['un_subscribed_date']=$a->null;
+//      drupal_write_record('checkbook_alerts',$alert,array("checkbook_alerts_sysid"));
+//  }
+//  else {
+//      drupal_write_record('checkbook_alerts',$alert);
+//  }
+    drupal_write_record('checkbook_alerts',$alert);
   $alertFrequency=_checkbook_alerts_alertFrequency($_GET['alert_minimum_days']);
 
     $link_expire_date = date("Y-m-d H:i:s",strtotime("+7 day", strtotime($alert["created_date"])));
