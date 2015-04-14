@@ -77,8 +77,8 @@ function _checkbook_alerts_transactions(){
 
   if(($a=$alerts->fetchObject())!=null) {
       $alert['checkbook_alerts_sysid']=$a->checkbook_alerts_sysid;
-      $alert['active']=$a->active;
-      $alert['active_date']=$a->active_date;
+      $alert['active']='N';
+      $alert['active_date']=$a->null;
       $alert['un_subscribed_date']=$a->null;
       drupal_write_record('checkbook_alerts',$alert,array("checkbook_alerts_sysid"));
   }
