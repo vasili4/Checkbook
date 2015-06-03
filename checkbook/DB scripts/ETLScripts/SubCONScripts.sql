@@ -684,14 +684,14 @@ BEGIN
 		 UPDATE 	tmp_sub_agreement_snapshot
 		SET	starting_year = effective_begin_fiscal_year,
 		starting_year_id = effective_begin_fiscal_year_id
-		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year AND effective_begin_fiscal_year IS NOT NULL ;
 		
 		UPDATE 	tmp_sub_agreement_snapshot a
 		SET	starting_year = a.registered_fiscal_year,
 		starting_year_id = b.year_id
 		FROM	ref_year b
 		WHERE a.registered_fiscal_year = b.year_value 
-		AND rank_value = 1 AND starting_year > registered_fiscal_year ;
+		AND rank_value = 1 AND starting_year > registered_fiscal_year AND registered_fiscal_year IS NOT NULL;
 		
 		
 	-- Updating the ending year to be ending year - 1 
@@ -870,7 +870,7 @@ BEGIN
 		 UPDATE 	tmp_sub_agreement_snapshot
 		SET	starting_year = effective_begin_fiscal_year,
 		starting_year_id = effective_begin_fiscal_year_id
-		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year AND effective_begin_fiscal_year IS NOT NULL;
 		 
 		UPDATE 	tmp_sub_agreement_snapshot a
 		SET	starting_year = a.registered_fiscal_year,
@@ -1354,7 +1354,8 @@ BEGIN
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, has_mwbe_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
-            is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
+            is_minority_vendor, vendor_type, contract_original_agreement_id, 
+            is_subvendor, associated_prime_vendor_name, mwbe_category_ui, job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1375,7 +1376,10 @@ BEGIN
             load_id, last_modified_date, b.nyc_year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
-            original_agreement_id as contract_original_agreement_id, job_id
+            original_agreement_id as contract_original_agreement_id, 
+            'No' as is_subvendor, 'N/A' as associated_prime_vendor_name, 
+            (CASE WHEN minority_type_id = 2 THEN 'Black American' WHEN minority_type_id = 3 THEN 'Hispanic American' WHEN minority_type_id = 7 THEN 'Non-M/WBE'
+				  WHEN minority_type_id = 9 THEN 'Women' WHEN minority_type_id = 11 THEN 'Individuals and Others' ELSE 'Asian American' END) AS mwbe_category_ui, job_id
        FROM agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date;
        
        
@@ -1397,7 +1401,8 @@ BEGIN
             rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
             master_agreement_id,master_contract_number,master_agreement_yn,
             latest_flag, load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
-            is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
+            is_minority_vendor, vendor_type, contract_original_agreement_id, 
+            is_subvendor, associated_prime_vendor_name, mwbe_category_ui, job_id)
      SELECT a.original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1418,7 +1423,10 @@ BEGIN
             latest_flag, load_id, last_modified_date,  b.nyc_year_id as last_modified_year_id, 'S' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type, 
-            d.original_agreement_id as contract_original_agreement_id, job_id
+            d.original_agreement_id as contract_original_agreement_id, 
+            'Yes' as is_subvendor, (CASE WHEN a.prime_vendor_id = 0 THEN 'N/A (PRIVACY/SECURITY)' ELSE c.legal_name END) as associated_prime_vendor_name, 
+            (CASE WHEN minority_type_id = 2 THEN 'Black American' WHEN minority_type_id = 3 THEN 'Hispanic American' WHEN minority_type_id = 7 THEN 'Non-M/WBE'
+				  WHEN minority_type_id = 9 THEN 'Women' WHEN minority_type_id = 11 THEN 'Individuals and Others' ELSE 'Asian American' END) AS mwbe_category_ui, job_id
      FROM sub_agreement_snapshot a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
      LEFT JOIN vendor c ON a.prime_vendor_id = c.vendor_id
      LEFT JOIN (select original_agreement_id, contract_number from history_agreement where latest_flag = 'Y') d ON a.contract_number = d.contract_number;
@@ -1454,7 +1462,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             tracking_number, rfed_amount, minority_type_id, minority_type_name, 
             master_agreement_yn, has_children, has_mwbe_children, original_version_flag, latest_flag, 
             load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
-            is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
+            is_minority_vendor, vendor_type, contract_original_agreement_id, 
+            is_subvendor, associated_prime_vendor_name, mwbe_category_ui, job_id)
     SELECT  original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1475,7 +1484,10 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             load_id, last_modified_date, c.year_id as last_modified_year_id, 'P' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
-            original_agreement_id as contract_original_agreement_id, job_id
+            original_agreement_id as contract_original_agreement_id, 
+            'No' as is_subvendor, 'N/A' as associated_prime_vendor_name, 
+            (CASE WHEN minority_type_id = 2 THEN 'Black American' WHEN minority_type_id = 3 THEN 'Hispanic American' WHEN minority_type_id = 7 THEN 'Non-M/WBE'
+				  WHEN minority_type_id = 9 THEN 'Women' WHEN minority_type_id = 11 THEN 'Individuals and Others' ELSE 'Asian American' END) AS mwbe_category_ui, job_id
        FROM agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
         LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id;
        
@@ -1498,7 +1510,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             rfed_amount, minority_type_id, minority_type_name, original_version_flag, 
             master_agreement_id,master_contract_number, master_agreement_yn,
             latest_flag, load_id, last_modified_date, last_modified_year_id, is_prime_or_sub, 
-            is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
+            is_minority_vendor, vendor_type, contract_original_agreement_id, 
+            is_subvendor, associated_prime_vendor_name, mwbe_category_ui, job_id)
      SELECT a.original_agreement_id, document_version, document_code_id, agency_history_id, 
             agency_id, agency_code, agency_name, agreement_id, starting_year, 
             starting_year_id, ending_year, ending_year_id, registered_year, 
@@ -1519,7 +1532,10 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             latest_flag, load_id, last_modified_date, c.year_id as last_modified_year_id,'S' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type,
-            e.original_agreement_id as contract_original_agreement_id, job_id
+            e.original_agreement_id as contract_original_agreement_id, 
+            'Yes' as is_subvendor, (CASE WHEN a.prime_vendor_id = 0 THEN 'N/A (PRIVACY/SECURITY)' ELSE d.legal_name END) as associated_prime_vendor_name, 
+            (CASE WHEN minority_type_id = 2 THEN 'Black American' WHEN minority_type_id = 3 THEN 'Hispanic American' WHEN minority_type_id = 7 THEN 'Non-M/WBE'
+				  WHEN minority_type_id = 9 THEN 'Women' WHEN minority_type_id = 11 THEN 'Individuals and Others' ELSE 'Asian American' END) AS mwbe_category_ui, job_id
      FROM sub_agreement_snapshot_cy a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
         LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
         LEFT JOIN vendor d ON a.prime_vendor_id = d.vendor_id
@@ -1564,7 +1580,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             contract_minority_type_id_cy, master_contract_minority_type_id, 
             master_contract_minority_type_id_cy, file_type, load_id, last_modified_date,
             last_modified_fiscal_year_id, last_modified_calendar_year_id,
-            is_prime_or_sub, is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
+            is_prime_or_sub, is_minority_vendor, vendor_type, contract_original_agreement_id, 
+            is_subvendor, associated_prime_vendor_name, mwbe_category_ui, job_id)
      SELECT disbursement_line_item_id, disbursement_id, line_number, disbursement_number, 
             check_eft_issued_date_id, check_eft_issued_nyc_year_id, fiscal_year, 
             check_eft_issued_cal_month_id, agreement_id, master_agreement_id, 
@@ -1597,7 +1614,10 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             'P' as is_prime_or_sub,
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'PM' ELSE 'P' END) as vendor_type,
-            agreement_id as contract_original_agreement_id, job_id
+            agreement_id as contract_original_agreement_id, 
+            'No' as is_subvendor, 'N/A' as associated_prime_vendor_name, 
+            (CASE WHEN minority_type_id = 2 THEN 'Black American' WHEN minority_type_id = 3 THEN 'Hispanic American' WHEN minority_type_id = 7 THEN 'Non-M/WBE'
+				  WHEN minority_type_id = 9 THEN 'Women' WHEN minority_type_id = 11 THEN 'Individuals and Others' ELSE 'Asian American' END) AS mwbe_category_ui,job_id
     FROM disbursement_line_item_details a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
         LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
     WHERE job_id = p_job_id_in;
@@ -1621,7 +1641,8 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             master_agreement_id,master_contract_number,
             file_type, load_id, last_modified_date, 
             last_modified_fiscal_year_id, last_modified_calendar_year_id,
-            is_prime_or_sub, is_minority_vendor, vendor_type, contract_original_agreement_id, job_id)
+            is_prime_or_sub, is_minority_vendor, vendor_type, contract_original_agreement_id, 
+            is_subvendor, associated_prime_vendor_name, mwbe_category_ui, job_id)
    SELECT  disbursement_line_item_id, disbursement_number, payment_id, check_eft_issued_date_id, 
             check_eft_issued_nyc_year_id, fiscal_year, check_eft_issued_cal_month_id, 
             agreement_id, check_amount, agency_id, agency_history_id, agency_code, 
@@ -1643,7 +1664,10 @@ DELETE FROM ONLY all_agreement_transactions_cy a
             'S' as is_prime_or_sub, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'Y' ELSE 'N' END) as is_minority_vendor, 
             (CASE WHEN minority_type_id in (2,3,4,5,9) THEN 'SM' ELSE 'S' END) as vendor_type, 
-            e.original_agreement_id as contract_original_agreement_id, job_id
+            e.original_agreement_id as contract_original_agreement_id, 
+             'Yes' as is_subvendor, (CASE WHEN a.prime_vendor_id = 0 THEN 'N/A (PRIVACY/SECURITY)' ELSE d.legal_name END) as associated_prime_vendor_name, 
+            (CASE WHEN minority_type_id = 2 THEN 'Black American' WHEN minority_type_id = 3 THEN 'Hispanic American' WHEN minority_type_id = 7 THEN 'Non-M/WBE'
+				  WHEN minority_type_id = 9 THEN 'Women' WHEN minority_type_id = 11 THEN 'Individuals and Others' ELSE 'Asian American' END) AS mwbe_category_ui,job_id
     FROM subcontract_spending_details a LEFT JOIN ref_date b ON a.last_modified_date::date = b.date
         LEFT JOIN ref_month c ON b.calendar_month_id = c.month_id
         LEFT JOIN vendor d ON a.prime_vendor_id = d.vendor_id

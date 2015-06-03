@@ -5,6 +5,7 @@ FMSScripts.sql
 MAGScripts.sql
 PMSScripts.sql
 VendorScripts.sql
+PendingContracts.sql
 
 psql -d checkbook_mwbe -f VendorScripts.sql 1>1.out 2>2.err
 psql -d checkbook_mwbe -f MAGScripts.sql 1>1.out 2>2.err

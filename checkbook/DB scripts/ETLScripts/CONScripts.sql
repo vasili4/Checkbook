@@ -1644,6 +1644,18 @@ BEGIN
 		starting_year_id = effective_begin_fiscal_year_id
 		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
 		 */
+		
+		UPDATE 	tmp_agreement_snapshot
+		SET	starting_year = effective_begin_fiscal_year,
+		starting_year_id = effective_begin_fiscal_year_id
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year AND effective_begin_fiscal_year IS NOT NULL;
+		
+		UPDATE 	tmp_agreement_snapshot a
+		SET	starting_year = a.registered_fiscal_year,
+		starting_year_id = b.year_id
+		FROM	ref_year b
+		WHERE a.registered_fiscal_year = b.year_value 
+		AND rank_value = 1 AND starting_year > registered_fiscal_year AND registered_fiscal_year IS NOT NULL;
 	
 	-- Updating the ending year to be ending year - 1 
 	-- Until this step ending year of a record is equivalent to the staring year of the sucessor. So -1 should be done to ensure no overlapping
@@ -1686,10 +1698,14 @@ BEGIN
 					minority_type_id, minority_type_name,
 					master_agreement_yn,load_id,last_modified_date,job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
-	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
+	        a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year
+	        			   WHEN (b.effective_end_fiscal_year IS NULL OR b.effective_end_fiscal_year < b.registered_fiscal_year) 
+		              AND b.registered_fiscal_year IS NOT NULL AND a.starting_year < b.registered_fiscal_year THEN b.registered_fiscal_year
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year OR b.effective_end_fiscal_year IS NULL THEN a.starting_year
 	        		      ELSE b.effective_end_fiscal_year END),
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
+	        			  WHEN (b.effective_end_fiscal_year IS NULL OR b.effective_end_fiscal_year < b.registered_fiscal_year) 
+		              AND b.registered_fiscal_year IS NOT NULL AND a.starting_year < b.registered_fiscal_year THEN b.registered_fiscal_year_id
 	        		      WHEN b.effective_end_fiscal_year < a.starting_year OR b.effective_end_fiscal_year IS NULL THEN a.starting_year_id
 	        		      ELSE b.effective_end_fiscal_year_id END),b.contract_number,
 	        b.original_contract_amount,b.maximum_contract_amount,b.description,
@@ -1829,6 +1845,18 @@ BEGIN
 		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year ;
 		 */
 		
+		UPDATE 	tmp_agreement_snapshot
+		SET	starting_year = effective_begin_fiscal_year,
+		starting_year_id = effective_begin_fiscal_year_id
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year AND effective_begin_fiscal_year IS NOT NULL;
+		
+		UPDATE 	tmp_agreement_snapshot a
+		SET	starting_year = a.registered_fiscal_year,
+		starting_year_id = b.year_id
+		FROM	ref_year b
+		WHERE a.registered_fiscal_year = b.year_value 
+		AND rank_value = 1 AND starting_year > registered_fiscal_year AND registered_fiscal_year IS NOT NULL;
+		
 		
 	-- Updating the ending year to be ending year - 1 
 	-- Until this step ending year of a record is equivalent to the staring year of the sucessor. So -1 should be done to ensure no overlapping
@@ -1871,9 +1899,13 @@ BEGIN
 					master_agreement_yn,load_id,last_modified_date, job_id)
 	SELECT 	a.original_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 		a.agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
+					  WHEN (b.effective_end_calendar_year IS NULL OR b.effective_end_calendar_year < b.registered_calendar_year) 
+		              AND b.registered_calendar_year IS NOT NULL AND a.starting_year < b.registered_calendar_year THEN b.registered_calendar_year
 				      WHEN b.effective_end_calendar_year < a.starting_year  OR b.effective_end_calendar_year IS NULL THEN a.starting_year
 				      ELSE b.effective_end_calendar_year END),
 				(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
+					  WHEN (b.effective_end_calendar_year IS NULL OR b.effective_end_calendar_year < b.registered_calendar_year) 
+		              AND b.registered_calendar_year IS NOT NULL AND a.starting_year < b.registered_calendar_year THEN b.registered_calendar_year_id
 				      WHEN b.effective_end_calendar_year < a.starting_year OR b.effective_end_calendar_year IS NULL THEN a.starting_year_id
 				      ELSE b.effective_end_calendar_year_id END),b.contract_number,
 		b.original_contract_amount,b.maximum_contract_amount,b.description,
@@ -2309,6 +2341,7 @@ SET rfed_amount = 0
 WHERE rfed_amount IS NULL 
 AND master_agreement_yn = 'Y';
 
+/*
 UPDATE agreement_snapshot X
 SET rfed_amount = Y.rfed_amount
 FROM
@@ -2316,6 +2349,15 @@ FROM
 (select agreement_id, max(fiscal_year) as fiscal_year from agreement_snapshot_expanded where master_agreement_yn = 'Y' group by 1) b 
 WHERE a.agreement_id = b.agreement_id AND a.fiscal_year = b.fiscal_year AND a.status_flag = 'A') Y
 WHERE X.agreement_id = Y.agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
+*/
+
+UPDATE agreement_snapshot X
+SET rfed_amount = Y.rfed_amount
+FROM
+(select master_agreement_id, sum(rfed_amount) as rfed_amount from agreement_snapshot where master_agreement_yn = 'N' and latest_flag = 'Y' group by 1) Y
+WHERE X.original_agreement_id = Y.master_agreement_id AND X.master_agreement_yn = 'Y' AND X.latest_flag = 'Y' ;
+
+
 
 UPDATE agreement_snapshot 
 SET rfed_amount = 0

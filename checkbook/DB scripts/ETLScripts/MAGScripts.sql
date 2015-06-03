@@ -1012,6 +1012,21 @@ BEGIN
 		AND starting_year > 2010
 		AND registered_fiscal_year <= 2010
 		AND rank_value = 1;
+	
+-- Updating the starting_year to effective_begin_fiscal_year if starting_year > effective_begin_fiscal_year
+		
+		UPDATE 	tmp_master_agreement_snapshot
+		SET	starting_year = effective_begin_fiscal_year,
+		starting_year_id = effective_begin_fiscal_year_id
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year AND effective_begin_fiscal_year IS NOT NULL;
+		
+		UPDATE 	tmp_master_agreement_snapshot a
+		SET	starting_year = a.registered_fiscal_year,
+		starting_year_id = b.year_id
+		FROM	ref_year b
+		WHERE a.registered_fiscal_year = b.year_value 
+		AND rank_value = 1 AND starting_year > registered_fiscal_year AND registered_fiscal_year IS NOT NULL;	
+		
 		
 	UPDATE 	tmp_master_agreement_snapshot
 	SET	ending_year = ending_year - 1,
@@ -1052,9 +1067,13 @@ BEGIN
 					load_id,last_modified_date, job_id)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id,b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
+	        			   WHEN (a.effective_end_fiscal_year IS NULL OR a.effective_end_fiscal_year < a.registered_fiscal_year) 
+		              AND a.registered_fiscal_year IS NOT NULL AND a.starting_year < a.registered_fiscal_year THEN a.registered_fiscal_year
 	        		      WHEN a.effective_end_fiscal_year < a.starting_year THEN a.starting_year
 	        		      ELSE a.effective_end_fiscal_year END),
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
+	        			  WHEN (a.effective_end_fiscal_year IS NULL OR a.effective_end_fiscal_year < a.registered_fiscal_year) 
+		              AND a.registered_fiscal_year IS NOT NULL AND a.starting_year < a.registered_fiscal_year THEN b.registered_fiscal_year_id
 	        		      WHEN a.effective_end_fiscal_year < a.starting_year THEN a.starting_year_id
 	        		      ELSE a.effective_end_fiscal_year_id END),b.contract_number,
 	        b.original_contract_amount,b.maximum_spending_limit,b.description,
@@ -1158,6 +1177,21 @@ BEGIN
 		AND starting_year > 2010
 		AND registered_calendar_year <= 2010
 		AND rank_value = 1;
+	
+-- Updating the starting_year to effective_begin_fiscal_year if starting_year > effective_begin_fiscal_year
+
+		UPDATE 	tmp_master_agreement_snapshot
+		SET	starting_year = effective_begin_fiscal_year,
+		starting_year_id = effective_begin_fiscal_year_id
+		WHERE rank_value = 1 AND starting_year > effective_begin_fiscal_year AND effective_begin_fiscal_year IS NOT NULL;
+		
+		UPDATE 	tmp_master_agreement_snapshot a
+		SET	starting_year = a.registered_fiscal_year,
+		starting_year_id = b.year_id
+		FROM	ref_year b
+		WHERE a.registered_fiscal_year = b.year_value 
+		AND rank_value = 1 AND starting_year > registered_fiscal_year AND registered_fiscal_year IS NOT NULL;	
+		
 		
 	UPDATE 	tmp_master_agreement_snapshot_cy
 	SET	ending_year = ending_year - 1,
@@ -1200,9 +1234,13 @@ BEGIN
 					load_id,last_modified_date, job_id)
 	SELECT 	a.original_master_agreement_id, a.starting_year,a.starting_year_id,a.document_version,b.document_code_id, b.agency_history_id, ah.agency_id,ag.agency_code,ah.agency_name,
 	        a.master_agreement_id, (CASE WHEN a.ending_year IS NOT NULL THEN ending_year 
+	        			  WHEN (a.effective_end_calendar_year IS NULL OR a.effective_end_calendar_year < a.registered_calendar_year) 
+		              AND a.registered_calendar_year IS NOT NULL AND a.starting_year < a.registered_calendar_year THEN a.registered_calendar_year
 	        		      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year
 	        		      ELSE b.effective_end_calendar_year END),
 	        		(CASE WHEN a.ending_year IS NOT NULL THEN ending_year_id 
+	        			  WHEN (a.effective_end_calendar_year IS NULL OR a.effective_end_calendar_year < a.registered_calendar_year) 
+		              AND a.registered_calendar_year IS NOT NULL AND a.starting_year < a.registered_calendar_year THEN b.registered_calendar_year_id
 	        		      WHEN b.effective_end_calendar_year < a.starting_year THEN a.starting_year_id
 	        		      ELSE b.effective_end_calendar_year_id END),b.contract_number,
 	        b.original_contract_amount,b.maximum_spending_limit,b.description,

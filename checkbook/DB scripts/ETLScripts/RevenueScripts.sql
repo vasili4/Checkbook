@@ -298,12 +298,17 @@ BEGIN
 	
 	-- FK:department_history_id
 
+	UPDATE etl.stg_revenue 
+	SET appr_cd = NULL
+	WHERE appr_cd = '';
+	
+	
 	INSERT INTO tmp_fk_revenue_values(uniq_id,department_history_id)
 	SELECT	a.uniq_id, max(c.department_history_id) 
-	FROM etl.stg_revenue a JOIN ref_department b ON a.appr_cd = b.department_code AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_revenue a JOIN ref_department b ON coalesce(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
-		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 	GROUP BY 1;
 	
 	CREATE TEMPORARY TABLE tmp_fk_revenue_values_new_dept(agency_id integer,appr_cd varchar,
@@ -312,13 +317,13 @@ BEGIN
 
 	
 	INSERT INTO tmp_fk_revenue_values_new_dept
-	SELECT c.agency_id,appr_cd,e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
+	SELECT c.agency_id,coalesce(appr_cd,'---------'),e.fund_class_id,fy_dc,MIN(b.uniq_id) as uniq_id
 	FROM etl.stg_revenue a join (SELECT uniq_id
 						 FROM tmp_fk_revenue_values
 						 GROUP BY 1
 						 HAVING max(department_history_id) IS NULL) b on a.uniq_id=b.uniq_id
 		JOIN ref_agency c ON a.dept_cd = c.agency_code	
-		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code
+		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code
 	GROUP BY 1,2,3,4;
 
 	RAISE NOTICE '4';
@@ -338,11 +343,11 @@ BEGIN
 				   agency_id,fund_class_id,
 				   fiscal_year,created_date,created_load_id,original_department_name)
 	SELECT a.department_id,COALESCE(b.appr_cd,'---------') as department_code,
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE '<Non-Applicable Department>' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,
 		now()::timestamp,p_load_id_in,
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 			ELSE 'Non-Applicable Department' END) as original_department_name
 	FROM   etl.ref_department_id_seq a JOIN tmp_fk_revenue_values_new_dept b ON a.uniq_id = b.uniq_id;
 
@@ -367,7 +372,7 @@ BEGIN
 					   department_name,agency_id,fund_class_id,
 					   fiscal_year,created_date,load_id)
 	SELECT a.department_history_id,c.department_id,	
-		(CASE WHEN COALESCE(b.appr_cd,'') <> '' THEN '<Unknown Department>'
+		(CASE WHEN COALESCE(b.appr_cd,'---------') <> '---------' THEN '<Unknown Department>'
 		      ELSE '<Non-Applicable Department>' END) as department_name,
 		b.agency_id,b.fund_class_id,b.fiscal_year,now()::timestamp,p_load_id_in
 	FROM   etl.ref_department_history_id_seq a JOIN tmp_fk_revenue_values_new_dept b ON a.uniq_id = b.uniq_id
@@ -389,7 +394,7 @@ BEGIN
 	FROM etl.stg_revenue a JOIN ref_department b ON COALESCE(a.appr_cd,'---------') = b.department_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_department_history c ON b.department_id = c.department_id
 		JOIN ref_agency d ON a.dept_cd = d.agency_code AND b.agency_id = d.agency_id
-		JOIN ref_fund_class e ON a.fcls_cd = e.fund_class_code AND e.fund_class_id = b.fund_class_id
+		JOIN ref_fund_class e ON coalesce(a.fcls_cd,'---') = e.fund_class_code AND e.fund_class_id = b.fund_class_id
 		JOIN etl.ref_department_history_id_seq f ON c.department_history_id = f.department_history_id
 	GROUP BY 1;
 
@@ -397,9 +402,13 @@ BEGIN
 	
 	-- FK:expenditure_object_history_id
 
+	UPDATE etl.stg_revenue 
+	SET obj_cd = NULL
+	WHERE obj_cd = '';
+	
 	INSERT INTO tmp_fk_revenue_values(uniq_id,expenditure_object_history_id)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
-	FROM etl.stg_revenue a JOIN ref_expenditure_object b ON a.obj_cd = b.expenditure_object_code AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_revenue a JOIN ref_expenditure_object b ON coalesce(a.obj_cd,'----') = b.expenditure_object_code AND a.fy_dc = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 	GROUP BY 1	;
 
@@ -409,7 +418,7 @@ BEGIN
 	DISTRIBUTED BY (uniq_id);
 	
 	INSERT INTO tmp_fk_revenue_values_new_exp_object
-	SELECT (CASE WHEN COALESCE(obj_cd,'')='' THEN '----' ELSE obj_cd END) as obj_cd,fy_dc,MIN(a.uniq_id) as uniq_id
+	SELECT COALESCE(a.obj_cd,'----') as obj_cd,fy_dc,MIN(a.uniq_id) as uniq_id
 	FROM etl.stg_revenue a join (SELECT uniq_id
 						 FROM tmp_fk_revenue_values
 						 GROUP BY 1
@@ -469,10 +478,7 @@ BEGIN
 
 	INSERT INTO tmp_fk_revenue_values(uniq_id,expenditure_object_history_id)
 	SELECT	a.uniq_id, max(c.expenditure_object_history_id) 
-	FROM etl.stg_revenue a JOIN ref_expenditure_object b ON (COALESCE(a.obj_cd,'----') = b.expenditure_object_code 
-										OR (a.obj_cd='' AND b.expenditure_object_code='----')
-									     ) 
-									     AND a.fy_dc = b.fiscal_year
+	FROM etl.stg_revenue a JOIN ref_expenditure_object b ON COALESCE(a.obj_cd,'----') = b.expenditure_object_code    AND a.fy_dc = b.fiscal_year
 		JOIN ref_expenditure_object_history c ON b.expenditure_object_id = c.expenditure_object_id
 		JOIN etl.ref_expenditure_object_history_id_seq d ON c.expenditure_object_history_id = d.expenditure_object_history_id
 	GROUP BY 1	;

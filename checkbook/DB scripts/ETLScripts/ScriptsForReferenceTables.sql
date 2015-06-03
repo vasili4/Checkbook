@@ -310,9 +310,9 @@ FROM vendor_history b WHERE b.legal_name = 'N/A (PRIVACY/SECURITY)';
 
 
 insert into subvendor(vendor_id,vendor_customer_code,legal_name,display_flag) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)','N');
-insert into vendor_history(vendor_history_id,vendor_id,legal_name) 
+insert into subvendor_history(vendor_history_id,vendor_id,legal_name) 
 select nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
-from vendor where vendor_customer_code='N/A'
+from subvendor where vendor_customer_code='N/A'
 and legal_name='N/A (PRIVACY/SECURITY)';
 
 

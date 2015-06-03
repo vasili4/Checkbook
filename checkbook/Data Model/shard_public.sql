@@ -3062,6 +3062,7 @@ CREATE TABLE all_agreement_transactions  (
  	minority_type_name character varying(50),
    master_agreement_yn character(1),  
    has_children character(1),
+   has_mwbe_children character(1),
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
@@ -3071,6 +3072,9 @@ CREATE TABLE all_agreement_transactions  (
    is_minority_vendor character(1), 
    vendor_type character(2),
    contract_original_agreement_id bigint,
+   is_subvendor character varying(3),
+   associated_prime_vendor_name character varying,
+   mwbe_category_ui character varying,
    job_id bigint
  )WITH(appendonly=true,orientation=column)  
  DISTRIBUTED BY (original_agreement_id);
@@ -3140,6 +3144,7 @@ CREATE TABLE all_agreement_transactions_cy  (
  	minority_type_name character varying(50),
    master_agreement_yn character(1),  
    has_children character(1),
+   has_mwbe_children character(1),
    original_version_flag character(1),
    latest_flag character(1),
    load_id integer,
@@ -3149,6 +3154,9 @@ CREATE TABLE all_agreement_transactions_cy  (
    is_minority_vendor character(1), 
    vendor_type character(2),
    contract_original_agreement_id bigint,
+   is_subvendor character varying(3),
+   associated_prime_vendor_name character varying,
+   mwbe_category_ui character varying,
    job_id bigint
  )WITH(appendonly=true,orientation=column)  
  DISTRIBUTED BY (original_agreement_id);
@@ -3258,6 +3266,9 @@ CREATE TABLE all_agreement_transactions_cy  (
 	is_minority_vendor character(1), 
     vendor_type character(2),
     contract_original_agreement_id bigint,
+    is_subvendor character varying(3),
+   associated_prime_vendor_name character varying,
+   mwbe_category_ui character varying,
 	job_id bigint
 	)WITH(appendonly=true,orientation=column)
 DISTRIBUTED BY (disbursement_line_item_id)

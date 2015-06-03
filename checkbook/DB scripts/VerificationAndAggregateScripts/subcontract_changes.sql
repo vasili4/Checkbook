@@ -89,9 +89,9 @@ CREATE TABLE subvendor_history (
 
 INSERT INTO subvendor(vendor_id,vendor_customer_code,legal_name,display_flag) values(nextval('seq_vendor_vendor_id'),'N/A','N/A (PRIVACY/SECURITY)','N');
 
-INSERT INTO vendor_history(vendor_history_id,vendor_id,legal_name) 
+INSERT INTO subvendor_history(vendor_history_id,vendor_id,legal_name) 
 SELECT nextval('seq_vendor_history_vendor_history_id'),vendor_id,legal_name
-FROM vendor WHERE vendor_customer_code='N/A'
+FROM subvendor WHERE vendor_customer_code='N/A'
 AND legal_name='N/A (PRIVACY/SECURITY)';
 
 
@@ -1807,5 +1807,41 @@ process all sub contract files, pending contract file and all other files from 2
 3) make changes in kettle.properties for emails (FMS_ or OASIS_)
 4) Copy all the files from february 1st into SOURCE_DIR folder
 5) run the ETL job in master
+
+
+For verification:
+
+select count(*) from disbursement_line_item_details; - 12748689
+select count(*) from agreement_snapshot; - 1933665
+select count(*) from payroll; - 46368777
+
+checkbook_ogent=# select count(*) from disbursement_line_item_details -- 3060
+
+ <int name="payroll">46368777</int>
+      <int name="spending">12751749</int>
+      <int name="revenue">1873117</int>
+      <int name="contracts">1470379</int>
+      <int name="budget">692596</int>
+
+
+
+
+23928061
+
+
+
+
+
+ select * from mwbe_last_job ;
+    use     | job_id
+------------+--------
+ etl        |    742
+
+To Change on production day:
+
+1) Refresh Shards2 and Shards3
+2) Change NYC_Master.kjb and push it to production etl server
+3) Change kettle.properties for emails (FMS or OASIS)
+4) Depending upon manual full indexing or not, we may need to comment ETL Job in crontab
 
 */
