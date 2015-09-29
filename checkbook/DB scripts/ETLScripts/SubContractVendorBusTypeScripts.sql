@@ -26,7 +26,8 @@ BEGIN
 	WHERE a.scntrc_vend_cd = b.vendor_customer_code AND a.bus_typ = c.business_type_code 
 	AND a.bus_typ_sta = b.status AND coalesce(a.min_typ,0) = coalesce(b.minority_type_id,0) ;
 	
-		
+	DELETE FROM  subcontract_vendor_business_type WHERE certification_no = 'FMSV Vendor bus type file';
+	
 	INSERT INTO subcontract_vendor_business_type(vendor_customer_code,business_type_id,status,
     				       minority_type_id,certification_start_date,certification_end_date, initiation_date, certification_no, disp_certification_start_date)
     	SELECT  a.scntrc_vend_cd,c.business_type_id,a.bus_typ_sta,
@@ -57,7 +58,15 @@ BEGIN
 	INSERT INTO etl.etl_data_load_verification(load_file_id,data_source_code,num_transactions,description)
 	VALUES(p_load_file_id_in,'SV',rec_count, '# of records updated into subcontract_vendor_business_type');
 	
+	-- modified to get vendor minority type from FMSV feed if not got in subcontract business type file.
 	
+	INSERT INTO subcontract_vendor_business_type(vendor_customer_code,business_type_id,status,minority_type_id,certification_start_date,
+	certification_end_date, initiation_date, certification_no, disp_certification_start_date)
+	SELECT a.vendor_customer_code, a.business_type_id,a.status,	a.minority_type_id,a.certification_start_date,a.certification_end_date, 
+	a.initiation_date, 'FMSV Vendor bus type file' as certification_no, null as disp_certification_start_date
+	FROM fmsv_business_type a JOIN subvendor b ON a.vendor_customer_code = b.vendor_customer_code 
+	LEFT JOIN subcontract_vendor_business_type c ON a.vendor_customer_code = c.vendor_customer_code 
+	WHERE c.vendor_customer_code IS NULL AND a.status = 2 ;
 	
 	--  processing data to insert/update in subcontract_business_type table
 	

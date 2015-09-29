@@ -1367,6 +1367,7 @@ CREATE TABLE revenue_details
     budget_code varchar(10),
     adopted_amount decimal(20,2),
     current_modified_budget_amount decimal(20,2),
+    remaining_amount numeric(16,2),
 	agency_short_name varchar(15),
 	department_short_name varchar(15),
 	agency_history_id smallint,

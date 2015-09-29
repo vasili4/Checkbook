@@ -976,7 +976,8 @@ BEGIN
 			
 		UPDATE revenue_details a
 		SET adopted_amount = b.adopted_amount,
-			current_modified_budget_amount = b.current_modified_budget_amount
+			current_modified_budget_amount = b.current_modified_budget_amount,
+			remaining_amount = b.current_modified_budget_amount - a.posting_amount
 		FROM revenue_budget b
 		WHERE a.budget_fiscal_year = b.budget_fiscal_year AND a.agency_code = b.agency_code AND a.budget_code = b.budget_code AND a.revenue_source_code = b.revenue_source_code
 		AND a.job_id = p_job_id_in;
