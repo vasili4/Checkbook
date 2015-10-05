@@ -2209,6 +2209,7 @@ CREATE EXTERNAL WEB TABLE aggregateon_payroll_employee_agency__0(
 	type_of_year char(1),
 	pay_frequency varchar,
 	type_of_employment varchar,
+	civil_service_title varchar,
 	employee_number varchar(70),
 	start_date date,		
 	annual_salary numeric(16,2),
@@ -2222,7 +2223,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_e
   
  CREATE VIEW aggregateon_payroll_employee_agency AS
   	SELECT aggregateon_payroll_employee_agency__0.employee_id, aggregateon_payroll_employee_agency__0.agency_id, aggregateon_payroll_employee_agency__0.fiscal_year_id,
-  		aggregateon_payroll_employee_agency__0.type_of_year,aggregateon_payroll_employee_agency__0.pay_frequency,aggregateon_payroll_employee_agency__0.type_of_employment,aggregateon_payroll_employee_agency__0.employee_number,
+  		aggregateon_payroll_employee_agency__0.type_of_year,aggregateon_payroll_employee_agency__0.pay_frequency,aggregateon_payroll_employee_agency__0.type_of_employment,aggregateon_payroll_employee_agency__0.civil_service_title,aggregateon_payroll_employee_agency__0.employee_number,
   		aggregateon_payroll_employee_agency__0.start_date,aggregateon_payroll_employee_agency__0.annual_salary, aggregateon_payroll_employee_agency__0.base_pay,
   		aggregateon_payroll_employee_agency__0.overtime_pay, aggregateon_payroll_employee_agency__0.other_payments,aggregateon_payroll_employee_agency__0.gross_pay
   	FROM	aggregateon_payroll_employee_agency__0;	
@@ -2301,6 +2302,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_y
 	month_id int,
 	pay_frequency varchar,
 	type_of_employment varchar,
+	civil_service_title varchar,
 	employee_number varchar(70),
 	start_date date,		
 	annual_salary numeric(16,2),
@@ -2315,7 +2317,7 @@ EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.aggregateon_payroll_e
  CREATE VIEW aggregateon_payroll_employee_agency_month AS
   	SELECT aggregateon_payroll_employee_agency_month__0.employee_id, aggregateon_payroll_employee_agency_month__0.agency_id, aggregateon_payroll_employee_agency_month__0.fiscal_year_id,
   		aggregateon_payroll_employee_agency_month__0.type_of_year,aggregateon_payroll_employee_agency_month__0.month_id,aggregateon_payroll_employee_agency_month__0.pay_frequency,
-  		aggregateon_payroll_employee_agency_month__0.type_of_employment,aggregateon_payroll_employee_agency_month__0.employee_number,
+  		aggregateon_payroll_employee_agency_month__0.type_of_employment,aggregateon_payroll_employee_agency_month__0.civil_service_title,aggregateon_payroll_employee_agency_month__0.employee_number,
   		aggregateon_payroll_employee_agency_month__0.start_date,aggregateon_payroll_employee_agency_month__0.annual_salary, aggregateon_payroll_employee_agency_month__0.base_pay,
   		aggregateon_payroll_employee_agency_month__0.overtime_pay, aggregateon_payroll_employee_agency_month__0.other_payments,aggregateon_payroll_employee_agency_month__0.gross_pay
   	FROM	aggregateon_payroll_employee_agency_month__0;	
