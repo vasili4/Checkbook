@@ -198,7 +198,7 @@ BEGIN
 	DISTRIBUTED BY (employee_id);
 
 	INSERT INTO tmp_ref_employee_1
-	SELECT a.*,b.employee_id FROM tmp_ref_employee a JOIN employee b ON a.employee_number = b.employee_number AND a.civil_service_code = b.civil_service_code
+	SELECT a.*,b.employee_id FROM tmp_ref_employee a JOIN employee b ON a.employee_number = b.employee_number AND a.agency_id = b.agency_id 
 	WHERE exists_flag ='Y' and modified_flag='Y';
 
 	RAISE NOTICE 'PMS UE 7';
