@@ -66,7 +66,7 @@ if(is_array($node->data) && count($node->data) > 0){
 
         $table .= '<div id="payroll-emp-trans-name">
                         <span class="payroll-label">Title: </span>
-                        <span class="payroll-value">'.$data['employee_employee_civil_service_title'].'</span>
+                        <span class="payroll-value">'.$data['civil_service_title_civil_service_title'].'</span>
                     </div>';
 
 
@@ -80,7 +80,7 @@ if(is_array($node->data) && count($node->data) > 0){
                    </tr>";
         $table .= "<tr>
                         <td class='label'>". ( ($typeOfEmployment == 'Salaried') ? WidgetUtil::getLabel('annual_salary') : WidgetUtil::getLabel('pay_rate'))  .":</td>
-                        <td class='data'>$". number_format($data['max_annual_salary'],2) ."</td>
+                        <td class='data'>$". number_format($data['annual_salary_annual_salary'],2) ."</td>
                         <td class='label'>". WidgetUtil::getLabel('other_pay_1_ytd') .":</td><td class='data'>$". number_format($data['total_other_payments'],2)."</td>
                    </tr>";
         $table .= "<tr>

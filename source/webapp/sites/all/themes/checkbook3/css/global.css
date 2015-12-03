@@ -2714,6 +2714,31 @@ body.page-payroll-employee-transactions #table_310{
     border-bottom: 1px solid #CACACA;
     border-right: 1px solid #CACACA;
 }
+
+#emp-agency-detail-records {
+    width: 940px !important;
+}
+#prev-emp,
+#next-emp{
+    height:26px;
+    width:73px;
+    position: absolute;
+    bottom:70px;
+    z-index: 10;
+}
+#prev-emp{
+    left:0;
+    background: url(../images/payroll-arrow-up.png) no-repeat scroll;
+}
+#next-emp{
+    right:0;
+    background: url(../images/payroll-arrow-down.png) no-repeat scroll;
+}
+
+.emp-agency-detail-record{
+    position: relative !important;
+}
+
 /*******************************
 ***   VIDEO SPOTLIGHT AREA   ***
 *******************************/
