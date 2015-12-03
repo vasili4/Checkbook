@@ -8,7 +8,7 @@
 "urlParamMap":{"year":"year.year","calyear":"year.year","yeartype":"type_of_year", "employment_type.employment_type": "type_of_employment"},
 "dataset": "checkbook:payroll_employee_agency",
 "noDataInitialLoad":true,
-"columns": ["employee.employee","agency.agency.agency_name", "agency.agency", "agency.agency.agency_short_name","employee.employee.employee_number", "civil_service_title.civil_service_title",  "annual_salary.annual_salary", "total_gross_pay", "total_base_salary", "total_other_payments", "total_overtime_amount", "year_type.year_type", "year.year", "employment_type.employment_type"],
+"columns": ["employee.employee","agency.agency.agency_name", "agency.agency", "agency.agency.agency_short_name","employee.employee.employee_number", "civil_service_title.civil_service_title",  "max_annual_salary", "total_gross_pay", "total_base_salary", "total_other_payments", "total_overtime_amount", "year_type.year_type", "year.year", "employment_type.employment_type"],
 "limit":5,
 "orderby":"annual_salary",
 "disableViewAll":true,
@@ -69,7 +69,7 @@ return $footer;
    },
   "annual_salary_formatted":{
      "type":"expression2",
-     "expression": "custom_number_formatter_format($row['annual_salary_annual_salary'],2,'$')"
+     "expression": "custom_number_formatter_format($row['max_annual_salary'],2,'$')"
    },
   "annual_salary_link":{
      "type":"expression2",
@@ -92,7 +92,7 @@ return $footer;
   {
       "labelAlias": "annual_salary",
       "column": "annual_salary_link",
-      "sortSourceColumn": "annual_salary.annual_salary",
+      "sortSourceColumn": "max_annual_salary",
       "header": "false"
     },
   {
