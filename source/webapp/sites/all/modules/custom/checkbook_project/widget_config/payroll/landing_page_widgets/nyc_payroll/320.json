@@ -10,7 +10,7 @@
 "noDataInitialLoad":true,
 "columns": ["employee.employee","agency.agency.agency_name", "agency.agency", "agency.agency.agency_short_name","employee.employee.employee_number", "civil_service_title.civil_service_title",  "annual_salary.annual_salary", "total_gross_pay", "total_base_salary", "total_other_payments", "total_overtime_amount", "year_type.year_type", "year.year", "employment_type.employment_type"],
 "limit":5,
-"orderby":"annual_salary.annual_salary",
+"orderby":"annual_salary",
 "disableViewAll":true,
 "enableExpand":true,
 "getTotalDataCount":true,
