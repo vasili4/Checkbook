@@ -259,7 +259,8 @@ BEGIN
 				effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 				effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 		   		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		   		source_updated_calendar_year_id,contract_number,rfed_amount_original, rfed_amount)
+		   		source_updated_calendar_year_id,contract_number,rfed_amount_original, rfed_amount,
+		   		aprv_sta, aprv_reas_id, aprv_reas_nm)
 	SELECT	d.agreement_id,a.document_code_id,
 		a.agency_history_id,a.doc_id,a.scntrc_vers_no,a.scntrc_id,
 		a.scntrc_trkg_no,a.scntrc_dscr,e.industry_type_id,a.scntrc_mwbe_cert,
@@ -271,7 +272,8 @@ BEGIN
 		effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 		effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 		source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.tot_scntrc_pymt, (CASE WHEN a.tot_scntrc_pymt IS NULL THEN 0 ELSE a.tot_scntrc_pymt END) as rfed_amount
+		source_updated_calendar_year_id,a.doc_cd||a.doc_dept_cd||a.doc_id as contract_number,a.tot_scntrc_pymt, (CASE WHEN a.tot_scntrc_pymt IS NULL THEN 0 ELSE a.tot_scntrc_pymt END) as rfed_amount,
+		a.aprv_sta, a.aprv_reas_id, a.aprv_reas_nm
 	FROM	etl.stg_scntrc_details a 
 					 JOIN tmp_sub_ct_con d ON a.uniq_id = d.uniq_id
 					 LEFT JOIN sub_industry_mappings e ON a.indus_cls = e.sub_industry_type_id
@@ -300,7 +302,7 @@ BEGIN
 			effective_end_calendar_year,effective_end_calendar_year_id,effective_begin_fiscal_year,
 			effective_begin_fiscal_year_id, effective_begin_calendar_year,effective_begin_calendar_year_id,
 			source_updated_fiscal_year,source_updated_fiscal_year_id, source_updated_calendar_year,
-			source_updated_calendar_year_id,a.tot_scntrc_pymt			
+			source_updated_calendar_year_id,a.tot_scntrc_pymt, a.aprv_sta, a.aprv_reas_id, a.aprv_reas_nm			
 		FROM	etl.stg_scntrc_details a 
 		JOIN tmp_sub_ct_con d ON a.uniq_id = d.uniq_id
 		LEFT JOIN sub_industry_mappings e ON a.indus_cls = e.sub_industry_type_id
@@ -348,7 +350,10 @@ BEGIN
 		source_updated_calendar_year = b.source_updated_calendar_year,
 		source_updated_calendar_year_id = b.source_updated_calendar_year_id,
 		rfed_amount_original = b.tot_scntrc_pymt,
-		rfed_amount = (CASE WHEN b.tot_scntrc_pymt IS NULL THEN 0 ELSE b.tot_scntrc_pymt END) 
+		rfed_amount = (CASE WHEN b.tot_scntrc_pymt IS NULL THEN 0 ELSE b.tot_scntrc_pymt END),
+		aprv_sta = b.aprv_sta, 
+		aprv_reas_id = b.aprv_reas_id, 
+		aprv_reas_nm = b.aprv_reas_nm
 	FROM	tmp_sub_con_ct_update b
 	WHERE	a.agreement_id = b.agreement_id;
 
@@ -542,7 +547,7 @@ BEGIN
 	SELECT distinct document_id,document_version,document_code_id, sub_contract_id, agency_id
 	FROM subcontract_details a JOIN ref_agency_history b ON a.agency_history_id = b.agency_history_id
 	JOIN etl.etl_data_load c ON coalesce(a.updated_load_id, a.created_load_id) = c.load_id 
-	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('SC');
+	WHERE c.job_id = p_job_id_in AND c.data_source_code IN ('SC') AND a.aprv_sta = 4;
 	
 	-- Get the max version and min version
 	
@@ -574,7 +579,8 @@ BEGIN
 		group_concat(CASE WHEN a.document_version <> b.first_version_no THEN agreement_id ELSE 0 END) as non_first_agreement_id,
 		MAX(CASE WHEN a.document_version = b.latest_version_no THEN maximum_contract_amount END) as latest_current_amount
 	FROM   subcontract_details a JOIN tmp_sub_loaded_agreements_1 b ON a.document_id = b.document_id AND a.document_code_id = b.document_code_id AND a.sub_contract_id = b.sub_contract_id
-		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id	
+		JOIN ref_agency_history c ON a.agency_history_id = c.agency_history_id AND c.agency_id = b.agency_id
+		WHERE a.aprv_sta = 4
 	GROUP BY 1,2,3,4;	
 	
 	-- Updating the original flag for non first agreements 
@@ -786,7 +792,7 @@ BEGIN
 		LEFT JOIN subvendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
 		LEFT JOIN (SELECT contract_number, vendor_id, minority_type_id, minority_type_name 
 		FROM agreement_snapshot WHERE latest_flag = 'Y' and contract_number ilike 'CT%') n  ON b.contract_number = n.contract_number AND b.prime_vendor_id = n.vendor_id
-		WHERE b.source_updated_date_id IS NOT NULL;
+		WHERE b.source_updated_date_id IS NOT NULL AND b.aprv_sta = 4;
 
 	
 	RAISE NOTICE 'PCON6';	
@@ -970,7 +976,7 @@ BEGIN
 		LEFT JOIN subvendor_min_bus_type m ON b.vendor_history_id = m.vendor_history_id
 		LEFT JOIN (SELECT contract_number, vendor_id, minority_type_id, minority_type_name 
 		FROM agreement_snapshot_cy WHERE latest_flag = 'Y' and contract_number ilike 'CT%') n  ON b.contract_number = n.contract_number AND b.prime_vendor_id = n.vendor_id
-		WHERE b.source_updated_date_id IS NOT NULL;
+		WHERE b.source_updated_date_id IS NOT NULL AND b.aprv_sta = 4;
 
 	RAISE NOTICE 'PCON9';
 	
