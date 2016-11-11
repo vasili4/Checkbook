@@ -1,0 +1,98 @@
+nav {
+  align-content: space-around;
+  display: flex;
+  padding: 15px;
+  width: 80%;
+  div {
+    display: inline-block;
+    flex: 1;
+    text-transform: uppercase;
+    vertical-align: middle;
+    &.nav-logo {
+      margin: 10px 20px 0 20px;
+      .main-logo-notag {
+        height: 23px;
+        width: 188px;
+        @extend %main-logo-notag;
+      }
+    }
+    &:not(.nav-logo) {
+      padding: 10px 20px;
+      text-align: center;
+      transition: .25s ease-in-out;
+      &.active {
+        background-color: $main;
+        a {
+          color: $white;
+        }
+        &.nav-dropdown:after {
+          @include navigation-ico($white);
+          transform: rotate(180deg);
+        }
+      }
+      &.nav-dropdown {
+        position: relative;
+        &:after {
+          @include navigation-ico($main-font);
+          background-position: center;
+          background-repeat: no-repeat;
+          content: "";
+          display: inline-block;
+          height: 10px;
+          margin-left: 5px;
+          width: 10px;
+        }
+      }
+    }
+    a {
+      color: $main-font;
+      // font-size: 14px;
+      font-size: .9em;
+      font-weight: bold;
+      text-decoration: none;
+      transition: .25s ease-in-out;
+      &:hover {
+        color: $main-hover;
+      }
+      img {
+        height: 20px;
+        width: auto;
+      }
+    }
+  }
+}
+
+.nav-domains {
+  background-color: $main;
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 55px;
+  transition: .25s ease-in-out;
+  visibility: hidden;
+  width: 100%;
+  &.active {
+    height: 50px;
+    visibility: visible;
+  }
+  .nav-domains__list {
+    display: flex;
+    margin: auto;
+    max-width: 1024px;
+    > div {
+      cursor: pointer;
+      flex: 1;
+      margin-top: 5px;
+      text-align: center;
+      &:hover div{
+        color: $white;
+      }
+      div {
+        font-size: 13px;
+        margin-top: 2px;
+        text-transform: uppercase;
+        transition: .1s ease-in;
+      }
+    }
+  }
+}

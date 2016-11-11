@@ -1,0 +1,21 @@
+name = checkbooknyc
+description = NYC Checkbook
+core = 7.x
+engine = phptemplate
+
+screenshot = 'screenshot.png'
+stylesheets[all][] = css/output.css
+
+; SCRIPTS
+scripts[] = 'js/script.js'
+
+
+regions[page_top] = 'Page Top'
+regions[page_bottom] = 'Page Bottom'
+regions[content] = 'Content'
+regions[left] = Left sidebar
+regions[right] = Right sidebar
+regions[content] = Content
+regions[header] = Header
+regions[footer] = Footer
+

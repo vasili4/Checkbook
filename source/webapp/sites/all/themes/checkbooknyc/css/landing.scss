@@ -1,0 +1,132 @@
+div.landing {
+  margin: auto;
+  margin-top: 3.5em;
+  max-width: 1024px;
+  position: relative;
+  padding-bottom: 8%;
+  div.landing-head {
+    flex: 1;
+    span {
+      display: block;
+      &.page-title {
+        color: $main;
+        font-size: 2.5em;
+        font-weight: bold;
+        text-transform: capitalize;
+      }
+      &.page-subtitle {
+        color: $main;
+        font-weight: bold;
+        margin-top: 10px;
+        text-transform: uppercase;
+      }
+      &.page-breadcrumb{
+        color: $main-font;
+        font-size: .7em;
+        font-weight: bold;
+        margin-top: 10px;
+        text-transform: uppercase;
+      }
+    }
+  }
+  div.year-filter {
+    position: absolute;
+    right: 0;
+    top: 1em;
+    span {
+      color: $main-font;
+      font-size: .9em;
+      text-transform: capitalize;
+    }
+  }
+  div.filter {
+    background-color: $light-gray;
+    border-radius: .15em;
+    // border: 1px solid $main-font;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    display: flex;
+    flex-direction: column;
+    font-size: .8em;
+    margin-top: 1.5em;
+    text-transform: uppercase;
+    position: relative;
+    .subdomain-filter {
+      background-color: $white;
+      border-bottom: 1px solid $main-font;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+      // position: relative;
+      &:before,
+      &:after {
+        bottom: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+      &:after {
+        border-color: rgba(255, 255, 255, 0);
+        border-top-color: #ffffff;
+        border-width: 11px;
+        left: 21%;
+        margin-left: -19px;
+        bottom: 56px;
+      }
+      &:before {
+        border-color: rgba(255, 255, 255, 0);
+        border-top-color: $main-font;
+        border-width: 12px;
+        left: 21%;
+        margin-left: -20px;
+        bottom: 54px;
+      }
+    }
+    .subdomain-filter,
+    .spending-filter {
+      display: flex;
+      flex-direction: row;
+      height: 6em;
+      overflow: hidden;
+      > span {
+        color: $main;
+        font-weight: bold;
+        margin: auto;
+        padding: 1em;
+      }
+      div {
+        flex: 1;
+        height: 3.5em;
+        margin: auto;
+        padding: 0 .5em;
+        text-align: center;
+        + div {
+          border-left: 1px solid $main-font;
+        }
+        span {
+          display: block;
+          + span {
+            margin-top: 5px;
+          }
+        }
+      }
+    }
+  }
+  .data-charts {
+    margin-top: 5%;
+    width: 100%;
+    height: 1500px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    background-color: $white;
+
+    //FOR TESTING- DELETE
+    .d3test {
+      display: block;
+      width: 5em;
+      height: 5em;
+      background-color: blue;
+    }
+  }
+
+}

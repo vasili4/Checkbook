@@ -1,0 +1,55 @@
+<?php
+/**
+ * @file
+ * Module to support custom pages for the site
+ */
+
+
+/**
+ * Implements hook_menu()
+ */
+
+function page_controller_menu() {
+
+    $items['home'] = array
+    (
+        'title' => 'Home',
+        'page callback' => 'page_controller',
+        'page arguments' => array('home'),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    $items['spending_landing'] = array
+    (
+        'title' => 'Spending Landing Page',
+        'page callback' => 'page_controller',
+        'page arguments' => array('spending_landing'),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+
+/**
+ * Implements hook_theme()
+ */
+function page_controller_theme() {
+
+    return array(
+        'home' => array(
+            'template' => 'templates/home-page',
+            'render element' => 'page',
+            'variables' => array('contents' => array()),
+        ),
+        'spending_landing' => array(
+            'template' => 'templates/spending-landing-page',
+            'variables' => array('contents' => array()),
+        )
+    );
+}
+
+function page_controller($template){
+    return theme($template);
+}
+
