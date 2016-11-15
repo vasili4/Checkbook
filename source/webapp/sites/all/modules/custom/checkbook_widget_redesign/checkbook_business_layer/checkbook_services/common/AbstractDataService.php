@@ -23,4 +23,17 @@ abstract class AbstractDataService implements IDataService {
         $data = $this->repository->getData($parameters, $limit, $orderBy, $statementName, $sqlConfigPath);
         return $data;
     }
+
+    /**
+     * Returns the count of data after executing the Sql
+     * @param $parameters
+     * @param $statementName
+     * @param null $sqlConfigPath
+     * @return mixed
+     */
+    public function getCountData($parameters, $statementName = null, $sqlConfigPath = null) {
+        $sqlConfigPath = $sqlConfigPath ?: $this->sqlConfigPath;
+        $data = $this->repository->getDataCount($parameters, $statementName, $sqlConfigPath);
+        return $data;
+    }
 } 

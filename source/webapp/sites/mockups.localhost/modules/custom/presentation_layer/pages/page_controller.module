@@ -4,6 +4,8 @@
  * Module to support custom pages for the site
  */
 
+require_once(realpath(drupal_get_path('module', 'checkbook_services')) .'/spending/SpendingDataService.php');
+require_once('includes/page_controller.inc');
 
 /**
  * Implements hook_menu()
@@ -34,22 +36,28 @@ function page_controller_menu() {
 /**
  * Implements hook_theme()
  */
-function page_controller_theme() {
+function page_controller_theme($viewModel) {
 
     return array(
         'home' => array(
             'template' => 'templates/home-page',
             'render element' => 'page',
-            'variables' => array('contents' => array()),
+            'arguments' => array('viewModel' => $viewModel),
         ),
         'spending_landing' => array(
             'template' => 'templates/spending-landing-page',
-            'variables' => array('contents' => array()),
+            'arguments' => array('viewModel' => $viewModel),
         )
     );
 }
 
 function page_controller($template){
-    return theme($template);
+    $viewModel = null;
+    switch($template) {
+        case "spending_landing":
+            $viewModel = _page_controller_get_spending_landing();
+            break;
+    }
+    return theme($template,array($viewModel));
 }
 

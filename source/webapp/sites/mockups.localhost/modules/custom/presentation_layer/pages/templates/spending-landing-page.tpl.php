@@ -71,9 +71,17 @@
  *
  * @ingroup themeable
  */
+
+var_dump($viewModel);
+
 ?>
 
 
+
 <div class="home">
-   I'm the Spending Landing Page!
+  <table border="1">
+      <tr>
+          <td></td>
+      </tr>
+  </table>
 </div>
