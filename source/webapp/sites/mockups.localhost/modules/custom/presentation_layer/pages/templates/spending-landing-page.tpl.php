@@ -71,17 +71,34 @@
  *
  * @ingroup themeable
  */
-
-var_dump($viewModel);
-
+if (!($viewModel instanceof DataTableViewModel)) {
+    return null;
+}
+$model = $viewModel->model;
+$viewConfig = $viewModel->viewConfig;
+if (!($model instanceof DataTableModel) || !($viewConfig instanceof DataTableViewConfig)) {
+    return null;
+}
 ?>
-
 
 
 <div class="home">
   <table border="1">
       <tr>
-          <td></td>
+          <?php foreach($viewConfig->tableColumns as $tableColumn) { ?>
+          <th>
+              <?php echo($tableColumn->label); ?>
+          </th>
+          <?php } ?>
       </tr>
+      <?php for($i=0; $i < count($model->data); $i++) { ?>
+      <tr>
+          <?php foreach($viewConfig->tableColumns as $tableColumn) {  ?>
+              <td>
+                  <?php echo($model->data[$i][$tableColumn->column]); ?>
+              </td>
+          <?php } ?>
+      </tr>
+      <?php } ?>
   </table>
 </div>

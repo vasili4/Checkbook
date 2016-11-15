@@ -42,7 +42,7 @@ function page_controller_theme($viewModel) {
         'home' => array(
             'template' => 'templates/home-page',
             'render element' => 'page',
-            'arguments' => array('viewModel' => $viewModel),
+            'arguments' => array(),
         ),
         'spending_landing' => array(
             'template' => 'templates/spending-landing-page',
@@ -56,8 +56,11 @@ function page_controller($template){
     switch($template) {
         case "spending_landing":
             $viewModel = _page_controller_get_spending_landing();
+            return theme($template,array('viewModel'=>$viewModel));
+            break;
+        default:
+            return theme($template,array());
             break;
     }
-    return theme($template,array($viewModel));
 }
 

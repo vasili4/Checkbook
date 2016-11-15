@@ -6,8 +6,8 @@ class DataTableViewModel {
     private $dataFunction;
     private $countFunction;
 
-    protected $columnsConfig;
-    protected $model;
+    public $viewConfig;
+    public $model;
 
     function __construct($viewConfig,$parameters,$limit,$orderBy) {
 
@@ -15,24 +15,17 @@ class DataTableViewModel {
         $this->dataFunction = $viewConfig->dataFunction;
         $this->countFunction = $viewConfig->countFunction;
 
-        $this->initializeDataTableColumnsViewConfig($viewConfig->tableColumns);
-        $this->initializeModel($parameters,$limit,$orderBy);
+        $this->viewConfig = new DataTableViewConfig($viewConfig);
+        $this->_initializeModel($parameters,$limit,$orderBy);
     }
 
-    function initializeDataTableColumnsViewConfig($tableColumnsConfig) {
+    private function _initializeModel($parameters,$limit,$orderBy) {
 
-        $this->columnsConfig = array();
-        foreach($tableColumnsConfig as $tableColumnConfig) {
-            $this->columnsConfig[] = new DataTableColumnViewConfig($tableColumnConfig);
-        }
-    }
-
-    function initializeModel($parameters,$limit,$orderBy) {
-
-        $service = new $this->serviceName();
+        $serviceName = $this->serviceName;
         $countFunction = $this->countFunction;
         $dataFunction = $this->dataFunction;
 
+        $service = new $serviceName();
         $count = $service->$countFunction($parameters);
         $data = $service->$dataFunction($parameters, $limit, $orderBy);
 
@@ -40,25 +33,45 @@ class DataTableViewModel {
     }
 }
 
+
+class DataTableViewConfig {
+
+    public $headerTitle;
+    public $headerSubTitle;
+    public $tableColumns;
+
+    /**
+     * @param $viewConfig
+     */
+    function __construct($viewConfig) {
+        $this->headerTitle = $viewConfig->headerTitle;
+        $this->headerSubTitle = $viewConfig->headerSubTitle;
+        $this->tableColumns = array();
+        foreach($viewConfig->tableColumns as $tableColumn) {
+            $this->tableColumns[] = new DataTableColumnViewConfig($tableColumn);
+        }
+    }
+}
+
 class DataTableColumnViewConfig {
 
-    protected $label;
-    protected $column;
-    protected $format;
-    protected $tooltip;
+    public $label;
+    public $column;
+    public $format;
+    public $tooltip;
 
-    function __construct($tableColumnConfig) {
-        $this->label = $tableColumnConfig->label;
-        $this->column = $tableColumnConfig->column;
-        $this->format = $tableColumnConfig->format;
-        $this->tooltip = $tableColumnConfig->tooltip;
+    function __construct($tableColumn) {
+        $this->label = $tableColumn->label;
+        $this->column = $tableColumn->column;
+        $this->format = $tableColumn->format;
+        $this->tooltip = $tableColumn->tooltip;
     }
 }
 
 class DataTableModel {
 
-    protected $data;
-    protected $count;
+    public $data;
+    public $count;
 
     function __construct($data,$count) {
         $this->data = $data;
