@@ -73,13 +73,10 @@
  */
 ?>
 
-
 <div class="domain-select-overlay"></div>
 <nav>
     <div class="nav-logo">
-        <a href="#">
-            <div class="main-logo-notag"></div>
-        </a>
+        <a href="#"><div class="main-logo-notag"></div></a>
     </div>
     <div><a href="#">home</a></div>
     <div class="nav-dropdown"><a href="#">domains</a></div>
@@ -91,12 +88,10 @@
 
 <div class="nav-domains">
     <div class="nav-domains__list">
-        <!-- <a href="landing.html" class="spending"> -->
-        <div class="spending">
+        <!-- <a href="landing.html" class="spending"> --><div class="spending">
             <div>$0.00B</div>
             <div>spending</div>
-            <!-- </a> -->
-        </div>
+            <!-- </a> --></div>
         <div class="budget">
             <div>$0.00B</div>
             <div>budget</div>
@@ -147,13 +142,12 @@
         <div class="home__front-links--domains">
             <div class="domains-img"></div>
             <div class="domain-text">
-                <span>How does the city spend your money?</span><br>
-                <span class="enter">Enter domains</span>
+					<span>How does the city spend your money?<span><br>
+					<span class="enter">Enter domains</span>
             </div>
         </div>
         <div class="domain-select">
             <span>select a domain</span>
-
             <div class="domain-select-close">&times;</div>
             <div class="domain-icons">
                 <div class="domain">
@@ -191,26 +185,14 @@
 <footer>
     <div class="footer__left-links">
         <div class="locale"><span>translate</span>
-            <a href="#">
-                <div class="globe-icon"></div>
-            </a> <!-- needs image -->
+            <a href="#"><div class="globe-icon"></div></a> <!-- needs image -->
         </div>
         <div class="social"><span>social</span>
-            <a href="#">
-                <div class="googleplus-icon"></div>
-            </a> <!-- needs image -->
-            <a href="#">
-                <div class="twitter-icon"></div>
-            </a> <!-- needs image -->
-            <a href="#">
-                <div class="facebook-icon"></div>
-            </a> <!-- needs image -->
-            <a href="#">
-                <div class="linkedin-icon"></div>
-            </a> <!-- needs image -->
-            <a href="#">
-                <div class="email-icon"></div>
-            </a> <!-- needs image -->
+            <a href="#"><div class="googleplus-icon"></div></a> <!-- needs image -->
+            <a href="#"><div class="twitter-icon"></div></a> <!-- needs image -->
+            <a href="#"><div class="facebook-icon"></div></a> <!-- needs image -->
+            <a href="#"><div class="linkedin-icon"></div></a> <!-- needs image -->
+            <a href="#"><div class="email-icon"></div></a> <!-- needs image -->
         </div>
     </div>
 
@@ -220,15 +202,13 @@
             City&nbsp;of&nbsp;New&nbsp;York<br>
             One&nbsp;Centre&nbsp;Street,
             New&nbsp;York,&nbsp;NY |
-            Phone:&nbsp;212.669.3916
-        </div>
+            Phone:&nbsp;212.669.3916<div>
 			<span>
 				<a href="#">disclaimer</a> |
 				<a href="#">privacy&nbsp;policy</a> |
 				<a href="#">language&nbsp;disclaimer</a>
 			</span>
-
-        <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
-        <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
-    </div>
+                <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
+                <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
+            </div>
 </footer>

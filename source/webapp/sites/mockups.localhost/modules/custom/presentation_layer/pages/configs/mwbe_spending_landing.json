@@ -13,7 +13,8 @@
                 {"label":"Prime Vendor","column":"vendor_name","format":"text","tooltip":60},
                 {"label":"Expense Category","column":"expense_category","format":"date"},
                 {"label":"Check Amount","column":"check_amount","format":"dollar"}
-            ]
+            ],
+            "orderBy":"check_amount desc    "
         }
     }
 }

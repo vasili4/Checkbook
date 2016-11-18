@@ -7,6 +7,8 @@ screenshot = 'screenshot.png'
 stylesheets[all][] = css/output.css
 
 ; SCRIPTS
+
+scripts[] = 'js/nvd3.js'
 scripts[] = 'js/script.js'
 
 
