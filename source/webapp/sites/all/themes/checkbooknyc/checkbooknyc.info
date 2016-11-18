@@ -5,6 +5,7 @@ engine = phptemplate
 
 screenshot = 'screenshot.png'
 stylesheets[all][] = css/output.css
+stylesheets[all][] = css/nvd3.css
 
 ; SCRIPTS
 
