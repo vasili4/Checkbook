@@ -30,7 +30,12 @@ DROP TABLE IF EXISTS subcontract_status_by_prime_contract_id;
             effective_begin_year_id smallint,
             effective_end_year_id smallint,
             sort_order smallint,
-            latest_flag char(1)
+            latest_flag char(1),
+            award_method_id smallint,
+            award_method_name character varying,
+            industry_type_id smallint,
+            industry_type_name character varying(50),
+            award_size_id smallint
             )
             DISTRIBUTED BY (original_agreement_id);
 
@@ -60,7 +65,12 @@ INSERT INTO subcontract_status_by_prime_contract_id
 			effective_end_year_id,
 			sort_order,
 			latest_flag,
-			prime_sub_vendor_minority_type_by_name_code
+			prime_sub_vendor_minority_type_by_name_code,
+			award_method_id,
+			award_method_name,
+			industry_type_id,
+			industry_type_name,
+			award_size_id
 			)
 			SELECT
 			a.original_agreement_id,
@@ -105,7 +115,12 @@ INSERT INTO subcontract_status_by_prime_contract_id
 			(CASE
 			    WHEN b.vendor_name IS NULL THEN ''
 			    ELSE ','||b.vendor_type||':'||b.minority_type_id||':'||CAST(subvendor.vendor_customer_code as text)||':'||b.vendor_name
-			END) AS prime_sub_vendor_minority_type_by_name_code
+			END) AS prime_sub_vendor_minority_type_by_name_code,
+			award_method_id,
+			award_method_name,
+			industry_type_id,
+			industry_type_name,
+			award_size_id
 			FROM all_agreement_transactions a
 			LEFT JOIN
 			(
