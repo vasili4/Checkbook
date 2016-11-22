@@ -4,6 +4,7 @@ description = Module to support custom pages for the site.
 core = 7.x
 package = Checkbook Mockups
 
+dependencies[] = component_controller
 dependencies[] = checkbook_services
 
 files[] = includes/page_controller.inc

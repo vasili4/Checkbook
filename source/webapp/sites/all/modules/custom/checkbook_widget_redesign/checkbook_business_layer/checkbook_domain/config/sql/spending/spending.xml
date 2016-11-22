@@ -22,261 +22,147 @@
             </where>
         </sql>
     </statement>
-    <statement name="GetCountChecks" datasource="checkbook">
+    <statement name="GetAgencies" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
+        <param name="mwbe" />
+        <sql>
+            SELECT
+            a.agency_id,
+            b.agency_name,
+            SUM(total_spending_amount) as check_amount
+            FROM aggregateon_mwbe_spending_coa_entities a
+            JOIN ref_agency b ON b.agency_id = a.agency_id
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="a.year_id" paramName="year" />
+                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
+                </exp>
+            </where>
+            GROUP BY a.agency_id,b.agency_name
+        </sql>
+    </statement>
+    <statement name="GetExpenseCategories" datasource="checkbook">
         <param name="year" />
         <param name="mwbe" />
         <sql>
-            SELECT DISTINCT count(check_eft_issued_date) as record_count FROM disbursement_line_item_details
-            <where>
-                <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                </exp>
-            </where>
-        </sql>
-    </statement>
-    <statement name="GetMwbeChecks" datasource="checkbook">
-        <param name="fiscal_year_id" required ="true"/>
-        <param name="calendar_year_id" />
-        <param name="mwbe" />
-        <sql>
-            SELECT check_eft_issued_date as issue_date,
-            vendor_name as vendor_name,
-            agency_name,
-            check_amount,
-            expenditure_object_name as expense_category,
-            agency_id,
-            vendor_id,
-            expenditure_object_id,
-            department_name,
-            industry_type_id
+            SELECT
+            expenditure_object_id as expense_category_id,
+            expenditure_object_name as expense_category_name,
+            check_amount
             FROM disbursement_line_item_details
             <where>
                 <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
+                    <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
                     <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
                 </exp>
             </where>
         </sql>
     </statement>
-    <statement name="GetCountMwbeChecks" datasource="checkbook">
-        <param name="year" required ="true"/>
-        <param name="yeartype" required ="true"/>
+    <statement name="GetPrimeVendors" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
         <param name="mwbe" />
         <sql>
-            SELECT DISTINCT count(check_eft_issued_date) as record_count FROM disbursement_line_item_details
+            SELECT
+            a.vendor_id,
+            b.legal_name as prime_vendor_name,
+            mwbe_category,
+            SUM(COALESCE(total_spending_amount,0)) as check_amount,
+            MAX(COALESCE(total_contract_amount,0)) as total_contract_amount
+            FROM aggregateon_mwbe_spending_contract a
+            JOIN vendor b ON b.vendor_id = a.vendor_id
+            LEFT JOIN
+            (
+                SELECT minority_type_id,
+                CASE WHEN minority_type_id IN (4,5) THEN 'Asian American' ELSE minority_type_name END as mwbe_category
+                FROM ref_minority_type
+            ) minority_type on minority_type.minority_type_id = a.minority_type_id
             <where>
                 <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    <exp op="=" dbField="a.year_id" paramName="year" />
+                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
                 </exp>
             </where>
+            GROUP BY a.vendor_id, b.legal_name, mwbe_category
         </sql>
     </statement>
-    <statement name="GetOGEChecks" datasource="checkbook_oge">
-        <param name="fiscal_year_id" required ="true"/>
-        <param name="calendar_year_id" />
-        <param name="agency" />
-        <sql>
-            SELECT check_eft_issued_date as issue_date,
-            vendor_name as vendor_name,
-            agency_name,
-            check_amount,
-            expenditure_object_name as expense_category,
-            agency_id,
-            vendor_id,
-            expenditure_object_id,
-            department_name
-            FROM disbursement_line_item_details
-            <where>
-                <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                    <exp op="=" dbField="agency_id" paramName="agency" />
-                </exp>
-            </where>
-        </sql>
-    </statement>
-    <statement name="GetCountOGEChecks" datasource="checkbook_oge">
-        <param name="year" required ="true"/>
-        <param name="yeartype" required ="true"/>
-        <param name="agency" />
-        <sql>
-            SELECT DISTINCT count(check_eft_issued_date) as record_count FROM disbursement_line_item_details
-            <where>
-                <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                    <exp op="=" dbField="agency_id" paramName="agency" />
-                </exp>
-            </where>
-        </sql>
-    </statement>
-    <statement name="GetSVmwbeChecks" datasource="checkbook">
-        <param name="fiscal_year_id" required ="true"/>
-        <param name="calendar_year_id" />
+    <statement name="GetSubVendors" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
         <param name="mwbe" />
         <sql>
-            SELECT l1.check_eft_issued_date as check_issue_date,
-            l1.agency_id,
-            l1.agency_name,
-            l1.vendor_id,
-            l1.vendor_name,
-            l2.legal_name AS sub_vendor_name,
-            l1.prime_vendor_id,
-            l3.legal_name AS vendor_name,
-            l1.check_amount,
-            l1.minority_type_id
-            FROM subcontract_spending_details l1
-            LEFT OUTER JOIN subvendor l2 ON l2.vendor_id = l1.vendor_id
-            LEFT OUTER JOIN vendor l3 ON l3.vendor_id = l1.prime_vendor_id
+            SELECT
+            a.vendor_id,
+            b.legal_name as sub_vendor_name,
+            mwbe_category,
+            SUM(COALESCE(total_spending_amount,0)) AS check_amount,
+            SUM(COALESCE(total_contract_amount,0)) AS total_sub_contract_amount,
+            SUM(total_sub_contracts) AS number_sub_contracts,
+            SUM(total_spending_amount) AS ytd_spending
+            FROM aggregateon_subven_spending_vendor a
+            JOIN subvendor b ON b.vendor_id = a.vendor_id
+            LEFT JOIN
+            (
+                SELECT minority_type_id,
+                CASE WHEN minority_type_id IN (4,5) THEN 'Asian American' ELSE minority_type_name END as mwbe_category
+                FROM ref_minority_type
+            ) minority_type on minority_type.minority_type_id = a.minority_type_id
             <where>
                 <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    <exp op="=" dbField="a.year_id" paramName="year" />
+                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
+                    <exp op="=" dbField="is_all_categories">'Y'</exp>
                 </exp>
             </where>
+            GROUP BY a.vendor_id, b.legal_name, mwbe_category
         </sql>
     </statement>
-    <statement name="GetCountSVmwbeChecks" datasource="checkbook">
-        <param name="year" required ="true"/>
-        <param name="yeartype" required ="true"/>
-        <sql>
-            SELECT DISTINCT count(check_eft_issued_date) as record_count FROM subcontract_spending_details l1
-            LEFT OUTER JOIN subvendor l2 ON l2.vendor_id = l1.vendor_id
-            LEFT OUTER JOIN vendor l3 ON l3.vendor_id = l1.prime_vendor_id
-            <where>
-                <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                </exp>
-            </where>
-        </sql>
-    </statement>
-    <statement name="GetSVChecks" datasource="checkbook">
-        <param name="fiscal_year_id" required ="true"/>
-        <param name="calendar_year_id" />
+    <statement name="GetContracts" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
         <param name="mwbe" />
         <sql>
-            SELECT l1.check_eft_issued_date as issue_date,
-            l1.agency_id,
-            l1.agency_name,
-            l1.vendor_id,
-            l1.vendor_name,
-            l2.legal_name AS legal_name_checkbook_sub_vendor,
-            l1.prime_vendor_id,
-            l3.legal_name AS legal_name_checkbook_prime_vendor,
-            l1.check_amount,
-            l1.minority_type_id
-            FROM subcontract_spending_details l1
-            LEFT OUTER JOIN subvendor l2 ON l2.vendor_id = l1.vendor_id
-            LEFT OUTER JOIN vendor l3 ON l3.vendor_id = l1.prime_vendor_id
+            SELECT
+            a.document_id as contract_number,
+            a.description as contract_purpose,
+            b.agency_name,
+            c.legal_name as prime_vendor_name,
+            SUM(COALESCE(total_spending_amount,0)) AS check_amount,
+            MAX(COALESCE(total_contract_amount,0)) AS total_contract_amount
+            FROM aggregateon_mwbe_spending_contract a
+            JOIN ref_agency b ON b.agency_id = a.agency_id
+            JOIN vendor c ON c.vendor_id = a.vendor_id
             <where>
                 <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
+                    <exp op="=" dbField="a.year_id" paramName="year" />
+                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
+                </exp>
+            </where>
+            GROUP BY a.document_id, a.description, b.agency_name, c.legal_name
+        </sql>
+    </statement>
+    <statement name="GetSpendingByIndustries" datasource="checkbook">
+        <param name="year" />
+        <param name="mwbe" />
+        <sql>
+            SELECT
+            a.industry_type_id,
+            b.industry_type_name,
+            SUM(total_spending_amount) as check_amount
+            FROM aggregateon_mwbe_spending_coa_entities a
+            JOIN ref_industry_type b ON b.industry_type_id = a.industry_type_id
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="year_id" paramName="year" />
                     <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
                 </exp>
             </where>
-        </sql>
-    </statement>
-    <statement name="GetCountSVChecks" datasource="checkbook">
-        <param name="year" required ="true"/>
-        <param name="yeartype" required ="true"/>
-        <sql>
-            SELECT DISTINCT count(check_eft_issued_date) as record_count FROM subcontract_spending_details l1
-            LEFT OUTER JOIN subvendor l2 ON l2.vendor_id = l1.vendor_id
-            LEFT OUTER JOIN vendor l3 ON l3.vendor_id = l1.prime_vendor_id
-            <where>
-                <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                </exp>
-            </where>
-        </sql>
-    </statement>
-    <statement name="GetmwbeSVChecks" datasource="checkbook">
-        <param name="fiscal_year_id" required ="true"/>
-        <param name="calendar_year_id" />
-        <sql>
-            SELECT l1.check_eft_issued_date as issue_date,
-            l1.agency_name,
-            l1.check_amount,
-            l1.expenditure_object_name,
-            l1.agency_id,
-            l1.prime_vendor_id,
-            l2.legal_name AS legal_name_checkbook_prime_vendor,
-            l1.industry_type_id,
-            l1.minority_type_id
-            FROM subcontract_spending_details l1
-            LEFT OUTER JOIN vendor l2 ON l2.vendor_id = l1.prime_vendor_id
-            <where>
-                <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                </exp>
-            </where>
-        </sql>
-    </statement>
-    <statement name="GetCountmwbeSVChecks" datasource="checkbook">
-        <param name="year" required ="true"/>
-        <param name="yeartype" required ="true"/>
-        <sql>
-            SELECT DISTINCT count(check_eft_issued_date) as record_count FROM subcontract_spending_details l1
-            LEFT OUTER JOIN vendor l2 ON l2.vendor_id = l1.prime_vendor_id
-            <where>
-                <exp op="AND">
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="B">
-                        <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    </exp>
-                    <exp op="IF" condition="=" paramName="yeartype" compareValue="C">
-                        <exp op="=" dbField="calendar_fiscal_year_id" paramName="year" />
-                    </exp>
-                </exp>
-            </where>
+            GROUP BY a.industry_type_id,b.industry_type_name
         </sql>
     </statement>
 </statements>

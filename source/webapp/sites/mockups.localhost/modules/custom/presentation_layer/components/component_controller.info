@@ -1,0 +1,18 @@
+
+name = Component Controller
+description = Module to support custom components for the site.
+core = 7.x
+package = Checkbook Mockups
+
+
+
+files[] = classes/simple_data_table/SimpleDataTableColumnViewConfig.php
+files[] = classes/simple_data_table/SimpleDataTableModel.php
+files[] = classes/simple_data_table/SimpleDataTableViewConfig.php
+files[] = classes/simple_data_table/SimpleDataTableViewModel.php
+files[] = classes/ComponentUtil.php
+
+files[] = includes/component_controller.inc
+
+dependencies[] = checkbook_infrastructure_layer
+dependencies[] = checkbook_services

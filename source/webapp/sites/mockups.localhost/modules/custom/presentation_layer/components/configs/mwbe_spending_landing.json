@@ -1,0 +1,112 @@
+{
+    "views":{
+        "checks":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetChecks",
+            "countFunction":"GetCountChecks",
+            "headerTitle":"Top 5 Checks",
+            "headerSubTitle":"Number of Checks",
+            "tableColumns":[
+                {"label":"Issue Date","column":"issue_date","format":"date"},
+                {"label":"Agency","column":"agency_name","format":"text","tooltip":60},
+                {"label":"Prime Vendor","column":"vendor_name","format":"text","tooltip":60},
+                {"label":"Expense Category","column":"expense_category","format":"text","tooltip":60},
+                {"label":"Check Amount","column":"check_amount","format":"dollar"}
+            ],
+            "orderBy":"check_amount desc"
+        },
+        "agencies":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetAgencies",
+            "countFunction":"GetCountAgencies",
+            "headerTitle":"Top 5 Agencies",
+            "headerSubTitle":"Number of Agencies",
+            "tableColumns":[
+                {"label":"Agency","column":"agency_name","format":"text","tooltip":60},
+                {"label":"YTD Spending","column":"check_amount","format":"dollar"},
+                {"label":"% Spending","column":"check_amount","format":"percent"}
+            ],
+            "orderBy":"check_amount desc"
+        },
+        "expenseCategories":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetExpenseCategories",
+            "countFunction":"GetCountExpenseCategories",
+            "headerTitle":"Top 5 Expense Categories",
+            "headerSubTitle":"Number of Expense Categories",
+            "tableColumns":[
+                {"label":"Expense Category","column":"expense_category_name","format":"text","tooltip":60},
+                {"label":"YTD Spending","column":"check_amount","format":"dollar"},
+                {"label":"% Spending","column":"check_amount","format":"percent"}
+            ],
+            "orderBy":"check_amount desc"
+        },
+        "primeVendors":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetPrimeVendors",
+            "countFunction":"GetCountPrimeVendors",
+            "headerTitle":"Top 5 Prime Vendors",
+            "headerSubTitle":"Number of Prime Vendors",
+            "tableColumns":[
+                {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":60},
+                {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":60},
+                {"label":"YTD Spending","column":"check_amount","format":"dollar"},
+                {"label":"% Spending","column":"check_amount","format":"percent"},
+                {"label":"Total Contract Amount","column":"total_contract_amount","format":"dollar"}
+            ],
+            "orderBy":"check_amount desc"
+        },
+        "subVendors":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetSubVendors",
+            "countFunction":"GetCountSubVendors",
+            "headerTitle":"Top 5 Sub Vendors",
+            "headerSubTitle":"Number of Sub Vendors",
+            "tableColumns":[
+                {"label":"Sub Vendor","column":"sub_vendor_name","format":"text","tooltip":60},
+                {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":60},
+                {"label":"YTD Spending","column":"ytd_spending","format":"dollar"},
+                {"label":"% Spending","column":"check_amount","format":"percent"},
+                {"label":"Number of Sub Contracts","column":"number_sub_contracts","format":"number"},
+                {"label":"Total Contract Amount","column":"total_sub_contract_amount","format":"dollar"}
+            ],
+            "orderBy":"check_amount desc"
+        },
+        "contracts":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetContracts",
+            "countFunction":"GetCountContracts",
+            "headerTitle":"Top 5 Contracts",
+            "headerSubTitle":"Number of Contracts",
+            "tableColumns":[
+                {"label":"Contract Id","column":"contract_number","format":"text","tooltip":60},
+                {"label":"Purpose","column":"contract_purpose","format":"text","tooltip":60},
+                {"label":"Contracting Agency","column":"agency_name","format":"text","tooltip":60},
+                {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":60},
+                {"label":"YTD Spending","column":"check_amount","format":"dollar"},
+                {"label":"Total Contract Amount","column":"total_contract_amount","format":"dollar"}
+            ],
+            "orderBy":"check_amount desc"
+        },
+        "spendingByIndustries":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetSpendingByIndustries",
+            "countFunction":"GetCountSpendingByIndustries",
+            "headerTitle":"Top 5 Industries",
+            "headerSubTitle":"Spending by Industries",
+            "tableColumns":[
+                {"label":"Industry","column":"industry_type_name","format":"text","tooltip":60},
+                {"label":"YTD Spending","column":"check_amount","format":"dollar"},
+                {"label":"% Spending","column":"check_amount","format":"percent"}
+            ],
+            "orderBy":"check_amount desc"
+        }
+    }
+}

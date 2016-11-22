@@ -1,0 +1,64 @@
+<?php
+/**
+ * @file
+ * Module to support custom, re-usable components for the site
+ */
+
+require_once('classes/simple_data_table/SimpleDataTableColumnViewConfig.php');
+require_once('classes/simple_data_table/SimpleDataTableModel.php');
+require_once('classes/simple_data_table/SimpleDataTableViewConfig.php');
+require_once('classes/simple_data_table/SimpleDataTableViewModel.php');
+
+/**
+ * Implements hook_menu()
+ */
+
+function component_controller_menu() {
+
+    $items['simple_data_table'] = array
+    (
+        'title' => 'Simple Data Table Component',
+        'page callback' => 'component_controller',
+        'page arguments' => array('simple_data_table'),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    $items['bar_chart'] = array
+    (
+        'title' => 'Bar Chart Component',
+        'page callback' => 'component_controller',
+        'page arguments' => array('bar_chart'),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+
+/*
+ * Implementation of hook_theme().
+ */
+function component_controller_theme($viewModel){
+    return array(
+        'simple_data_table' => array(
+            'template' => 'templates/simple-data-table',
+            'arguments' => array('viewModel' => $viewModel),
+        ),
+        'bar_chart' => array(
+            'template' => 'templates/bar-chart',
+            'arguments' => array('viewModel' => $viewModel),
+        )
+    );
+}
+
+function component_controller($template){
+    $viewModel = null;
+    switch($template) {
+        case "spending_landing":
+            return theme($template,array('viewModel'=>$viewModel));
+            break;
+        default:
+            return theme($template,array());
+            break;
+    }
+}

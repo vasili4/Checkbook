@@ -4,7 +4,6 @@
  * Module to support custom pages for the site
  */
 
-require_once(realpath(drupal_get_path('module', 'checkbook_services')) .'/spending/SpendingDataService.php');
 require_once('includes/page_controller.inc');
 
 /**
@@ -55,7 +54,6 @@ function page_controller($template){
     $viewModel = null;
     switch($template) {
         case "spending_landing":
-            $viewModel = _page_controller_get_spending_landing();
             return theme($template,array('viewModel'=>$viewModel));
             break;
         default:
