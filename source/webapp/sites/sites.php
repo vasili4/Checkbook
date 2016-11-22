@@ -57,6 +57,6 @@
 $sites['localhost'] = 'localhost';
 $sites['mockups.localhost'] = 'mockups.localhost';
 
-//$sites['mockup-dev-checkbook-nyc.reisys.com'] = 'mockups.localhost';
-//$sites['mockup-qa-checkbook-nyc.reisys.com'] = 'mockups.localhost';
-//$sites['mockup-uat-checkbook-nyc.reisys.com'] = 'mockups.localhost';
+$sites['mockup-dev-checkbook-nyc.reisys.com'] = 'mockups.localhost';
+$sites['mockup-qa-checkbook-nyc.reisys.com'] = 'mockups.localhost';
+$sites['mockup-uat-checkbook-nyc.reisys.com'] = 'mockups.localhost';
