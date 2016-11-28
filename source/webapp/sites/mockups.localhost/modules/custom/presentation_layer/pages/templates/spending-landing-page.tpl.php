@@ -1,11 +1,11 @@
 <div class="domain-select-overlay"></div>
 <nav>
     <div class="nav-logo">
-        <a href="#">
+        <a href="index.html">
             <div class="main-logo-notag"></div>
         </a>
     </div>
-    <div><a href="#">home</a></div>
+    <div><a href="index.html">home</a></div>
     <div class="nav-dropdown active"><a href="#">domains</a></div>
     <div><a href="#">bonds</a></div>
     <div><a href="#">trends</a></div>
@@ -14,26 +14,26 @@
 </nav>
 <div class="nav-domains active">
     <div class="nav-domains__list">
-        <div class="spending">
+        <a href="landing.html" class="spending active">
             <div>$0.00B</div>
             <div>spending</div>
-        </div>
-        <div class="budget">
+        </a>
+        <a href="#" class="budget">
             <div>$0.00B</div>
             <div>budget</div>
-        </div>
-        <div class="revenue">
+        </a>
+        <a href="#" class="revenue">
             <div>$0.00B</div>
             <div>revenue</div>
-        </div>
-        <div class="contracts">
+        </a>
+        <a href="#" class="contracts">
             <div>$0.00B</div>
             <div>contracts</div>
-        </div>
-        <div class="payroll">
+        </a>
+        <a href="#" class="payroll">
             <div>$0.00B</div>
             <div>payroll</div>
-        </div>
+        </a>
     </div>
 </div>
 <div class="landing">
@@ -63,7 +63,6 @@
             <div class="subdomain"> <span>$0.00B</span> <span>other</span> </div>
         </div>
     </div>
-
     <div class="data-visualization">
         <div class="snapshots-container">
             <div class="domain-label">snapshots</div>
@@ -78,14 +77,14 @@
                 <div class="pie">
                     <div class="image"></div>
                     <div class="data">
-                        <div>3/5</div>
+                        <div>45%</div>
                         <div>insert text here</div>
                     </div>
                 </div>
                 <div class="bar">
                     <div class="image"></div>
                     <div class="data">
-                        <div>3/5</div>
+                        <div>9.3K</div>
                         <div>insert text here</div>
                     </div>
                 </div>
@@ -128,32 +127,21 @@
             </div>
             <div style="clear: left"></div>
         </div>
+        <a href="javascript:" id="return-to-top">return to top</a>
     </div>
 </div>
 <!-- .landing close tag -->
 <footer>
     <div class="footer__left-links">
         <div class="locale"><span>translate</span>
-            <a href="#">
-                <div class="globe-icon"></div>
-            </a>
+            <a href="#"><div class="globe-icon"></div></a>
         </div>
         <div class="social"><span>social</span>
-            <a href="#">
-                <div class="googleplus-icon"></div>
-            </a>
-            <a href="#">
-                <div class="twitter-icon"></div>
-            </a>
-            <a href="#">
-                <div class="facebook-icon"></div>
-            </a>
-            <a href="#">
-                <div class="linkedin-icon"></div>
-            </a>
-            <a href="#">
-                <div class="email-icon"></div>
-            </a>
+            <a href="#"><div class="googleplus-icon"></div></a>
+            <a href="#"><div class="twitter-icon"></div></a>
+            <a href="#"><div class="facebook-icon"></div></a>
+            <a href="#"><div class="linkedin-icon"></div></a>
+            <a href="#"><div class="email-icon"></div></a>
         </div>
     </div>
     <div class="footer__right-links">
