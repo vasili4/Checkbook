@@ -9,6 +9,7 @@ class SimpleDataTableViewConfig {
     public $headerTitle;
     public $headerSubTitle;
     public $tableColumns;
+    public $sortColumn;
 
     /**
      * @param $viewConfig
@@ -20,5 +21,7 @@ class SimpleDataTableViewConfig {
         foreach($viewConfig->tableColumns as $tableColumn) {
             $this->tableColumns[] = new SimpleDataTableColumnViewConfig($tableColumn);
         }
+        $sortColumn = explode(" ",$viewConfig->orderBy);
+        $this->sortColumn = $sortColumn[0];
     }
 } 

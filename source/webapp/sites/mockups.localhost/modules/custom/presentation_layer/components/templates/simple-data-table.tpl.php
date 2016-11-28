@@ -92,6 +92,9 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
 
                 <th style="<?php echo $align ?>border: none; padding-left: 1em; padding-bottom:1em; padding-top:1em;background-color: #e1efd6; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px; line-height: 10px;" class="sort-desc">
                     <?php echo($tableColumn->label); ?>
+                    <?php if($tableColumn->column == $viewConfig->sortColumn) { ?>
+                        <img src="<?php base_path()?>sites/all/themes/checkbooknyc/images/sort_arrow_down.png">
+                    <?php } ?>
                 </th>
             <?php } ?>
         </tr>
