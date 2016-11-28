@@ -67,7 +67,7 @@ nav {
   height: 0;
   overflow: hidden;
   position: absolute;
-  top: 55px;
+  top: 53px;
   transition: .25s ease-in-out;
   visibility: hidden;
   width: 100%;
@@ -79,12 +79,18 @@ nav {
     display: flex;
     margin: auto;
     max-width: 1024px;
-    > div {
+    > div,
+    a {
       cursor: pointer;
       flex: 1;
       margin-top: 5px;
       text-align: center;
-      &:hover div{
+      text-decoration: none;
+      color: $main-font;
+      &:hover div {
+        color: $white;
+      }
+      &.active div {
         color: $white;
       }
       div {

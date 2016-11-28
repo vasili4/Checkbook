@@ -72,5 +72,4 @@
  * @ingroup themeable
  */
 ?>
-
 <?php print render($page['content']); ?>

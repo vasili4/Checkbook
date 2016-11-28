@@ -1,16 +1,15 @@
 (function ($) {
 
 
-    $(document).ready(function () {
-
-        $(".recommended-search__button, .recommended-search__close").click(function (e) {
+    $(document).ready(function() {
+        $(".recommended-search__button, .recommended-search__close").click(function(e) {
             $(".recommended-search__button").toggleClass("active");
             $(".recommended-search").toggleClass("active");
 
             e.stopPropagation();
         });
 
-        $(".domains-img, .domain-select-close").click(function (e) {
+        $(".domains-img, .domain-select-close").click(function(e) {
             $(".domain-select").toggleClass("active");
             $(".domains-img").toggleClass("active");
             $(".domain-select-overlay").toggleClass("active");
@@ -18,7 +17,7 @@
             e.stopPropagation();
         });
 
-        $(".nav-dropdown").click(function (e) {
+        $(".nav-dropdown").click(function(e) {
             $(this).toggleClass("active");
             $(".nav-domains").toggleClass("active");
 
@@ -39,6 +38,19 @@
             }
         });
 
+        $(window).scroll(function() {
+            if ($(this).scrollTop() >= 200) {
+                $('#return-to-top').fadeIn(200);
+            } else {
+                $('#return-to-top').fadeOut(0);
+            }
+        });
+        $('#return-to-top').click(function() {
+            $('body,html').animate({
+                scrollTop: 0
+            }, 500);
+        });
+
         //removes active class from all elements
         //hides modal elements on click on window
         //need to update to remove modal elements
@@ -48,7 +60,8 @@
         // });
 
 
-        var chart;
+        var chart,
+            char2;
         var fiscalYear = ["2011", "2012", "2013", "2014", "2015", "2016", "2017"];
         var dollarFormat = function(d) {
             return '$' + d3.format(',.01f')(d) + "M";
@@ -60,7 +73,7 @@
                 .duration(1000)
                 .margin({
                     bottom: 100,
-                    left: 70
+                    left: 70,
                 })
                 .rotateLabels(0)
                 .groupSpacing(0.1)
@@ -96,28 +109,29 @@
 
         //line graph//////////////////////////////////////////////////////////////////
         nv.addGraph(function() {
-            chart = nv.models.lineChart()
+            chart2 = nv.models.lineChart()
                 .options({
-                    duration: 1000,
+                    duration: 350,
                     useInteractiveGuideline: true
                 })
                 .height(450);
             // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
-            chart.xAxis
+            chart2.xAxis
                 .tickValues([0, 1, 2, 3, 4, 5, 6])
                 .tickFormat(function(d) {
                     return fiscalYear[d];
                 });;
-            chart.yAxis
+            chart2.yAxis
                 .tickFormat(dollarFormat);
-            chart.
-                data = sinAndCos();
+            chart2.interactiveLayer.tooltip.fixedTop(-100);
+            data = sinAndCos();
             d3.select('#chart2 svg')
                 .datum(mock)
-                .call(chart);
-            nv.utils.windowResize(chart.update);
-            return chart;
+                .call(chart2);
+            nv.utils.windowResize(chart2.update);
+            return chart2;
         });
+
 
         function sinAndCos() {
             var sin = [],
@@ -175,196 +189,161 @@
                 fillOpacity: .1
             }];
         }
-    })
+
+    });
 
 })(jQuery);
 
-var mock = [
-    {
+var mock = [{
+    key: "Asian American",
+    values: [{
         key: "Asian American",
-        values: [
-            {
-                key: "Asian American",
-                x: 0,
-                y: 198.8
-            },
-            {
-                key: "Asian American",
-                series: 0,
-                x: 1,
-                y: 240.1
-            },
-            {
-                key: "Asian American",
-                series: 0,
-                x: 2,
-                y: 292.9
-            },
-            {
-                key: "Asian American",
-                series: 0,
-                x: 3,
-                y: 393.3
-            },
-            {
-                key: "Asian American",
-                series: 0,
-                x: 4,
-                y: 374.0
-            },
-            {
-                key: "Asian American",
-                series: 0,
-                x: 5,
-                y: 481.1
-            },
-            {
-                key: "Asian American",
-                series: 0,
-                x: 6,
-                y: 215.0
-            }
-        ]
-    },
-    {
+        series: "2011",
+        x: 0,
+        y: 198.8
+    }, {
+        key: "Asian American",
+        series: "2011",
+        x: 1,
+        y: 240.1
+    }, {
+        key: "Asian American",
+        series: "2011",
+        x: 2,
+        y: 292.9
+    }, {
+        key: "Asian American",
+        series: "2011",
+        x: 3,
+        y: 393.3
+    }, {
+        key: "Asian American",
+        series: "2011",
+        x: 4,
+        y: 374.0,
+    }, {
+        key: "Asian American",
+        series: "2011",
+        x: 5,
+        y: 481.1,
+    }, {
+        key: "Asian American",
+        series: "2011",
+        x: 6,
+        y: 215.0
+    }]
+}, {
+    key: "Black American",
+    values: [{
         key: "Black American",
-        values: [
-            {
-                key: "Black American",
-                series: 0,
-                x: 0,
-                y: 32.3
-            },
-            {
-                key: "Black American",
-                series: 0,
-                x: 1,
-                y: 31.3
-            },
-            {
-                key: "Black American",
-                series: 0,
-                x: 2,
-                y: 31.9
-            },
-            {
-                key: "Black American",
-                series: 0,
-                x: 3,
-                y: 39.4
-            },
-            {
-                key: "Black American",
-                series: 0,
-                x: 4,
-                y: 41.7
-            },
-            {
-                key: "Black American",
-                series: 0,
-                x: 5,
-                y: 54.6
-            },
-            {
-                key: "Black American",
-                series: 0,
-                x: 6,
-                y: 21.2
-            }
-        ]
-    },
-    {
+        series: 0,
+        x: 0,
+        y: 32.3
+    }, {
+        key: "Black American",
+        series: 0,
+        x: 1,
+        y: 31.3
+    }, {
+        key: "Black American",
+        series: 0,
+        x: 2,
+        y: 31.9
+    }, {
+        key: "Black American",
+        series: 0,
+        x: 3,
+        y: 39.4
+    }, {
+        key: "Black American",
+        series: 0,
+        x: 4,
+        y: 41.7
+    }, {
+        key: "Black American",
+        series: 0,
+        x: 5,
+        y: 54.6
+    }, {
+        key: "Black American",
+        series: 0,
+        x: 6,
+        y: 21.2
+    }]
+}, {
+    key: "Hispanic American",
+    values: [{
         key: "Hispanic American",
-        values: [
-            {
-                key: "Hispanic American",
-                series: 0,
-                x: 0,
-                y: 67.5
-            },
-            {
-                key: "Hispanic American",
-                series: 0,
-                x: 1,
-                y: 83.5
-            },
-            {
-                key: "Hispanic American",
-                series: 0,
-                x: 2,
-                y: 78.8
-            },
-            {
-                key: "Hispanic American",
-                series: 0,
-                x: 3,
-                y: 67.6
-            },
-            {
-                key: "Hispanic American",
-                series: 0,
-                x: 4,
-                y: 90.2
-            },
-            {
-                key: "Hispanic American",
-                series: 0,
-                x: 5,
-                y: 104.4
-            },
-            {
-                key: "Hispanic American",
-                series: 0,
-                x: 6,
-                y: 44.6
-            }
-        ]
-    },
-    {
+        series: 0,
+        x: 0,
+        y: 67.5
+    }, {
+        key: "Hispanic American",
+        series: 0,
+        x: 1,
+        y: 83.5
+    }, {
+        key: "Hispanic American",
+        series: 0,
+        x: 2,
+        y: 78.8
+    }, {
+        key: "Hispanic American",
+        series: 0,
+        x: 3,
+        y: 67.6
+    }, {
+        key: "Hispanic American",
+        series: 0,
+        x: 4,
+        y: 90.2
+    }, {
+        key: "Hispanic American",
+        series: 0,
+        x: 5,
+        y: 104.4
+    }, {
+        key: "Hispanic American",
+        series: 0,
+        x: 6,
+        y: 44.6
+    }]
+}, {
+    key: "Women",
+    values: [{
         key: "Women",
-        values: [
-            {
-                key: "Women",
-                series: 0,
-                x: 0,
-                y: 165.2
-            },
-            {
-                key: "Women",
-                series: 0,
-                x: 1,
-                y: 168.2
-            },
-            {
-                key: "Women",
-                series: 0,
-                x: 2,
-                y: 158.4
-            },
-            {
-                key: "Women",
-                series: 0,
-                x: 3,
-                y: 217.2
-            },
-            {
-                key: "Women",
-                series: 0,
-                x: 4,
-                y: 245.4
-            },
-            {
-                key: "Women",
-                series: 0,
-                x: 5,
-                y: 306.9
-            },
-            {
-                key: "Women",
-                series: 0,
-                x: 6,
-                y: 139.4
-            }
-        ]
-    }
-];
+        series: 0,
+        x: 0,
+        y: 165.2
+    }, {
+        key: "Women",
+        series: 0,
+        x: 1,
+        y: 168.2
+    }, {
+        key: "Women",
+        series: 0,
+        x: 2,
+        y: 158.4
+    }, {
+        key: "Women",
+        series: 0,
+        x: 3,
+        y: 217.2
+    }, {
+        key: "Women",
+        series: 0,
+        x: 4,
+        y: 245.4
+    }, {
+        key: "Women",
+        series: 0,
+        x: 5,
+        y: 306.9
+    }, {
+        key: "Women",
+        series: 0,
+        x: 6,
+        y: 139.4
+    }]
+}];

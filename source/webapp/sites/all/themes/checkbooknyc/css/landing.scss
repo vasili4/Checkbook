@@ -3,6 +3,7 @@ div.landing {
   max-width: 1024px;
   position: relative;
   padding-bottom: 8%;
+  z-index: 1;
 
   div.landing-head {
     flex: 1;
@@ -118,12 +119,13 @@ div.landing {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     margin-top: 5%;
     min-height: 800px;
-    padding: 2.5em;
+    padding: 2em;
     position: relative;
+    height: 100%;
 
     div.domain-label {
       color: $main;
-      display: block;
+      display: inline-block;
       font-size: 1.5em;
       font-weight: bold;
       text-transform: uppercase;
@@ -139,7 +141,7 @@ div.landing {
         > div {
           display: flex;
           height: 90px;
-          margin-top: 25px;
+          margin-top: 2%;
           width: 27.5%;
 
           div.image {
@@ -152,6 +154,7 @@ div.landing {
               background-color: $snapshot-blue;
               background-size: 55px;
             }
+
             .data {
               background-color: $snapshot-blue-light;
             }
@@ -163,6 +166,7 @@ div.landing {
               background-color: $snapshot-yellow;
               background-size: 55px;
             }
+
             .data {
               background-color: $snapshot-yellow-light;
               color: $gray;
@@ -175,6 +179,7 @@ div.landing {
               background-color: $snapshot-maroon;
               background-size: 55px;
             }
+
             .data {
               background-color: $snapshot-maroon-light;
             }
@@ -189,6 +194,7 @@ div.landing {
               padding-right: 1em;
               text-align: right;
               text-transform: uppercase;
+
               + div {
                 margin-top: 5px;
               }
@@ -196,7 +202,7 @@ div.landing {
 
             div:first-of-type {
               font-size: 3em;
-              padding-right: .2em;
+              padding-right: 0.2em;
               text-align: right;
             }
           }
@@ -206,6 +212,7 @@ div.landing {
 
     div.chart-toggle {
       float: right;
+      margin-right: 1em;
 
       div {
         cursor: pointer;
@@ -258,7 +265,7 @@ div.landing {
       position: absolute;
       transition: 0.5s ease-in-out;
       visibility: hidden;
-      margin-top: 5%;
+      margin-top: 2%;
 
       &.active {
         opacity: 1;
@@ -270,14 +277,32 @@ div.landing {
       // visibility: hidden;
     }
 
-    //data-tables
-    div.data-tables-container {
-      margin: auto;
-      margin-top: 55%;
-    }
-
     div#chart2 {
       margin-left: 10px;
     }
+
+    div.data-tables-container {
+      margin: 55% auto auto;
+    }
   }
+}
+
+#return-to-top {
+  background-color: $main;
+  border-radius: 0 5px 5px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  color: $white;
+  display: none;
+  font-size: 0.75em;
+  height: 60px;
+  margin-left: 85.4em;
+  padding: .6em 1em;
+  position: fixed;
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  top: 59%;
+  width: 68px;
+  word-spacing: 50px;
+  z-index: 0;
 }
