@@ -91,7 +91,7 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
                 <?php $align = $tableColumn->format == "text" || $tableColumn->format == "date" ? " text-align: left;" : " text-align: center;";?>
 
                 <th style="<?php echo $align ?>border: none; padding-left: 1em; padding-bottom:1em; padding-top:1em;background-color: #e1efd6; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px; line-height: 10px;" class="sort-desc">
-                    <?php echo($tableColumn->label); ?>+
+                    <?php echo($tableColumn->label); ?>
                 </th>
             <?php } ?>
         </tr>

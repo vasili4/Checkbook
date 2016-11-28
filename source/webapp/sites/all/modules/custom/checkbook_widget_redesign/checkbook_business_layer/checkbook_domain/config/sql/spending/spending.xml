@@ -30,9 +30,22 @@
             SELECT
             a.agency_id,
             b.agency_name,
-            SUM(total_spending_amount) as check_amount
+            SUM(total_spending_amount) as check_amount,
+            SUM(total_spending_amount)/MAX(total.check_amount)*100 as percent_spending
             FROM aggregateon_mwbe_spending_coa_entities a
             JOIN ref_agency b ON b.agency_id = a.agency_id
+            JOIN
+            (
+                SELECT SUM(total_spending_amount) AS check_amount
+                FROM aggregateon_mwbe_spending_coa_entities
+                <where>
+                    <exp op="AND">
+                        <exp op="=" dbField="year_id" paramName="year" />
+                        <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    </exp>
+                </where>
+            ) total on 1 = 1
             <where>
                 <exp op="AND">
                     <exp op="=" dbField="a.year_id" paramName="year" />
@@ -45,19 +58,36 @@
     </statement>
     <statement name="GetExpenseCategories" datasource="checkbook">
         <param name="year" />
+        <param name="yeartype" />
         <param name="mwbe" />
         <sql>
             SELECT
-            expenditure_object_id as expense_category_id,
-            expenditure_object_name as expense_category_name,
-            check_amount
-            FROM disbursement_line_item_details
+            b.expenditure_object_id as expense_category_id,
+            b.original_expenditure_object_name as expense_category_name,
+            SUM(total_spending_amount) as check_amount,
+            SUM(total_spending_amount)/MAX(total.check_amount)*100 as percent_spending
+            FROM aggregateon_mwbe_spending_coa_entities a
+            JOIN ref_expenditure_object b ON b.expenditure_object_id = a.expenditure_object_id
+            JOIN
+            (
+                SELECT SUM(total_spending_amount) AS check_amount
+                FROM aggregateon_mwbe_spending_coa_entities
+                <where>
+                    <exp op="AND">
+                        <exp op="=" dbField="year_id" paramName="year" />
+                        <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    </exp>
+                </where>
+            ) total on 1 = 1
             <where>
                 <exp op="AND">
-                    <exp op="=" dbField="check_eft_issued_nyc_year_id" paramName="year" />
-                    <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    <exp op="=" dbField="a.year_id" paramName="year" />
+                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
                 </exp>
             </where>
+            GROUP BY b.expenditure_object_id,b.original_expenditure_object_name
         </sql>
     </statement>
     <statement name="GetPrimeVendors" datasource="checkbook">
@@ -70,8 +100,9 @@
             b.legal_name as prime_vendor_name,
             mwbe_category,
             SUM(COALESCE(total_spending_amount,0)) as check_amount,
+            SUM(total_spending_amount)/MAX(total.check_amount)*100 as percent_spending,
             MAX(COALESCE(total_contract_amount,0)) as total_contract_amount
-            FROM aggregateon_mwbe_spending_contract a
+            FROM aggregateon_mwbe_spending_vendor a
             JOIN vendor b ON b.vendor_id = a.vendor_id
             LEFT JOIN
             (
@@ -79,11 +110,25 @@
                 CASE WHEN minority_type_id IN (4,5) THEN 'Asian American' ELSE minority_type_name END as mwbe_category
                 FROM ref_minority_type
             ) minority_type on minority_type.minority_type_id = a.minority_type_id
+            JOIN
+            (
+                SELECT SUM(total_spending_amount) AS check_amount
+                FROM aggregateon_mwbe_spending_vendor
+                <where>
+                    <exp op="AND">
+                        <exp op="=" dbField="year_id" paramName="year" />
+                        <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                        <exp op="IS" dbField="spending_category_id">NULL</exp>
+                    </exp>
+                </where>
+            ) total on 1 = 1
             <where>
                 <exp op="AND">
                     <exp op="=" dbField="a.year_id" paramName="year" />
                     <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
                     <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
+                    <exp op="IS" dbField="a.spending_category_id">NULL</exp>
                 </exp>
             </where>
             GROUP BY a.vendor_id, b.legal_name, mwbe_category
@@ -99,6 +144,7 @@
             b.legal_name as sub_vendor_name,
             mwbe_category,
             SUM(COALESCE(total_spending_amount,0)) AS check_amount,
+            SUM(total_spending_amount)/MAX(total.check_amount)*100 as percent_spending,
             SUM(COALESCE(total_contract_amount,0)) AS total_sub_contract_amount,
             SUM(total_sub_contracts) AS number_sub_contracts,
             SUM(total_spending_amount) AS ytd_spending
@@ -110,6 +156,19 @@
                 CASE WHEN minority_type_id IN (4,5) THEN 'Asian American' ELSE minority_type_name END as mwbe_category
                 FROM ref_minority_type
             ) minority_type on minority_type.minority_type_id = a.minority_type_id
+            JOIN
+            (
+                SELECT SUM(total_spending_amount) AS check_amount
+                FROM aggregateon_subven_spending_vendor
+                <where>
+                    <exp op="AND">
+                        <exp op="=" dbField="year_id" paramName="year" />
+                        <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                        <exp op="=" dbField="is_all_categories">'Y'</exp>
+                    </exp>
+                </where>
+            ) total on 1 = 1
             <where>
                 <exp op="AND">
                     <exp op="=" dbField="a.year_id" paramName="year" />
@@ -148,18 +207,35 @@
     </statement>
     <statement name="GetSpendingByIndustries" datasource="checkbook">
         <param name="year" />
+        <param name="yeartype" />
         <param name="mwbe" />
         <sql>
             SELECT
             a.industry_type_id,
             b.industry_type_name,
-            SUM(total_spending_amount) as check_amount
+            SUM(total_spending_amount) as check_amount,
+            SUM(total_spending_amount)/MAX(total.check_amount)*100 as percent_spending
             FROM aggregateon_mwbe_spending_coa_entities a
             JOIN ref_industry_type b ON b.industry_type_id = a.industry_type_id
+            JOIN
+            (
+                SELECT SUM(total_spending_amount) AS check_amount
+                FROM aggregateon_mwbe_spending_coa_entities
+                <where>
+                    <exp op="AND">
+                        <exp op="=" dbField="year_id" paramName="year" />
+                        <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                        <exp op="IS NOT" dbField="industry_type_id">NULL</exp>
+                    </exp>
+                </where>
+            ) total on 1 = 1
             <where>
                 <exp op="AND">
                     <exp op="=" dbField="year_id" paramName="year" />
+                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
                     <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    <exp op="IS NOT" dbField="a.industry_type_id">NULL</exp>
                 </exp>
             </where>
             GROUP BY a.industry_type_id,b.industry_type_name

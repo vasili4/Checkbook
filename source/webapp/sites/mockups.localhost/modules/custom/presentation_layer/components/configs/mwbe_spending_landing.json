@@ -26,7 +26,7 @@
             "tableColumns":[
                 {"label":"Agency","column":"agency_name","format":"text","tooltip":60},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
-                {"label":"% Spending","column":"check_amount","format":"percent"}
+                {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
             "orderBy":"check_amount desc"
         },
@@ -40,7 +40,7 @@
             "tableColumns":[
                 {"label":"Expense Category","column":"expense_category_name","format":"text","tooltip":60},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
-                {"label":"% Spending","column":"check_amount","format":"percent"}
+                {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
             "orderBy":"check_amount desc"
         },
@@ -55,7 +55,7 @@
                 {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":60},
                 {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":60},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
-                {"label":"% Spending","column":"check_amount","format":"percent"},
+                {"label":"% Spending","column":"percent_spending","format":"percent"},
                 {"label":"Total Contract Amount","column":"total_contract_amount","format":"dollar"}
             ],
             "orderBy":"check_amount desc"
@@ -70,8 +70,8 @@
             "tableColumns":[
                 {"label":"Sub Vendor","column":"sub_vendor_name","format":"text","tooltip":60},
                 {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":60},
-                {"label":"YTD Spending","column":"ytd_spending","format":"dollar"},
-                {"label":"% Spending","column":"check_amount","format":"percent"},
+                {"label":"YTD Spending","column":"check_amount","format":"dollar"},
+                {"label":"% Spending","column":"percent_spending","format":"percent"},
                 {"label":"Number of Sub Contracts","column":"number_sub_contracts","format":"number"},
                 {"label":"Total Contract Amount","column":"total_sub_contract_amount","format":"dollar"}
             ],
@@ -104,7 +104,7 @@
             "tableColumns":[
                 {"label":"Industry","column":"industry_type_name","format":"text","tooltip":60},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
-                {"label":"% Spending","column":"check_amount","format":"percent"}
+                {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
             "orderBy":"check_amount desc"
         }
