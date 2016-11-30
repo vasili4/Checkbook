@@ -75,140 +75,157 @@
 
 <div class="domain-select-overlay"></div>
 <nav>
-    <div class="nav-logo">
-        <a href="#"><div class="main-logo-notag"></div></a>
-    </div>
-    <div><a href="#">home</a></div>
-    <div class="nav-dropdown"><a href="#">domains</a></div>
-    <div><a href="#">bonds</a></div>
-    <div><a href="#">trends</a></div>
-    <div><a href="#">resources</a></div>
-    <div><a href="#">downloads</a></div>
+  <div class="nav-logo">
+    <a href="javascript:void(0);">
+      <div class="main-logo-notag"></div>
+    </a>
+  </div>
+  <div><a href="/">home</a></div>
+  <div class="nav-dropdown domain-select"><a href="javascript:void(0);">domains</a></div>
+  <div><a href="javascript:void(0);">bonds</a></div>
+  <div><a href="javascript:void(0);">trends</a></div>
+  <div class="nav-dropdown search-tools-select"><a href="javascript:void(0);">search&nbsp;tools</a></div>
+  <div><a href="javascript:void(0);">help</a></div>
 </nav>
 
 <div class="nav-domains">
-    <div class="nav-domains__list">
-        <!-- <a href="landing.html" class="spending"> --><div class="spending">
-            <div>$0.00B</div>
-            <div>spending</div>
-            <!-- </a> --></div>
-        <div class="budget">
-            <div>$0.00B</div>
-            <div>budget</div>
-        </div>
-        <div class="revenue">
-            <div>$0.00B</div>
-            <div>revenue</div>
-        </div>
-        <div class="contracts">
-            <div>$0.00B</div>
-            <div>contracts</div>
-        </div>
-        <div class="payroll">
-            <div>$0.00B</div>
-            <div>payroll</div>
-        </div>
-    </div>
+  <div class="nav-dropdown__list">
+    <a href="/spending_landing" class="spending">
+      <div>$0.00B</div>
+      <div>spending</div>
+    </a>
+    <a href="javascript:void(0);" class="budget">
+      <div>$0.00B</div>
+      <div>budget</div>
+    </a>
+    <a href="javascript:void(0);" class="revenue">
+      <div>$0.00B</div>
+      <div>revenue</div>
+    </a>
+    <a href="javascript:void(0);" class="contracts">
+      <div>$0.00B</div>
+      <div>contracts</div>
+    </a>
+    <a href="javascript:void(0);" class="payroll">
+      <div>$0.00B</div>
+      <div>payroll</div>
+    </a>
+  </div>
+</div>
+
+<div class="nav-search-tools">
+  <div class="nav-dropdown__list">
+    <a href="javascript:void(0);" class="advanced-search">
+      <div>advanced&nbsp;search</div>
+    </a>
+    <a href="javascript:void(0);" class="data-feeds">
+      <div>data&nbsp;feeds</div>
+    </a>
+    <a href="javascript:void(0);" class="api">
+      <div>api</div>
+    </a>
+    <a href="javascript:void(0);" class="create-alerts">
+      <div>create&nbsp;alerts</div>
+    </a>
+  </div>
 </div>
 
 <div class="home">
-    <div class="home__logo"></div>
-    <div class="search">
-        <span class="search-icon"></span>
-        <input type="search" class="search__input" placeholder="What can we help you find today?">
-        <ul class="search__input-options">
-            <li>create alerts</li>
-            <li class="recommended-search__button">recommended searches</li>
-            <li>advanced search</li>
-        </ul>
-        <div class="recommended-search">
-            <div class="recommended-search__close">&times;</div>
-            <span>m/wbe spending</span>
-            <span>sub vendor contracts</span>
-            <span>pending contracts</span>
-            <span>total nyc budget</span>
-            <span>sub vendor spending</span>
-            <span>new contracts</span>
-            <span>total nyc revenue</span>
-            <span>total nyc spending</span>
-            <span>m/wbe contracts</span>
-            <span>expiring contracts</span>
-            <span>total nyc payroll</span>
-            <span>total nyc contracts</span>
-        </div>
+  <div class="home__logo"></div>
+  <div class="search">
+    <span class="search-icon"></span>
+    <input type="search" class="search__input" placeholder="What can we help you find today?">
+    <ul class="search__input-options">
+      <li>create alerts</li>
+      <li class="recommended-search__button">recommended searches</li>
+      <li>advanced search</li>
+    </ul>
+    <div class="recommended-search">
+      <div class="recommended-search__close">&times;</div>
+      <span>m/wbe spending</span>
+      <span>sub vendor contracts</span>
+      <span>pending contracts</span>
+      <span>total nyc budget</span>
+      <span>sub vendor spending</span>
+      <span>new contracts</span>
+      <span>total nyc revenue</span>
+      <span>total nyc spending</span>
+      <span>m/wbe contracts</span>
+      <span>expiring contracts</span>
+      <span>total nyc payroll</span>
+      <span>total nyc contracts</span>
     </div>
+  </div>
 
-    <div class="home__front-links">
-        <div class="home__front-links--domains">
-            <div class="domains-img"></div>
-            <div class="domain-text">
-					<span>How does the city spend your money?<span><br>
-					<span class="enter">Enter domains</span>
-            </div>
-        </div>
-        <div class="domain-select">
-            <span>select a domain</span>
-            <div class="domain-select-close">&times;</div>
-            <div class="domain-icons">
-                <div class="domain">
-                    <div class="spending-ico"></div>
-                    <span>spending</span>
-                </div>
-                <div class="domain">
-                    <div class="budget-ico"></div>
-                    <span>budget</span>
-                </div>
-                <div class="domain">
-                    <div class="revenue-ico"></div>
-                    <span>revenue</span>
-                </div>
-                <div class="domain">
-                    <div class="contracts-ico"></div>
-                    <span>contract</span>
-                </div>
-                <div class="domain">
-                    <div class="payroll-ico"></div>
-                    <span>payroll</span>
-                </div>
-            </div>
-        </div>
-        <div class="home__front-links--bonds">
-            <div class="bonds-img"></div>
-            <div class="domain-text">
-                <span>How does lending impact our budget?</span><br>
-                <span class="enter">Enter bonds</span>
-            </div>
-        </div>
+  <div class="home__front-links">
+    <div class="home__front-links--domains">
+      <div class="domains-img"></div>
+      <div class="domain-text">
+        <span>How does the city spend your money?<span><br>
+          <span class="enter">Enter domains</span>
+      </div>
     </div>
+    <div class="domain-select">
+      <span>select a domain</span>
+      <div class="domain-select-close">&times;</div>
+      <div class="domain-icons">
+        <a href="/spending_landing" class="domain">
+          <div class="spending-ico"></div>
+          <span>spending</span>
+        </a>
+        <a href="javascript:void(0);" class="domain">
+          <div class="budget-ico"></div>
+          <span>budget</span>
+        </a>
+        <a href="javascript:void(0);" class="domain">
+          <div class="revenue-ico"></div>
+          <span>revenue</span>
+        </a>
+        <a href="javascript:void(0);" class="domain">
+          <div class="contracts-ico"></div>
+          <span>contract</span>
+        </a>
+        <a href="javascript:void(0);" class="domain">
+          <div class="payroll-ico"></div>
+          <span>payroll</span>
+        </a>
+      </div>
+    </div>
+    <div class="home__front-links--bonds">
+      <div class="bonds-img"></div>
+      <div class="domain-text">
+        <span>How does lending impact our budget?</span><br>
+        <span class="enter">Enter bonds</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <footer>
-    <div class="footer__left-links">
-        <div class="locale"><span>translate</span>
-            <a href="#"><div class="globe-icon"></div></a> <!-- needs image -->
-        </div>
-        <div class="social"><span>social</span>
-            <a href="#"><div class="googleplus-icon"></div></a> <!-- needs image -->
-            <a href="#"><div class="twitter-icon"></div></a> <!-- needs image -->
-            <a href="#"><div class="facebook-icon"></div></a> <!-- needs image -->
-            <a href="#"><div class="linkedin-icon"></div></a> <!-- needs image -->
-            <a href="#"><div class="email-icon"></div></a> <!-- needs image -->
-        </div>
+  <div class="footer__left-links">
+    <div class="locale"><span>translate</span>
+      <a href="javascript:void(0);"><div class="globe-icon"></div></a>
     </div>
+    <div class="social"><span>social</span>
+      <a href="javascript:void(0);"><div class="googleplus-icon"></div></a>
+      <a href="javascript:void(0);"><div class="twitter-icon"></div></a>
+      <a href="javascript:void(0);"><div class="facebook-icon"></div></a>
+      <a href="javascript:void(0);"><div class="linkedin-icon"></div></a>
+      <a href="javascript:void(0);"><div class="email-icon"></div></a>
+    </div>
+  </div>
 
-    <div class="footer__right-links">
-        <div class="comptroller-logo"></div>
-        <div>Office&nbsp;of&nbsp;the&nbsp;Comptroller -
-            City&nbsp;of&nbsp;New&nbsp;York<br>
-            One&nbsp;Centre&nbsp;Street,
-            New&nbsp;York,&nbsp;NY |
-            Phone:&nbsp;212.669.3916<div>
-			<span>
-				<a href="#">disclaimer</a> |
-				<a href="#">privacy&nbsp;policy</a> |
-				<a href="#">language&nbsp;disclaimer</a>
-			</span>
-                <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
-                <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
-            </div>
+  <div class="footer__right-links">
+    <div class="comptroller-logo"></div>
+    <div>Office&nbsp;of&nbsp;the&nbsp;Comptroller - City&nbsp;of&nbsp;New&nbsp;York
+      <br> One&nbsp;Centre&nbsp;Street, New&nbsp;York,&nbsp;NY | Phone:&nbsp;212.669.3916
+      <div>
+        <span>
+        <a href="javascript:void(0);">disclaimer</a> |
+        <a href="javascript:void(0);">privacy&nbsp;policy</a> |
+        <a href="javascript:void(0);">language&nbsp;disclaimer</a>
+      </span>
+        <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
+        <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
+      </div>
 </footer>

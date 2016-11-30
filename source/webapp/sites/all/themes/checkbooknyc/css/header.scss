@@ -62,7 +62,8 @@ nav {
   }
 }
 
-.nav-domains {
+.nav-domains,
+.nav-search-tools {
   background-color: $main;
   height: 0;
   overflow: hidden;
@@ -75,7 +76,7 @@ nav {
     height: 50px;
     visibility: visible;
   }
-  .nav-domains__list {
+  .nav-dropdown__list {
     display: flex;
     margin: auto;
     max-width: 1024px;
@@ -100,5 +101,10 @@ nav {
         transition: .1s ease-in;
       }
     }
+  }
+}
+.nav-search-tools {
+  .nav-dropdown__list {
+    line-height: 3;
   }
 }
