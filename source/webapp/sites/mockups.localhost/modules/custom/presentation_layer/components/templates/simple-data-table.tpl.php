@@ -81,16 +81,13 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
 }
 ?>
 
-
-<div class="simple-data-table" style="display: block; margin: auto; max-width: 940px;">
-    <div style="color: #92C46D; font-weight: bold; font-size: 0.8em; text-transform: uppercase; padding-bottom: 5px;"><?php echo($viewConfig->headerTitle) ?></div>
-    <table style="border-collapse: collapse; width: 100%;">
-        <tbody style="border-top: none">
+<div class="simple-data-table">
+    <div class="simple-data-table-header"><?php echo($viewConfig->headerTitle) ?></div>
+    <table>
+        <tbody>
         <tr>
             <?php foreach($viewConfig->tableColumns as $tableColumn) { ?>
-                <?php $align = $tableColumn->format == "text" || $tableColumn->format == "date" ? " text-align: left;" : " text-align: center;";?>
-
-                <th style="<?php echo $align ?>border: none; padding-left: 1em; padding-bottom:1em; padding-top:1em;background-color: #e1efd6; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px; line-height: 10px;" class="sort-desc">
+                <th class="<?php echo($tableColumn->format."-heading"); ?>">
                     <?php echo($tableColumn->label); ?>
                     <?php if($tableColumn->column == $viewConfig->sortColumn) { ?>
                         <img src="<?php base_path()?>sites/all/themes/checkbooknyc/images/sort_arrow_down.png">
@@ -101,8 +98,7 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
         <?php for($i=0; $i < count($model->data); $i++) { ?>
             <tr>
                 <?php foreach($viewConfig->tableColumns as $tableColumn) {  ?>
-                <?php $align = $tableColumn->format == "dollar" || $tableColumn->format == "number" || $tableColumn->format == "percent" ? " text-align: right; padding-right: 3em;" : " text-align: left;";?>
-                    <td style="<?php echo $align ?>background-color: #ffffff; border-top: 1px solid #e9e9e7; padding-left: 1em; font-family: 'Century Gothic'; font-size: 11px; line-height: 30px;">
+                    <td class="<?php echo($tableColumn->format."-column"); ?>">
                         <?php echo($model->data[$i][$tableColumn->column]); ?>
                     </td>
                 <?php } ?>
@@ -110,13 +106,13 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
         <?php } ?>
         </tbody>
     </table>
-    <div style="float: right;">
+    <div class="simple-data-table-links">
         <div>
-            <div style="float: left; background-image: url(<?php base_path()?>sites/all/themes/checkbooknyc/images/export_arrow.png); background-repeat: no-repeat; background-position-y: 8px;">
-                <a class="export-link" style="padding-left:15px; color: #000000; font-weight: bold; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px;" href="#" config="mwbe_spending_landing/checks" oncontextmenu="return false;">Export CSV</a>
+            <div class="simple-data-table-export-link">
+                <a class="simple-data-table-export-link" href="#" config="mwbe_spending_landing/checks" oncontextmenu="return false;">Export CSV</a>
             </div>
-            <div style="margin-left:20px; float: left; background-image: url(<?php base_path()?>sites/all/themes/checkbooknyc/images/details_arrow.png); background-repeat: no-repeat; background-position-y: 8px;">
-                <a style="padding-left:15px; color: #000000; font-weight: bold; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px;"  href="javascript: void(0);">Details</a>
+            <div class="simple-data-table-details-link">
+                <a class="simple-data-table-details-link" href="javascript: void(0);">Details</a>
             </div>
         </div>
     </div>
