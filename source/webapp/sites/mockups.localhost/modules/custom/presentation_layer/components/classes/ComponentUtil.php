@@ -8,7 +8,9 @@ class ComponentUtil {
 
     static function DisplaySimpleDataTableComponent($config,$component,$parameters,$limit) {
 
-        $viewModel = self::_loadViewModel($config,$component,$parameters,$limit);
+        $viewModel = self::loadViewModel($config,$component,$parameters,$limit);
+        $viewModel->model = self::formatModelHtml($viewModel->model,$viewModel->viewConfig);
+
         return theme('simple_data_table',array('viewModel'=>$viewModel));
     }
 
@@ -21,9 +23,9 @@ class ComponentUtil {
      * @param $limit
      * @return SimpleDataTableViewModel
      */
-    private static function _loadViewModel($config,$component,$parameters,$limit) {
+    static function loadViewModel($config,$component,$parameters,$limit) {
 
-        $config = self::_loadConfig($config);
+        $config = self::loadConfig($config);
         $viewConfig = $config->views->$component;
         $orderBy = $viewConfig->orderBy;
         $viewModel = new SimpleDataTableViewModel($viewConfig,$parameters,$limit,$orderBy);
@@ -31,12 +33,36 @@ class ComponentUtil {
         return $viewModel;
     }
 
+
+    /**
+     * Function will format the data for html display
+     *
+     * @param $model
+     * @param $viewConfig
+     * @return mixed
+     */
+    static function formatModelHtml($model, $viewConfig) {
+        $tooltipColumns = array_filter($viewConfig->tableColumns,
+            function($value) {
+                return isset($value->tooltip);
+            });
+        if(count($tooltipColumns) > 0) {
+            foreach($model->data as $key => $val) {
+                foreach($tooltipColumns as $column) {
+                    $model->data[$key][$column->column] = FormattingUtilities::getTooltip($model->data[$key][$column->column], $column->tooltip);
+                }
+            }
+        }
+        return $model;
+    }
+
+
     /**
      * Function to load the configuration file for the component
      * @param $name
      * @return mixed|stdClass
      */
-    private static function _loadConfig($name){
+    static function loadConfig($name){
         $config =  new stdClass();
         $files = file_scan_directory( drupal_get_path('module','component_controller') , '/^'.$name.'\.json$/');
         if(count($files) > 0){

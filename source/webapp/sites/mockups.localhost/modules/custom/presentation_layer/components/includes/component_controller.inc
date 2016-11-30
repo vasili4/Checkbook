@@ -1,2 +1,43 @@
 <?php
 
+function _component_controller_simple_data_table_export($config,$component) {
+
+    $parameters = array('year'=>118,'mwbe'=>'(2,3,4,5,9)');
+    $viewModel = ComponentUtil::loadViewModel($config,$component,$parameters,200000);
+    $data = $viewModel->model->data;
+    $viewConfig = $viewModel->viewConfig;
+
+    $output = NULL;
+
+    $i=0;
+    foreach($viewConfig->tableColumns as $column) {
+        $output .= ($i == 0) ? $column->label : ',"'.$column->label.'"';
+        $i++;
+    }
+    if(is_array($data) && count($data) > 0) {
+        $dataRecords = $data;
+
+        foreach($dataRecords as $dataRec){
+            $output .= PHP_EOL;
+            $i = 0;
+            $rowData = NULL;
+            foreach($viewConfig->tableColumns as $column) {
+
+                $columnValue = html_entity_decode($dataRec[$column->column], ENT_QUOTES);
+                $columnValue = str_replace('"',chr(34).'"',$columnValue);
+                $rowData .= ($i == 0) ? ('"'.$columnValue.'"') : (',"'.$columnValue.'"');
+                $i++;
+            }
+            $rowData = str_replace(array("\r\n", "\n", "\r"),'',$rowData);
+            $output .= $rowData;
+        }
+    }
+
+    drupal_add_http_header("Content-Type", "text/csv");
+    drupal_add_http_header("Content-Length",strlen($output));
+    drupal_add_http_header("Content-Disposition", "attachment; filename=TransactionsData.csv");
+    drupal_add_http_header("Pragma", "cache");
+    drupal_add_http_header("Expires", "-1");
+    echo $output;
+
+}

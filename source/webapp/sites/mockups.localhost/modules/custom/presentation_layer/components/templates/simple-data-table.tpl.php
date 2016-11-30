@@ -113,10 +113,10 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
     <div style="float: right;">
         <div>
             <div style="float: left; background-image: url(<?php base_path()?>sites/all/themes/checkbooknyc/images/export_arrow.png); background-repeat: no-repeat; background-position-y: 8px;">
-                <a style="padding-left:15px; color: #000000; font-weight: bold; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px;" href="#">Export CSV</a>
+                <a class="export-link" style="padding-left:15px; color: #000000; font-weight: bold; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px;" href="#" config="mwbe_spending_landing/checks" oncontextmenu="return false;">Export CSV</a>
             </div>
             <div style="margin-left:20px; float: left; background-image: url(<?php base_path()?>sites/all/themes/checkbooknyc/images/details_arrow.png); background-repeat: no-repeat; background-position-y: 8px;">
-                <a style="padding-left:15px; color: #000000; font-weight: bold; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px;" href="#">Details</a>
+                <a style="padding-left:15px; color: #000000; font-weight: bold; text-transform: uppercase; font-family: 'Century Gothic'; font-size: 11px;"  href="javascript: void(0);">Details</a>
             </div>
         </div>
     </div>

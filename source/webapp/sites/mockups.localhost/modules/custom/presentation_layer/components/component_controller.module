@@ -8,6 +8,7 @@ require_once('classes/simple_data_table/SimpleDataTableColumnViewConfig.php');
 require_once('classes/simple_data_table/SimpleDataTableModel.php');
 require_once('classes/simple_data_table/SimpleDataTableViewConfig.php');
 require_once('classes/simple_data_table/SimpleDataTableViewModel.php');
+require_once('includes/component_controller.inc');
 
 /**
  * Implements hook_menu()
@@ -20,6 +21,12 @@ function component_controller_menu() {
         'title' => 'Simple Data Table Component',
         'page callback' => 'component_controller',
         'page arguments' => array('simple_data_table'),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+    $items['simple_data_table/export'] = array(
+        'title' => 'Export CSV',
+        'page callback' => '_component_controller_simple_data_table_export',
         'access callback' => TRUE,
         'type' => MENU_CALLBACK,
     );
