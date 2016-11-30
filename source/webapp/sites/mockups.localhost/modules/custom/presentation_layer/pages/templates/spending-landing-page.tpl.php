@@ -13,7 +13,7 @@
   <div><a href="javascript:void(0);">help</a></div>
 </nav>
 
-<div class="nav-domains">
+<div class="nav-submenu nav-domains">
   <div class="nav-dropdown__list">
     <a href="/spending_landing" class="spending">
       <div>$0.00B</div>
@@ -38,7 +38,7 @@
   </div>
 </div>
 
-<div class="nav-search-tools">
+<div class="nav-submenu nav-search-tools">
   <div class="nav-dropdown__list">
     <a href="javascript:void(0);" class="advanced-search">
       <div>advanced&nbsp;search</div>
@@ -101,31 +101,33 @@
         <svg width="950" height="500"></svg>
       </div>
     </div>
-
-      <div class="data-tables-container">
-          <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
-              <?php echo(_page_controller_get_mwbe_spending_data_table("checks")); ?>
-          </div>
-          <div style="margin-top: 30px; display: inline; position: relative; width: 450px; float: left;">
-              <?php echo(_page_controller_get_mwbe_spending_data_table("agencies")); ?>
-          </div>
-          <div style="margin-top: 30px; display: inline; position: relative; width: 450px; float: left; margin-left: 40px;">
-              <?php echo(_page_controller_get_mwbe_spending_data_table("expenseCategories")); ?>
-          </div>
-          <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
-              <?php echo(_page_controller_get_mwbe_spending_data_table("primeVendors")); ?>
-          </div>
-          <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
-              <?php echo(_page_controller_get_mwbe_spending_data_table("subVendors")); ?>
-          </div>
-          <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
-              <?php echo(_page_controller_get_mwbe_spending_data_table("contracts")); ?>
-          </div>
-          <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
-              <?php echo(_page_controller_get_mwbe_spending_data_table("spendingByIndustries")); ?>
-          </div>
-          <div style="clear: left"></div>
-      </div>
+    <div class="data-tables-container">
+        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("checks")); ?>
+        </div>
+        <div style="margin-top: 30px; display: inline; position: relative; width: 450px; float: left;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("agencies")); ?>
+        </div>
+        <div style="margin-top: 30px; display: inline; position: relative; width: 450px; float: left; margin-left: 40px;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("expenseCategories")); ?>
+        </div>
+        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("primeVendors")); ?>
+        </div>
+        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("subVendors")); ?>
+        </div>
+        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("contracts")); ?>
+        </div>
+        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("spendingByIndustries")); ?>
+        </div>
+        <div style="clear: left"></div>
+    </div>
+    </div>
+    <a href="javascript:" id="return-to-top">return to top</a>
+    </div>
   </div>
   <a href="javascript:" id="return-to-top">return to top</a>
 </div>

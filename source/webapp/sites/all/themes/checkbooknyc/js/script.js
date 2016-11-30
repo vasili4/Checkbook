@@ -29,7 +29,26 @@
     $('.nav-dropdown.domain-select').hover(function() {
       $(this).addClass("active");
       $(".nav-domains").addClass("active");
+
+      console.log($(this));
+      if ($(this).hasClass("active")) {
+        $('.nav-dropdown').not(this).removeClass('active');
+        $(".nav-search-tools").removeClass("active");
+      }
     });
+
+    //adds hover state for search tools in header navigation
+    $('.nav-dropdown.search-tools-select').hover(function() {
+      $(this).addClass("active");
+      $(".nav-search-tools").addClass("active");
+
+      console.log($(this));
+      if ($(this).hasClass("active")) {
+        $('.nav-dropdown').not(this).removeClass('active');
+        $(".nav-domains").removeClass("active");
+      }
+    });
+
 
     $('.nav-domains').hover(function() {
       if ($('.nav-domains').hasClass("active")) {
@@ -40,11 +59,6 @@
       $(".nav-dropdown.domain-select").removeClass("active");
     });
 
-    //adds hover state for search tools in header navigation
-    $('.nav-dropdown.search-tools-select').hover(function() {
-      $(this).addClass("active");
-      $(".nav-search-tools").addClass("active");
-    });
 
     $('.nav-search-tools').hover(function() {
       if ($('.nav-search-tools').hasClass("active")) {
