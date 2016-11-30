@@ -544,7 +544,7 @@ div.landing {
       div.landing div.filter .subdomain-filter:before {
         background-color: white;
         border: solid transparent;
-        bottom: 67px;
+        top: 66px;
         box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.12), 1px 1px 1px rgba(0, 0, 0, 0.24);
         content: '';
         height: 20px;
@@ -553,6 +553,38 @@ div.landing {
         position: absolute;
         transform: rotate(45deg);
         width: 20px; }
+      div.landing div.filter .subdomain-filter .mwbe-filter-button {
+        background-color: #92C46D;
+        border: none;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 0.8em;
+        height: 17px;
+        line-height: 1.6;
+        position: absolute;
+        right: 183px;
+        text-align: center;
+        text-transform: uppercase;
+        top: 40px;
+        width: 369px; }
+        div.landing div.filter .subdomain-filter .mwbe-filter-button:after {
+          background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2021.4%2019.3%22%3E%3Cstyle%3E.a%7Bfill%3A#ffffff%3B%7D%3C%2Fstyle%3E%3Cpolygon%20points%3D%2220%207.2%2010.7%2016.4%201.4%207.2%200%208.6%2010.7%2019.3%2021.4%208.6%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%2220%200%2010.7%209.3%201.4%200%200%201.4%2010.7%2012.1%2021.4%201.4%20%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-position: center;
+          background-repeat: no-repeat;
+          content: "";
+          display: inline-block;
+          height: 7px;
+          margin-left: 5px;
+          width: 7px; }
+        div.landing div.filter .subdomain-filter .mwbe-filter-button.active:after {
+          background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2021.4%2019.3%22%3E%3Cstyle%3E.a%7Bfill%3A#ffffff%3B%7D%3C%2Fstyle%3E%3Cpolygon%20points%3D%2220%207.2%2010.7%2016.4%201.4%207.2%200%208.6%2010.7%2019.3%2021.4%208.6%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%2220%200%2010.7%209.3%201.4%200%200%201.4%2010.7%2012.1%2021.4%201.4%20%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
+          background-repeat: no-repeat;
+          background-position: center;
+          transform: rotate(180deg); }
+        div.landing div.filter .subdomain-filter .mwbe-filter-button:hover {
+          background-color: #A5CE87; }
     div.landing div.filter .spending-filter,
     div.landing div.filter .subdomain-filter {
       display: flex;
@@ -568,8 +600,8 @@ div.landing {
       div.landing div.filter .spending-filter div,
       div.landing div.filter .subdomain-filter div {
         flex: 1;
-        height: 3.5em;
-        margin: auto;
+        height: 2.5em;
+        margin-top: 20px;
         padding: 0 0.5em;
         text-align: center; }
         div.landing div.filter .spending-filter div + div,
@@ -581,6 +613,29 @@ div.landing {
           div.landing div.filter .spending-filter div span + span,
           div.landing div.filter .subdomain-filter div span + span {
             margin-top: 5px; }
+    div.landing div.filter .mwbe-filter {
+      background-color: #92C46D;
+      color: #ffffff;
+      display: flex;
+      height: 0;
+      overflow: hidden;
+      width: 100%;
+      transition: 0.25s ease-in-out;
+      z-index: 1; }
+      div.landing div.filter .mwbe-filter.active {
+        height: 20px; }
+      div.landing div.filter .mwbe-filter div {
+        color: #615946;
+        cursor: pointer;
+        flex: 1;
+        font-size: 0.8em;
+        padding: 4px;
+        text-align: center;
+        text-transform: uppercase; }
+        div.landing div.filter .mwbe-filter div:hover {
+          color: #B2A380; }
+        div.landing div.filter .mwbe-filter div.active {
+          color: #ffffff; }
   div.landing div.data-visualization {
     background-color: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
@@ -710,7 +765,7 @@ div.landing {
   font-size: 0.75em;
   height: 60px;
   margin-left: 85.4em;
-  padding: .6em 1em;
+  padding: 0.6em 1em;
   position: fixed;
   text-align: left;
   text-decoration: none;
@@ -804,7 +859,8 @@ html {
 *:after {
   box-sizing: inherit; }
 
-.content {
+.content,
+body {
   font-family: "Century Gothic";
   margin: auto;
   min-height: 100%;
@@ -812,6 +868,7 @@ html {
   position: relative; }
 
 body {
-  margin: 0; }
+  margin: 0;
+  padding: 0; }
 
 /*# sourceMappingURL=output.css.map */

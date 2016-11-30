@@ -66,7 +66,7 @@ div.landing {
       &:before {
         background-color: white;
         border: solid transparent;
-        bottom: 67px;
+        top: 66px;
         box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.12), 1px 1px 1px rgba(0, 0, 0, 0.24);
         content: '';
         height: 20px;
@@ -75,6 +75,42 @@ div.landing {
         position: absolute;
         transform: rotate(45deg);
         width: 20px;
+      }
+
+      .mwbe-filter-button {
+        background-color: $main;
+        border: none;
+        color: $white;
+        cursor: pointer;
+        font-size: 0.8em;
+        height: 17px;
+        line-height: 1.6;
+        position: absolute;
+        right: 183px;
+        text-align: center;
+        text-transform: uppercase;
+        top: 40px;
+        width: 369px;
+
+        &:after {
+          @include navigation-ico($white);
+          background-position: center;
+          background-repeat: no-repeat;
+          content: "";
+          display: inline-block;
+          height: 7px;
+          margin-left: 5px;
+          width: 7px;
+        }
+        &.active:after {
+          @include navigation-ico($white);
+          transform: rotate(180deg);
+        }
+
+        &:hover {
+          background-color: $green-hover;
+        }
+
       }
     }
 
@@ -94,8 +130,8 @@ div.landing {
 
       div {
         flex: 1;
-        height: 3.5em;
-        margin: auto;
+        height: 2.5em;
+        margin-top: 20px;
         padding: 0 0.5em;
         text-align: center;
 
@@ -109,6 +145,40 @@ div.landing {
           + span {
             margin-top: 5px;
           }
+        }
+      }
+    }
+
+    .mwbe-filter {
+      // height: 20px;
+      background-color: $main;
+      color: $white;
+      display: flex;
+      height: 0;
+      overflow: hidden;
+      width: 100%;
+      transition: 0.25s ease-in-out;
+      z-index: 1;
+
+      &.active {
+        height: 20px;
+      }
+
+      div {
+        color: #615946;
+        cursor: pointer;
+        flex: 1;
+        font-size: 0.8em;
+        padding: 4px;
+        text-align: center;
+        text-transform: uppercase;
+
+        &:hover {
+          color: $main-hover;
+        }
+
+        &.active {
+          color: $white;
         }
       }
     }
@@ -296,7 +366,7 @@ div.landing {
   font-size: 0.75em;
   height: 60px;
   margin-left: 85.4em;
-  padding: .6em 1em;
+  padding: 0.6em 1em;
   position: fixed;
   text-align: left;
   text-decoration: none;
