@@ -48,11 +48,7 @@ class SimpleDataTableViewModel {
             function($value) {
                 return isset($value->format);
             });
-        $tooltipColumns = array_filter($this->viewConfig->tableColumns,
-            function($value) {
-                return isset($value->tooltip);
-            });
-        if(count($formatColumns) > 0 || count($tooltipColumns) > 0) {
+        if(count($formatColumns) > 0) {
             foreach($model->data as $key => $val) {
                 //formatting
                 foreach($formatColumns as $column) {
@@ -70,10 +66,6 @@ class SimpleDataTableViewModel {
                             $model->data[$key][$column->column] = round($model->data[$key][$column->column],2) . '%';
                             break;
                     }
-                }
-                //tooltip
-                foreach($tooltipColumns as $column) {
-                    $model->data[$key][$column->column] = FormattingUtilities::getTooltip($model->data[$key][$column->column], $column->tooltip);
                 }
             }
         }
