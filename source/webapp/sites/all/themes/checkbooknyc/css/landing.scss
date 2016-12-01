@@ -351,8 +351,48 @@ div.landing {
       margin-left: 10px;
     }
 
-    div.data-tables-container {
-      margin: 55% auto auto;
+    div.charts-data-tables-container {
+      margin: 53% auto auto;
+    }
+    div.charts-data-table-container {
+      margin-top: 25px;
+      display: inline-block;
+      position: relative;
+      width: 940px;
+    }
+    a.charts-data-tables-toggle {
+      display: block;
+      margin-top: 25px;
+      background-color: #92C46D;
+      height: 35px;
+      background-image: url(../images/toggle_arrow_up.png);
+      background-repeat:no-repeat;
+      background-position: center center;
+    }
+    a.charts-data-tables-toggle.close {
+      background-image: url(../images/toggle_arrow_down.png);
+    }
+    div.data-table-container {
+      margin-top: 30px;
+      display: inline;
+      position: relative;
+      float: left;
+      width: 940px;
+    }
+    div.data-table-container-left {
+      margin-top: 30px;
+      display: inline;
+      position: relative;
+      float: left;
+      width: 450px;
+    }
+    div.data-table-container-right {
+      margin-top: 30px;
+      display: inline;
+      position: relative;
+      float: left;
+      width: 450px;
+      margin-left: 40px;
     }
   }
 }
