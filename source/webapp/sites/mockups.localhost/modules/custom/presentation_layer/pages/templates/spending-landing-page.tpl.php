@@ -70,6 +70,7 @@
           <div class="year-select-option">2015</div>
           <div class="year-select-option">2014</div>
           <div class="year-select-option">2013</div>
+          <div class="year-select-option">2012</div>
         </div>
       </div>
       <!--change to div select element-->
@@ -181,9 +182,9 @@
   <div class="footer__bottom-links">
     <div class="bottom-container">
       <div>
-          <a href="javascript:void(0);">disclaimer</a> |
-          <a href="javascript:void(0);">privacy&nbsp;policy</a> |
-          <a href="javascript:void(0);">language&nbsp;disclaimer</a>
+          <a href="http://comptroller.nyc.gov/disclaimer/" target="_blank">disclaimer</a> |
+          <a href="http://comptroller.nyc.gov/privacy-policy/" target="_blank">privacy&nbsp;policy</a> |
+          <a href="http://comptroller.nyc.gov/language-disclaimer/" target="_blank">language&nbsp;disclaimer</a>
       </div>
       <div>Copyright&nbsp;&copy;2016,&nbsp;Office&nbsp;of&nbsp;the&nbsp;New&nbsp;York&nbsp;City&nbsp;Comptroller</div>
       <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>

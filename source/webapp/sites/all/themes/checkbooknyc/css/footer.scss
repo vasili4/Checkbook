@@ -12,11 +12,12 @@ footer {
     > div {
       align-self: center;
       display: inline-block;
-      flex: 1;
+      // flex: 1;
       margin: 10px;
 
       &.footer__left-links {
         margin-left: 5%;
+        flex: 3;
 
         > div {
           display: inline-block;
@@ -97,22 +98,21 @@ footer {
       &.footer__right-links {
         font-family: "Century Gothic";
         font-size: 10px;
-        line-height: 15px;
+        line-height: 20px;
         margin-right: 5%;
-        text-align: right;
+        text-align: left;
 
         div.comptroller-logo {
           background-repeat: no-repeat;
-          background: url("../images/comptrollerlogo_edited.png");
+          background-image: url("../images/comptroller_logo_only.png");
           display: inline-block;
-          height: 40px;
-          width: 187px;
+          height: 30px;
+    width: 35px;
+    margin-top: 5px;
         }
 
         div:last-of-type {
           display: inline-block;
-          vertical-align: top;
-          margin-top: 10px;
         }
 
         span {
