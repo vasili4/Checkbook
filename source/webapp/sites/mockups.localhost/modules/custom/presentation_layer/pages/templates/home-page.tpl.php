@@ -202,30 +202,38 @@
 </div>
 
 <footer>
-  <div class="footer__left-links">
-    <div class="locale"><span>translate</span>
-      <a href="javascript:void(0);"><div class="globe-icon"></div></a>
+  <div class="footer-flex">
+    <div class="footer__left-links">
+      <div class="locale"><span>translate</span>
+        <a href="javascript:void(0);">
+          <div class="globe-icon"></div>
+        </a>
+      </div>
+      <div class="social"><span>social</span>
+        <a href="javascript:void(0);"><div class="googleplus-icon"></div></a>
+        <a href="javascript:void(0);"><div class="twitter-icon"></div></a>
+        <a href="javascript:void(0);"><div class="facebook-icon"></div></a>
+        <a href="javascript:void(0);"><div class="linkedin-icon"></div></a>
+        <a href="javascript:void(0);"><div class="email-icon"></div></a>
+      </div>
     </div>
-    <div class="social"><span>social</span>
-      <a href="javascript:void(0);"><div class="googleplus-icon"></div></a>
-      <a href="javascript:void(0);"><div class="twitter-icon"></div></a>
-      <a href="javascript:void(0);"><div class="facebook-icon"></div></a>
-      <a href="javascript:void(0);"><div class="linkedin-icon"></div></a>
-      <a href="javascript:void(0);"><div class="email-icon"></div></a>
-    </div>
-  </div>
-
   <div class="footer__right-links">
     <div class="comptroller-logo"></div>
     <div>Office&nbsp;of&nbsp;the&nbsp;Comptroller - City&nbsp;of&nbsp;New&nbsp;York
       <br> One&nbsp;Centre&nbsp;Street, New&nbsp;York,&nbsp;NY | Phone:&nbsp;212.669.3916
+    </div>
+
+  </div>
+  </div>
+  <div class="footer__bottom-links">
+    <div>
       <div>
-        <span>
-        <a href="javascript:void(0);">disclaimer</a> |
-        <a href="javascript:void(0);">privacy&nbsp;policy</a> |
-        <a href="javascript:void(0);">language&nbsp;disclaimer</a>
-      </span>
-        <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
-        <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
+          <a href="javascript:void(0);">disclaimer</a> |
+          <a href="javascript:void(0);">privacy&nbsp;policy</a> |
+          <a href="javascript:void(0);">language&nbsp;disclaimer</a>
       </div>
+      <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
+      <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
+    </div>
+</div>
 </footer>

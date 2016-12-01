@@ -3,7 +3,7 @@
 
   // set up main nv object
   var nv = {};
-
+  var customColors = ["#842b55", "#f9e79b", "#5ab7c5", "#8c9191"];
   // the major global objects under the nv namespace
   nv.dev = false; //set false when in production
   nv.tooltip = nv.tooltip || {}; // For the tooltip system
@@ -1175,8 +1175,13 @@
    */
   nv.utils.defaultColor = function() {
     // get range of the scale so we'll turn it into our own function.
-    return nv.utils.getColor(d3.scale.category20().range());
+    // return nv.utils.getColor(d3.scale.category20().range());
+    return nv.utils.getColor(useCustomColors());
   };
+
+  var useCustomColors = function() {
+    return customColors;
+  }
 
 
   /*
@@ -10608,6 +10613,7 @@
       width = null,
       height = null,
       color = nv.utils.defaultColor(),
+      // color = useCustomColors(),
       showControls = true,
       controlLabels = {},
       showLegend = true,

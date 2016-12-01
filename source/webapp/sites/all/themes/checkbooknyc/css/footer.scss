@@ -1,105 +1,164 @@
 footer {
-  background-color: $white;
-  bottom: 0;
-  display: flex;
-  height: auto;
-  left: 0;
-  position: absolute;
-  right: 0;
-  width: 100%;
-  > div {
-    align-self: center;
-    display: inline-block;
-    flex: 1;
-    margin: 10px;
-    &.footer__left-links {
-      margin-left: 5%;
-      > div {
-        display: inline-block;
-        font-family: "Century Gothic";
-        text-transform: uppercase;
-      }
-      span {
-        font-size: 11px;
-        vertical-align:super;
-      }
-      div.locale div.globe-icon {
-        @extend %translate-ico;
-        display: inline-block;
-        height: 25px;
-        margin: 0 25px 0 7px;
-        transition: .25s ease-in-out;
-        width: 25px;
-        &:hover {
-          @include translate-ico($whitespace, $iconfill);
+  .footer-flex {
+    background-color: $white;
+    bottom: 32px;
+    display: flex;
+    height: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+
+    > div {
+      align-self: center;
+      display: inline-block;
+      flex: 1;
+      margin: 10px;
+
+      &.footer__left-links {
+        margin-left: 5%;
+
+        > div {
+          display: inline-block;
+          font-family: "Century Gothic";
+          text-transform: uppercase;
         }
-      }
-      div.social {
-        div {
-          background-repeat: no-repeat;
+
+        span {
+          font-size: 11px;
+          vertical-align: super;
+        }
+
+        div.locale div.globe-icon {
+          @extend %translate-ico;
           display: inline-block;
           height: 25px;
-          margin-left: 7px;
-          transition: .25s ease-in-out;
+          margin: 0 25px 0 7px;
+          transition: 0.25s ease-in-out;
           width: 25px;
-          &.googleplus-icon {
-            @extend %googleplus-ico;
-            &:hover {
-              @include googleplus-ico($whitespace, $iconfill);
+
+          &:hover {
+            @include translate-ico($whitespace, $iconfill);
+          }
+        }
+
+        div.social {
+          div {
+            background-repeat: no-repeat;
+            display: inline-block;
+            height: 25px;
+            margin-left: 7px;
+            transition: 0.25s ease-in-out;
+            width: 25px;
+
+            &.googleplus-icon {
+              @extend %googleplus-ico;
+
+              &:hover {
+                @include googleplus-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.twitter-icon {
+              @extend %twitter-ico;
+
+              &:hover {
+                @include twitter-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.facebook-icon {
+              @extend %facebook-ico;
+
+              &:hover {
+                @include facebook-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.linkedin-icon {
+              @extend %linkedin-ico;
+
+              &:hover {
+                @include linkedin-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.email-icon {
+              @extend %email-ico;
+
+              &:hover {
+                @include email-ico($whitespace, $iconfill);
+              }
             }
           }
-          &.twitter-icon {
-            @extend %twitter-ico;
+        }
+      }
+
+      &.footer__right-links {
+        font-family: "Century Gothic";
+        font-size: 10px;
+        line-height: 15px;
+        margin-right: 5%;
+        text-align: right;
+
+        div.comptroller-logo {
+          background-repeat: no-repeat;
+          background: url("../images/comptrollerlogo_edited.png");
+          display: inline-block;
+          height: 40px;
+          width: 187px;
+        }
+
+        div:last-of-type {
+          display: inline-block;
+          vertical-align: top;
+          margin-top: 10px;
+        }
+
+        span {
+          text-transform: uppercase;
+
+          a {
+            color: $link-font;
+            text-decoration: none;
+
             &:hover {
-              @include twitter-ico($whitespace, $iconfill);
+              color: $main-hover;
             }
           }
-          &.facebook-icon {
-            @extend %facebook-ico;
-            &:hover {
-              @include facebook-ico($whitespace, $iconfill);
-            }
-          }
-          &.linkedin-icon {
-            @extend %linkedin-ico;
-            &:hover {
-              @include linkedin-ico($whitespace, $iconfill);
-            }
-          }
-          &.email-icon {
-            @extend %email-ico;
-            &:hover {
-              @include email-ico($whitespace, $iconfill);
-            }
-          }
+        }
+
+        .footer__open-source-disclaimer {
+          text-transform: uppercase;
         }
       }
     }
-    &.footer__right-links {
-      font-family: "Century Gothic";
-      font-size: 10px;
-      line-height: 15px;
-      margin-right: 5%;
-      text-align: right;
-      div.comptroller-logo {
-        background-repeat: no-repeat;
-        background: url(../images/comptrollerlogo_edited.png);
-        display: inline-block;
-        height: 40px;
-        width: 187px;
-      }
-      span {
-        text-transform: uppercase;
+  }
+
+  .footer__bottom-links {
+    background-color: $gray;
+    bottom: 0;
+    height: 2em;
+    position: absolute;
+    width: 100%;
+
+    div {
+      align-content: space-around;
+      display: flex;
+      text-align: center;
+
+      div {
+        color: $white;
+        flex: 1;
+        font-size: 0.7em;
+        padding: 0.8em;
+        text-align: center;
+        text-transform: capitalize;
+
         a {
-          color: $link-font;
+          color: $white;
           text-decoration: none;
-          &:hover {
-            color: $main-hover;
-          }
         }
-      }
-      .footer__open-source-disclaimer {
-        text-transform: uppercase;
       }
     }
   }
