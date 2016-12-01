@@ -92,8 +92,15 @@
       e.stopPropagation();
     });
 
+      //toggle the chart data table
+      $(".charts-data-tables-toggle").click(function()
+      {
+          $(".charts-data-table-container").slideToggle();
+          $( ".charts-data-tables-toggle" ).toggleClass( "close" );
+          return false;
+      });
 
-    $(window).scroll(function() {
+      $(window).scroll(function() {
       if ($(this).scrollTop() >= 200) {
         $('#return-to-top').fadeIn(200);
       } else {

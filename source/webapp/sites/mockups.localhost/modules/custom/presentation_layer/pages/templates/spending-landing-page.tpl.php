@@ -95,7 +95,7 @@
   </div>
 
   <div class="data-visualization">
-    <div class="charts-container">
+    <div class="zc-container">
       <div class="domain-label">m/wbe spending summary</div>
       <div class="chart-toggle">
         <div class="chart-bar active"></div>
@@ -109,34 +109,32 @@
       </div>
     </div>
 
-    <div class="charts-data-tables-container" style="margin: 53% auto auto;">
-        <div style="display: inline; position: relative; width: 940px;">
+    <div class="charts-data-tables-container">
+        <div class="charts-data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("mwbeSpendingByYears")); ?>
         </div>
     </div>
-
-    <div style="background-color: #92C46D; height: 35px; margin:6% auto auto;"></div>
-
-    <div class="data-tables-container" style="margin: auto;">
-        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+     <a class="charts-data-tables-toggle" href="#"></a>
+    <div class="data-tables-container">
+        <div class="data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("checks")); ?>
         </div>
-        <div style="margin-top: 30px; display: inline; position: relative; width: 450px; float: left;">
+        <div class="data-table-container-left">
             <?php echo(_page_controller_get_mwbe_spending_data_table("agencies")); ?>
         </div>
-        <div style="margin-top: 30px; display: inline; position: relative; width: 450px; float: left; margin-left: 40px;">
+        <div class="data-table-container-right">
             <?php echo(_page_controller_get_mwbe_spending_data_table("expenseCategories")); ?>
         </div>
-        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+        <div class="data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("primeVendors")); ?>
         </div>
-        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+        <div class="data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("subVendors")); ?>
         </div>
-        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+        <div class="data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("contracts")); ?>
         </div>
-        <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
+        <div class="data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("spendingByIndustries")); ?>
         </div>
         <div style="clear: left"></div>
