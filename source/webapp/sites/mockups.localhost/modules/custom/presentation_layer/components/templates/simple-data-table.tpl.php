@@ -109,7 +109,7 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
     <div class="simple-data-table-links">
         <div>
             <div class="simple-data-table-export-link">
-                <a class="simple-data-table-export-link" href="#" config="mwbe_spending_landing/checks" oncontextmenu="return false;">Export CSV</a>
+                <a class="simple-data-table-export-link" href="#" config="mwbe_spending_landing/<?php echo($viewConfig->component) ?>" oncontextmenu="return false;">Export CSV</a>
             </div>
             <div class="simple-data-table-details-link">
                 <a class="simple-data-table-details-link" href="javascript: void(0);">Details</a>

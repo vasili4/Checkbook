@@ -1,4 +1,5 @@
 <statements>
+    <!-- Widgets -->
     <statement name="GetChecks" datasource="checkbook">
         <param name="year" />
         <param name="mwbe" />
@@ -98,18 +99,17 @@
             SELECT
             a.vendor_id,
             b.legal_name as prime_vendor_name,
-            mwbe_category,
+            CASE
+                WHEN minority_type_id = 2 THEN 'Black American'
+                WHEN minority_type_id = 3 THEN 'Hispanic American'
+                WHEN minority_type_id IN (4,5) THEN 'Asian American'
+                WHEN minority_type_id = 9 THEN 'Women'
+            END as mwbe_category,
             SUM(COALESCE(total_spending_amount,0)) as check_amount,
             SUM(total_spending_amount)/MAX(total.check_amount)*100 as percent_spending,
             MAX(COALESCE(total_contract_amount,0)) as total_contract_amount
             FROM aggregateon_mwbe_spending_vendor a
             JOIN vendor b ON b.vendor_id = a.vendor_id
-            LEFT JOIN
-            (
-                SELECT minority_type_id,
-                CASE WHEN minority_type_id IN (4,5) THEN 'Asian American' ELSE minority_type_name END as mwbe_category
-                FROM ref_minority_type
-            ) minority_type on minority_type.minority_type_id = a.minority_type_id
             JOIN
             (
                 SELECT SUM(total_spending_amount) AS check_amount
@@ -142,7 +142,12 @@
             SELECT
             a.vendor_id,
             b.legal_name as sub_vendor_name,
-            mwbe_category,
+            CASE
+                WHEN minority_type_id = 2 THEN 'Black American'
+                WHEN minority_type_id = 3 THEN 'Hispanic American'
+                WHEN minority_type_id IN (4,5) THEN 'Asian American'
+                WHEN minority_type_id = 9 THEN 'Women'
+            END as mwbe_category,
             SUM(COALESCE(total_spending_amount,0)) AS check_amount,
             SUM(total_spending_amount)/MAX(total.check_amount)*100 as percent_spending,
             SUM(COALESCE(total_contract_amount,0)) AS total_sub_contract_amount,
@@ -150,12 +155,6 @@
             SUM(total_spending_amount) AS ytd_spending
             FROM aggregateon_subven_spending_vendor a
             JOIN subvendor b ON b.vendor_id = a.vendor_id
-            LEFT JOIN
-            (
-                SELECT minority_type_id,
-                CASE WHEN minority_type_id IN (4,5) THEN 'Asian American' ELSE minority_type_name END as mwbe_category
-                FROM ref_minority_type
-            ) minority_type on minority_type.minority_type_id = a.minority_type_id
             JOIN
             (
                 SELECT SUM(total_spending_amount) AS check_amount
@@ -239,6 +238,60 @@
                 </exp>
             </where>
             GROUP BY a.industry_type_id,b.industry_type_name
+        </sql>
+    </statement>
+    <!-- Charts -->
+    <statement name="GetMwbeSpendingByYears" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
+        <param name="mwbe" />
+        <sql>
+            SELECT
+            year_value as fiscal_year,
+            SUM(CASE WHEN minority_type_id IN (4,5) THEN total_spending ELSE 0 END) AS asian_american_spending,
+            SUM(CASE WHEN minority_type_id = 2 THEN total_spending ELSE 0 END) AS black_american_spending,
+            SUM(CASE WHEN minority_type_id = 3 THEN total_spending ELSE 0 END) AS hispanic_american_spending,
+            SUM(CASE WHEN minority_type_id = 9 THEN total_spending ELSE 0 END) AS women_spending,
+            SUM(CASE WHEN minority_type_id IN (2, 3, 4, 5, 9) THEN total_spending ELSE 0 END) AS total_mwbe_spending
+            FROM
+            (
+                SELECT year.year_value,minority_type_id,
+                SUM(COALESCE(total_spending_amount,0)) as total_spending
+                FROM aggregateon_mwbe_spending_coa_entities a
+                JOIN ref_year year on year.year_id = a.year_id
+                <where>
+                    <exp op="AND">
+                        <exp op="IN" dbField="a.year_id" paramName="year" />
+                        <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
+                    </exp>
+                </where>
+                GROUP BY a.minority_type_id,year.year_value
+            ) spending
+            GROUP BY fiscal_year
+        </sql>
+    </statement>
+    <!-- Common -->
+    <statement name="GetSpendingByCategory" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
+        <param name="mwbe" />
+        <sql>
+            SELECT
+            b.spending_category_id,
+            b.display_name as spending_category_name,
+            SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+            FROM aggregateon_mwbe_spending_vendor a
+            JOIN ref_spending_category b on b.spending_category_id = a.spending_category_id
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="a.year_id" paramName="year" />
+                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
+                </exp>
+            </where>
+            GROUP BY b.spending_category_id,b.display_name,b.display_order
+            ORDER BY b.display_order
         </sql>
     </statement>
 </statements>

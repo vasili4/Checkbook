@@ -62,4 +62,16 @@ class SpendingDataService extends AbstractDataService {
     public function GetCountSpendingByIndustries($parameters) {
         return $this->getCountData($parameters, "GetSpendingByIndustries");
     }
+
+    /* Charts */
+
+    public function GetMwbeSpendingByYears($parameters, $limit = null, $orderBy = null) {
+        return $this->getData($parameters, $limit, $orderBy, "GetMwbeSpendingByYears");
+    }
+
+    /* Common Spending */
+
+    public function GetSpendingByCategory($parameters, $limit = null, $orderBy = null) {
+        return $this->getData($parameters, $limit, $orderBy, "GetSpendingByCategory");
+    }
 }

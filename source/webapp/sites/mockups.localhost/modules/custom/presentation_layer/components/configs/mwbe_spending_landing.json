@@ -14,7 +14,9 @@
                 {"label":"Expense Category","column":"expense_category","format":"text","tooltip":60},
                 {"label":"Check Amount","column":"check_amount","format":"dollar"}
             ],
-            "orderBy":"check_amount desc"
+            "orderBy":"check_amount desc",
+            "defaultLimit":5,
+            "defaultParameters":{"year":118,"mwbe":"(2,3,4,5,9)"}
         },
         "agencies":{
             "viewType":"simple_data_table",
@@ -28,7 +30,9 @@
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
-            "orderBy":"check_amount desc"
+            "orderBy":"check_amount desc",
+            "defaultLimit":5,
+            "defaultParameters":{"year":118,"mwbe":"(2,3,4,5,9)"}
         },
         "expenseCategories":{
             "viewType":"simple_data_table",
@@ -42,7 +46,9 @@
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
-            "orderBy":"check_amount desc"
+            "orderBy":"check_amount desc",
+            "defaultLimit":5,
+            "defaultParameters":{"year":118,"mwbe":"(2,3,4,5,9)"}
         },
         "primeVendors":{
             "viewType":"simple_data_table",
@@ -58,7 +64,9 @@
                 {"label":"% Spending","column":"percent_spending","format":"percent"},
                 {"label":"Total Contract Amount","column":"total_contract_amount","format":"dollar"}
             ],
-            "orderBy":"check_amount desc"
+            "orderBy":"check_amount desc",
+            "defaultLimit":5,
+            "defaultParameters":{"year":118,"mwbe":"(2,3,4,5,9)"}
         },
         "subVendors":{
             "viewType":"simple_data_table",
@@ -75,7 +83,9 @@
                 {"label":"Number of Sub Contracts","column":"number_sub_contracts","format":"number"},
                 {"label":"Total Contract Amount","column":"total_sub_contract_amount","format":"dollar"}
             ],
-            "orderBy":"check_amount desc"
+            "orderBy":"check_amount desc",
+            "defaultLimit":5,
+            "defaultParameters":{"year":118,"mwbe":"(2,3,4,5,9)"}
         },
         "contracts":{
             "viewType":"simple_data_table",
@@ -92,7 +102,9 @@
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"Total Contract Amount","column":"total_contract_amount","format":"dollar"}
             ],
-            "orderBy":"check_amount desc"
+            "orderBy":"check_amount desc",
+            "defaultLimit":5,
+            "defaultParameters":{"year":118,"mwbe":"(2,3,4,5,9)"}
         },
         "spendingByIndustries":{
             "viewType":"simple_data_table",
@@ -106,7 +118,24 @@
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
-            "orderBy":"check_amount desc"
+            "orderBy":"check_amount desc",
+            "defaultLimit":5,
+            "defaultParameters":{"year":118,"mwbe":"(2,3,4,5,9)"}
+        },
+        "mwbeSpendingByYears":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetMwbeSpendingByYears",
+            "tableColumns":[
+                {"label":"Fiscal Year","column":"fiscal_year","format":"text","tooltip":60},
+                {"label":"Total M/WBE","column":"total_mwbe_spending","format":"dollar"},
+                {"label":"Asian American","column":"asian_american_spending","format":"dollar"},
+                {"label":"Black American","column":"black_american_spending","format":"dollar"},
+                {"label":"Hispanic American","column":"hispanic_american_spending","format":"dollar"},
+                {"label":"Women","column":"women_spending","format":"dollar"}
+            ],
+            "orderBy":"fiscal_year",
+            "defaultParameters":{"year":"(112,113,114,115,116,117,118)","mwbe":"(2,3,4,5,9)"}
         }
     }
 }

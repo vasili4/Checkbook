@@ -20,6 +20,7 @@ class SimpleDataTableViewModel {
         $this->countFunction = $viewConfig->countFunction;
 
         $this->viewConfig = new SimpleDataTableViewConfig($viewConfig);
+
         $this->_initializeModel($parameters,$limit,$orderBy);
     }
 

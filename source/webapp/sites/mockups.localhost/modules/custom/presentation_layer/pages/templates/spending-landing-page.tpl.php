@@ -108,7 +108,16 @@
         <svg width="950" height="500"></svg>
       </div>
     </div>
-    <div class="data-tables-container">
+
+    <div class="charts-data-tables-container" style="margin: 53% auto auto;">
+        <div style="display: inline; position: relative; width: 940px;">
+            <?php echo(_page_controller_get_mwbe_spending_data_table("mwbeSpendingByYears")); ?>
+        </div>
+    </div>
+
+    <div style="background-color: #92C46D; height: 35px; margin:6% auto auto;"></div>
+
+    <div class="data-tables-container" style="margin: auto;">
         <div style="margin-top: 30px; display: inline; position: relative; width: 940px; float: left;">
             <?php echo(_page_controller_get_mwbe_spending_data_table("checks")); ?>
         </div>
@@ -132,6 +141,7 @@
         </div>
         <div style="clear: left"></div>
     </div>
+
     </div>
     <a href="javascript:" id="return-to-top">return to top</a>
     </div>
