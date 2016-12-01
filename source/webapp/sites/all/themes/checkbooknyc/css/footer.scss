@@ -142,18 +142,17 @@ footer {
     position: absolute;
     width: 100%;
 
-    div {
-      align-content: space-around;
-      display: flex;
+    div.bottom-container {
+      display: block;
       text-align: center;
 
       div {
         color: $white;
-        flex: 1;
         font-size: 0.7em;
         padding: 0.8em;
         text-align: center;
         text-transform: capitalize;
+        display: inline-block;
 
         a {
           color: $white;

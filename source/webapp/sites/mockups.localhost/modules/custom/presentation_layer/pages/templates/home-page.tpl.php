@@ -226,13 +226,13 @@
   </div>
   </div>
   <div class="footer__bottom-links">
-    <div>
+    <div class="bottom-container">
       <div>
           <a href="javascript:void(0);">disclaimer</a> |
           <a href="javascript:void(0);">privacy&nbsp;policy</a> |
           <a href="javascript:void(0);">language&nbsp;disclaimer</a>
       </div>
-      <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
+      <div>Copyright&nbsp;&copy;2016,&nbsp;Office&nbsp;of&nbsp;the&nbsp;New&nbsp;York&nbsp;City&nbsp;Comptroller</div>
       <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
     </div>
 </div>

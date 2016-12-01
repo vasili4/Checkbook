@@ -62,9 +62,16 @@
       <span class="page-subtitle">new york city</span>
       <span class="page-breadcrumb">home - domain: spending - m/wbe</span>
     </div>
-    <div class="year-filter"> <span>fiscal year filter: </span> <select>
-        <option>2016(Jul 1, 2015 - Jun 20, 2016)</option>
-      </select>
+    <div class="year-filter">
+      <span>fiscal year filter: </span>
+      <div>
+        <div class="selected-year">2016(Jul 1, 2015 - Jun 30, 2016)</div>
+        <div class="year-select">
+          <div class="year-select-option">2015</div>
+          <div class="year-select-option">2014</div>
+          <div class="year-select-option">2013</div>
+        </div>
+      </div>
       <!--change to div select element-->
     </div>
   </div>
@@ -148,27 +155,38 @@
 </div>
 <!-- .landing close tag -->
 <footer>
-  <div class="footer__left-links">
-    <div class="locale"><span>translate</span>
-      <a href="javascript:void(0);"><div class="globe-icon"></div></a>
+  <div class="footer-flex">
+    <div class="footer__left-links">
+      <div class="locale"><span>translate</span>
+        <a href="javascript:void(0);">
+          <div class="globe-icon"></div>
+        </a>
+      </div>
+      <div class="social"><span>social</span>
+        <a href="javascript:void(0);"><div class="googleplus-icon"></div></a>
+        <a href="javascript:void(0);"><div class="twitter-icon"></div></a>
+        <a href="javascript:void(0);"><div class="facebook-icon"></div></a>
+        <a href="javascript:void(0);"><div class="linkedin-icon"></div></a>
+        <a href="javascript:void(0);"><div class="email-icon"></div></a>
+      </div>
     </div>
-    <div class="social"><span>social</span>
-      <a href="javascript:void(0);"><div class="googleplus-icon"></div></a>
-      <a href="javascript:void(0);"><div class="twitter-icon"></div></a>
-      <a href="javascript:void(0);"><div class="facebook-icon"></div></a>
-      <a href="javascript:void(0);"><div class="linkedin-icon"></div></a>
-      <a href="javascript:void(0);"><div class="email-icon"></div></a>
-    </div>
-  </div>
   <div class="footer__right-links">
     <div class="comptroller-logo"></div>
-    <div>Office&nbsp;of&nbsp;the&nbsp;Comptroller - City&nbsp;of&nbsp;New&nbsp;York <br> One&nbsp;Centre&nbsp;Street, New&nbsp;York,&nbsp;NY | Phone:&nbsp;212.669.3916
-      <div> <span>
+    <div>Office&nbsp;of&nbsp;the&nbsp;Comptroller - City&nbsp;of&nbsp;New&nbsp;York
+      <br> One&nbsp;Centre&nbsp;Street, New&nbsp;York,&nbsp;NY | Phone:&nbsp;212.669.3916
+    </div>
+
+  </div>
+  </div>
+  <div class="footer__bottom-links">
+    <div class="bottom-container">
+      <div>
           <a href="javascript:void(0);">disclaimer</a> |
           <a href="javascript:void(0);">privacy&nbsp;policy</a> |
           <a href="javascript:void(0);">language&nbsp;disclaimer</a>
-    </span>
-        <div>&copy; 2016,&nbsp;The&nbsp;New&nbsp;York City&nbsp;Comptroller's&nbsp;Office</div>
-        <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
       </div>
+      <div>Copyright&nbsp;&copy;2016,&nbsp;Office&nbsp;of&nbsp;the&nbsp;New&nbsp;York&nbsp;City&nbsp;Comptroller</div>
+      <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
+    </div>
+</div>
 </footer>

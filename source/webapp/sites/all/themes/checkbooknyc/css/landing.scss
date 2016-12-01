@@ -45,6 +45,35 @@ div.landing {
       font-size: 0.9em;
       text-transform: capitalize;
     }
+
+    > div {
+      background-color: $white;
+      border: 1px solid $main-font;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 0.7em;
+      height: 25px;
+      padding: 0.4em 1em;
+      width: 200px;
+
+      &:after {
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid $main;
+        content: "";
+        display: inline-block;
+        height: 0;
+        left: 296px;
+        position: absolute;
+        top: 9px;
+        width: 0;
+      }
+
+      div.year-select {
+        height: 0;
+        overflow: hidden;
+      }
+    }
   }
 
   div.filter {
@@ -102,6 +131,7 @@ div.landing {
           margin-left: 5px;
           width: 7px;
         }
+
         &.active:after {
           @include navigation-ico($white);
           transform: rotate(180deg);
@@ -110,7 +140,6 @@ div.landing {
         &:hover {
           background-color: $green-hover;
         }
-
       }
     }
 
@@ -354,24 +383,28 @@ div.landing {
     div.charts-data-tables-container {
       margin: 53% auto auto;
     }
+
     div.charts-data-table-container {
       margin-top: 25px;
       display: inline-block;
       position: relative;
       width: 940px;
     }
+
     a.charts-data-tables-toggle {
       display: block;
       margin-top: 25px;
       background-color: #92C46D;
       height: 35px;
-      background-image: url(../images/toggle_arrow_up.png);
-      background-repeat:no-repeat;
+      background-image: url("../images/toggle_arrow_up.png");
+      background-repeat: no-repeat;
       background-position: center center;
     }
+
     a.charts-data-tables-toggle.close {
-      background-image: url(../images/toggle_arrow_down.png);
+      background-image: url("../images/toggle_arrow_down.png");
     }
+
     div.data-table-container {
       margin-top: 30px;
       display: inline;
@@ -379,6 +412,7 @@ div.landing {
       float: left;
       width: 940px;
     }
+
     div.data-table-container-left {
       margin-top: 30px;
       display: inline;
@@ -386,6 +420,7 @@ div.landing {
       float: left;
       width: 450px;
     }
+
     div.data-table-container-right {
       margin-top: 30px;
       display: inline;
