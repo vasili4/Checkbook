@@ -2,10 +2,14 @@
 
 function _component_controller_simple_data_table_export($config,$component) {
 
-    $parameters = array('year'=>118,'mwbe'=>'(2,3,4,5,9)');
-    $viewModel = ComponentUtil::loadViewModel($config,$component,$parameters,200000);
+    $viewModel = ComponentUtil::loadViewModel($config,$component,null,200000);
     $data = $viewModel->model->data;
     $viewConfig = $viewModel->viewConfig;
+
+    $parameters = array();
+    foreach($viewConfig->defaultParameters as $key=>$value) {
+        $parameters[$key] = $value;
+    }
 
     $output = NULL;
 

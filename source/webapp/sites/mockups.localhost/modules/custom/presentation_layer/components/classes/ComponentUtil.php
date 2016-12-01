@@ -27,7 +27,14 @@ class ComponentUtil {
 
         $config = self::loadConfig($config);
         $viewConfig = $config->views->$component;
+        $viewConfig->component = $component;
         $orderBy = $viewConfig->orderBy;
+
+        //use default limit and parameters
+        $limit = isset($limit) ? $limit : $viewConfig->defaultLimit;
+        foreach($viewConfig->defaultParameters as $key=>$value) {
+            $parameters[$key] = $value;
+        }
         $viewModel = new SimpleDataTableViewModel($viewConfig,$parameters,$limit,$orderBy);
 
         return $viewModel;
