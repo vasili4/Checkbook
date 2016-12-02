@@ -6,6 +6,11 @@
 
 class ComponentUtil {
 
+    static function DisplayTopNavigationComponent() {
+
+        return theme('top_navigation_menu',array('viewModel'=>$viewModel));
+    }
+
     static function DisplaySimpleDataTableComponent($config,$component,$parameters,$limit) {
 
         $viewModel = self::loadViewModel($config,$component,$parameters,$limit);

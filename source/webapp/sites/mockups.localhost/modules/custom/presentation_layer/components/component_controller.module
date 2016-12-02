@@ -37,6 +37,14 @@ function component_controller_menu() {
         'access callback' => TRUE,
         'type' => MENU_CALLBACK,
     );
+    $items['top_navigation_menu'] = array
+    (
+        'title' => 'Top Navigation Menu',
+        'page callback' => 'component_controller',
+        'page arguments' => array('top_navigation_menu'),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
     return $items;
 }
 
@@ -48,6 +56,10 @@ function component_controller_theme($viewModel){
     return array(
         'simple_data_table' => array(
             'template' => 'templates/simple-data-table',
+            'arguments' => array('viewModel' => $viewModel),
+        ),
+        'top_navigation_menu' => array(
+            'template' => 'templates/top-navigation-menu',
             'arguments' => array('viewModel' => $viewModel),
         ),
         'bar_chart' => array(
