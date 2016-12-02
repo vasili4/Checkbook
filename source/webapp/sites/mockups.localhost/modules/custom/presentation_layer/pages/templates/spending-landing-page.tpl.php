@@ -21,33 +21,33 @@
       <!--change to div select element-->
     </div>
   </div>
-  <div class="filter">
-    <div class="subdomain-filter"> <span class="label">sub domain</span>
-      <div class="subdomain"> <span>$0.00B</span> <span>all (citywide)</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>other&nbsp;government entities</span> </div>
-      <div class="subdomain active"> <span>$0.00B</span> <span>m/wbe</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>m/wbe (sub&nbsp;vendor)</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>sub&nbsp;vendors</span> </div>
-      <div class="mwbe-filter-button">select filter</div>
+    <div class="filter">
+        <?php $data = MockData::SpendingBySubDomains(); ?>
+        <div class="subdomain-filter"> <span class="label">sub domain</span>
+            <div class="subdomain"> <span><?php echo($data[0]["value"]); ?></span> <span><?php echo($data[0]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[1]["value"]); ?></span> <span><?php echo($data[1]["name"]); ?></span> </div>
+            <div class="subdomain active"> <span><?php echo($data[2]["value"]); ?></span> <span><?php echo($data[2]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[3]["value"]); ?></span> <span><?php echo($data[3]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[4]["value"]); ?></span> <span><?php echo($data[4]["name"]); ?></span> </div>
+            <div class="mwbe-filter-button">select filter</div>
+        </div>
+        <div class="mwbe-filter">
+            <div>total m/wbe</div>
+            <div>asian american</div>
+            <div>black american</div>
+            <div>women</div>
+            <div>hispanic american</div>
+        </div>
+        <?php $data = MockData::SpendingByCategories(); ?>
+        <div class="spending-filter"> <span class="label">spending types</span>
+            <div class="subdomain active"> <span><?php echo($data[0]["value"]); ?></span> <span><?php echo($data[0]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[1]["value"]); ?></span> <span><?php echo($data[1]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[2]["value"]); ?></span> <span><?php echo($data[2]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[3]["value"]); ?></span> <span><?php echo($data[3]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[4]["value"]); ?></span> <span><?php echo($data[4]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($data[5]["value"]); ?></span> <span><?php echo($data[5]["name"]); ?></span> </div>
+        </div>
     </div>
-    <div class="mwbe-filter">
-      <div>total m/wbe</div>
-      <div>asian american</div>
-      <div>black american</div>
-      <div>women</div>
-      <div>hispanic american</div>
-    </div>
-    <div class="spending-filter"> <span class="label">spending types</span>
-      <div class="subdomain active"> <span>$0.00B</span> <span>total</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>payroll</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>capital</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>contract</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>trust & agency</span> </div>
-      <div class="subdomain"> <span>$0.00B</span> <span>other</span> </div>
-    </div>
-  </div>
-
-<!--    --><?php //echo(_page_controller_get_bottom_navigation_menu()); ?>
 
   <div class="data-visualization">
     <div class="zc-container">

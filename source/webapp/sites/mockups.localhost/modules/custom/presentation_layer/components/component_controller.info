@@ -18,3 +18,4 @@ files[] = includes/component_controller.inc
 
 dependencies[] = checkbook_infrastructure_layer
 dependencies[] = checkbook_services
+dependencies[] = mockup_utilities

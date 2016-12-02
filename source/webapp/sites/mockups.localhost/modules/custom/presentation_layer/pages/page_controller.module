@@ -5,6 +5,7 @@
  */
 
 require_once('includes/page_controller.inc');
+module_load_include('php', 'mockup_utilities', 'MockData');
 
 /**
  * Implements hook_menu()

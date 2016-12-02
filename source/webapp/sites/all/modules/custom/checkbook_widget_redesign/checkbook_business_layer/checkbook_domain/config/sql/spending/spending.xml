@@ -315,6 +315,73 @@
         <param name="year" />
         <param name="yeartype" />
         <sql>
+
+            SELECT * FROM (
+
+            SELECT 'Budget' domain, 1 as display_order,
+            SUM(COALESCE(current_budget_amount,0)) AS total_amount
+            FROM budget
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="budget_fiscal_year_id" paramName="year" />
+                </exp>
+            </where>
+
+            UNION
+
+            SELECT 'Revenue' domain, 2 as display_order,
+            SUM(COALESCE(posting_amount,0)) AS total_amount
+            FROM revenue_details
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="budget_fiscal_year_id" paramName="year" />
+                </exp>
+            </where>
+
+            UNION
+
+            SELECT 'Spending' domain, 3 as display_order,
+            SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+            FROM aggregateon_mwbe_spending_coa_entities
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="year_id" paramName="year" />
+                </exp>
+            </where>
+
+            UNION
+
+            SELECT 'Contracts' domain, 4 as display_order,
+            SUM(COALESCE(maximum_contract_amount,0)) AS total_spending_amount
+            FROM aggregateon_all_contracts_cumulative_spending a
+            JOIN ref_document_code b ON b.document_code_id = a.document_code_id
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="fiscal_year_id" paramName="year" />
+                    <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="document_code">('CT1', 'CTA1', 'RCT1', 'MA1')</exp>
+                    <exp op="=" dbField="status_flag">'R'</exp>
+                </exp>
+            </where>
+
+            UNION
+
+            SELECT 'Payroll' domain, 5 as display_order,
+            SUM(COALESCE(gross_pay,0)) AS total_amount
+            FROM payroll
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="fiscal_year_id" paramName="year" />
+                </exp>
+            </where>
+            ) domains
+            ORDER BY display_order
+        </sql>
+    </statement>
+    <statement name="GetSpendingBySubDomain" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
+        <sql>
             SELECT 'ALL (Citywide)' as sub_domain, 1 as display_order,
             SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
             FROM aggregateon_mwbe_spending_coa_entities

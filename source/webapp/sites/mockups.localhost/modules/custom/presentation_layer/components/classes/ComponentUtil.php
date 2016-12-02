@@ -12,32 +12,6 @@ class ComponentUtil {
         return theme('top_navigation_menu',array('viewModel'=> null));
     }
 
-    static function DisplayBottomNavigationComponent() {
-
-        $service = new SpendingDataService();
-        $parameters = array('year'=>118,'mwbe'=>'(2,3,4,5,9)');
-
-        $spending_types =  array();
-        $model = $service->GetSpendingByCategory($parameters);
-        foreach($model as $row) {
-            $spending_types[] = array(
-                "name" => $row["spending_category"],
-                "amount" => FormattingUtilities::formatNumber($row["total_spending_amount"],2,'$')
-            );
-        }
-
-        $sub_domains = array();
-        $model = $service->GetSpendingByDomain($parameters);
-        foreach($model as $row) {
-            $sub_domains[] = array(
-                "name" => $row["sub_domain"],
-                "amount" => FormattingUtilities::formatNumber($row["total_spending_amount"],2,'$')
-            );
-        }
-        $viewModel = array("viewConfig" => array("spending_types" => $spending_types,"sub_domains" => $sub_domains));
-        return theme('bottom_navigation_menu',array('viewModel'=>$viewModel));
-    }
-
     static function DisplaySimpleDataTableComponent($config,$component,$parameters,$limit) {
 
         $viewModel = self::loadViewModel($config,$component,$parameters,$limit);

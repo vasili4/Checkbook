@@ -9,6 +9,7 @@ require_once('classes/simple_data_table/SimpleDataTableModel.php');
 require_once('classes/simple_data_table/SimpleDataTableViewConfig.php');
 require_once('classes/simple_data_table/SimpleDataTableViewModel.php');
 require_once('includes/component_controller.inc');
+module_load_include('php', 'mockup_utilities', 'MockData');
 
 /**
  * Implements hook_menu()
@@ -45,13 +46,6 @@ function component_controller_menu() {
         'access callback' => TRUE,
         'type' => MENU_CALLBACK,
     );
-    $items['bottom_navigation_menu'] = array
-    (
-        'title' => 'Bottom Navigation Menu',
-        'page arguments' => array('bottom_navigation_menu'),
-        'access callback' => TRUE,
-        'type' => MENU_CALLBACK,
-    );
     return $items;
 }
 
@@ -67,10 +61,6 @@ function component_controller_theme($viewModel){
         ),
         'top_navigation_menu' => array(
             'template' => 'templates/top-navigation-menu',
-            'arguments' => array('viewModel' => $viewModel),
-        ),
-        'bottom_navigation_menu' => array(
-            'template' => 'templates/bottom-navigation-menu',
             'arguments' => array('viewModel' => $viewModel),
         ),
         'bar_chart' => array(

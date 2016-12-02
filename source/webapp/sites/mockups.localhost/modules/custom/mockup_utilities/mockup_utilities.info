@@ -1,0 +1,9 @@
+
+name = Mockup Utilities
+description = Module to support common utilities for the mockup site.
+core = 7.x
+package = Checkbook Mockups
+
+
+dependencies[] = checkbook_infrastructure_layer
+dependencies[] = checkbook_services

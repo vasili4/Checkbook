@@ -76,8 +76,12 @@ class SpendingDataService extends AbstractDataService {
     }
 
     public function GetSpendingByDomain($parameters, $limit = null, $orderBy = null) {
-        $citywide = $this->getData($parameters, $limit, $orderBy, "GetSpendingByDomain");
-        $oge = $this->getData($parameters, $limit, $orderBy, "GetSpendingByDomain","spending/oge_spending");
+        return $this->getData($parameters, $limit, $orderBy, "GetSpendingByDomain");
+    }
+
+    public function GetSpendingBySubDomain($parameters, $limit = null, $orderBy = null) {
+        $citywide = $this->getData($parameters, $limit, $orderBy, "GetSpendingBySubDomain");
+        $oge = $this->getData($parameters, $limit, $orderBy, "GetSpendingBySubDomain","spending/oge_spending");
         $data = array_merge($citywide, $oge);
 
         usort($data, function($a, $b) {

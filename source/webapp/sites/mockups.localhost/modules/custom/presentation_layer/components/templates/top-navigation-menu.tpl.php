@@ -12,28 +12,28 @@
     <div class="nav-dropdown search-tools-select"><a href="javascript:void(0);">search&nbsp;tools</a></div>
     <div class="nav-dropdown help-select"><a href="javascript:void(0);">help</a></div>
 </nav>
-
+<?php $domains = MockData::SpendingByDomains(); ?>
 <div class="nav-submenu nav-domains">
     <div class="nav-dropdown__list">
-        <a href="/spending_landing" class="spending">
-            <div>$0.00B</div>
-            <div>spending</div>
-        </a>
         <a href="javascript:void(0);" class="budget">
-            <div>$0.00B</div>
-            <div>budget</div>
+            <div><?php echo($domains[0]["value"]); ?></div>
+            <div><?php echo($domains[0]["name"]); ?></div>
         </a>
         <a href="javascript:void(0);" class="revenue">
-            <div>$0.00B</div>
-            <div>revenue</div>
+            <div><?php echo($domains[1]["value"]); ?></div>
+            <div><?php echo($domains[1]["name"]); ?></div>
+        </a>
+        <a href="/spending_landing" class="spending">
+            <div><?php echo($domains[2]["value"]); ?></div>
+            <div><?php echo($domains[2]["name"]); ?></div>
         </a>
         <a href="javascript:void(0);" class="contracts">
-            <div>$0.00B</div>
-            <div>contracts</div>
+            <div><?php echo($domains[3]["value"]); ?></div>
+            <div><?php echo($domains[3]["name"]); ?></div>
         </a>
         <a href="javascript:void(0);" class="payroll">
-            <div>$0.00B</div>
-            <div>payroll</div>
+            <div><?php echo($domains[4]["value"]); ?></div>
+            <div><?php echo($domains[4]["name"]); ?></div>
         </a>
     </div>
 </div>
