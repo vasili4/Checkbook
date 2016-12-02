@@ -58,14 +58,14 @@ div.home {
         &:hover {
           color: $main-hover;
         }
-        &:first-of-type:after {
-          @extend %alert-ico;
-          content: "";
-          display: inline-block;
-          height: 10px;
-          margin-left: 5px;
-          width: 10px;
-        }
+        // &:first-of-type:after {
+        //   @extend %alert-ico;
+        //   content: "";
+        //   display: inline-block;
+        //   height: 10px;
+        //   margin-left: 5px;
+        //   width: 10px;
+        // }
         &.active {
           background-color: $main;
           color: $white

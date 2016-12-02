@@ -6,9 +6,9 @@
     <span class="search-icon"></span>
     <input type="search" class="search__input" placeholder="What can we help you find today?">
     <ul class="search__input-options">
-      <li>create alerts</li>
+      <!-- <li>create alerts</li> -->
       <li class="recommended-search__button">recommended searches</li>
-      <li>advanced search</li>
+      <!-- <li>advanced search</li> -->
     </ul>
     <div class="recommended-search">
       <div class="recommended-search__close">&times;</div>
