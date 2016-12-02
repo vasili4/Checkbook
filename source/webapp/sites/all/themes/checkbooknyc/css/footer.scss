@@ -1,18 +1,18 @@
 footer {
+  background-color: $white;
+  bottom: -32px;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+
   .footer-flex {
-    background-color: $white;
-    bottom: 32px;
     display: flex;
-    height: auto;
-    left: 0;
-    position: absolute;
-    right: 0;
-    width: 100%;
 
     > div {
       align-self: center;
       display: inline-block;
-      // flex: 1;
       margin: 10px;
 
       &.footer__left-links {
@@ -137,7 +137,7 @@ footer {
 
   .footer__bottom-links {
     background-color: $gray;
-    bottom: 0;
+    bottom: -32px;
     height: 2em;
     position: absolute;
     width: 100%;
@@ -145,6 +145,11 @@ footer {
     div.bottom-container {
       display: block;
       text-align: center;
+      white-space: nowrap;
+
+      span {
+        color: $white;
+      }
 
       div {
         color: $white;
