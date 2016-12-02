@@ -85,13 +85,13 @@
         });
 
         //removes active class when hovering over new dropdown option
-        $('.nav-help').hover(function () {
-            if ($('.nav-help').hasClass('active')) {
+        $('.nav-search-tools').hover(function () {
+            if ($('.nav-search-tools').hasClass('active')) {
                 return;
             }
         }, function () {
-            $('.nav-help').removeClass('active');
-            $('.nav-dropdown.help-select').removeClass('active');
+            $('.nav-search-tools').removeClass('active');
+            $('.nav-dropdown.search-tools-select').removeClass('active');
         });
 
         //adds hover state for help in header navigation
@@ -109,12 +109,12 @@
 
         //removes active class when hovering over new dropdown option
         $('.nav-help').hover(function () {
-            if ($('.nav-search-tools').hasClass('active')) {
+            if ($('.nav-help').hasClass('active')) {
                 return;
             }
         }, function () {
             $('.nav-help').removeClass('active');
-            $('.nav-dropdown.search-tools-select').removeClass('active');
+            $('.nav-dropdown.help-select').removeClass('active');
         });
 
 
