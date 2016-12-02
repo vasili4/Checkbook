@@ -278,20 +278,84 @@
         <param name="mwbe" />
         <sql>
             SELECT
-            b.spending_category_id,
-            b.display_name as spending_category_name,
+            a.spending_category_id,
+            a.display_name as spending_category_name,
+            replace(a.display_name, 'Spending', '') as spending_category,
+            COALESCE(total_spending_amount,0) as total_spending_amount
+            FROM ref_spending_category a
+            LEFT JOIN
+            (
+                SELECT spending_category_id, SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+                FROM aggregateon_mwbe_spending_coa_entities
+                <where>
+                    <exp op="AND">
+                        <exp op="=" dbField="year_id" paramName="year" />
+                        <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    </exp>
+                </where>
+                GROUP BY spending_category_id
+
+                UNION
+
+                SELECT 6 as spending_category_id, SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+                FROM aggregateon_mwbe_spending_coa_entities
+                <where>
+                    <exp op="AND">
+                        <exp op="=" dbField="year_id" paramName="year" />
+                        <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                        <exp op="IN" dbField="minority_type_id" paramName="mwbe" />
+                    </exp>
+                </where>
+            ) b on b.spending_category_id = a.spending_category_id
+            ORDER BY a.display_order
+        </sql>
+    </statement>
+    <statement name="GetSpendingByDomain" datasource="checkbook">
+        <param name="year" />
+        <param name="yeartype" />
+        <sql>
+            SELECT 'ALL (Citywide)' as sub_domain, 1 as display_order,
             SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
-            FROM aggregateon_mwbe_spending_vendor a
-            JOIN ref_spending_category b on b.spending_category_id = a.spending_category_id
+            FROM aggregateon_mwbe_spending_coa_entities
             <where>
                 <exp op="AND">
-                    <exp op="=" dbField="a.year_id" paramName="year" />
-                    <exp op="=" dbField="a.type_of_year" paramName="yeartype" />
-                    <exp op="IN" dbField="a.minority_type_id" paramName="mwbe" />
+                    <exp op="=" dbField="year_id" paramName="year" />
+                    <exp op="=" dbField="type_of_year" paramName="yeartype" />
                 </exp>
             </where>
-            GROUP BY b.spending_category_id,b.display_name,b.display_order
-            ORDER BY b.display_order
+            UNION
+            SELECT 'M/WBE' as sub_domain, 3 as display_order,
+            SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+            FROM aggregateon_mwbe_spending_coa_entities
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="year_id" paramName="year" />
+                    <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="minority_type_id">(2,3,4,5,9)</exp>
+                </exp>
+            </where>
+            UNION
+            SELECT 'M/WBE (Sub Vendor)' as sub_domain, 4 as display_order,
+            SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+            FROM aggregateon_subven_spending_coa_entities
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="year_id" paramName="year" />
+                    <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                    <exp op="IN" dbField="minority_type_id">(2,3,4,5,9)</exp>
+                </exp>
+            </where>
+            UNION
+            SELECT 'Sub Vendors' as sub_domain, 5 as display_order,
+            SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+            FROM aggregateon_subven_spending_coa_entities
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="year_id" paramName="year" />
+                    <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                </exp>
+            </where>
         </sql>
     </statement>
 </statements>

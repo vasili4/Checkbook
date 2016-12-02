@@ -47,6 +47,8 @@
     </div>
   </div>
 
+<!--    --><?php //echo(_page_controller_get_bottom_navigation_menu()); ?>
+
   <div class="data-visualization">
     <div class="zc-container">
       <div class="domain-label">m/wbe spending summary</div>

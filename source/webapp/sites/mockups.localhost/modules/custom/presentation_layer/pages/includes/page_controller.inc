@@ -9,3 +9,8 @@ function _page_controller_get_top_navigation_menu() {
     $output = ComponentUtil::DisplayTopNavigationComponent();
     return $output;
 }
+
+function _page_controller_get_bottom_navigation_menu() {
+    $output = ComponentUtil::DisplayBottomNavigationComponent();
+    return $output;
+}
