@@ -26,7 +26,7 @@
         });
 
         //adds hover state for domains dropdown in header navigation
-        $('.nav-dropdown.domain-select').hover(function () {
+        $('.nav-dropdown.domain-select-nav').hover(function () {
             $(this).addClass('active');
             $('.nav-domains').addClass('active');
 
@@ -45,7 +45,7 @@
             }
         }, function () {
             $('.nav-domains').removeClass('active');
-            $('.nav-dropdown.domain-select').removeClass('active');
+            $('.nav-dropdown.domain-select-nav').removeClass('active');
         });
 
         //adds hover state for trends in header navigation

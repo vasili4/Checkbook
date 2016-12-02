@@ -6,7 +6,7 @@
         </a>
     </div>
     <div><a href="/">home</a></div>
-    <div class="nav-dropdown domain-select"><a href="javascript:void(0);">domains</a></div>
+    <div class="nav-dropdown domain-select-nav"><a href="javascript:void(0);">domains</a></div>
     <div><a href="javascript:void(0);">bonds</a></div>
     <div class="nav-dropdown trends-select"><a href="javascript:void(0);">trends</a></div>
     <div class="nav-dropdown search-tools-select"><a href="javascript:void(0);">search&nbsp;tools</a></div>
