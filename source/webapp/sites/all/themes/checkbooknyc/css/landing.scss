@@ -174,11 +174,24 @@ div.landing {
       }
 
       div {
+        cursor: pointer;
         flex: 1;
         height: 2.5em;
         margin-top: 20px;
         padding: 0 0.5em;
         text-align: center;
+
+        &:hover {
+          color: $main-hover;
+        }
+
+        &.active {
+          color: $main;
+
+          span:last-of-type {
+            text-decoration: underline;
+          }
+        }
 
         + div {
           border-left: 1px solid $main-font;
@@ -219,7 +232,7 @@ div.landing {
         text-transform: uppercase;
 
         &:hover {
-          color: $main-hover;
+          color: $white;
         }
 
         &.active {

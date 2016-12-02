@@ -33,7 +33,42 @@
             if ($(this).hasClass('active')) {
                 $('.nav-dropdown').not(this).removeClass('active');
                 $('.nav-search-tools').removeClass('active');
+                $('.nav-trends').removeClass('active');
+                $('.nav-help').removeClass('active');
             }
+        });
+
+        //removes active class when hovering over new dropdown option
+        $('.nav-domains').hover(function () {
+            if ($('.nav-domains').hasClass('active')) {
+                return;
+            }
+        }, function () {
+            $('.nav-domains').removeClass('active');
+            $('.nav-dropdown.domain-select').removeClass('active');
+        });
+
+        //adds hover state for trends in header navigation
+        $('.nav-dropdown.trends-select').hover(function () {
+            $(this).addClass('active');
+            $('.nav-trends').addClass('active');
+
+            if ($(this).hasClass('active')) {
+                $('.nav-dropdown').not(this).removeClass('active');
+                $('.nav-domains').removeClass('active');
+                $('.nav-search-tools').removeClass('active');
+                $('.nav-help').removeClass('active');
+            }
+        });
+
+        //removes active class when hovering over new dropdown option
+        $('.nav-trends').hover(function () {
+            if ($('.nav-trends').hasClass('active')) {
+                return;
+            }
+        }, function () {
+            $('.nav-trends').removeClass('active');
+            $('.nav-dropdown.trends-select').removeClass('active');
         });
 
         //adds hover state for search tools in header navigation
@@ -44,39 +79,13 @@
             if ($(this).hasClass('active')) {
                 $('.nav-dropdown').not(this).removeClass('active');
                 $('.nav-domains').removeClass('active');
+                $('.nav-trends').removeClass('active');
+                $('.nav-help').removeClass('active');
             }
         });
 
-
-        $('.nav-domains').hover(function () {
-            if ($('.nav-domains').hasClass('active')) {
-                return;
-            }
-        }, function () {
-            $('.nav-domains').removeClass('active');
-            $('.nav-dropdown.domain-select').removeClass('active');
-        });
-
-        $('.nav-trends').hover(function () {
-            if ($('.nav-trends').hasClass('active')) {
-                return;
-            }
-        }, function () {
-            $('.nav-trends').removeClass('active');
-            $('.nav-dropdown.trends-select').removeClass('active');
-        });
-
-        $('.nav-search-tools').hover(function () {
-            if ($('.nav-search-tools').hasClass('active')) {
-                return;
-            }
-        }, function () {
-            $('.nav-search-tools').removeClass('active');
-            $('.nav-dropdown.search-tools-select').removeClass('active');
-        });
-
+        //removes active class when hovering over new dropdown option
         $('.nav-help').hover(function () {
-            alert('assd');
             if ($('.nav-help').hasClass('active')) {
                 return;
             }
@@ -84,6 +93,30 @@
             $('.nav-help').removeClass('active');
             $('.nav-dropdown.help-select').removeClass('active');
         });
+
+        //adds hover state for help in header navigation
+        $('.nav-dropdown.help-select').hover(function () {
+            $(this).addClass('active');
+            $('.nav-help').addClass('active');
+
+            if ($(this).hasClass('active')) {
+                $('.nav-dropdown').not(this).removeClass('active');
+                $('.nav-domains').removeClass('active');
+                $('.nav-trends').removeClass('active');
+                $('.nav-search-tools').removeClass('active');
+            }
+        });
+
+        //removes active class when hovering over new dropdown option
+        $('.nav-help').hover(function () {
+            if ($('.nav-search-tools').hasClass('active')) {
+                return;
+            }
+        }, function () {
+            $('.nav-help').removeClass('active');
+            $('.nav-dropdown.search-tools-select').removeClass('active');
+        });
+
 
         $('.chart-bar').click(function () {
             if (!$('#chart1').hasClass('active')) {

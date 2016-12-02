@@ -103,12 +103,12 @@ footer {
         text-align: left;
 
         div.comptroller-logo {
-          background-repeat: no-repeat;
           background-image: url("../images/comptroller_logo_only.png");
+          background-repeat: no-repeat;
           display: inline-block;
           height: 30px;
-    width: 35px;
-    margin-top: 5px;
+          margin-top: 5px;
+          width: 35px;
         }
 
         div:last-of-type {
