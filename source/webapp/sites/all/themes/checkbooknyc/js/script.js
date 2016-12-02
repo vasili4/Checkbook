@@ -126,74 +126,90 @@
       char2;
     var fiscalYear = ['2011', '2012', '2013', '2014', '2015', '2016', '2017'];
     var dollarFormat = function(d) {
-      return '$' + d3.format(',.01f')(d) + 'M';
-    };
-    //stacked bargraph////////////////////////////////////////////////////////////
+      return '$' + d3.format(',.2f')(d) + 'M';
+    }
 
-    nv.addGraph(function() {
-      chart = nv.models.multiBarChart()
-        .duration(1000)
-        .margin({
-          bottom: 100,
-          left: 70,
-        })
-        .rotateLabels(0)
-        .groupSpacing(0.5)
-        .reduceXTicks(true)
-        .staggerLabels(false)
-        .stacked(true);
-      chart.xAxis
-        .showMaxMin(false)
-        .tickValues([0, 1, 2, 3, 4, 5, 6])
-        .tickFormat(function(d) {
-          return fiscalYear[d];
-        });
-      chart.yAxis
-        .tickFormat(dollarFormat);
-      chart.dispatch.on('renderEnd', function() {
-        nv.log('Render Complete');
-      });
+    /* Load Chart Data */
+    var chartData;
+    var url = 'mwbe_spending_summary_chart_data/mwbe_spending_landing/mwbeSpendingByYears';
 
-      d3.select('#chart1 svg')
-        .datum(mock)
-        .call(chart);
-
-      nv.utils.windowResize(chart.update);
-      chart.dispatch.on('stateChange', function(e) {
-        nv.log('New State:', JSON.stringify(e));
-      });
-      chart.state.dispatch.on('change', function(state) {
-        nv.log('state', JSON.stringify(state));
-      });
-      return chart;
+    $.ajax({
+        url: url,
+        success: function(result) {
+            chartData = JSON.parse(result);
+            CreateGraph();
+        }
     });
 
+      function CreateGraph() {
 
-    //line graph//////////////////////////////////////////////////////////////////
-    nv.addGraph(function() {
-      chart2 = nv.models.lineChart()
-        .options({
-          duration: 350,
-          useInteractiveGuideline: true
-        })
-        .height(450);
-      // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
-      chart2.xAxis
-        .tickValues([0, 1, 2, 3, 4, 5, 6])
-        .tickFormat(function(d) {
-          return fiscalYear[d];
-        });;
-      chart2.yAxis
-        .tickFormat(dollarFormat);
-      chart2.interactiveLayer.tooltip.fixedTop(150);
-      data = sinAndCos();
-      d3.select('#chart2 svg')
-        .datum(mock)
-        .call(chart2);
-      nv.utils.windowResize(chart2.update);
-      return chart2;
-    });
+          //stacked bargraph////////////////////////////////////////////////////////////
+          nv.addGraph(function() {
+              chart = nv.models.multiBarChart()
+                  .duration(1000)
+                  .margin({
+                      bottom: 100,
+                      left: 70
+                  })
+                  .rotateLabels(0)
+                  .groupSpacing(0.5)
+                  .reduceXTicks(true)
+                  .staggerLabels(false)
+                  .stacked(true);
+              chart.xAxis
+                  .showMaxMin(false)
+                  .tickValues([0, 1, 2, 3, 4, 5, 6])
+                  .tickFormat(function(d) {
+                      return fiscalYear[d];
+                  });
+              chart.yAxis
+                  .tickFormat(dollarFormat);
+              chart.dispatch.on('renderEnd', function() {
+                  nv.log('Render Complete');
+              });
 
+
+              d3.select('#chart1 svg')
+                  .datum(chartData)
+                  .call(chart);
+
+
+              nv.utils.windowResize(chart.update);
+              chart.dispatch.on('stateChange', function(e) {
+                  nv.log('New State:', JSON.stringify(e));
+              });
+              chart.state.dispatch.on('change', function(state) {
+                  nv.log('state', JSON.stringify(state));
+              });
+              return chart;
+          });
+
+
+          //line graph//////////////////////////////////////////////////////////////////
+          nv.addGraph(function() {
+              chart2 = nv.models.lineChart()
+                  .options({
+                      duration: 350,
+                      useInteractiveGuideline: true
+                  })
+                  .height(450);
+              // chart sub-models (ie. xAxis, yAxis, etc) when accessed directly, return themselves, not the parent chart, so need to chain separately
+              chart2.xAxis
+                  .tickValues([0, 1, 2, 3, 4, 5, 6])
+                  .tickFormat(function(d) {
+                      return fiscalYear[d];
+                  });
+              chart2.yAxis
+                  .tickFormat(dollarFormat);
+              chart2.interactiveLayer.tooltip.fixedTop(150);
+              data = sinAndCos();
+              d3.select('#chart2 svg')
+                  .datum(chartData)
+                  .call(chart2);
+              nv.utils.windowResize(chart2.update);
+              return chart2;
+          });
+      }
 
     function sinAndCos() {
       var sin = [],
@@ -255,157 +271,3 @@
   });
 
 })(jQuery);
-
-var mock = [{
-  key: 'Asian American',
-  values: [{
-    key: 'Asian American',
-    series: '2011',
-    x: 0,
-    y: 198.8
-  }, {
-    key: 'Asian American',
-    series: '2011',
-    x: 1,
-    y: 240.1
-  }, {
-    key: 'Asian American',
-    series: '2011',
-    x: 2,
-    y: 292.9
-  }, {
-    key: 'Asian American',
-    series: '2011',
-    x: 3,
-    y: 393.3
-  }, {
-    key: 'Asian American',
-    series: '2011',
-    x: 4,
-    y: 374.0,
-  }, {
-    key: 'Asian American',
-    series: '2011',
-    x: 5,
-    y: 481.1,
-  }, {
-    key: 'Asian American',
-    series: '2011',
-    x: 6,
-    y: 215.0
-  }]
-}, {
-  key: 'Black American',
-  values: [{
-    key: 'Black American',
-    series: 0,
-    x: 0,
-    y: 32.3
-  }, {
-    key: 'Black American',
-    series: 0,
-    x: 1,
-    y: 31.3
-  }, {
-    key: 'Black American',
-    series: 0,
-    x: 2,
-    y: 31.9
-  }, {
-    key: 'Black American',
-    series: 0,
-    x: 3,
-    y: 39.4
-  }, {
-    key: 'Black American',
-    series: 0,
-    x: 4,
-    y: 41.7
-  }, {
-    key: 'Black American',
-    series: 0,
-    x: 5,
-    y: 54.6
-  }, {
-    key: 'Black American',
-    series: 0,
-    x: 6,
-    y: 21.2
-  }]
-}, {
-  key: 'Hispanic American',
-  values: [{
-    key: 'Hispanic American',
-    series: 0,
-    x: 0,
-    y: 67.5
-  }, {
-    key: 'Hispanic American',
-    series: 0,
-    x: 1,
-    y: 83.5
-  }, {
-    key: 'Hispanic American',
-    series: 0,
-    x: 2,
-    y: 78.8
-  }, {
-    key: 'Hispanic American',
-    series: 0,
-    x: 3,
-    y: 67.6
-  }, {
-    key: 'Hispanic American',
-    series: 0,
-    x: 4,
-    y: 90.2
-  }, {
-    key: 'Hispanic American',
-    series: 0,
-    x: 5,
-    y: 104.4
-  }, {
-    key: 'Hispanic American',
-    series: 0,
-    x: 6,
-    y: 44.6
-  }]
-}, {
-  key: 'Women',
-  values: [{
-    key: 'Women',
-    series: 0,
-    x: 0,
-    y: 165.2
-  }, {
-    key: 'Women',
-    series: 0,
-    x: 1,
-    y: 168.2
-  }, {
-    key: 'Women',
-    series: 0,
-    x: 2,
-    y: 158.4
-  }, {
-    key: 'Women',
-    series: 0,
-    x: 3,
-    y: 217.2
-  }, {
-    key: 'Women',
-    series: 0,
-    x: 4,
-    y: 245.4
-  }, {
-    key: 'Women',
-    series: 0,
-    x: 5,
-    y: 306.9
-  }, {
-    key: 'Women',
-    series: 0,
-    x: 6,
-    y: 139.4
-  }]
-}];

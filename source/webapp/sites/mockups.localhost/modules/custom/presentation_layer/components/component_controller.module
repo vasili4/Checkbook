@@ -30,11 +30,10 @@ function component_controller_menu() {
         'access callback' => TRUE,
         'type' => MENU_CALLBACK,
     );
-    $items['bar_chart'] = array
+    $items['mwbe_spending_summary_chart_data'] = array
     (
-        'title' => 'Bar Chart Component',
-        'page callback' => 'component_controller',
-        'page arguments' => array('bar_chart'),
+        'title' => 'M/WBE Spending Summary Chart Data',
+        'page callback' => '_component_controller_mwbe_spending_summary_chart_data',
         'access callback' => TRUE,
         'type' => MENU_CALLBACK,
     );
