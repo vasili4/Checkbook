@@ -1,0 +1,18 @@
+<statements>
+    <!-- Common -->
+    <statement name="GetSpendingByDomain" datasource="checkbook_oge">
+        <param name="year" />
+        <param name="yeartype" />
+        <sql>
+            SELECT 'Other Government Entities' as sub_domain, 2 as display_order,
+            SUM(COALESCE(total_spending_amount,0)) AS total_spending_amount
+            FROM aggregateon_spending_coa_entities
+            <where>
+                <exp op="AND">
+                    <exp op="=" dbField="year_id" paramName="year" />
+                    <exp op="=" dbField="type_of_year" paramName="yeartype" />
+                </exp>
+            </where>
+        </sql>
+    </statement>
+</statements>

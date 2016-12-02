@@ -45,6 +45,13 @@ function component_controller_menu() {
         'access callback' => TRUE,
         'type' => MENU_CALLBACK,
     );
+    $items['bottom_navigation_menu'] = array
+    (
+        'title' => 'Bottom Navigation Menu',
+        'page arguments' => array('bottom_navigation_menu'),
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
     return $items;
 }
 
@@ -60,6 +67,10 @@ function component_controller_theme($viewModel){
         ),
         'top_navigation_menu' => array(
             'template' => 'templates/top-navigation-menu',
+            'arguments' => array('viewModel' => $viewModel),
+        ),
+        'bottom_navigation_menu' => array(
+            'template' => 'templates/bottom-navigation-menu',
             'arguments' => array('viewModel' => $viewModel),
         ),
         'bar_chart' => array(

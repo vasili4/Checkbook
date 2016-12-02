@@ -74,4 +74,15 @@ class SpendingDataService extends AbstractDataService {
     public function GetSpendingByCategory($parameters, $limit = null, $orderBy = null) {
         return $this->getData($parameters, $limit, $orderBy, "GetSpendingByCategory");
     }
+
+    public function GetSpendingByDomain($parameters, $limit = null, $orderBy = null) {
+        $citywide = $this->getData($parameters, $limit, $orderBy, "GetSpendingByDomain");
+        $oge = $this->getData($parameters, $limit, $orderBy, "GetSpendingByDomain","spending/oge_spending");
+        $data = array_merge($citywide, $oge);
+
+        usort($data, function($a, $b) {
+                return ($a['display_order'] == $b['display_order']) ? 0 : ($a['display_order'] < $b['display_order']) ? -1 : 1;
+            });
+        return $data;
+    }
 }
