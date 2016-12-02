@@ -105,6 +105,7 @@ nav {
       margin-top: 5px;
       text-align: center;
       text-decoration: none;
+      transition: .25s ease-in-out;
 
       &:hover div {
         color: $white;

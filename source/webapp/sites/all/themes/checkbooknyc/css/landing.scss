@@ -100,6 +100,7 @@ div.landing {
     flex-direction: column;
     font-size: 0.8em;
     margin-top: 1.5em;
+    min-width: 1024px;
     position: relative;
     text-transform: uppercase;
 
@@ -180,12 +181,13 @@ div.landing {
         margin-top: 20px;
         padding: 0 0.5em;
         text-align: center;
+        transition: .25s ease-in-out;
 
-        &:hover {
+        &.subdomain:hover {
           color: $main-hover;
         }
 
-        &.active {
+        &.subdomain.active {
           color: $main;
 
           span:last-of-type {
@@ -230,6 +232,7 @@ div.landing {
         padding: 4px;
         text-align: center;
         text-transform: uppercase;
+        transition: .25s ease-in-out;
 
         &:hover {
           color: $white;

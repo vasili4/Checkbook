@@ -165,7 +165,8 @@ nav {
       flex: 1;
       margin-top: 5px;
       text-align: center;
-      text-decoration: none; }
+      text-decoration: none;
+      transition: .25s ease-in-out; }
       .nav-domains .nav-dropdown__list > div:hover div,
       .nav-domains .nav-dropdown__list a:hover div,
       .nav-help .nav-dropdown__list > div:hover div,
@@ -595,6 +596,7 @@ div.landing {
     flex-direction: column;
     font-size: 0.8em;
     margin-top: 1.5em;
+    min-width: 1024px;
     position: relative;
     text-transform: uppercase; }
     div.landing div.filter .subdomain-filter {
@@ -663,15 +665,16 @@ div.landing {
         height: 2.5em;
         margin-top: 20px;
         padding: 0 0.5em;
-        text-align: center; }
-        div.landing div.filter .spending-filter div:hover,
-        div.landing div.filter .subdomain-filter div:hover {
+        text-align: center;
+        transition: .25s ease-in-out; }
+        div.landing div.filter .spending-filter div.subdomain:hover,
+        div.landing div.filter .subdomain-filter div.subdomain:hover {
           color: #B2A380; }
-        div.landing div.filter .spending-filter div.active,
-        div.landing div.filter .subdomain-filter div.active {
+        div.landing div.filter .spending-filter div.subdomain.active,
+        div.landing div.filter .subdomain-filter div.subdomain.active {
           color: #92C46D; }
-          div.landing div.filter .spending-filter div.active span:last-of-type,
-          div.landing div.filter .subdomain-filter div.active span:last-of-type {
+          div.landing div.filter .spending-filter div.subdomain.active span:last-of-type,
+          div.landing div.filter .subdomain-filter div.subdomain.active span:last-of-type {
             text-decoration: underline; }
         div.landing div.filter .spending-filter div + div,
         div.landing div.filter .subdomain-filter div + div {
@@ -700,7 +703,8 @@ div.landing {
         font-size: 0.8em;
         padding: 4px;
         text-align: center;
-        text-transform: uppercase; }
+        text-transform: uppercase;
+        transition: .25s ease-in-out; }
         div.landing div.filter .mwbe-filter div:hover {
           color: #ffffff; }
         div.landing div.filter .mwbe-filter div.active {
@@ -949,7 +953,7 @@ footer .footer-flex {
           footer .footer-flex > div.footer__right-links span a:hover {
             color: #B2A380; }
       footer .footer-flex > div.footer__right-links .footer__open-source-disclaimer {
-        text-transform: uppercase; }
+        text-transform: none; }
 footer .footer__bottom-links {
   background-color: #615946;
   bottom: 0;

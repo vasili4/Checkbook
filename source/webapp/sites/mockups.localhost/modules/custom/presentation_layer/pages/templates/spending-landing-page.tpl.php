@@ -132,7 +132,7 @@
           <a href="http://comptroller.nyc.gov/language-disclaimer/" target="_blank">language&nbsp;disclaimer</a>
       </div>
       <div>Copyright&nbsp;&copy;2016,&nbsp;Office&nbsp;of&nbsp;the&nbsp;New&nbsp;York&nbsp;City&nbsp;Comptroller</div>
-      <div class="footer__open-source-disclaimer">checkbooknyc&nbsp;is&nbsp;open&nbsp;source&nbsp;software</div>
+      <div class="footer__open-source-disclaimer">Checkbook&nbsp;NYC&nbsp;is&nbsp;Open&nbsp;Source&nbsp;Software</div>
     </div>
 </div>
 </footer>
