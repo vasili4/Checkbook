@@ -57,6 +57,14 @@
       $('.nav-dropdown.domain-select').removeClass('active');
     });
 
+      $('.nav-trends').hover(function() {
+          if ($('.nav-trends').hasClass('active')) {
+              return;
+          }
+      }, function() {
+          $('.nav-trends').removeClass('active');
+          $('.nav-dropdown.trends-select').removeClass('active');
+      });
 
     $('.nav-search-tools').hover(function() {
       if ($('.nav-search-tools').hasClass('active')) {
@@ -66,6 +74,16 @@
       $('.nav-search-tools').removeClass('active');
       $('.nav-dropdown.search-tools-select').removeClass('active');
     });
+
+      $('.nav-help').hover(function() {
+          alert('assd');
+          if ($('.nav-help').hasClass('active')) {
+              return;
+          }
+      }, function() {
+          $('.nav-help').removeClass('active');
+          $('.nav-dropdown.help-select').removeClass('active');
+      });
 
     $('.chart-bar').click(function() {
       if (!$('#chart1').hasClass('active')) {

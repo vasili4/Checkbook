@@ -63,7 +63,7 @@ nav {
 }
 
 .nav-domains,
-.nav-search-tools {
+.nav-search-tools, .nav-trends, .nav-help {
   background-color: $main;
   height: 0;
   overflow: hidden;
@@ -103,7 +103,7 @@ nav {
     }
   }
 }
-.nav-search-tools {
+.nav-search-tools, .nav-trends, .nav-help {
   .nav-dropdown__list {
     line-height: 3;
   }
