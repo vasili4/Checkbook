@@ -117,7 +117,6 @@
             $('.nav-dropdown.help-select').removeClass('active');
         });
 
-
         $('.chart-bar').click(function () {
             if (!$('#chart1').hasClass('active')) {
                 $('#chart1, .chart-bar').addClass('active');
@@ -142,6 +141,10 @@
 
             e.stopPropagation();
         });
+
+        //By default closee the toggle
+        $(".charts-data-table-container").slideToggle();
+        $(".charts-data-tables-toggle").toggleClass("close");
 
         //toggle the chart data table
         $(".charts-data-tables-toggle").click(function () {
