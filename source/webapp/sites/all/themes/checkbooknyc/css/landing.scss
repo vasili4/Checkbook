@@ -1,9 +1,10 @@
 div.landing {
-  margin: 1.7em auto auto;
+  margin: 2.7em auto auto;
   max-width: 1024px;
   position: relative;
   padding-bottom: 8%;
   z-index: 1;
+
 
   div.landing-head {
     flex: 1;
@@ -20,7 +21,6 @@ div.landing {
 
       &.page-subtitle {
         color: $main;
-        font-weight: bold;
         margin-top: 10px;
         text-transform: uppercase;
       }
@@ -53,7 +53,7 @@ div.landing {
       display: inline-block;
       font-size: 0.7em;
       height: 25px;
-      padding: 0.4em 1em;
+      padding: 0.4em .7em;
       width: 200px;
 
       &:after {
@@ -65,7 +65,7 @@ div.landing {
         height: 0;
         left: 296px;
         position: absolute;
-        top: 9px;
+        top: 10px;
         width: 0;
       }
 
@@ -93,7 +93,7 @@ div.landing {
   }
 
   div.filter {
-    background-color: $light-gray;
+    background-color: $nav-gray;
     border-radius: 0.15em;
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     display: flex;
@@ -132,11 +132,11 @@ div.landing {
         height: 17px;
         line-height: 1.6;
         position: absolute;
-        right: 183px;
+        right: 177px;
         text-align: center;
         text-transform: uppercase;
         top: 40px;
-        width: 369px;
+        width: 358px;
 
         &:after {
           @include navigation-ico($white);
@@ -162,6 +162,7 @@ div.landing {
 
     .spending-filter,
     .subdomain-filter {
+      color: $main-font;
       display: flex;
       flex-direction: row;
       height: 6em;
@@ -170,8 +171,9 @@ div.landing {
       > span {
         color: $main;
         font-weight: bold;
+        letter-spacing: .05em;
         margin: auto;
-        padding: 1em;
+        padding: 1em 2em;
       }
 
       div {
@@ -189,21 +191,17 @@ div.landing {
 
         &.subdomain.active {
           color: $main;
-
-          span:last-of-type {
-            text-decoration: underline;
-          }
         }
 
         + div {
-          border-left: 1px solid $main-font;
+          border-left: 1px solid $border-gray;
         }
 
         span {
           display: block;
 
           + span {
-            margin-top: 5px;
+            margin-top: 3px;
           }
         }
       }
@@ -259,6 +257,7 @@ div.landing {
       display: inline-block;
       font-size: 1.5em;
       font-weight: bold;
+      letter-spacing: .05em;
       text-transform: uppercase;
     }
 

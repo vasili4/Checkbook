@@ -1,6 +1,6 @@
 footer {
   background-color: $white;
-  bottom: -32px;
+  bottom: 0;
   height: auto;
   left: 0;
   position: absolute;
@@ -98,7 +98,7 @@ footer {
       &.footer__right-links {
         font-family: "Century Gothic";
         font-size: 10px;
-        line-height: 20px;
+        line-height: 14px;
         margin-right: 5%;
         text-align: left;
 
@@ -136,7 +136,7 @@ footer {
   }
 
   .footer__bottom-links {
-    background-color: $gray;
+    background-color: $main-font;
     bottom: -32px;
     height: 2em;
     position: absolute;
@@ -153,11 +153,12 @@ footer {
 
       div {
         color: $white;
-        font-size: 0.7em;
-        padding: 0.8em;
+        font-size: 0.5em;
+        padding: 1.2em 2.8em;
         text-align: center;
-        text-transform: capitalize;
+        text-transform: uppercase;;
         display: inline-block;
+        letter-spacing: .4px;
 
         a {
           color: $white;

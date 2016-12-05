@@ -5,6 +5,12 @@ nav {
   margin: auto;
   max-width: 1024px;
 
+  div.nav-home:hover,
+  div.nav-bonds:hover {
+    background-color: $main;
+    color: $white;
+  }
+
   div {
     display: inline-block;
     flex: 1;
@@ -57,9 +63,7 @@ nav {
 
     a {
       color: $main-font;
-      // font-size: 14px;
       font-size: 0.9em;
-      font-weight: bold;
       text-decoration: none;
       transition: 0.25s ease-in-out;
 
@@ -98,6 +102,7 @@ nav {
     display: flex;
     margin: auto;
     max-width: 1024px;
+    margin-top: 1px;
 
     > div,
     a {

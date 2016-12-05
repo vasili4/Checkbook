@@ -14,6 +14,8 @@ html {
   -o-background-size: cover;
   -webkit-background-size: cover;
   background: url(../images/background.jpg) no-repeat center center fixed;
+  // background: url(../images/blackandwhite.jpeg) no-repeat center center fixed;
+
   background-size: cover;
   box-sizing: border-box;
   height: 100%;
@@ -27,13 +29,21 @@ html {
 body {
   font-family: "Century Gothic";
   margin: auto;
-  min-height: 105%;
+  min-height: 100%;
+  height: 100%;
   // padding-bottom: 7rem;
   position: relative;
 }
+.content {
+  padding-bottom: 7em;
+}
 body {
   margin: 0;
-  padding-bottom: 7rem;
+
   padding: 0;
   position: relative;
+}
+#block-system-main,
+div.region-content {
+  height: 100%;
 }
