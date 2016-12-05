@@ -100,7 +100,7 @@
                 {"label":"Contracting Agency","column":"agency_name","format":"text","tooltip":60},
                 {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":60},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
-                {"label":"Total Contract Amount","column":"total_contract_amount","format":"dollar"}
+                {"label":"Total Contract<br/>Amount","column":"total_contract_amount","format":"dollar"}
             ],
             "orderBy":"check_amount desc",
             "defaultLimit":5,
