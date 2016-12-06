@@ -16,6 +16,28 @@ div.landing {
         font-size: 2.5em;
         font-weight: bold;
         text-transform: capitalize;
+
+        span.diamond {
+          width: 0;
+          height: 0;
+          border: 7px solid transparent;
+          border-bottom-color: $main;
+          position: relative;
+          top: -11px;
+          margin: 0 11px;
+          display: inline-block;
+
+          &:after {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 7px;
+            width: 0;
+            height: 0;
+            border: 7px solid transparent;
+            border-top-color: $main;
+          }
+        }
       }
 
       &.page-subtitle {
@@ -52,7 +74,7 @@ div.landing {
       display: inline-block;
       font-size: 0.7em;
       height: 25px;
-      padding: 0.4em .7em;
+      padding: 0.4em 0.7em;
       width: 200px;
 
       &:after {
@@ -62,7 +84,7 @@ div.landing {
         content: "";
         display: inline-block;
         height: 0;
-        left: 296px;
+        left: 287px;
         position: absolute;
         top: 10px;
         width: 0;
@@ -105,22 +127,7 @@ div.landing {
 
     .subdomain-filter {
       background-color: $white;
-      // border-bottom: 1px solid $main-font;
       box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-      // position: relative;
-      &:before {
-        background-color: white;
-        border: solid transparent;
-        top: 66px;
-        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.12), 1px 1px 1px rgba(0, 0, 0, 0.24);
-        content: '';
-        height: 20px;
-        left: 190px;
-        pointer-events: none;
-        position: absolute;
-        transform: rotate(45deg);
-        width: 20px;
-      }
 
       .mwbe-filter-button {
         background-color: $main;
@@ -155,7 +162,7 @@ div.landing {
 
         &:hover {
           // background-color: $green-hover;
-          opacity: .9;
+          opacity: 0.9;
         }
       }
     }
@@ -171,7 +178,7 @@ div.landing {
       > span {
         color: $main;
         font-weight: bold;
-        letter-spacing: .05em;
+        letter-spacing: 0.05em;
         margin: auto;
         padding: 1em 2em;
       }
@@ -183,7 +190,7 @@ div.landing {
         margin-top: 20px;
         padding: 0 0.5em;
         text-align: center;
-        transition: .25s ease-in-out;
+        transition: 0.25s ease-in-out;
 
         &.subdomain:hover {
           color: $main-hover;
@@ -208,7 +215,6 @@ div.landing {
     }
 
     .mwbe-filter {
-      // height: 20px;
       background-color: $main;
       color: $white;
       display: flex;
@@ -223,14 +229,14 @@ div.landing {
       }
 
       div {
-        color: #615946;
+        color: $navlink;
         cursor: pointer;
         flex: 1;
         font-size: 0.8em;
         padding: 4px;
         text-align: center;
         text-transform: uppercase;
-        transition: .25s ease-in-out;
+        transition: 0.25s ease-in-out;
 
         &:hover {
           color: $white;
@@ -257,7 +263,7 @@ div.landing {
       display: inline-block;
       font-size: 1.5em;
       font-weight: bold;
-      letter-spacing: .05em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
     }
 

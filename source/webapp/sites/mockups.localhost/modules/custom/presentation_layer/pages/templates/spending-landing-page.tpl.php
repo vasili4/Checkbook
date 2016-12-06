@@ -3,7 +3,7 @@
 <div class="landing">
   <div class="landing-filters">
     <div class="landing-head">
-      <span class="page-title">M/WBE total spending $9.90B</span>
+      <span class="page-title">M/WBE total spending <span class="diamond"></span> $9.90B</span>
       <span class="page-subtitle">new york city</span>
       <span class="page-breadcrumb">home - domain: spending - m/wbe</span>
     </div>

@@ -552,6 +552,24 @@ div.landing {
         font-size: 2.5em;
         font-weight: bold;
         text-transform: capitalize; }
+        div.landing div.landing-head span.page-title span.diamond {
+          width: 0;
+          height: 0;
+          border: 7px solid transparent;
+          border-bottom-color: #697884;
+          position: relative;
+          top: -11px;
+          margin: 0 11px;
+          display: inline-block; }
+          div.landing div.landing-head span.page-title span.diamond:after {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 7px;
+            width: 0;
+            height: 0;
+            border: 7px solid transparent;
+            border-top-color: #697884; }
       div.landing div.landing-head span.page-subtitle {
         color: #697884;
         margin-top: 10px;
@@ -577,7 +595,7 @@ div.landing {
       display: inline-block;
       font-size: 0.7em;
       height: 25px;
-      padding: 0.4em .7em;
+      padding: 0.4em 0.7em;
       width: 200px; }
       div.landing div.year-filter > div:after {
         border-left: 6px solid transparent;
@@ -586,7 +604,7 @@ div.landing {
         content: "";
         display: inline-block;
         height: 0;
-        left: 296px;
+        left: 287px;
         position: absolute;
         top: 10px;
         width: 0; }
@@ -619,18 +637,6 @@ div.landing {
     div.landing div.filter .subdomain-filter {
       background-color: #ffffff;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24); }
-      div.landing div.filter .subdomain-filter:before {
-        background-color: white;
-        border: solid transparent;
-        top: 66px;
-        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.12), 1px 1px 1px rgba(0, 0, 0, 0.24);
-        content: '';
-        height: 20px;
-        left: 190px;
-        pointer-events: none;
-        position: absolute;
-        transform: rotate(45deg);
-        width: 20px; }
       div.landing div.filter .subdomain-filter .mwbe-filter-button {
         background-color: #697884;
         border: none;
@@ -662,7 +668,7 @@ div.landing {
           background-position: center;
           transform: rotate(180deg); }
         div.landing div.filter .subdomain-filter .mwbe-filter-button:hover {
-          opacity: .9; }
+          opacity: 0.9; }
     div.landing div.filter .spending-filter,
     div.landing div.filter .subdomain-filter {
       color: #49463b;
@@ -674,7 +680,7 @@ div.landing {
       div.landing div.filter .subdomain-filter > span {
         color: #697884;
         font-weight: bold;
-        letter-spacing: .05em;
+        letter-spacing: 0.05em;
         margin: auto;
         padding: 1em 2em; }
       div.landing div.filter .spending-filter div,
@@ -685,7 +691,7 @@ div.landing {
         margin-top: 20px;
         padding: 0 0.5em;
         text-align: center;
-        transition: .25s ease-in-out; }
+        transition: 0.25s ease-in-out; }
         div.landing div.filter .spending-filter div.subdomain:hover,
         div.landing div.filter .subdomain-filter div.subdomain:hover {
           color: #B2A380; }
@@ -713,14 +719,14 @@ div.landing {
       div.landing div.filter .mwbe-filter.active {
         height: 20px; }
       div.landing div.filter .mwbe-filter div {
-        color: #615946;
+        color: #d6d6d6;
         cursor: pointer;
         flex: 1;
         font-size: 0.8em;
         padding: 4px;
         text-align: center;
         text-transform: uppercase;
-        transition: .25s ease-in-out; }
+        transition: 0.25s ease-in-out; }
         div.landing div.filter .mwbe-filter div:hover {
           color: #ffffff; }
         div.landing div.filter .mwbe-filter div.active {
@@ -738,7 +744,7 @@ div.landing {
       display: inline-block;
       font-size: 1.5em;
       font-weight: bold;
-      letter-spacing: .05em;
+      letter-spacing: 0.05em;
       text-transform: uppercase; }
     div.landing div.data-visualization div.snapshots-container {
       height: 200px; }
