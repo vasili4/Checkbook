@@ -1,6 +1,23 @@
 @font-face {
   font-family: "Century Gothic";
-  src: url("../css/fonts/GOTHIC.TTF") format("truetype"); }
+  src: url("../css/fonts/GOTHIC.TTF") format("truetype");
+  font-weight: normal;
+  font-style: normal; }
+@font-face {
+  font-family: "Century Gothic";
+  src: url("../css/fonts/GOTHICB.TTF") format("truetype");
+  font-weight: bold;
+  font-style: normal; }
+@font-face {
+  font-family: "Century Gothic";
+  src: url("../css/fonts/GOTHICBI.TTF") format("truetype");
+  font-weight: bold;
+  font-style: italic; }
+@font-face {
+  font-family: "Century Gothic";
+  src: url("../css/fonts/GOTHIC.TTF") format("truetype");
+  font-weight: normal;
+  font-style: italic; }
 div.home .home__front-links .home__front-links--domains div.bonds-img,
 div.home .home__front-links .home__front-links--bonds div.bonds-img {
   background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20105%20105%22%3E%3Cstyle%3E.a%7Bfill%3A#ffffff%3B%7D.b%7Bfill%3A#92C46D%3B%7D%3C%2Fstyle%3E%3Ccircle%20cx%3D%2252.5%22%20cy%3D%2252.5%22%20r%3D%2246%22%20class%3D%22a%22%2F%3E%3Ccircle%20cx%3D%2252.5%22%20cy%3D%2252.5%22%20r%3D%2252.5%22%20class%3D%22b%22%2F%3E%3Ccircle%20cx%3D%2252.5%22%20cy%3D%2252.5%22%20r%3D%2244.3%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M36%2077.7h-6.3V66.4l6.3-7.5V77.7zM42.6%2077.7h-5.2V57.5l3.6%208.8%201.6-1.9V77.7zM49.9%2077.7h-5.8v-15l5.8-7.1V77.7zM56.4%2077.7h-5.2V54l5.2-6.2V77.7zM63%2077.7h-5.2V48.9l2.9%205.8%202.3-2.6v25.6H63zM70.7%2077.7h-6.3V50.4l6.3-7.3V77.7zM73.7%2041.1L71%2037.4%2060.8%2048.7l-3.8-8L42.8%2058.9l-4-10.9L26.3%2061.5v-6.5l13.8-15%203.8%2010.3%2013.8-17.8%204%208.5%206.6-7.3%20-2.6-3.6%2013.1-4.8L73.7%2041.1z%22%20class%3D%22b%22%2F%3E%3C%2Fsvg%3E%0A");
@@ -789,6 +806,19 @@ div.landing {
           div.landing div.data-visualization div.chart-toggle div.chart-bar:hover {
             background-size: 23px; }
           div.landing div.data-visualization div.chart-toggle div.chart-bar.active {
+            background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2026%2026%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Cstyle%3E.a%7Bfill%3A#92C46D%3B%7D%3C%2Fstyle%3E%3Cpath%20d%3D%22M19.5%2026c-0.6%200-1-0.4-1-1V1c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v24c0%200.6-0.4%201-1%201H19.5z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M10.5%2026c-0.6%200-1-0.4-1-1V7c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v18c0%200.6-0.4%201-1%201H10.5z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M1.5%2026c-0.6%200-1-0.4-1-1V13c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v12c0%200.6-0.4%201-1%201H1.5z%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 20px; }
+        div.landing div.data-visualization div.chart-toggle div.chart-bar-grouped {
+          background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2026%2026%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Cstyle%3E.a%7Bfill%3A#49463b%3B%7D%3C%2Fstyle%3E%3Cpath%20d%3D%22M19.5%2026c-0.6%200-1-0.4-1-1V1c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v24c0%200.6-0.4%201-1%201H19.5z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M10.5%2026c-0.6%200-1-0.4-1-1V7c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v18c0%200.6-0.4%201-1%201H10.5z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M1.5%2026c-0.6%200-1-0.4-1-1V13c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v12c0%200.6-0.4%201-1%201H1.5z%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 20px;
+          transition: 0.1s ease-in-out; }
+          div.landing div.data-visualization div.chart-toggle div.chart-bar-grouped:hover {
+            background-size: 23px; }
+          div.landing div.data-visualization div.chart-toggle div.chart-bar-grouped.active {
             background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2026%2026%22%20width%3D%22512%22%20height%3D%22512%22%3E%3Cstyle%3E.a%7Bfill%3A#92C46D%3B%7D%3C%2Fstyle%3E%3Cpath%20d%3D%22M19.5%2026c-0.6%200-1-0.4-1-1V1c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v24c0%200.6-0.4%201-1%201H19.5z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M10.5%2026c-0.6%200-1-0.4-1-1V7c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v18c0%200.6-0.4%201-1%201H10.5z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M1.5%2026c-0.6%200-1-0.4-1-1V13c0-0.6%200.4-1%201-1h5c0.6%200%201%200.4%201%201v12c0%200.6-0.4%201-1%201H1.5z%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
             background-repeat: no-repeat;
             background-position: center;
