@@ -119,17 +119,43 @@
 
         $('.chart-bar').click(function () {
             if (!$('#chart1').hasClass('active')) {
-                $('#chart1, .chart-bar').addClass('active');
-                $('#chart2, .chart-line').removeClass('active');
+                $('#chart1').addClass('active');
             }
+            $('.chart-bar').addClass('active');
+            $('#chart2, .chart-line, .chart-bar-grouped').removeClass('active');
+            toggleBarChart('Stacked');
+        });
+
+        $('.chart-bar-grouped').click(function () {
+            if (!$('#chart1').hasClass('active')) {
+                $('#chart1').addClass('active');
+            }
+            $('.chart-bar-grouped').addClass('active');
+            $('#chart2, .chart-line, .chart-bar').removeClass('active');
+            toggleBarChart('Grouped');
         });
 
         $('.chart-line').click(function () {
             if (!$('#chart2').hasClass('active')) {
                 $('#chart2, .chart-line').addClass('active');
-                $('#chart1, .chart-bar').removeClass('active');
+                $('#chart1, .chart-bar, .chart-bar-grouped').removeClass('active');
             }
         });
+
+        function toggleBarChart(toggle) {
+            switch (toggle) {
+                case 'Grouped':
+                    chart.stacked(false);
+                    break;
+                case 'Stacked':
+                    chart.stacked(true);
+                    break;
+            }
+            d3.select('#chart1 svg')
+                .datum(chartData)
+                .call(chart);
+            nv.utils.windowResize(chart.update);
+        }
 
         $('.mwbe-filter-button').click(function (e) {
             if ($('.mwbe-filter').hasClass('active')) {
@@ -166,17 +192,7 @@
             }, 500);
         });
 
-        //removes active class from all elements
-        //hides modal elements on click on window
-        //need to update to remove modal elements
-        //on click on window outside of modal elements
-        // $(window).click(function() {
-        //   $('*').removeClass('active');
-        // });
-
-
-        var chart,
-            char2;
+        var chart,char2;
         var fiscalYear = ['2011', '2012', '2013', '2014', '2015', '2016', '2017'];
         var dollarFormat = function (d) {
             return '$' + d3.format(',.2f')(d) + 'M';
@@ -196,7 +212,7 @@
 
         function CreateGraph() {
 
-            //stacked bargraph////////////////////////////////////////////////////////////
+            /* Bar graph */
             nv.addGraph(function () {
                 chart = nv.models.multiBarChart()
                     .duration(1000)
@@ -208,7 +224,8 @@
                     .groupSpacing(0.5)
                     .reduceXTicks(true)
                     .staggerLabels(false)
-                    .stacked(true);
+                    .stacked(true)
+                    .showControls(false);
                 chart.xAxis
                     .showMaxMin(false)
                     .tickValues([0, 1, 2, 3, 4, 5, 6])
@@ -221,11 +238,9 @@
                     nv.log('Render Complete');
                 });
 
-
                 d3.select('#chart1 svg')
                     .datum(chartData)
                     .call(chart);
-
 
                 nv.utils.windowResize(chart.update);
                 chart.dispatch.on('stateChange', function (e) {
@@ -237,8 +252,7 @@
                 return chart;
             });
 
-
-            //line graph//////////////////////////////////////////////////////////////////
+            /* Line graph */
             nv.addGraph(function () {
                 chart2 = nv.models.lineChart()
                     .options({

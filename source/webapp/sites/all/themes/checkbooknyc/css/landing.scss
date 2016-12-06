@@ -367,6 +367,21 @@ div.landing {
           }
         }
 
+        &.chart-bar-grouped {
+          @include bargraph-ico($main-font);
+          background-size: 20px;
+          transition: 0.1s ease-in-out;
+
+          &:hover {
+            background-size: 23px;
+          }
+
+          &.active {
+            @include bargraph-ico($main);
+            background-size: 20px;
+          }
+        }
+
         &.chart-line {
           @include linegraph-ico($main-font);
           background-size: 25px;
