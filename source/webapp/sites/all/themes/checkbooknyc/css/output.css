@@ -92,24 +92,27 @@ nav {
   padding: 15px;
   margin: auto;
   max-width: 1024px; }
-  nav div.nav-home:hover,
-  nav div.nav-bonds:hover {
-    background-color: #697884;
-    color: #ffffff; }
+  nav div.nav-bonds:hover,
+  nav div.nav-home:hover {
+    background-color: #697884; }
+    nav div.nav-bonds:hover a,
+    nav div.nav-home:hover a {
+      color: #ffffff; }
   nav div {
     display: inline-block;
     flex: 1;
     text-transform: uppercase;
     vertical-align: middle; }
     nav div.nav-logo {
-      margin: 10px 20px 0 0; }
+      margin: 0 20px 0 0; }
       nav div.nav-logo .main-logo-notag {
         height: 23px;
         width: 188px; }
     nav div:not(.nav-logo) {
-      padding: 10px 20px;
+      padding: 2px 20px 10px 20px;
       text-align: center;
-      transition: 0.25s ease-in-out; }
+      transition: 0.25s ease-in-out;
+      margin-top: 10px; }
       nav div:not(.nav-logo).active {
         background-color: #697884; }
         nav div:not(.nav-logo).active a {
@@ -129,9 +132,9 @@ nav {
           background-repeat: no-repeat;
           content: "";
           display: inline-block;
-          height: 10px;
+          height: 11px;
           margin-left: 5px;
-          width: 10px; }
+          width: 11px; }
     nav div a {
       color: #49463b;
       font-size: 0.9em;
@@ -152,7 +155,7 @@ nav {
   height: 0;
   overflow: hidden;
   position: absolute;
-  top: 53px;
+  top: 56px;
   transition: 0.25s ease-in-out;
   visibility: hidden;
   width: 100%; }
@@ -179,12 +182,12 @@ nav {
     .nav-search-tools .nav-dropdown__list a,
     .nav-trends .nav-dropdown__list > div,
     .nav-trends .nav-dropdown__list a {
-      color: #49463b;
+      color: #d6d6d6;
       flex: 1;
       margin-top: 5px;
       text-align: center;
       text-decoration: none;
-      transition: .25s ease-in-out; }
+      transition: 0.25s ease-in-out; }
       .nav-domains .nav-dropdown__list > div:hover div,
       .nav-domains .nav-dropdown__list a:hover div,
       .nav-help .nav-dropdown__list > div:hover div,

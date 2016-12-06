@@ -5,10 +5,13 @@ nav {
   margin: auto;
   max-width: 1024px;
 
-  div.nav-home:hover,
-  div.nav-bonds:hover {
+  div.nav-bonds:hover,
+  div.nav-home:hover {
     background-color: $main;
-    color: $white;
+
+    a {
+      color: $white;
+    }
   }
 
   div {
@@ -18,7 +21,7 @@ nav {
     vertical-align: middle;
 
     &.nav-logo {
-      margin: 10px 20px 0 0;
+      margin: 0 20px 0 0;
 
       .main-logo-notag {
         height: 23px;
@@ -28,9 +31,10 @@ nav {
     }
 
     &:not(.nav-logo) {
-      padding: 10px 20px;
+      padding: 2px 20px 10px 20px;
       text-align: center;
       transition: 0.25s ease-in-out;
+      margin-top: 10px;
 
       &.active {
         background-color: $main;
@@ -54,9 +58,9 @@ nav {
           background-repeat: no-repeat;
           content: "";
           display: inline-block;
-          height: 10px;
+          height: 11px;
           margin-left: 5px;
-          width: 10px;
+          width: 11px;
         }
       }
     }
@@ -88,7 +92,7 @@ nav {
   height: 0;
   overflow: hidden;
   position: absolute;
-  top: 53px;
+  top: 56px;
   transition: 0.25s ease-in-out;
   visibility: hidden;
   width: 100%;
@@ -107,12 +111,12 @@ nav {
 
     > div,
     a {
-      color: $main-font;
+      color: $navlink;
       flex: 1;
       margin-top: 5px;
       text-align: center;
       text-decoration: none;
-      transition: .25s ease-in-out;
+      transition: 0.25s ease-in-out;
 
       &:hover div {
         color: $white;

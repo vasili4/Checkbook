@@ -29,12 +29,9 @@
         $('.nav-dropdown.domain-select-nav').hover(function () {
             $(this).addClass('active');
             $('.nav-domains').addClass('active');
-
             if ($(this).hasClass('active')) {
                 $('.nav-dropdown').not(this).removeClass('active');
-                $('.nav-search-tools').removeClass('active');
-                $('.nav-trends').removeClass('active');
-                $('.nav-help').removeClass('active');
+                $('.nav-submenu').not('.nav-submenu.nav-domains').removeClass('active');
             }
         });
 
@@ -55,9 +52,7 @@
 
             if ($(this).hasClass('active')) {
                 $('.nav-dropdown').not(this).removeClass('active');
-                $('.nav-domains').removeClass('active');
-                $('.nav-search-tools').removeClass('active');
-                $('.nav-help').removeClass('active');
+                $('.nav-submenu').not('.nav-submenu.nav-trends').removeClass('active');
             }
         });
 
@@ -78,9 +73,7 @@
 
             if ($(this).hasClass('active')) {
                 $('.nav-dropdown').not(this).removeClass('active');
-                $('.nav-domains').removeClass('active');
-                $('.nav-trends').removeClass('active');
-                $('.nav-help').removeClass('active');
+                $('.nav-submenu').not('.nav-submenu.nav-search-tools').removeClass('active');
             }
         });
 
@@ -101,11 +94,14 @@
 
             if ($(this).hasClass('active')) {
                 $('.nav-dropdown').not(this).removeClass('active');
-                $('.nav-domains').removeClass('active');
-                $('.nav-trends').removeClass('active');
-                $('.nav-search-tools').removeClass('active');
+                $('.nav-submenu').not('.nav-submenu.nav-help').removeClass('active');
             }
         });
+
+        $('.nav-bonds, .nav-home').hover(function() {
+            $('.nav-submenu').removeClass('active');
+            $('.nav-dropdown').removeClass('active');
+        })
 
         //removes active class when hovering over new dropdown option
         $('.nav-help').hover(function () {
