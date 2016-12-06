@@ -22,7 +22,6 @@
   font-weight: normal;
   font-style: italic;
 };
-
 //cross browser input element placeholder styling
 @mixin optional-at-root($sel) {
   @at-root #{if(not &, $sel, selector-append(&, $sel))} {
