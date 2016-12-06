@@ -5,14 +5,20 @@
 @import "header";
 @import "home";
 @import "landing";
-@import "footer"; // @import "datatables";
+@import "footer";
+// @import "datatables";
 
 html {
   -moz-background-size: cover;
   -o-background-size: cover;
   -webkit-background-size: cover;
-  background: url("../images/background.jpg") no-repeat center center fixed;
-  // background: url(../images/blackandwhite.jpeg) no-repeat center center fixed;
+
+  //bold background
+  // background: url("../images/background.jpg") no-repeat center center fixed;
+
+  //conservative background
+  background: url("../images/bgimage.jpg") no-repeat center center fixed;
+
   background-size: cover;
   box-sizing: border-box;
   height: 100%;
@@ -26,15 +32,13 @@ html {
 
 .content,
 body {
-  font-family: "Century Gothic";
+  // font-family: "Century Gothic";
+  font-family: "Lato", sans-serif;
   margin: auto;
-  // padding-bottom: 7rem;
   position: relative;
 }
 
 .content {
-  // padding-bottom: 7em;
-  // overflow: auto;
   min-height: 100%;
   height: 100%;
 }

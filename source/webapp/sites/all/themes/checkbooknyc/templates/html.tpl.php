@@ -51,6 +51,7 @@
         <title><?php print $head_title; ?></title>
         <?php print $styles; ?>
         <?php print $scripts; ?>
+        <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
     </head>
     <body class="<?php print $classes; ?>" <?php print $attributes; ?>>
         <div id="skip-link">

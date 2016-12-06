@@ -82,7 +82,7 @@ div.home {
       font-size: 11px;
       margin-top: -12px;
       padding: 5px 0 5px 40px;
-      position: absolute;
+      position: relative;
       width: 100%;
       opacity: 0;
       visibility: hidden;
@@ -104,6 +104,7 @@ div.home {
         color: $main-font;
         cursor: pointer;
         display: inline-block;
+        flex: 1;
         margin-left: 15px;
         margin: 5px 24px 5px 0;
         min-width: 140px;
@@ -131,8 +132,7 @@ div.home {
   .home__front-links {
     align-content: space-between;
     display: flex;
-    // margin: 13% 0 13% 0;
-    margin-top: 13%;
+    margin-top: 5%;
     position: relative;
     .home__front-links--domains {
       margin-right: 15px;
@@ -184,10 +184,11 @@ div.home {
         span {
           color: $main-font;
           font-size: 14px;
+          font-weight: 400;
           transition: .25s ease-in-out;
           &.enter {
             font-size: 20px;
-            font-weight: bold;
+            font-weight: 400;
             letter-spacing: .05em;
             text-transform: lowercase;
           }
@@ -325,7 +326,7 @@ div.home {
 .domain-select-overlay{
   -webkit-filter: blur(5px);
   background-color: black;
-  bottom: -5%;
+  bottom: -9em;
   display: block;
   filter: blur(5px);
   left: 0;
