@@ -1,6 +1,26 @@
 @font-face {
   font-family: "Century Gothic";
-  src: url('../css/fonts/centurygothic') format('truetype');
+  src: url('../css/fonts/GOTHIC.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+};
+@font-face {
+  font-family: "Century Gothic";
+  src: url('../css/fonts/GOTHICB.TTF') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+};
+@font-face {
+  font-family: "Century Gothic";
+  src: url('../css/fonts/GOTHICBI.TTF') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+};
+@font-face {
+  font-family: "Century Gothic";
+  src: url('../css/fonts/GOTHIC.TTF') format('truetype');
+  font-weight: normal;
+  font-style: italic;
 };
 
 //cross browser input element placeholder styling
