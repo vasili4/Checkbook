@@ -5,44 +5,51 @@
 @import "header";
 @import "home";
 @import "landing";
-@import "footer";
-// @import "datatables";
-
+@import "footer"; // @import "datatables";
 
 html {
   -moz-background-size: cover;
   -o-background-size: cover;
   -webkit-background-size: cover;
-  background: url(../images/background.jpg) no-repeat center center fixed;
+  background: url("../images/background.jpg") no-repeat center center fixed;
   // background: url(../images/blackandwhite.jpeg) no-repeat center center fixed;
-
   background-size: cover;
   box-sizing: border-box;
   height: 100%;
 }
+
 *,
-*:before,
-*:after {
+*:after,
+*:before {
   box-sizing: inherit;
 }
+
 .content,
 body {
   font-family: "Century Gothic";
   margin: auto;
-  min-height: 100%;
-  height: 100%;
   // padding-bottom: 7rem;
   position: relative;
 }
+
 .content {
-  padding-bottom: 7em;
+  // padding-bottom: 7em;
+  // overflow: auto;
+  min-height: 100%;
+  height: 100%;
 }
+
 body {
   margin: 0;
-
+  height: 100%;
   padding: 0;
   position: relative;
 }
+
+body.page-spending-landing {
+  height: auto;
+}
+
 #block-system-main,
 div.region-content {
   height: 100%;

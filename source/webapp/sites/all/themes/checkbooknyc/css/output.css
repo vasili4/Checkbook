@@ -512,7 +512,7 @@ div.home {
 .domain-select-overlay {
   -webkit-filter: blur(5px);
   background-color: black;
-  bottom: 0;
+  bottom: -5%;
   display: block;
   filter: blur(5px);
   left: 0;
@@ -536,7 +536,6 @@ div.landing {
   margin: 2.7em auto auto;
   max-width: 1024px;
   position: relative;
-  padding-bottom: 8%;
   z-index: 1; }
   div.landing div.landing-head {
     flex: 1; }
@@ -889,14 +888,14 @@ div.landing {
   text-align: left;
   text-decoration: none;
   text-transform: uppercase;
-  top: 59%;
+  top: 70%;
   width: 68px;
   word-spacing: 50px;
   z-index: 0; }
 
 footer {
   background-color: #ffffff;
-  bottom: 0;
+  bottom: -7em;
   height: auto;
   left: 0;
   position: absolute;
@@ -957,7 +956,8 @@ footer {
           margin-top: 5px;
           width: 35px; }
         footer .footer-flex > div.footer__right-links div:last-of-type {
-          display: inline-block; }
+          display: inline-block;
+          vertical-align: super; }
         footer .footer-flex > div.footer__right-links span {
           text-transform: uppercase; }
           footer .footer-flex > div.footer__right-links span a {
@@ -974,19 +974,20 @@ footer {
     position: absolute;
     width: 100%; }
     footer .footer__bottom-links div.bottom-container {
-      display: block;
+      display: flex;
       text-align: center;
       white-space: nowrap; }
       footer .footer__bottom-links div.bottom-container span {
         color: #ffffff; }
       footer .footer__bottom-links div.bottom-container div {
         color: #ffffff;
+        display: inline-block;
+        flex: 1;
         font-size: 0.5em;
+        letter-spacing: .4px;
         padding: 1.2em 2.8em;
         text-align: center;
-        text-transform: uppercase;
-        display: inline-block;
-        letter-spacing: .4px; }
+        text-transform: uppercase; }
         footer .footer__bottom-links div.bottom-container div a {
           color: #ffffff;
           text-decoration: none; }
@@ -995,31 +996,34 @@ html {
   -moz-background-size: cover;
   -o-background-size: cover;
   -webkit-background-size: cover;
-  background: url(../images/background.jpg) no-repeat center center fixed;
+  background: url("../images/background.jpg") no-repeat center center fixed;
   background-size: cover;
   box-sizing: border-box;
   height: 100%; }
 
 *,
-*:before,
-*:after {
+*:after,
+*:before {
   box-sizing: inherit; }
 
 .content,
 body {
   font-family: "Century Gothic";
   margin: auto;
-  min-height: 100%;
-  height: 100%;
   position: relative; }
 
 .content {
-  padding-bottom: 7em; }
+  min-height: 100%;
+  height: 100%; }
 
 body {
   margin: 0;
+  height: 100%;
   padding: 0;
   position: relative; }
+
+body.page-spending-landing {
+  height: auto; }
 
 #block-system-main,
 div.region-content {

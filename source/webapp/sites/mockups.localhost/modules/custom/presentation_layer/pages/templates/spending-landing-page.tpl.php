@@ -131,10 +131,12 @@
       <div>
           <a href="http://comptroller.nyc.gov/disclaimer/" target="_blank">disclaimer</a> |
           <a href="http://comptroller.nyc.gov/privacy-policy/" target="_blank">privacy&nbsp;policy</a> |
-          <a href="http://comptroller.nyc.gov/language-disclaimer/" target="_blank">language&nbsp;disclaimer</a> |
-          <a href="https://github.com/NYCComptroller/Checkbook " target="_blank">Checkbook&nbsp;NYC&nbsp;is&nbsp;Open&nbsp;Source&nbsp;Software</a>
-      </div><span> | </span>
+          <a href="http://comptroller.nyc.gov/language-disclaimer/" target="_blank">language&nbsp;disclaimer</a>
+      </div>
       <div>Copyright&nbsp;&copy;2016,&nbsp;Office&nbsp;of&nbsp;the&nbsp;New&nbsp;York&nbsp;City&nbsp;Comptroller</div>
+      <div>
+        <a href="https://github.com/NYCComptroller/Checkbook " target="_blank">Checkbook&nbsp;NYC&nbsp;is&nbsp;Open&nbsp;Source&nbsp;Software</a>
+      </div>
     </div>
 </div>
 </footer>

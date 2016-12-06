@@ -1,6 +1,6 @@
 footer {
   background-color: $white;
-  bottom: 0;
+  bottom: -7em;
   height: auto;
   left: 0;
   position: absolute;
@@ -113,6 +113,7 @@ footer {
 
         div:last-of-type {
           display: inline-block;
+          vertical-align: super;
         }
 
         span {
@@ -143,7 +144,7 @@ footer {
     width: 100%;
 
     div.bottom-container {
-      display: block;
+      display: flex;
       text-align: center;
       white-space: nowrap;
 
@@ -153,12 +154,13 @@ footer {
 
       div {
         color: $white;
+        display: inline-block;
+        flex: 1;
         font-size: 0.5em;
+        letter-spacing: .4px;
         padding: 1.2em 2.8em;
         text-align: center;
         text-transform: uppercase;;
-        display: inline-block;
-        letter-spacing: .4px;
 
         a {
           color: $white;
