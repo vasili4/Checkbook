@@ -1,32 +1,34 @@
-/*
-div.simple-data-table tr {
-    background: #ffffff;
-}
+div.simple-data-table {
 
-div.simple-data-table tr:hover {
-    background-color: #f4f5f5;
-}
 
-div.simple-data-table-header {
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  tbody {
+    border-top: none;
+  }
+
+  div.simple-data-table-header {
     color: #697884;
     font-size: 1.2em;
     font-weight: bold;
     padding-bottom: 5px;
     text-transform: uppercase;
-}
+  }
 
-div.simple-data-table table {
-    border-collapse: collapse;
-    width: 100%;
-}
+  tr {
+    background: #ffffff;
 
-div.simple-data-table tbody {
-    border-top: none;
-}
+    &:hover {
+      background-color: #f4f5f5;
+    }
+  }
 
-div.simple-data-table th.dollar-heading,
-div.simple-data-table th.number-heading,
-div.simple-data-table th.percent-heading {
+  th.dollar-heading,
+  th.number-heading,
+  th.percent-heading {
     background-color: #697884;
     border: none;
     font-size: 0.75em;
@@ -39,10 +41,11 @@ div.simple-data-table th.percent-heading {
     opacity: 0.5;
     white-space: nowrap;
     color: #ffffff;
-}
+    font-weight: bold;
+  }
 
-div.simple-data-table th.date-heading,
-div.simple-data-table th.text-heading {
+  th.date-heading,
+  th.text-heading {
     background-color: #697884;
     border: none;
     font-size: 0.75em;
@@ -55,63 +58,67 @@ div.simple-data-table th.text-heading {
     opacity: 0.5;
     white-space: nowrap;
     color: #ffffff;
-}
+    font-weight: bold;
+  }
 
-div.simple-data-table td.dollar-column,
-div.simple-data-table td.number-column,
-div.simple-data-table td.percent-column {
+  td.dollar-column,
+  td.number-column,
+  td.percent-column {
     border-top: 1px solid #e9e9e7;
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;
     padding-right: 3em;
     text-align: right;
-}
+  }
 
-div.simple-data-table td.date-column,
-div.simple-data-table td.text-column {
+  td.date-column,
+  td.text-column {
     border-top: 1px solid #e9e9e7;
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;
     text-align: left;
-}
+  }
 
-div.simple-data-table-links {
+  div.simple-data-table-links {
     float: right;
-}
+  }
 
-div.simple-data-table-links > div {
+  div.simple-data-table-links > div {
     display: flex;
-}
+  }
 
-div.simple-data-table-export-link {
+  div.simple-data-table-export-link {
     @include export-ico($iconfill);
     background-position-y: 5px;
     background-position-x: 0px;
     background-size: 11px;
-}
+  }
 
-a.simple-data-table-export-link {
+  a.simple-data-table-export-link {
     color: #000000;
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
     text-transform: uppercase;
-}
+    text-decoration: none;
+  }
 
-div.simple-data-table-details-link {
-    background-image: url("../images/export_arrow.png");
-    background-position-y: 8px;
-    background-repeat: no-repeat;
-    float: left;
-    margin-left: 20px;
-}
+  div.simple-data-table-details-link {
+    @include plus-ico($iconfill);
+    margin-left: 12px;
+    background-position-y: 5px;
+    background-position-x: 0px;
+    background-size: 11px;
+  }
 
-a.simple-data-table-details-link {
+  a.simple-data-table-details-link {
     color: #000000;
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
     text-transform: uppercase;
-}*/
+    text-decoration: none;
+  }
+}

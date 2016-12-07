@@ -5,7 +5,6 @@ core = 7.x
 package = Checkbook Mockups
 
 
-stylesheets[all][] = css/simple-data-table.css
 scripts[] = js/simple-data-table.js
 
 files[] = classes/simple_data_table/SimpleDataTableColumnViewConfig.php
