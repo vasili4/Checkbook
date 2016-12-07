@@ -90,7 +90,7 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
                 <th class="<?php echo($tableColumn->format."-heading"); ?>">
                     <?php echo($tableColumn->label); ?>
                     <?php if($tableColumn->column == $viewConfig->sortColumn) { ?>
-                        <img src="<?php base_path()?>sites/all/themes/checkbooknyc/images/sort_arrow_down.png">
+                        <img style="width: 8px; height: 7px;" src="<?php base_path()?>sites/all/themes/checkbooknyc/images/white_arrow_down.png">
                     <?php } ?>
                 </th>
             <?php } ?>
