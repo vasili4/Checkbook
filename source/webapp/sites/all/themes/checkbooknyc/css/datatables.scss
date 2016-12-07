@@ -1,6 +1,4 @@
 div.simple-data-table {
-
-
   table {
     border-collapse: collapse;
     width: 100%;
@@ -21,6 +19,7 @@ div.simple-data-table {
   tr:first-child {
     background: #697884;
     opacity: 0.5;
+
     &:hover {
       background-color: #697884;
     }
@@ -28,6 +27,7 @@ div.simple-data-table {
 
   tr {
     background: #ffffff;
+
     &:hover {
       background-color: #f4f5f5;
     }
@@ -50,7 +50,9 @@ div.simple-data-table {
   th.number-heading,
   th.percent-heading {
     border: none;
+    color: #ffffff;
     font-size: 0.75em;
+    font-weight: 400;
     line-height: 10px;
     padding-bottom: 1em;
     padding-left: 1em;
@@ -58,14 +60,14 @@ div.simple-data-table {
     text-align: center;
     text-transform: uppercase;
     white-space: nowrap;
-    color: #ffffff;
-    font-weight: bold;
   }
 
   th.date-heading,
   th.text-heading {
     border: none;
+    color: #ffffff;
     font-size: 0.75em;
+    font-weight: 400;
     line-height: 10px;
     padding-bottom: 1em;
     padding-left: 1em;
@@ -73,8 +75,6 @@ div.simple-data-table {
     text-align: left;
     text-transform: uppercase;
     white-space: nowrap;
-    color: #ffffff;
-    font-weight: bold;
   }
 
   td.dollar-column,
@@ -107,8 +107,8 @@ div.simple-data-table {
 
   div.simple-data-table-export-link {
     @include export-ico($iconfill);
+    background-position-x: 0;
     background-position-y: 5px;
-    background-position-x: 0px;
     background-size: 11px;
   }
 
@@ -117,16 +117,16 @@ div.simple-data-table {
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
-    text-transform: uppercase;
     text-decoration: none;
+    text-transform: uppercase;
   }
 
   div.simple-data-table-details-link {
     @include plus-ico($iconfill);
-    margin-left: 12px;
+    background-position-x: 0;
     background-position-y: 5px;
-    background-position-x: 0px;
     background-size: 11px;
+    margin-left: 12px;
   }
 
   a.simple-data-table-details-link {
@@ -134,7 +134,7 @@ div.simple-data-table {
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
-    text-transform: uppercase;
     text-decoration: none;
+    text-transform: uppercase;
   }
 }

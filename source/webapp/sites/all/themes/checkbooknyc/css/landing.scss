@@ -18,8 +18,8 @@ div.landing {
         text-transform: capitalize;
 
         span.diamond {
-          border-bottom-color: $main;
           border: 7px solid transparent;
+          border-bottom-color: $main;
           display: inline-block;
           height: 0;
           margin: 0 11px;
@@ -28,8 +28,8 @@ div.landing {
           width: 0;
 
           &:after {
-            border-top-color: $main;
             border: 7px solid transparent;
+            border-top-color: $main;
             content: '';
             height: 0;
             left: -7px;
