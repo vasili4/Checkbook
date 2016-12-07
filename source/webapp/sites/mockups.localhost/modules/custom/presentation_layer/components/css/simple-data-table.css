@@ -29,43 +29,38 @@ div.simple-data-table th.number-heading,
 div.simple-data-table th.percent-heading {
     background-color: #697884;
     border: none;
-    font-family: 'Century Gothic';
-    font-size: 11px;
+    font-size: 0.75em;
     line-height: 10px;
     padding-bottom: 1em;
     padding-left: 1em;
     padding-top: 1em;
     text-align: center;
     text-transform: uppercase;
-    opacity: 0.4;
+    opacity: 0.5;
     white-space: nowrap;
     color: #ffffff;
-    font-weight: 500;
 }
 
 div.simple-data-table th.date-heading,
 div.simple-data-table th.text-heading {
     background-color: #697884;
     border: none;
-    font-family: 'Century Gothic';
-    font-size: 11px;
+    font-size: 0.75em;
     line-height: 10px;
     padding-bottom: 1em;
     padding-left: 1em;
     padding-top: 1em;
     text-align: left;
     text-transform: uppercase;
+    opacity: 0.5;
     white-space: nowrap;
-    opacity: 0.4;
     color: #ffffff;
-    font-weight: 500;
 }
 
 div.simple-data-table td.dollar-column,
 div.simple-data-table td.number-column,
 div.simple-data-table td.percent-column {
     border-top: 1px solid #e9e9e7;
-    font-family: 'Century Gothic';
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;
@@ -76,7 +71,6 @@ div.simple-data-table td.percent-column {
 div.simple-data-table td.date-column,
 div.simple-data-table td.text-column {
     border-top: 1px solid #e9e9e7;
-    font-family: 'Century Gothic';
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;
@@ -102,7 +96,6 @@ div.simple-data-table-export-link {
 
 a.simple-data-table-export-link {
     color: #000000;
-    font-family: 'Century Gothic';
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
@@ -119,7 +112,6 @@ div.simple-data-table-details-link {
 
 a.simple-data-table-details-link {
     color: #000000;
-    font-family: 'Century Gothic';
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
