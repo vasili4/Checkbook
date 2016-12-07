@@ -376,7 +376,7 @@ div.landing {
 
         &.chart-bar-grouped {
           @include grouped-bargraph-ico($main-font);
-          background-size: 20px;
+          background-size: 22px;
           transition: 0.1s ease-in-out;
 
           &:hover {
