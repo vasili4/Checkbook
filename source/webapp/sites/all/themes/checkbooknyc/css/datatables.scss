@@ -18,18 +18,37 @@ div.simple-data-table {
     text-transform: uppercase;
   }
 
+  tr:first-child {
+    background: #697884;
+    opacity: 0.5;
+    &:hover {
+      background-color: #697884;
+    }
+  }
+
   tr {
     background: #ffffff;
-
     &:hover {
       background-color: #f4f5f5;
+    }
+  }
+
+  div.simple-data-table-sort {
+    &:after {
+      @include navigation-ico($white);
+      background-position: center;
+      background-repeat: no-repeat;
+      content: "";
+      display: inline-block;
+      height: 7px;
+      margin-left: 5px;
+      width: 7px;
     }
   }
 
   th.dollar-heading,
   th.number-heading,
   th.percent-heading {
-    background-color: #697884;
     border: none;
     font-size: 0.75em;
     line-height: 10px;
@@ -38,7 +57,6 @@ div.simple-data-table {
     padding-top: 1em;
     text-align: center;
     text-transform: uppercase;
-    opacity: 0.5;
     white-space: nowrap;
     color: #ffffff;
     font-weight: bold;
@@ -46,7 +64,6 @@ div.simple-data-table {
 
   th.date-heading,
   th.text-heading {
-    background-color: #697884;
     border: none;
     font-size: 0.75em;
     line-height: 10px;
@@ -55,7 +72,6 @@ div.simple-data-table {
     padding-top: 1em;
     text-align: left;
     text-transform: uppercase;
-    opacity: 0.5;
     white-space: nowrap;
     color: #ffffff;
     font-weight: bold;
