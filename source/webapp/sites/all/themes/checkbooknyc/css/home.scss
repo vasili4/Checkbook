@@ -3,49 +3,61 @@ div.home {
   margin: auto;
   max-width: 1024px;
   padding: 8%;
+
   .home__logo {
     height: 90px;
     width: auto;
     @extend %main-logo;
   }
+
   .search {
     margin-top: 35px;
     position: relative;
     z-index: 0;
+
     .search-icon {
       @extend %search-ico;
-      background-size: 17px;
+      background-size: 22px;
       display: block;
-      height: 17px;
+      height: 22px;
       left: 15px;
       position: absolute;
-      top: 6px;
-      width: 17px;
+      top: 7px;
+      width: 22px;
     }
+
     .search__input {
-      border-radius: 3px;
-      border: .5px solid #bdbdbd;
+      border-radius: 5px;
+      border: 0.5px solid #bdbdbd;
       display: block;
-      font-family: "Century Gothic";
-      height: 30px;
+      font-family: "Lato";
+      font-size: 1em;
+      height: 35px;
       padding: 0 45px;
+      padding-bottom: 2px;
       width: 100%;
       @include placeholder {
-        font-style:italic;
-        color: $main-font;
+        // color: $main-font;
+        color: $light-gray;
+        font-size: .9em;
+        font-style: italic;
+        font-weight: 300;
+
         &:focus {
           color: transparent;
         }
       }
     }
+
     .search__input-options {
       color: $main-font;
       font-size: 12px;
-      letter-spacing: .4px;
+      letter-spacing: 0.4px;
       list-style: none;
       margin-top: 5px;
       text-align: right;
       text-transform: uppercase;
+
       li {
         color: $main-font;
         cursor: pointer;
@@ -53,8 +65,9 @@ div.home {
         height: 21px;
         line-height: 2;
         margin-left: 5px;
-        padding: 0 3px 0 5px;
-        transition: .25s ease-in-out;
+        padding: 0 4px 0 5px;
+        transition: 0.25s ease-in-out;
+
         &:hover {
           color: $main-hover;
         }
@@ -68,15 +81,21 @@ div.home {
         // }
         &.active {
           background-color: $main;
-          color: $white
+          color: $white;
+        }
+
+        span {
+          display: inline-block;
+          width: 5px;
         }
       }
     }
+
     .recommended-search {
       align-content: space-around;
       background-color: $white;
       border-radius: 3px 0 3px 3px;
-      border: 2px solid $main;
+      border: 1px solid $main;
       display: flex;
       flex-wrap: wrap;
       font-size: 11px;
@@ -86,11 +105,13 @@ div.home {
       width: 100%;
       opacity: 0;
       visibility: hidden;
-      transition: .25s ease-in-out;
+      transition: 0.25s ease-in-out;
+
       &.active {
-          opacity: 1;
-          visibility: visible;
+        opacity: 1;
+        visibility: visible;
       }
+
       .recommended-search__close {
         color: $light-gray;
         cursor: pointer;
@@ -100,19 +121,21 @@ div.home {
         right: 5px;
         top: -1px;
       }
+
       span {
         color: $main-font;
         cursor: pointer;
         display: inline-block;
         flex: 1;
-        margin-left: 15px;
         margin: 5px 24px 5px 0;
         min-width: 140px;
         position: relative;
         text-transform: uppercase;
+
         &:hover {
           color: $main-hover;
         }
+
         &:before {
           -moz-box-sizing: content-box;
           -webkit-box-sizing: content-box;
@@ -129,67 +152,81 @@ div.home {
       }
     }
   }
+
   .home__front-links {
     align-content: space-between;
     display: flex;
-    margin-top: 5%;
+    margin-top: 3%;
     position: relative;
+
     .home__front-links--domains {
       margin-right: 15px;
-      z-index: 2
+      z-index: 2;
     }
-    .home__front-links--bonds {
-    }
-    .home__front-links--domains,
-    .home__front-links--bonds {
+
+    .home__front-links--bonds {}
+
+    .home__front-links--bonds,
+    .home__front-links--domains {
       display: inline-block;
       flex: 1;
       white-space: nowrap;
+
       div {
         display: inline-block;
+
         &.domains-img {
           @extend %domain-ico;
           cursor: pointer;
           display: inline-block;
           height: 75px;
-          transition: .25s ease-in-out;
+          transition: 0.25s ease-in-out;
           width: 75px;
+
           &:hover {
             @extend %domain-hover-ico;
           }
+
           &.active {
             @extend %domain-hover-ico;
           }
         }
+
         &.bonds-img {
           @extend %bonds-ico;
           cursor: pointer;
           display: inline-block;
           height: 75px;
-          transition: .25s ease-in-out;
+          transition: 0.25s ease-in-out;
           width: 75px;
+
           &:hover {
             @extend %bonds-hover-ico;
           }
         }
+
         &.domain-text {
           cursor: pointer;
           font-weight: bold;
           margin-top: 15px;
           vertical-align: top;
-          &:hover span{
+
+          &:hover span {
             color: $main-hover;
           }
         }
+
         span {
           color: $main-font;
           font-size: 14px;
           font-weight: 400;
-          transition: .25s ease-in-out;
+          margin-left: 8px;
+          transition: 0.25s ease-in-out;
+
           &.enter {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: 400;
-            letter-spacing: .05em;
+            letter-spacing: 0.03em;
             text-transform: lowercase;
           }
         }
@@ -206,10 +243,11 @@ div.home {
       position: absolute;
       top: -185px;
       width: 700px;
-      transition: .25s ease-in-out;
+      transition: 0.25s ease-in-out;
       visibility: hidden;
       opacity: 0;
       z-index: 1;
+
       &:after {
         border-color: white transparent;
         border-style: solid;
@@ -219,10 +257,11 @@ div.home {
         left: 23px;
         position: absolute;
       }
+
       &:before {
         background-color: white;
         bottom: -10px;
-        box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.12), .5px 1px 1px rgba(0, 0, 0, .24);
+        box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.12), 0.5px 1px 1px rgba(0, 0, 0, .24);
         background-color: white;
         content: '';
         height: 20px;
@@ -231,15 +270,18 @@ div.home {
         transform: rotate(45deg);
         width: 20px;
       }
+
       &.active {
         visibility: visible;
         opacity: 1;
       }
+
       > span {
         color: $main;
         font-size: 18px;
         font-weight: bold;
       }
+
       .domain-select-close {
         color: $light-gray;
         cursor: pointer;
@@ -249,66 +291,85 @@ div.home {
         right: 10px;
         top: 0;
       }
+
       .domain-icons {
         display: flex;
         margin-top: 21px;
         text-align: center;
+
         .domain {
           color: $main;
           cursor: pointer;
           flex: 1;
           position: relative;
+
           > div {
             height: 50px;
             margin: auto;
             width: 80px;
-            transition: .25s ease-in-out;
+            transition: 0.25s ease-in-out;
+
             &.spending-ico {
               @include enterspending-ico($iconfill);
+
               &:hover {
                 @include enterspending-ico($iconhover);
+
                 ~ span {
-                  color: $iconhover
+                  color: $iconhover;
                 }
               }
             }
+
             &.budget-ico {
               @include enterbudget-ico($iconfill);
+
               &:hover {
                 @include enterbudget-ico($iconhover);
+
                 ~ span {
-                  color: $iconhover
+                  color: $iconhover;
                 }
               }
             }
+
             &.revenue-ico {
               @include enterrevenue-ico($iconfill);
+
               &:hover {
                 @include enterrevenue-ico($iconhover);
+
                 ~ span {
-                  color: $iconhover
+                  color: $iconhover;
                 }
               }
             }
+
             &.contracts-ico {
               @include entercontracts-ico($iconfill);
+
               &:hover {
                 @include entercontracts-ico($iconhover);
+
                 ~ span {
-                  color: $iconhover
+                  color: $iconhover;
                 }
               }
             }
+
             &.payroll-ico {
               @include enterpayroll-ico($iconfill);
+
               &:hover {
                 @include enterpayroll-ico($iconhover);
+
                 ~ span {
-                  color: $iconhover
+                  color: $iconhover;
                 }
               }
             }
           }
+
           span {
             font-size: 13px;
             font-weight: bold;
@@ -316,37 +377,39 @@ div.home {
             position: absolute;
             text-transform: uppercase;
             top: 60px;
-            transition: .25s ease-in-out;
+            transition: 0.25s ease-in-out;
           }
         }
       }
     }
   }
 }
-.domain-select-overlay{
+
+.domain-select-overlay {
   -webkit-filter: blur(5px);
   background-color: black;
   bottom: -9em;
   display: block;
   filter: blur(5px);
   left: 0;
-  opacity: .5;
+  opacity: 0.5;
   position: absolute;
   right: 0;
   top: 0;
   visibility: hidden;
   z-index: 1;
+
   &.active {
     visibility: visible;
   }
 }
-
 @media only screen and (max-width: 768px) {
-    .home__front-links {
-      flex-direction: column;
-    }
-    .home__front-links--domains,
-    .home__front-links--bonds {
-      padding: 5%;
-    }
+  .home__front-links {
+    flex-direction: column;
+  }
+
+  .home__front-links--bonds,
+  .home__front-links--domains {
+    padding: 5%;
+  }
 }

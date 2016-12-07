@@ -6,9 +6,7 @@
     <span class="search-icon"></span>
     <input type="search" class="search__input" placeholder="What can we help you find today?">
     <ul class="search__input-options">
-      <!-- <li>create alerts</li> -->
-      <li class="recommended-search__button">recommended searches</li>
-      <!-- <li>advanced search</li> -->
+      <li class="recommended-search__button">suggested<span></span>searches</li>
     </ul>
     <div class="recommended-search">
       <div class="recommended-search__close">&times;</div>
@@ -88,11 +86,10 @@
       </div>
     </div>
   <div class="footer__right-links">
-    <div class="comptroller-logo"></div>
     <div>Office&nbsp;of&nbsp;the&nbsp;Comptroller - City&nbsp;of&nbsp;New&nbsp;York
       <br> One&nbsp;Centre&nbsp;Street, New&nbsp;York,&nbsp;NY | Phone:&nbsp;212.669.3916
     </div>
-
+    <div class="comptroller-logo"></div>
   </div>
   </div>
   <div class="footer__bottom-links">
