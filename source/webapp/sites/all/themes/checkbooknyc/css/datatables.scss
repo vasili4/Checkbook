@@ -1,120 +1,140 @@
+div.simple-data-table {
 
-div.simple-data-table tr {
-    background: #ffffff;
-}
 
-div.simple-data-table tr:hover {
-    background-color: #f4f5f5;
-}
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
 
-div.simple-data-table-header {
+  tbody {
+    border-top: none;
+  }
+
+  div.simple-data-table-header {
     color: #697884;
     font-size: 1.2em;
     font-weight: bold;
     padding-bottom: 5px;
     text-transform: uppercase;
-}
+  }
 
-div.simple-data-table table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-div.simple-data-table tbody {
-    border-top: none;
-}
-
-div.simple-data-table th.dollar-heading,
-div.simple-data-table th.number-heading,
-div.simple-data-table th.percent-heading {
-    background-color: #697884;
-    border: none;
-    color: #ffffff;
-    font-size: 0.75em;
-    font-weight: 400;
-    line-height: 10px;
+  tr:first-child {
+    background: #697884;
     opacity: 0.5;
+    &:hover {
+      background-color: #697884;
+    }
+  }
+
+  tr {
+    background: #ffffff;
+    &:hover {
+      background-color: #f4f5f5;
+    }
+  }
+
+  div.simple-data-table-sort {
+    &:after {
+      @include navigation-ico($white);
+      background-position: center;
+      background-repeat: no-repeat;
+      content: "";
+      display: inline-block;
+      height: 7px;
+      margin-left: 5px;
+      width: 7px;
+    }
+  }
+
+  th.dollar-heading,
+  th.number-heading,
+  th.percent-heading {
+    border: none;
+    font-size: 0.75em;
+    line-height: 10px;
     padding-bottom: 1em;
     padding-left: 1em;
     padding-top: 1em;
     text-align: center;
     text-transform: uppercase;
     white-space: nowrap;
-}
+    color: #ffffff;
+    font-weight: bold;
+  }
 
-div.simple-data-table th.date-heading,
-div.simple-data-table th.text-heading {
-    background-color: #697884;
+  th.date-heading,
+  th.text-heading {
     border: none;
     font-size: 0.75em;
-    font-weight: 400;
     line-height: 10px;
     padding-bottom: 1em;
     padding-left: 1em;
     padding-top: 1em;
     text-align: left;
     text-transform: uppercase;
-    opacity: 0.5;
     white-space: nowrap;
     color: #ffffff;
-}
+    font-weight: bold;
+  }
 
-div.simple-data-table td.dollar-column,
-div.simple-data-table td.number-column,
-div.simple-data-table td.percent-column {
+  td.dollar-column,
+  td.number-column,
+  td.percent-column {
     border-top: 1px solid #e9e9e7;
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;
     padding-right: 3em;
     text-align: right;
-}
+  }
 
-div.simple-data-table td.date-column,
-div.simple-data-table td.text-column {
+  td.date-column,
+  td.text-column {
     border-top: 1px solid #e9e9e7;
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;
     text-align: left;
-}
+  }
 
-div.simple-data-table-links {
+  div.simple-data-table-links {
     float: right;
-}
+  }
 
-div.simple-data-table-links > div {
+  div.simple-data-table-links > div {
     display: flex;
-}
+  }
 
-div.simple-data-table-export-link {
+  div.simple-data-table-export-link {
     @include export-ico($iconfill);
     background-position-y: 5px;
     background-position-x: 0px;
     background-size: 11px;
-}
+  }
 
-a.simple-data-table-export-link {
+  a.simple-data-table-export-link {
     color: #000000;
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
     text-transform: uppercase;
-}
+    text-decoration: none;
+  }
 
-div.simple-data-table-details-link {
+  div.simple-data-table-details-link {
     @include plus-ico($iconfill);
+    margin-left: 12px;
     background-position-y: 5px;
-    float: left;
-    margin-left: 20px;
-    background-position-x: 0;
+    background-position-x: 0px;
     background-size: 11px;
-}
+  }
 
-a.simple-data-table-details-link {
+  a.simple-data-table-details-link {
     color: #000000;
     font-size: 11px;
     font-weight: bold;
     padding-left: 15px;
     text-transform: uppercase;
+    text-decoration: none;
+  }
 }

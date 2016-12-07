@@ -88,10 +88,9 @@ if (!($model instanceof SimpleDataTableModel) || !($viewConfig instanceof Simple
         <tr>
             <?php foreach($viewConfig->tableColumns as $tableColumn) { ?>
                 <th class="<?php echo($tableColumn->format."-heading"); ?>">
-                    <?php echo($tableColumn->label); ?>
-                    <?php if($tableColumn->column == $viewConfig->sortColumn) { ?>
-                        <img style="width: 8px; height: 7px;" src="<?php base_path()?>sites/all/themes/checkbooknyc/images/white_arrow_down.png">
-                    <?php } ?>
+                    <div <?php echo($tableColumn->column == $viewConfig->sortColumn ? "class=simple-data-table-sort" : ""); ?>>
+                        <?php echo($tableColumn->label); ?>
+                    </div>
                 </th>
             <?php } ?>
         </tr>
