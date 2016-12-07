@@ -163,3 +163,8 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+@mixin plus-ico($iconfill) {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22612%22%20height%3D%22792%22%20viewBox%3D%220%200%20612%20792%22%3E%3Cstyle%3E.a%7Bfill%3A%23{$iconfill}%3B%7D%3C%2Fstyle%3E%3Cpath%20d%3D%22M0%20447.2c205.4%200%20408.7%200%20612%200%200-25.4%200-52.9%200-78.4H0C0%20396.4%200%20421.8%200%20447.2z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M266.8%20102c0%20205.4%200%20408.7%200%20612%2025.4%200%2052.9%200%2078.4%200V102C317.6%20102%20292.2%20102%20266.8%20102z%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
+  background-repeat: no-repeat;
+  background-position: center;
+}
