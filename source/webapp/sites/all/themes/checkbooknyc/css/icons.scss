@@ -164,7 +164,12 @@
   background-position: center;
 }
 @mixin plus-ico($iconfill) {
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22612%22%20height%3D%22792%22%20viewBox%3D%220%200%20612%20792%22%3E%3Cstyle%3E.a%7Bfill%3A%23{$iconfill}%3B%7D%3C%2Fstyle%3E%3Cpath%20d%3D%22M0%20447.2c205.4%200%20408.7%200%20612%200%200-25.4%200-52.9%200-78.4H0C0%20396.4%200%20421.8%200%20447.2z%22%20class%3D%22a%22%2F%3E%3Cpath%20d%3D%22M266.8%20102c0%20205.4%200%20408.7%200%20612%2025.4%200%2052.9%200%2078.4%200V102C317.6%20102%20292.2%20102%20266.8%20102z%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22612%22%20height%3D%22792%22%20viewBox%3D%220%200%20612%20792%22%3E%3Crect%20y%3D%22341.8%22%20width%3D%22612%22%20height%3D%22108.5%22%20fill%3D%22#{$iconfill}%22%2F%3E%3Crect%20x%3D%22251.8%22%20y%3D%2290%22%20width%3D%22108.5%22%20height%3D%22612%22%20fill%3D%22#{$iconfill}%22%2F%3E%3C%2Fsvg%3E%0A");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+@mixin backtotop-ico($iconfill) {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22612%22%20height%3D%22792%22%20viewBox%3D%220%200%20612%20792%22%3E%3Cpath%20d%3D%22M266.3%20262.5c102.7%20102.7%20204.4%20204.4%20306.1%20306.1%2012.7-12.7%2026.5-26.5%2039.2-39.2L305.5%20223.4C291.7%20237.1%20279%20249.8%20266.3%20262.5z%22%20fill%3D%22#{$iconfill}%22%2F%3E%3Cpath%20d%3D%22M306.1%20223.4C203.4%20326.1%20101.7%20427.8%200%20529.5c12.7%2012.7%2026.5%2026.5%2039.2%2039.2l306.1-306.1C331.5%20248.8%20318.8%20236.1%20306.1%20223.4z%22%20fill%3D%22#{$iconfill}%22%2F%3E%3C%2Fsvg%3E%0A");
   background-repeat: no-repeat;
   background-position: center;
 }

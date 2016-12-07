@@ -493,7 +493,7 @@ div.landing {
   font-size: 0.6em;
   height: 50px;
   margin-left: 106.7em;
-  padding: .8em 1em;
+  padding: 0.8em 1em;
   position: fixed;
   text-align: left;
   text-decoration: none;
@@ -502,4 +502,14 @@ div.landing {
   width: 58px;
   word-spacing: 50px;
   z-index: 0;
+
+  &:after {
+    @include backtotop-ico($white);
+    background-size: 9px;
+    content: '';
+    display: inline-block;
+    height: 9px;
+    margin-left: 5px;
+    width: 9px;
+  }
 }
