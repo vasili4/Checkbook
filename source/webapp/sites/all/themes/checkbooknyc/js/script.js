@@ -150,6 +150,7 @@
             d3.select('#chart1 svg')
                 .datum(chartData)
                 .call(chart);
+            d3.select('#chart1 .nv-legendWrap').attr('transform', 'translate(-430, 420)');
             nv.utils.windowResize(chart.update);
         }
 
@@ -239,6 +240,7 @@
                     .call(chart);
 
                 nv.utils.windowResize(chart.update);
+                d3.select('#chart1 .nv-legendWrap').attr('transform', 'translate(-430, 420)');
                 chart.dispatch.on('stateChange', function (e) {
                     nv.log('New State:', JSON.stringify(e));
                 });
