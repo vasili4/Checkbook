@@ -9,7 +9,7 @@ div.simple-data-table {
   }
 
   div.simple-data-table-header {
-    color: #697884;
+    color: $main;
     font-size: 1.2em;
     font-weight: bold;
     padding-bottom: 5px;
@@ -17,19 +17,19 @@ div.simple-data-table {
   }
 
   tr:first-child {
-    background: #697884;
+    background: $main;
     opacity: 0.5;
 
     &:hover {
-      background-color: #697884;
+      background-color: $main;
     }
   }
 
   tr {
-    background: #ffffff;
+    background: $white;
 
     &:hover {
-      background-color: #f4f5f5;
+      background-color: $nav-gray;
     }
   }
 
@@ -50,7 +50,7 @@ div.simple-data-table {
   th.number-heading,
   th.percent-heading {
     border: none;
-    color: #ffffff;
+    color: $tbl-head-col;
     font-size: 0.75em;
     font-weight: 400;
     line-height: 10px;
@@ -65,7 +65,7 @@ div.simple-data-table {
   th.date-heading,
   th.text-heading {
     border: none;
-    color: #ffffff;
+    color: $tbl-head-col;
     font-size: 0.75em;
     font-weight: 400;
     line-height: 10px;
@@ -80,7 +80,7 @@ div.simple-data-table {
   td.dollar-column,
   td.number-column,
   td.percent-column {
-    border-top: 1px solid #e9e9e7;
+    border-top: 1px solid $nav-gray;
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;
@@ -90,7 +90,7 @@ div.simple-data-table {
 
   td.date-column,
   td.text-column {
-    border-top: 1px solid #e9e9e7;
+    border-top: 1px solid $nav-gray;
     font-size: 11px;
     line-height: 30px;
     padding-left: 1em;

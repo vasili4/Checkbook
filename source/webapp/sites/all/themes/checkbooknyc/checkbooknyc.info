@@ -3,7 +3,7 @@ description = NYC Checkbook
 core = 7.x
 engine = phptemplate
 
-screenshot = 'screenshot.png'
+screenshot = 'screenshot1.png'
 stylesheets[all][] = css/output.css
 stylesheets[all][] = css/nvd3.css
 

@@ -1101,7 +1101,7 @@ div.simple-data-table th.text-heading {
 div.simple-data-table td.dollar-column,
 div.simple-data-table td.number-column,
 div.simple-data-table td.percent-column {
-  border-top: 1px solid #e9e9e7;
+  border-top: 1px solid #f4f5f5;
   font-size: 11px;
   line-height: 30px;
   padding-left: 1em;
@@ -1109,7 +1109,7 @@ div.simple-data-table td.percent-column {
   text-align: right; }
 div.simple-data-table td.date-column,
 div.simple-data-table td.text-column {
-  border-top: 1px solid #e9e9e7;
+  border-top: 1px solid #f4f5f5;
   font-size: 11px;
   line-height: 30px;
   padding-left: 1em;
@@ -1185,4 +1185,4 @@ body.page-spending-landing {
 div.region-content {
   height: 100%; }
 
-/*# sourceMappingURL=output.css.map */
+/*# sourceMappingURL=main.css.map */

@@ -1,0 +1,515 @@
+div.landing {
+  margin: 2.7em auto auto;
+  max-width: 1024px;
+  position: relative;
+  z-index: 1;
+
+  div.landing-head {
+    flex: 1;
+
+    span {
+      display: block;
+
+      &.page-title {
+        color: $main;
+        font-size: 2.5em;
+        font-weight: bold;
+        margin-top: -2px;
+        text-transform: capitalize;
+
+        span.diamond {
+          border: 7px solid transparent;
+          border-bottom-color: $main;
+          display: inline-block;
+          height: 0;
+          margin: 0 11px;
+          position: relative;
+          top: -11px;
+          width: 0;
+
+          &:after {
+            border: 7px solid transparent;
+            border-top-color: $main;
+            content: '';
+            height: 0;
+            left: -7px;
+            position: absolute;
+            top: 7px;
+            width: 0;
+          }
+        }
+      }
+
+      &.page-subtitle {
+        color: $main;
+        margin-top: 10px;
+        text-transform: uppercase;
+      }
+
+      &.page-breadcrumb {
+        color: $main-font;
+        font-size: 0.7em;
+        font-weight: 500;
+        margin-top: 10px;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  div.year-filter {
+    position: absolute;
+    right: 0;
+    top: 1em;
+
+    span {
+      color: $main-font;
+      font-size: 0.9em;
+      text-transform: capitalize;
+    }
+
+    > div {
+      background-color: $white;
+      border: 1px solid $main-font;
+      cursor: pointer;
+      display: inline-block;
+      font-size: 0.7em;
+      height: 25px;
+      padding: 0.4em 0.7em;
+      width: 200px;
+
+      &:after {
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid $main;
+        content: "";
+        display: inline-block;
+        height: 0;
+        left: 287px;
+        position: absolute;
+        top: 10px;
+        width: 0;
+      }
+
+      div.year-select {
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        height: 0;
+        overflow: hidden;
+        position: absolute;
+        right: 1px;
+        top: 24px;
+        width: 200px;
+        z-index: 1;
+
+        div {
+          text-align: center;
+          padding: 5px;
+
+          &:nth-child(even) {
+            background-color: $light-gray;
+          }
+        }
+      }
+    }
+  }
+
+  div.filter {
+    background-color: $nav-gray;
+    border-radius: 0.15em;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8em;
+    margin-top: 1.5em;
+    min-width: 1024px;
+    position: relative;
+    text-transform: uppercase;
+
+    .subdomain-filter {
+      background-color: $white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+      .mwbe-filter-button {
+        background-color: $main;
+        border: none;
+        color: $white;
+        cursor: pointer;
+        font-size: 0.8em;
+        height: 17px;
+        line-height: 1.6;
+        position: absolute;
+        right: 177px;
+        text-align: center;
+        text-transform: uppercase;
+        top: 40px;
+        width: 355px;
+
+        &:after {
+          @include navigation-ico($white);
+          background-position: center;
+          background-repeat: no-repeat;
+          content: "";
+          display: inline-block;
+          height: 7px;
+          margin-left: 5px;
+          width: 7px;
+        }
+
+        &.active:after {
+          @include navigation-ico($white);
+          transform: rotate(180deg);
+        }
+
+        &:hover {
+          // background-color: $green-hover;
+          opacity: 0.9;
+        }
+      }
+    }
+
+    .spending-filter,
+    .subdomain-filter {
+      color: $main-font;
+      display: flex;
+      flex-direction: row;
+      height: 6em;
+      overflow: hidden;
+
+      > span {
+        color: $main;
+        font-weight: bold;
+        letter-spacing: 0.05em;
+        margin: auto;
+        padding: 1em 2em;
+      }
+
+      div {
+        cursor: pointer;
+        flex: 1;
+        height: 2.5em;
+        margin-top: 20px;
+        padding: 0 0.5em;
+        text-align: center;
+        transition: 0.25s ease-in-out;
+
+        &.subdomain:hover {
+          color: $main-hover;
+        }
+
+        &.subdomain.active {
+          color: $main;
+        }
+
+        + div {
+          border-left: 1px solid $border-gray;
+        }
+
+        span {
+          display: block;
+
+          + span {
+            margin-top: 3px;
+          }
+        }
+      }
+    }
+
+    .mwbe-filter {
+      background-color: $main;
+      color: $white;
+      display: flex;
+      height: 0;
+      overflow: hidden;
+      transition: 0.25s ease-in-out;
+      width: 100%;
+      z-index: 1;
+
+      &.active {
+        height: 20px;
+      }
+
+      div {
+        color: $navlink;
+        cursor: pointer;
+        flex: 1;
+        font-size: 0.8em;
+        padding: 4px;
+        text-align: center;
+        text-transform: uppercase;
+        transition: 0.25s ease-in-out;
+
+        &:hover {
+          color: $white;
+        }
+
+        &.active {
+          color: $white;
+        }
+      }
+    }
+  }
+
+  div.data-visualization {
+    background-color: $white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    height: 100%;
+    margin-top: 30px;
+    min-height: 800px;
+    padding: 2em;
+    position: relative;
+
+    div.domain-label {
+      color: $main;
+      display: inline-block;
+      font-size: 1.5em;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    div.snapshots-container {
+      height: 200px;
+
+      .snapshots {
+        display: flex;
+        justify-content: space-between;
+
+        > div {
+          display: flex;
+          height: 90px;
+          margin-top: 2%;
+          width: 27.5%;
+
+          div.image {
+            flex: 2;
+          }
+
+          &.person {
+            .image {
+              @include person-ico($white);
+              background-color: $snapshot-blue;
+              background-size: 55px;
+            }
+
+            .data {
+              background-color: $snapshot-blue-light;
+            }
+          }
+
+          &.pie {
+            .image {
+              @include piegraph-ico($gray);
+              background-color: $snapshot-yellow;
+              background-size: 55px;
+            }
+
+            .data {
+              background-color: $snapshot-yellow-light;
+              color: $gray;
+            }
+          }
+
+          &.bar {
+            .image {
+              @include snapshot-bargraph-ico($white);
+              background-color: $snapshot-maroon;
+              background-size: 55px;
+            }
+
+            .data {
+              background-color: $snapshot-maroon-light;
+            }
+          }
+
+          div.data {
+            flex: 3;
+            color: $white;
+
+            div {
+              font-size: 0.75em;
+              padding-right: 1em;
+              text-align: right;
+              text-transform: uppercase;
+
+              + div {
+                margin-top: 5px;
+              }
+            }
+
+            div:first-of-type {
+              font-size: 3em;
+              padding-right: 0.2em;
+              text-align: right;
+            }
+          }
+        }
+      }
+    }
+
+    div.chart-toggle {
+      float: right;
+      margin-right: 1em;
+
+      div {
+        cursor: pointer;
+        display: inline-block;
+        font-size: 12px;
+        height: 30px;
+        padding: 0.5em 1em;
+        text-transform: uppercase;
+        width: 30px;
+
+        &.chart-bar {
+          @include bargraph-ico($main-font);
+          background-size: 20px;
+          transition: 0.1s ease-in-out;
+
+          &:hover {
+            background-size: 23px;
+          }
+
+          &.active {
+            @include bargraph-ico($main);
+            background-size: 20px;
+          }
+        }
+
+        &.chart-bar-grouped {
+          @include grouped-bargraph-ico($main-font);
+          background-size: 22px;
+          transition: 0.1s ease-in-out;
+
+          &:hover {
+            background-size: 23px;
+          }
+
+          &.active {
+            @include grouped-bargraph-ico($main);
+            background-size: 20px;
+          }
+        }
+
+        &.chart-line {
+          @include linegraph-ico($main-font);
+          background-size: 25px;
+          transition: 0.1s ease-in-out;
+
+          &:hover {
+            background-size: 28px;
+          }
+
+          &.active {
+            @include linegraph-ico($main);
+            background-size: 25px;
+          }
+        }
+
+        + div {
+          margin-left: 10px;
+        }
+      }
+    }
+
+    div#chart1,
+    div#chart2 {
+      margin-top: 2%;
+      opacity: 0;
+      position: absolute;
+      transition: 0.5s ease-in-out;
+      visibility: hidden;
+
+      &.active {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+
+    div#chart1 {
+      // visibility: hidden;
+    }
+
+    div#chart2 {
+      margin-left: 10px;
+    }
+
+    div.charts-data-tables-container {
+      margin: 53% auto auto;
+    }
+
+    div.charts-data-table-container {
+      display: inline-block;
+      margin-top: 25px;
+      position: relative;
+      width: 940px;
+    }
+
+    a.charts-data-tables-toggle {
+      background-color: $main;
+      background-image: url("../images/white_arrow_up.png");
+      background-position: center center;
+      background-repeat: no-repeat;
+      display: block;
+      height: 35px;
+      margin-top: 25px;
+    }
+
+    a.charts-data-tables-toggle.close {
+      background-image: url("../images/white_arrow_down.png");
+    }
+
+    div.data-table-container {
+      display: inline;
+      float: left;
+      margin-top: 30px;
+      position: relative;
+      width: 940px;
+    }
+
+    div.data-table-container-left {
+      display: inline;
+      float: left;
+      margin-top: 30px;
+      position: relative;
+      width: 450px;
+    }
+
+    div.data-table-container-right {
+      display: inline;
+      float: left;
+      margin-left: 40px;
+      margin-top: 30px;
+      position: relative;
+      width: 450px;
+    }
+  }
+}
+
+#return-to-top {
+  background-color: $main;
+  border-radius: 0 5px 5px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  color: #ffffff;
+  display: none;
+  font-size: 0.6em;
+  height: 50px;
+  margin-left: 106.7em;
+  padding: 0.8em 1em;
+  position: fixed;
+  text-align: left;
+  text-decoration: none;
+  text-transform: uppercase;
+  top: 70%;
+  width: 58px;
+  word-spacing: 50px;
+  z-index: 0;
+
+  &:after {
+    @include backtotop-ico($white);
+    background-size: 9px;
+    content: '';
+    display: inline-block;
+    height: 9px;
+    margin-left: 5px;
+    width: 9px;
+  }
+}
