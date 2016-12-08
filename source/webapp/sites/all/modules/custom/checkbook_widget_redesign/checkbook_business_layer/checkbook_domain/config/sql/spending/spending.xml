@@ -271,6 +271,17 @@
             GROUP BY fiscal_year
         </sql>
     </statement>
+    <statement name="GetMwbeVendorSpendingByZipCodes" datasource="checkbook">
+        <sql>
+            SELECT 10004 as zipcode, 'Manhattan' as borough, 7 as mwbe_vendor_count, 13.5 as ytd_spending UNION ALL
+            SELECT 10003 as zipcode, 'Manhattan' as borough, 9 as mwbe_vendor_count, 9.34 as ytd_spending UNION ALL
+            SELECT 10007 as zipcode, 'Manhattan' as borough, 6 as mwbe_vendor_count, 8.06 as ytd_spending UNION ALL
+            SELECT 10005 as zipcode, 'Manhattan' as borough, 2 as mwbe_vendor_count, 7.5 as ytd_spending UNION ALL
+            SELECT 10002 as zipcode, 'Manhattan' as borough, 5 as mwbe_vendor_count, 1.1 as ytd_spending UNION ALL
+            SELECT 10006 as zipcode, 'Manhattan' as borough, 3 as mwbe_vendor_count, 1.06 as ytd_spending
+
+        </sql>
+    </statement>
     <!-- Common -->
     <statement name="GetSpendingByCategory" datasource="checkbook">
         <param name="year" />

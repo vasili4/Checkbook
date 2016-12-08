@@ -863,6 +863,26 @@ div.landing {
             background-size: 25px; }
         div.landing div.data-visualization div.chart-toggle div + div {
           margin-left: 10px; }
+    div.landing div.data-visualization div.map-section-container {
+      margin-top: 30px; }
+      div.landing div.data-visualization div.map-section-container div.heat-map {
+        background-image: url("../images/heatmap.jpeg");
+        display: block;
+        height: 799px;
+        width: 960px;
+        margin-top: 30px; }
+      div.landing div.data-visualization div.map-section-container div.map-data-tables-container {
+        margin-top: 30px; }
+      div.landing div.data-visualization div.map-section-container a.map-data-tables-toggle {
+        background-color: #697884;
+        background-image: url("../images/white_arrow_up.png");
+        background-position: center center;
+        background-repeat: no-repeat;
+        display: block;
+        height: 35px;
+        margin-top: 25px; }
+      div.landing div.data-visualization div.map-section-container a.map-data-tables-toggle.close {
+        background-image: url("../images/white_arrow_down.png"); }
     div.landing div.data-visualization div#chart1,
     div.landing div.data-visualization div#chart2 {
       margin-top: 2%;

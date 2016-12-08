@@ -165,9 +165,11 @@
             e.stopPropagation();
         });
 
-        //By default closee the toggle
+        //By default close the toggle
         $(".charts-data-table-container").slideToggle("ease-in-out");
         $(".charts-data-tables-toggle").toggleClass("close");
+        $(".map-data-table-container").slideToggle("ease-in-out");
+        $(".map-data-tables-toggle").toggleClass("close");
 
         //toggle the chart data table
         $(".charts-data-tables-toggle").click(function () {
@@ -175,6 +177,13 @@
             $(".charts-data-tables-toggle").toggleClass("close");
             return false;
         });
+        //toggle the map data table
+        $(".map-data-tables-toggle").click(function () {
+            $(".map-data-table-container").slideToggle("ease-in-out");
+            $(".map-data-tables-toggle").toggleClass("close");
+            return false;
+        });
+
 
         $(window).scroll(function () {
             if ($(this).scrollTop() >= 200) {

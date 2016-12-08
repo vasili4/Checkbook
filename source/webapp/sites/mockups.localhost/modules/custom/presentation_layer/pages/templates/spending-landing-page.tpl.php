@@ -50,6 +50,7 @@
     </div>
 
   <div class="data-visualization">
+      <!-- Charts -->
     <div class="zc-container">
       <div class="domain-label">m/wbe spending summary</div>
       <div class="chart-toggle">
@@ -64,14 +65,27 @@
         <svg width="950" height="500"></svg>
       </div>
     </div>
-
     <div class="charts-data-tables-container">
         <div class="charts-data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("mwbeSpendingByYears")); ?>
         </div>
     </div>
      <a class="charts-data-tables-toggle" href="#"></a>
-    <div class="data-tables-container">
+      <!-- Heat Map -->
+      <div class="map-section-container">
+          <div class="map-container">
+              <div class="domain-label">m/wbe certified prime vendors</div>
+              <div class="heat-map"></div>
+          </div>
+          <div class="map-data-tables-container">
+              <div class="map-data-table-container">
+                  <?php echo(_page_controller_get_mwbe_spending_data_table("mwbeVendorSpendingByZipCodes")); ?>
+              </div>
+          </div>
+          <a class="map-data-tables-toggle" href="#"></a>
+      </div>
+      <!-- Data Tables -->
+      <div class="data-tables-container">
         <div class="data-table-container">
             <?php echo(_page_controller_get_mwbe_spending_data_table("checks")); ?>
         </div>

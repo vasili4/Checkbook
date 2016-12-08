@@ -136,6 +136,18 @@
             ],
             "orderBy":"fiscal_year",
             "defaultParameters":{"year":"(112,113,114,115,116,117,118)","mwbe":"(2,3,4,5,9)"}
+        },
+        "mwbeVendorSpendingByZipCodes":{
+            "viewType":"simple_data_table",
+            "serviceName":"SpendingDataService",
+            "dataFunction":"GetMwbeVendorSpendingByZipCodes",
+            "tableColumns":[
+                {"label":"Zip Code","column":"zipcode","format":"text"},
+                {"label":"Borough","column":"borough","format":"text"},
+                {"label":"Number of M/WBE Vendors","column":"mwbe_vendor_count","format":"number"},
+                {"label":"Total YTD Spending","column":"ytd_spending","format":"dollar"}
+            ],
+            "orderBy":"ytd_spending desc"
         }
     }
 }

@@ -69,6 +69,15 @@ class SpendingDataService extends AbstractDataService {
         return $this->getData($parameters, $limit, $orderBy, "GetMwbeSpendingByYears");
     }
 
+    public function GetMwbePrimeVendorSpendingByZipCodes($parameters, $limit = null, $orderBy = null) {
+        return $this->getData($parameters, $limit, $orderBy, "GetMwbePrimeVendorSpendingByZipCodes");
+    }
+
+    public function GetMwbeVendorSpendingByZipCodes($parameters, $limit = null, $orderBy = null) {
+        return $this->getData($parameters, $limit, $orderBy, "GetMwbeVendorSpendingByZipCodes");
+    }
+
+
     /* Common Spending */
 
     public function GetSpendingByCategory($parameters, $limit = null, $orderBy = null) {
