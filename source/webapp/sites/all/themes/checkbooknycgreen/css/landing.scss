@@ -374,8 +374,8 @@ div.landing {
           }
         }
 
-        &.chart-bar-grouped {
-          @include grouped-bargraph-ico($main-font);
+        &.chart-bar-stacked {
+          @include stacked-bargraph-ico($main-font);
           background-size: 22px;
           transition: 0.1s ease-in-out;
 
@@ -384,7 +384,7 @@ div.landing {
           }
 
           &.active {
-            @include grouped-bargraph-ico($main);
+            @include stacked-bargraph-ico($main);
             background-size: 20px;
           }
         }

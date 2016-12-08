@@ -118,23 +118,23 @@
                 $('#chart1').addClass('active');
             }
             $('.chart-bar').addClass('active');
-            $('#chart2, .chart-line, .chart-bar-grouped').removeClass('active');
-            toggleBarChart('Stacked');
+            $('#chart2, .chart-line, .chart-bar-stacked').removeClass('active');
+            toggleBarChart('Grouped');
         });
 
-        $('.chart-bar-grouped').click(function () {
+        $('.chart-bar-stacked').click(function () {
             if (!$('#chart1').hasClass('active')) {
                 $('#chart1').addClass('active');
             }
-            $('.chart-bar-grouped').addClass('active');
+            $('.chart-bar-stacked').addClass('active');
             $('#chart2, .chart-line, .chart-bar').removeClass('active');
-            toggleBarChart('Grouped');
+            toggleBarChart('Stacked');
         });
 
         $('.chart-line').click(function () {
             if (!$('#chart2').hasClass('active')) {
                 $('#chart2, .chart-line').addClass('active');
-                $('#chart1, .chart-bar, .chart-bar-grouped').removeClass('active');
+                $('#chart1, .chart-bar, .chart-bar-stacked').removeClass('active');
             }
         });
 
