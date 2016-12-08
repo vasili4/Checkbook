@@ -189,6 +189,12 @@
             }, 500);
         });
 
+        $('.mwbe-filter > div').click(function() {
+          var $this = $(this);
+          $('.mwbe-filter-button').text($this.html()).removeClass('active');
+          $('.mwbe-filter').removeClass('active');
+        })
+
         var chart,char2;
         var fiscalYear = ['2011', '2012', '2013', '2014', '2015', '2016', '2017'];
         var dollarFormat = function (d) {

@@ -32,11 +32,11 @@
             <div class="mwbe-filter-button">select filter</div>
         </div>
         <div class="mwbe-filter">
-            <div>total m/wbe</div>
-            <div>asian american</div>
-            <div>black american</div>
-            <div>women</div>
-            <div>hispanic american</div>
+            <div class="mwbe-filter-mwbe">total m/wbe</div>
+            <div class="mwbe-filter-asian">asian american</div>
+            <div class="mwbe-filter-black">black american</div>
+            <div class="mwbe-filter-women">women</div>
+            <div class="mwbe-filter-hispanic">hispanic american</div>
         </div>
         <?php $data = MockData::SpendingByCategories(); ?>
         <div class="spending-filter"> <span class="label">spending types</span>
