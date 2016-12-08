@@ -3,7 +3,14 @@
 
   // set up main nv object
   var nv = {};
-  var customColors = ["#842b55", "#f9e79b", "#5ab7c5", "#8c9191"];
+  //green theme
+  // var customColors = ["#842b55", "#f9e79b", "#5ab7c5", "#8c9191"];
+
+  //gray theme
+  var customColors = ["#a94e4d", "#dccf98", "#6a8f8c", "#6f6982"];
+
+  //gray theme 2
+  // var customColors = ["#a94e4d", "#e9e2ca", "#6a8f8c", "#6a5889"];
   // the major global objects under the nv namespace
   nv.dev = false; //set false when in production
   nv.tooltip = nv.tooltip || {}; // For the tooltip system

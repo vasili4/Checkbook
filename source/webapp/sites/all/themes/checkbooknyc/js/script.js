@@ -165,12 +165,12 @@
         });
 
         //By default closee the toggle
-        $(".charts-data-table-container").slideToggle();
+        $(".charts-data-table-container").slideToggle("ease-in-out");
         $(".charts-data-tables-toggle").toggleClass("close");
 
         //toggle the chart data table
         $(".charts-data-tables-toggle").click(function () {
-            $(".charts-data-table-container").slideToggle();
+            $(".charts-data-table-container").slideToggle("ease-in-out");
             $(".charts-data-tables-toggle").toggleClass("close");
             return false;
         });

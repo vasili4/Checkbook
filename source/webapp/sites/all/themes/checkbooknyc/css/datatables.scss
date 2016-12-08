@@ -17,8 +17,7 @@ div.simple-data-table {
   }
 
   tr:first-child {
-    background: #697884;
-    opacity: 0.5;
+    background: $header-gray;
 
     &:hover {
       background-color: #697884;
@@ -29,7 +28,7 @@ div.simple-data-table {
     background: #ffffff;
 
     &:hover {
-      background-color: #f4f5f5;
+      background-color: $table-row;
     }
   }
 
