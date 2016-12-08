@@ -178,7 +178,7 @@ div.landing {
 
       > span {
         color: $main;
-        font-weight: bold;
+        font-weight: 800;
         letter-spacing: 0.05em;
         margin: auto;
         padding: 1em 2em;
@@ -199,6 +199,7 @@ div.landing {
 
         &.subdomain.active {
           color: $main;
+          font-weight: 600;
         }
 
         + div {

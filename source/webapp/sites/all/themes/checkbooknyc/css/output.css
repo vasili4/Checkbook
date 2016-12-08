@@ -696,7 +696,7 @@ div.landing {
       div.landing div.filter .spending-filter > span,
       div.landing div.filter .subdomain-filter > span {
         color: #697884;
-        font-weight: bold;
+        font-weight: 800;
         letter-spacing: 0.05em;
         margin: auto;
         padding: 1em 2em; }
@@ -714,7 +714,8 @@ div.landing {
           color: #697884; }
         div.landing div.filter .spending-filter div.subdomain.active,
         div.landing div.filter .subdomain-filter div.subdomain.active {
-          color: #697884; }
+          color: #697884;
+          font-weight: 600; }
         div.landing div.filter .spending-filter div + div,
         div.landing div.filter .subdomain-filter div + div {
           border-left: 1px solid #b1b0ad; }
