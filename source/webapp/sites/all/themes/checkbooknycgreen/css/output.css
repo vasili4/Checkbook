@@ -868,8 +868,8 @@ div.landing {
       div.landing div.data-visualization div.map-section-container div.heat-map {
         background-image: url("../images/heatmap.jpeg");
         display: block;
-        height: 799px;
-        width: 960px;
+        width: 950px;
+        height: 500px;
         margin-top: 30px; }
       div.landing div.data-visualization div.map-section-container div.map-data-tables-container {
         margin-top: 30px; }

@@ -3,7 +3,8 @@
 <div class="landing">
   <div class="landing-filters">
     <div class="landing-head">
-      <span class="page-title">M/WBE total spending <span class="diamond"></span> $9.90B</span>
+        <?php $spendingData = MockData::SpendingByCategories(); ?>
+      <span class="page-title">M/WBE total spending <span class="diamond"></span><?php echo($spendingData[0]["value"]); ?></span>
       <span class="page-subtitle">new york city</span>
       <span class="page-breadcrumb">home - domain: spending - m/wbe</span>
     </div>
@@ -38,14 +39,13 @@
             <div class="mwbe-filter-women">women</div>
             <div class="mwbe-filter-hispanic">hispanic american</div>
         </div>
-        <?php $data = MockData::SpendingByCategories(); ?>
         <div class="spending-filter"> <span class="label">spending types</span>
-            <div class="subdomain active"> <span><?php echo($data[0]["value"]); ?></span> <span><?php echo($data[0]["name"]); ?></span> </div>
-            <div class="subdomain"> <span><?php echo($data[1]["value"]); ?></span> <span><?php echo($data[1]["name"]); ?></span> </div>
-            <div class="subdomain"> <span><?php echo($data[2]["value"]); ?></span> <span><?php echo($data[2]["name"]); ?></span> </div>
-            <div class="subdomain"> <span><?php echo($data[3]["value"]); ?></span> <span><?php echo($data[3]["name"]); ?></span> </div>
-            <div class="subdomain"> <span><?php echo($data[4]["value"]); ?></span> <span><?php echo($data[4]["name"]); ?></span> </div>
-            <div class="subdomain"> <span><?php echo($data[5]["value"]); ?></span> <span><?php echo($data[5]["name"]); ?></span> </div>
+            <div class="subdomain active"> <span><?php echo($spendingData[0]["value"]); ?></span> <span><?php echo($spendingData[0]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($spendingData[1]["value"]); ?></span> <span><?php echo($spendingData[1]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($spendingData[2]["value"]); ?></span> <span><?php echo($spendingData[2]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($spendingData[3]["value"]); ?></span> <span><?php echo($spendingData[3]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($spendingData[4]["value"]); ?></span> <span><?php echo($spendingData[4]["name"]); ?></span> </div>
+            <div class="subdomain"> <span><?php echo($spendingData[5]["value"]); ?></span> <span><?php echo($spendingData[5]["name"]); ?></span> </div>
         </div>
     </div>
 
