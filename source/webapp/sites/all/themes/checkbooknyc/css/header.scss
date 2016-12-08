@@ -108,11 +108,12 @@ nav {
     margin: auto;
     max-width: 1024px;
     margin-top: 1px;
+    justify-content: space-around;
 
     > div,
     a {
       color: $navlink;
-      flex: 1;
+      // flex: 1;
       margin-top: 5px;
       text-align: center;
       text-decoration: none;
@@ -141,5 +142,6 @@ nav {
 .nav-trends {
   .nav-dropdown__list {
     line-height: 3;
+    justify-content: space-around;
   }
 }

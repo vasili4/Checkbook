@@ -108,7 +108,7 @@ div.simple-data-table {
     @include export-ico($iconfill);
     background-position-x: 0;
     background-position-y: 5px;
-    background-size: 11px;
+    background-size: 10px;
   }
 
   a.simple-data-table-export-link {
@@ -122,9 +122,9 @@ div.simple-data-table {
 
   div.simple-data-table-details-link {
     @include plus-ico($iconfill);
-    background-position-x: 0;
+    background-position-x: 1px;
     background-position-y: 5px;
-    background-size: 11px;
+    background-size: 10px;
     margin-left: 12px;
   }
 

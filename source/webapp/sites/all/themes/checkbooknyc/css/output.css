@@ -173,7 +173,8 @@ nav {
     display: flex;
     margin: auto;
     max-width: 1024px;
-    margin-top: 1px; }
+    margin-top: 1px;
+    justify-content: space-around; }
     .nav-domains .nav-dropdown__list > div,
     .nav-domains .nav-dropdown__list a,
     .nav-help .nav-dropdown__list > div,
@@ -183,7 +184,6 @@ nav {
     .nav-trends .nav-dropdown__list > div,
     .nav-trends .nav-dropdown__list a {
       color: #D9D9D9;
-      flex: 1;
       margin-top: 5px;
       text-align: center;
       text-decoration: none;
@@ -222,7 +222,8 @@ nav {
 .nav-help .nav-dropdown__list,
 .nav-search-tools .nav-dropdown__list,
 .nav-trends .nav-dropdown__list {
-  line-height: 3; }
+  line-height: 3;
+  justify-content: space-around; }
 
 div.home {
   display: block;
@@ -668,6 +669,7 @@ div.landing {
           background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2021.4%2019.3%22%3E%3Cstyle%3E.a%7Bfill%3A#ffffff%3B%7D%3C%2Fstyle%3E%3Cpolygon%20points%3D%2220%207.2%2010.7%2016.4%201.4%207.2%200%208.6%2010.7%2019.3%2021.4%208.6%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%2220%200%2010.7%209.3%201.4%200%200%201.4%2010.7%2012.1%2021.4%201.4%20%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
           background-repeat: no-repeat;
           background-position: center;
+          backface-visibility: hidden;
           background-position: center;
           background-repeat: no-repeat;
           content: "";
@@ -935,6 +937,7 @@ div.landing {
     background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22612%22%20height%3D%22792%22%20viewBox%3D%220%200%20612%20792%22%3E%3Cpath%20d%3D%22M266.3%20262.5c102.7%20102.7%20204.4%20204.4%20306.1%20306.1%2012.7-12.7%2026.5-26.5%2039.2-39.2L305.5%20223.4C291.7%20237.1%20279%20249.8%20266.3%20262.5z%22%20fill%3D%22#ffffff%22%2F%3E%3Cpath%20d%3D%22M306.1%20223.4C203.4%20326.1%20101.7%20427.8%200%20529.5c12.7%2012.7%2026.5%2026.5%2039.2%2039.2l306.1-306.1C331.5%20248.8%20318.8%20236.1%20306.1%20223.4z%22%20fill%3D%22#ffffff%22%2F%3E%3C%2Fsvg%3E%0A");
     background-repeat: no-repeat;
     background-position: center;
+    background-position-y: 1px;
     background-size: 9px;
     content: '';
     display: inline-block;
@@ -1123,7 +1126,7 @@ div.simple-data-table div.simple-data-table-export-link {
   background-position: center;
   background-position-x: 0;
   background-position-y: 5px;
-  background-size: 11px; }
+  background-size: 10px; }
 div.simple-data-table a.simple-data-table-export-link {
   color: #000000;
   font-size: 11px;
@@ -1135,9 +1138,9 @@ div.simple-data-table div.simple-data-table-details-link {
   background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22612%22%20height%3D%22792%22%20viewBox%3D%220%200%20612%20792%22%3E%3Crect%20y%3D%22341.8%22%20width%3D%22612%22%20height%3D%22108.5%22%20fill%3D%22#697884%22%2F%3E%3Crect%20x%3D%22251.8%22%20y%3D%2290%22%20width%3D%22108.5%22%20height%3D%22612%22%20fill%3D%22#697884%22%2F%3E%3C%2Fsvg%3E%0A");
   background-repeat: no-repeat;
   background-position: center;
-  background-position-x: 0;
+  background-position-x: 1px;
   background-position-y: 5px;
-  background-size: 11px;
+  background-size: 10px;
   margin-left: 12px; }
 div.simple-data-table a.simple-data-table-details-link {
   color: #000000;
@@ -1184,4 +1187,4 @@ body.page-spending-landing {
 div.region-content {
   height: 100%; }
 
-/*# sourceMappingURL=main.css.map */
+/*# sourceMappingURL=output.css.map */
