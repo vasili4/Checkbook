@@ -1,0 +1,21 @@
+name = checkbooknycgreen
+description = NYC Checkbook
+core = 7.x
+engine = phptemplate
+
+base theme = checkbooknyc
+
+screenshot = 'screenshot.png'
+stylesheets[all][] = css/output.css
+stylesheets[all][] = css/nvd3.css
+
+
+regions[page_top] = 'Page Top'
+regions[page_bottom] = 'Page Bottom'
+regions[content] = 'Content'
+regions[left] = Left sidebar
+regions[right] = Right sidebar
+regions[content] = Content
+regions[header] = Header
+regions[footer] = Footer
+

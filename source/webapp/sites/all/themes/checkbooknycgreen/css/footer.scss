@@ -1,0 +1,171 @@
+footer {
+  background-color: $white;
+  bottom: -7.7em;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+
+  .footer-flex {
+    display: flex;
+    height: 4em;
+
+    > div {
+      align-self: center;
+      display: inline-block;
+      margin: 10px;
+
+      &.footer__left-links {
+        margin-left: 5%;
+        flex: 3;
+
+        > div {
+          display: inline-block;
+          text-transform: uppercase;
+        }
+
+        span {
+          font-size: 11px;
+          vertical-align: super;
+        }
+
+        div.locale div.globe-icon {
+          @extend %translate-ico;
+          display: inline-block;
+          height: 25px;
+          margin: 0 25px 0 7px;
+          transition: 0.25s ease-in-out;
+          width: 25px;
+
+          &:hover {
+            @include translate-ico($whitespace, $iconfill);
+          }
+        }
+
+        div.social {
+          div {
+            background-repeat: no-repeat;
+            display: inline-block;
+            height: 25px;
+            margin-left: 7px;
+            transition: 0.25s ease-in-out;
+            width: 25px;
+
+            &.googleplus-icon {
+              @extend %googleplus-ico;
+
+              &:hover {
+                @include googleplus-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.twitter-icon {
+              @extend %twitter-ico;
+
+              &:hover {
+                @include twitter-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.facebook-icon {
+              @extend %facebook-ico;
+
+              &:hover {
+                @include facebook-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.linkedin-icon {
+              @extend %linkedin-ico;
+
+              &:hover {
+                @include linkedin-ico($whitespace, $iconfill);
+              }
+            }
+
+            &.email-icon {
+              @extend %email-ico;
+
+              &:hover {
+                @include email-ico($whitespace, $iconfill);
+              }
+            }
+          }
+        }
+      }
+
+      &.footer__right-links {
+        font-size: 10px;
+        line-height: 14px;
+        margin-right: 5%;
+        text-align: left;
+
+        div {
+          display: inline-block;
+          vertical-align: middle;
+          vertical-align: -webkit-baseline-middle;
+          text-align: right;
+        }
+
+        div.comptroller-logo {
+          background-image: url("../images/comptroller_logo_only.png");
+          background-repeat: no-repeat;
+          display: inline-block;
+          height: 30px;
+          width: 35px;
+        }
+
+        span {
+          text-transform: uppercase;
+
+          a {
+            color: $link-font;
+            text-decoration: none;
+
+            &:hover {
+              color: $main-hover;
+            }
+          }
+        }
+
+        .footer__open-source-disclaimer {
+          text-transform: none;
+        }
+      }
+    }
+  }
+
+  .footer__bottom-links {
+    background-color: $main;
+    bottom: -21px;
+    position: absolute;
+    width: 100%;
+
+    div.bottom-container {
+      display: flex;
+      text-align: center;
+      white-space: nowrap;
+
+      span {
+        color: $white;
+      }
+
+      div {
+        color: $white;
+        display: inline-block;
+        flex: 1;
+        font-size: 0.5em;
+        letter-spacing: .4px;
+        padding: 0.6em 0.8em;
+        text-align: center;
+        text-transform: uppercase;;
+
+        a {
+          color: $white;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

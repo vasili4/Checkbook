@@ -1,0 +1,60 @@
+@import "color";
+@import "fonts";
+@import "icons";
+@import "crossbrowser";
+@import "header";
+@import "home";
+@import "landing";
+@import "footer";
+@import "datatables";
+
+html {
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  -webkit-background-size: cover;
+
+  //bold background
+  background: url("../images/background.jpg") no-repeat center center fixed;
+
+  //conservative background
+  //background: url("../images/bgimage.jpg") no-repeat center center fixed;
+
+  background-size: cover;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+*,
+*:after,
+*:before {
+  box-sizing: inherit;
+}
+
+.content,
+body {
+  font-family: "Century Gothic";
+//  font-family: "Lato", sans-serif;
+  margin: auto;
+  position: relative;
+}
+
+.content {
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  padding: 0;
+  position: relative;
+}
+
+body.page-spending-landing {
+  height: auto;
+}
+
+#block-system-main,
+div.region-content {
+  height: 100%;
+}

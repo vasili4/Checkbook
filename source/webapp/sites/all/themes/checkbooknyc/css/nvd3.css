@@ -308,9 +308,13 @@ svg.nvd3-svg {
   border-radius: 5px;
 }
 
+/* Overriding nvd3 css */
 .nvd3 text {
-  font: normal 12px Arial;
+    font-size: 12px;/
 }
+/*.nvd3 text {*/
+  /*font: normal 12px Arial;*/
+/*}*/
 
 .nvd3 .title {
   font: bold 14px Arial;
@@ -542,6 +546,7 @@ svg.nvd3-svg {
   fill-opacity: 0;
 }
 
+/* Overriding nvd3 css */
 .nvtooltip {
   position: absolute;
   background-color: rgba(255, 255, 255, 1.0);
@@ -550,8 +555,7 @@ svg.nvd3-svg {
   border: 1px solid rgba(0, 0, 0, .2);
   z-index: 10000;
   display: block;
-  font-family: Arial;
-  font-size: 13px;
+  font-size: 12px;
   text-align: left;
   pointer-events: none;
   white-space: nowrap;
@@ -562,6 +566,27 @@ svg.nvd3-svg {
   -ms-user-select: none;
   user-select: none;
 }
+
+/*.nvtooltip {*/
+    /*position: absolute;*/
+    /*background-color: rgba(255, 255, 255, 1.0);*/
+    /*color: rgba(0, 0, 0, 1.0);*/
+    /*padding: 1px;*/
+    /*border: 1px solid rgba(0, 0, 0, .2);*/
+    /*z-index: 10000;*/
+    /*display: block;*/
+    /*font-family: Arial;*/
+    /*font-size: 13px;*/
+    /*text-align: left;*/
+    /*pointer-events: none;*/
+    /*white-space: nowrap;*/
+    /*-webkit-touch-callout: none;*/
+    /*-webkit-user-select: none;*/
+    /*-khtml-user-select: none;*/
+    /*-moz-user-select: none;*/
+    /*-ms-user-select: none;*/
+    /*user-select: none;*/
+/*}*/
 
 .nvtooltip {
   background: rgba(255, 255, 255, 0.8);

@@ -1,0 +1,145 @@
+nav {
+  align-content: space-around;
+  display: flex;
+  padding: 15px;
+  margin: auto;
+  max-width: 1024px;
+
+  div.nav-bonds:hover,
+  div.nav-home:hover {
+    background-color: $main;
+
+    a {
+      color: $white;
+    }
+  }
+
+  div {
+    display: inline-block;
+    flex: 1;
+    text-transform: uppercase;
+    vertical-align: middle;
+
+    &.nav-logo {
+      margin: 0 20px 0 0;
+
+      .main-logo-notag {
+        height: 23px;
+        width: 188px;
+        @extend %main-logo-notag;
+      }
+    }
+
+    &:not(.nav-logo) {
+      padding: 2px 20px 10px 20px;
+      text-align: center;
+      transition: 0.25s ease-in-out;
+      margin-top: 10px;
+
+      &.active {
+        background-color: $main;
+
+        a {
+          color: $white;
+        }
+
+        &.nav-dropdown:after {
+          @include navigation-ico($white);
+          transform: rotate(180deg);
+        }
+      }
+
+      &.nav-dropdown {
+        position: relative;
+
+        &:after {
+          @include navigation-ico($main-font);
+          background-position: center;
+          background-repeat: no-repeat;
+          content: "";
+          display: inline-block;
+          height: 11px;
+          margin-left: 5px;
+          width: 11px;
+        }
+      }
+    }
+
+    a {
+      color: $main-font;
+      font-size: 0.9em;
+      font-weight: 400;
+      text-decoration: none;
+      transition: 0.25s ease-in-out;
+
+      &:hover {
+        color: $main-hover;
+      }
+
+      img {
+        height: 20px;
+        width: auto;
+      }
+    }
+  }
+}
+
+.nav-domains,
+.nav-help,
+.nav-search-tools,
+.nav-trends {
+  background-color: $main;
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 56px;
+  transition: 0.25s ease-in-out;
+  visibility: hidden;
+  width: 100%;
+
+  &.active {
+    height: 50px;
+    visibility: visible;
+  }
+
+  .nav-dropdown__list {
+    cursor: pointer;
+    display: flex;
+    margin: auto;
+    max-width: 1024px;
+    margin-top: 1px;
+
+    > div,
+    a {
+      color: $navlink;
+      flex: 1;
+      margin-top: 5px;
+      text-align: center;
+      text-decoration: none;
+      transition: 0.25s ease-in-out;
+
+      &:hover div {
+        color: $white;
+      }
+
+      &.active div {
+        color: $white;
+      }
+
+      div {
+        font-size: 13px;
+        margin-top: 2px;
+        text-transform: uppercase;
+        transition: 0.1s ease-in;
+      }
+    }
+  }
+}
+
+.nav-help,
+.nav-search-tools,
+.nav-trends {
+  .nav-dropdown__list {
+    line-height: 3;
+  }
+}

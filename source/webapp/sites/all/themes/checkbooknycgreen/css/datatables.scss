@@ -1,0 +1,135 @@
+div.simple-data-table {
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  tbody {
+    border-top: none;
+  }
+
+  div.simple-data-table-header {
+    color: $main;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+  }
+
+  tr:first-child {
+    background: $tbl-head-col;
+
+    &:hover {
+      background-color: $tbl-head-col;
+    }
+  }
+
+  tr {
+    background: $white;
+
+    &:hover {
+      background-color: $nav-gray;
+    }
+  }
+
+  div.simple-data-table-sort {
+    &:after {
+      @include navigation-ico($white);
+      background-position: center;
+      background-repeat: no-repeat;
+      content: "";
+      display: inline-block;
+      height: 7px;
+      margin-left: 5px;
+      width: 7px;
+    }
+  }
+
+  th.dollar-heading,
+  th.number-heading,
+  th.percent-heading {
+    border: none;
+    font-size: 0.75em;
+    line-height: 10px;
+    padding-bottom: 1em;
+    padding-left: 1em;
+    padding-top: 1em;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  th.date-heading,
+  th.text-heading {
+    border: none;
+    font-size: 0.75em;
+    line-height: 10px;
+    padding-bottom: 1em;
+    padding-left: 1em;
+    padding-top: 1em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  td.dollar-column,
+  td.number-column,
+  td.percent-column {
+    border-top: 1px solid $nav-gray;
+    font-size: 11px;
+    line-height: 30px;
+    padding-left: 1em;
+    padding-right: 3em;
+    text-align: right;
+  }
+
+  td.date-column,
+  td.text-column {
+    border-top: 1px solid $nav-gray;
+    font-size: 11px;
+    line-height: 30px;
+    padding-left: 1em;
+    text-align: left;
+  }
+
+  div.simple-data-table-links {
+    float: right;
+  }
+
+  div.simple-data-table-links > div {
+    display: flex;
+  }
+
+  div.simple-data-table-export-link {
+    @include export-ico($iconfill);
+    background-position-x: 0;
+    background-position-y: 5px;
+    background-size: 11px;
+  }
+
+  a.simple-data-table-export-link {
+    color: #000000;
+    font-size: 11px;
+    font-weight: bold;
+    padding-left: 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  div.simple-data-table-details-link {
+    @include plus-ico($iconfill);
+    background-position-x: 0;
+    background-position-y: 5px;
+    background-size: 11px;
+    margin-left: 12px;
+  }
+
+  a.simple-data-table-details-link {
+    color: #000000;
+    font-size: 11px;
+    font-weight: bold;
+    padding-left: 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+}
