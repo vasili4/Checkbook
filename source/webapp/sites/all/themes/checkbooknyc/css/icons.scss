@@ -138,7 +138,7 @@
   background-repeat: no-repeat;
   background-position: center;
 }
-@mixin grouped-bargraph-ico($main-font) {
+@mixin stacked-bargraph-ico($main-font) {
   background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22384%22%20height%3D%22384%22%20viewBox%3D%220%200%20384%20384%22%3E%3Cstyle%3E.a%7Bfill%3A#{$main-font}%3B%7D%3C%2Fstyle%3E%3Cpolygon%20points%3D%22115.9%20111.6%20183.7%20111.6%20183.7%20210.7%20116%20210.7%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%22115.9%20226.6%20183.7%20226.6%20183.7%20364.5%20116%20364.5%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%22208.2%20326.4%20276%20326.4%20276%20364.5%20208.3%20364.5%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%22302.1%20288.2%20369.9%20288.2%20369.9%20364.5%20302.2%20364.5%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%22302.1%20168.8%20369.9%20168.8%20369.9%20272.7%20302.2%20272.7%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%22208.2%2019.5%20276%2019.5%20276%20310.6%20208.3%20310.6%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%2222.4%20307.6%2090.2%20307.6%2090.2%20364.5%2022.5%20364.5%20%22%20class%3D%22a%22%2F%3E%3Cpolygon%20points%3D%2222.4%20207%2090.2%20207%2090.2%20291.5%2022.5%20291.5%20%22%20class%3D%22a%22%2F%3E%3C%2Fsvg%3E%0A");
   background-repeat: no-repeat;
   background-position: center;

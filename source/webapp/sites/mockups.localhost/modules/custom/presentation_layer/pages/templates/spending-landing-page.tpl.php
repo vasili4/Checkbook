@@ -53,8 +53,8 @@
     <div class="zc-container">
       <div class="domain-label">m/wbe spending summary</div>
       <div class="chart-toggle">
-        <div class="chart-bar active"></div>
-        <div class="chart-bar-grouped"></div>
+        <div class="chart-bar-stacked active"></div>
+        <div class="chart-bar"></div>
         <div class="chart-line"></div>
       </div>
       <div id="chart1" class='with-3d-shadow with-transitions active'>
