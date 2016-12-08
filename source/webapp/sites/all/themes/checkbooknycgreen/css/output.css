@@ -291,12 +291,14 @@ div.home {
       text-align: right;
       text-transform: uppercase; }
       div.home .search .search__input-options li {
-        color: #615946;
+        color: #92C46D;
         cursor: pointer;
         display: inline-block;
         height: 21px;
         line-height: 2;
         margin-left: 5px;
+        letter-spacing: 0.7px;
+        font-weight: 600;
         padding: 0 4px 0 5px;
         transition: 0.25s ease-in-out; }
         div.home .search .search__input-options li:hover {
