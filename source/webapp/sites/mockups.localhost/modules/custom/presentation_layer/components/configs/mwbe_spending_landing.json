@@ -96,8 +96,8 @@
             "headerSubTitle":"Number of Contracts",
             "tableColumns":[
                 {"label":"Contract Id","column":"contract_number","format":"text","tooltip":40},
-                {"label":"Purpose","column":"contract_purpose","format":"text","tooltip":40},
-                {"label":"Contracting Agency","column":"agency_name","format":"text","tooltip":40},
+                {"label":"Purpose","column":"contract_purpose","format":"text","tooltip":30},
+                {"label":"Contracting Agency","column":"agency_name","format":"text","tooltip":30},
                 {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":40},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"Total Contract<br/>Amount&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;","column":"total_contract_amount","format":"dollar"}
