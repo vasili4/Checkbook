@@ -9,9 +9,9 @@
             "headerSubTitle":"Number of Checks",
             "tableColumns":[
                 {"label":"Issue Date","column":"issue_date","format":"date"},
-                {"label":"Agency","column":"agency_name","format":"text","tooltip":60},
-                {"label":"Prime Vendor","column":"vendor_name","format":"text","tooltip":60},
-                {"label":"Expense Category","column":"expense_category","format":"text","tooltip":60},
+                {"label":"Agency","column":"agency_name","format":"text","tooltip":40},
+                {"label":"Prime Vendor","column":"vendor_name","format":"text","tooltip":40},
+                {"label":"Expense Category","column":"expense_category","format":"text","tooltip":40},
                 {"label":"Check Amount","column":"check_amount","format":"dollar"}
             ],
             "orderBy":"check_amount desc",
@@ -26,7 +26,7 @@
             "headerTitle":"Top 5 Agencies",
             "headerSubTitle":"Number of Agencies",
             "tableColumns":[
-                {"label":"Agency","column":"agency_name","format":"text","tooltip":60},
+                {"label":"Agency","column":"agency_name","format":"text","tooltip":40},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
@@ -42,7 +42,7 @@
             "headerTitle":"Top 5 Expense Categories",
             "headerSubTitle":"Number of Expense Categories",
             "tableColumns":[
-                {"label":"Expense Category","column":"expense_category_name","format":"text","tooltip":60},
+                {"label":"Expense Category","column":"expense_category_name","format":"text","tooltip":40},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
@@ -58,8 +58,8 @@
             "headerTitle":"Top 5 Prime Vendors",
             "headerSubTitle":"Number of Prime Vendors",
             "tableColumns":[
-                {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":60},
-                {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":60},
+                {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":40},
+                {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":40},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"},
                 {"label":"Total Contract Amount","column":"total_contract_amount","format":"dollar"}
@@ -76,8 +76,8 @@
             "headerTitle":"Top 5 Sub Vendors",
             "headerSubTitle":"Number of Sub Vendors",
             "tableColumns":[
-                {"label":"Sub Vendor","column":"sub_vendor_name","format":"text","tooltip":60},
-                {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":60},
+                {"label":"Sub Vendor","column":"sub_vendor_name","format":"text","tooltip":40},
+                {"label":"M/WBE Category","column":"mwbe_category","format":"text","tooltip":40},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"},
                 {"label":"Number of Sub Contracts","column":"number_sub_contracts","format":"number"},
@@ -95,12 +95,12 @@
             "headerTitle":"Top 5 Contracts",
             "headerSubTitle":"Number of Contracts",
             "tableColumns":[
-                {"label":"Contract Id","column":"contract_number","format":"text","tooltip":60},
-                {"label":"Purpose","column":"contract_purpose","format":"text","tooltip":60},
-                {"label":"Contracting Agency","column":"agency_name","format":"text","tooltip":60},
-                {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":60},
+                {"label":"Contract Id","column":"contract_number","format":"text","tooltip":40},
+                {"label":"Purpose","column":"contract_purpose","format":"text","tooltip":40},
+                {"label":"Contracting Agency","column":"agency_name","format":"text","tooltip":40},
+                {"label":"Prime Vendor","column":"prime_vendor_name","format":"text","tooltip":40},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
-                {"label":"Total Contract<br/>Amount","column":"total_contract_amount","format":"dollar"}
+                {"label":"Total Contract<br/>Amount&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;","column":"total_contract_amount","format":"dollar"}
             ],
             "orderBy":"check_amount desc",
             "defaultLimit":5,
@@ -114,7 +114,7 @@
             "headerTitle":"Top 5 Industries",
             "headerSubTitle":"Spending by Industries",
             "tableColumns":[
-                {"label":"Industry","column":"industry_type_name","format":"text","tooltip":60},
+                {"label":"Industry","column":"industry_type_name","format":"text","tooltip":40},
                 {"label":"YTD Spending","column":"check_amount","format":"dollar"},
                 {"label":"% Spending","column":"percent_spending","format":"percent"}
             ],
@@ -127,7 +127,7 @@
             "serviceName":"SpendingDataService",
             "dataFunction":"GetMwbeSpendingByYears",
             "tableColumns":[
-                {"label":"Fiscal Year","column":"fiscal_year","format":"text","tooltip":60},
+                {"label":"Fiscal Year","column":"fiscal_year","format":"text","tooltip":40},
                 {"label":"Total M/WBE","column":"total_mwbe_spending","format":"dollar"},
                 {"label":"Asian American","column":"asian_american_spending","format":"dollar"},
                 {"label":"Black American","column":"black_american_spending","format":"dollar"},

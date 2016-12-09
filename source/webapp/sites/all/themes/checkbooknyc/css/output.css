@@ -1103,11 +1103,11 @@ div.simple-data-table th.percent-heading {
   color: #ffffff;
   font-size: 0.75em;
   font-weight: 400;
-  line-height: 10px;
+  line-height: 12px;
   padding-bottom: 1em;
-  padding-left: 1em;
+  padding-right: 1em;
   padding-top: 1em;
-  text-align: center;
+  text-align: right;
   text-transform: uppercase;
   white-space: nowrap; }
 div.simple-data-table th.date-heading,
@@ -1116,9 +1116,9 @@ div.simple-data-table th.text-heading {
   color: #ffffff;
   font-size: 0.75em;
   font-weight: 400;
-  line-height: 10px;
+  line-height: 12px;
   padding-bottom: 1em;
-  padding-left: 1em;
+  padding-right: 1em;
   padding-top: 1em;
   text-align: left;
   text-transform: uppercase;
@@ -1128,17 +1128,17 @@ div.simple-data-table td.number-column,
 div.simple-data-table td.percent-column {
   border-top: 1px solid #f4f5f5;
   font-size: 11px;
-  line-height: 30px;
-  padding-left: 1em;
-  padding-right: 3em;
+  padding-right: 1em;
   text-align: right; }
 div.simple-data-table td.date-column,
 div.simple-data-table td.text-column {
   border-top: 1px solid #f4f5f5;
   font-size: 11px;
   line-height: 30px;
-  padding-left: 1em;
+  padding-right: 1em;
   text-align: left; }
+div.simple-data-table th:first-of-type, div.simple-data-table td:first-of-type {
+  padding-left: 1em; }
 div.simple-data-table div.simple-data-table-links {
   float: right; }
 div.simple-data-table div.simple-data-table-links > div {
