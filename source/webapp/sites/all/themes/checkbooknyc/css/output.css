@@ -871,7 +871,7 @@ div.landing {
     div.landing div.data-visualization div.map-section-container {
       margin-top: 30px; }
       div.landing div.data-visualization div.map-section-container div.heat-map {
-        background-image: url("../images/heatmap.jpeg");
+        background-image: url("../images/heatmap2.jpeg");
         display: block;
         width: 950px;
         height: 500px;
@@ -1095,7 +1095,7 @@ div.simple-data-table div.simple-data-table-sort:after {
   display: inline-block;
   height: 9px;
   margin-left: 5px;
-  width: 10px; }
+  width: 9px; }
 div.simple-data-table th.dollar-heading,
 div.simple-data-table th.number-heading,
 div.simple-data-table th.percent-heading {
