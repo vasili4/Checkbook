@@ -1090,16 +1090,16 @@ div.simple-data-table div.simple-data-table-sort:after {
   background-repeat: no-repeat;
   content: "";
   display: inline-block;
-  height: 7px;
+  height: 9px;
   margin-left: 5px;
-  width: 7px; }
+  width: 9px; }
 div.simple-data-table th.dollar-heading,
 div.simple-data-table th.number-heading,
 div.simple-data-table th.percent-heading {
   border: none;
   color: #000000;
   font-size: 0.75em;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 12px;
   padding-bottom: 1em;
   padding-right: 1em;
@@ -1112,7 +1112,7 @@ div.simple-data-table th.text-heading {
   border: none;
   color: #000000;
   font-size: 0.75em;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 12px;
   padding-bottom: 1em;
   padding-right: 1em;

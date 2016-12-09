@@ -1093,9 +1093,9 @@ div.simple-data-table div.simple-data-table-sort:after {
   background-repeat: no-repeat;
   content: "";
   display: inline-block;
-  height: 7px;
+  height: 9px;
   margin-left: 5px;
-  width: 7px; }
+  width: 10px; }
 div.simple-data-table th.dollar-heading,
 div.simple-data-table th.number-heading,
 div.simple-data-table th.percent-heading {
