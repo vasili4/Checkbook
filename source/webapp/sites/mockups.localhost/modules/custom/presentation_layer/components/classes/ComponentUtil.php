@@ -20,6 +20,10 @@ class ComponentUtil {
         return theme('simple_data_table',array('viewModel'=>$viewModel));
     }
 
+    static function DisplayFooterComponent() {
+        return theme('footer',array('viewModel'=> null));
+    }
+
     /**
      * Function will read the configuration file and return the viewModel
      *
