@@ -178,7 +178,7 @@ div.landing {
 
       > span {
         color: $main;
-        font-weight: bold;
+        font-weight: 800;
         letter-spacing: 0.05em;
         margin: auto;
         padding: 1em 2em;
@@ -199,6 +199,7 @@ div.landing {
 
         &.subdomain.active {
           color: $main;
+          font-weight: 600;
         }
 
         + div {
@@ -416,10 +417,10 @@ div.landing {
       margin-top: 30px;
 
       div.heat-map {
-        background-image: url("../images/heatmap.jpeg");
+        background-image: url("../images/heatmap2.jpeg");
         display: block;
-        height: 799px;
-        width: 960px;
+        width: 950px;
+        height: 500px;
         margin-top: 30px;
       }
 

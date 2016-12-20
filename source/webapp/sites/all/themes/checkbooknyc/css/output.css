@@ -267,12 +267,14 @@ div.home {
       text-align: right;
       text-transform: uppercase; }
       div.home .search .search__input-options li {
-        color: #49463b;
+        color: #656257;
         cursor: pointer;
         display: inline-block;
         height: 21px;
         line-height: 2;
         margin-left: 5px;
+        letter-spacing: 0.7px;
+        font-weight: 600;
         padding: 0 4px 0 5px;
         transition: 0.25s ease-in-out; }
         div.home .search .search__input-options li:hover {
@@ -572,7 +574,7 @@ div.landing {
       div.landing div.filter .spending-filter > span,
       div.landing div.filter .subdomain-filter > span {
         color: #697884;
-        font-weight: bold;
+        font-weight: 800;
         letter-spacing: 0.05em;
         margin: auto;
         padding: 1em 2em; }
@@ -590,7 +592,8 @@ div.landing {
           color: #697884; }
         div.landing div.filter .spending-filter div.subdomain.active,
         div.landing div.filter .subdomain-filter div.subdomain.active {
-          color: #697884; }
+          color: #697884;
+          font-weight: 600; }
         div.landing div.filter .spending-filter div + div,
         div.landing div.filter .subdomain-filter div + div {
           border-left: 1px solid #b1b0ad; }
@@ -746,10 +749,10 @@ div.landing {
     div.landing div.data-visualization div.map-section-container {
       margin-top: 30px; }
       div.landing div.data-visualization div.map-section-container div.heat-map {
-        background-image: url("../images/heatmap.jpeg");
+        background-image: url("../images/heatmap2.jpeg");
         display: block;
-        height: 799px;
-        width: 960px;
+        width: 950px;
+        height: 500px;
         margin-top: 30px; }
       div.landing div.data-visualization div.map-section-container div.map-data-tables-container {
         margin-top: 30px; }
@@ -968,9 +971,9 @@ div.simple-data-table div.simple-data-table-sort:after {
   background-repeat: no-repeat;
   content: "";
   display: inline-block;
-  height: 7px;
+  height: 9px;
   margin-left: 5px;
-  width: 7px; }
+  width: 9px; }
 div.simple-data-table th.dollar-heading,
 div.simple-data-table th.number-heading,
 div.simple-data-table th.percent-heading {
@@ -978,11 +981,11 @@ div.simple-data-table th.percent-heading {
   color: #ffffff;
   font-size: 0.75em;
   font-weight: 400;
-  line-height: 10px;
+  line-height: 12px;
   padding-bottom: 1em;
-  padding-left: 1em;
+  padding-right: 1em;
   padding-top: 1em;
-  text-align: center;
+  text-align: right;
   text-transform: uppercase;
   white-space: nowrap; }
 div.simple-data-table th.date-heading,
@@ -991,9 +994,9 @@ div.simple-data-table th.text-heading {
   color: #ffffff;
   font-size: 0.75em;
   font-weight: 400;
-  line-height: 10px;
+  line-height: 12px;
   padding-bottom: 1em;
-  padding-left: 1em;
+  padding-right: 1em;
   padding-top: 1em;
   text-align: left;
   text-transform: uppercase;
@@ -1003,17 +1006,17 @@ div.simple-data-table td.number-column,
 div.simple-data-table td.percent-column {
   border-top: 1px solid #f4f5f5;
   font-size: 11px;
-  line-height: 30px;
-  padding-left: 1em;
-  padding-right: 3em;
+  padding-right: 1em;
   text-align: right; }
 div.simple-data-table td.date-column,
 div.simple-data-table td.text-column {
   border-top: 1px solid #f4f5f5;
   font-size: 11px;
   line-height: 30px;
-  padding-left: 1em;
+  padding-right: 1em;
   text-align: left; }
+div.simple-data-table th:first-of-type, div.simple-data-table td:first-of-type {
+  padding-left: 1em; }
 div.simple-data-table div.simple-data-table-links {
   float: right; }
 div.simple-data-table div.simple-data-table-links > div {
@@ -1085,4 +1088,4 @@ body.page-spending-landing {
 div.region-content {
   height: 100%; }
 
-/*# sourceMappingURL=output.css.map */
+/*# sourceMappingURL=main.css.map */

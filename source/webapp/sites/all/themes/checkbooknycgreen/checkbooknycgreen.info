@@ -9,6 +9,8 @@ screenshot = 'screenshot.png'
 stylesheets[all][] = css/output.css
 stylesheets[all][] = css/nvd3.css
 
+; SCRIPTS
+scripts[] = 'js/nvd3.js'
 
 regions[page_top] = 'Page Top'
 regions[page_bottom] = 'Page Bottom'
