@@ -155,23 +155,31 @@ div.home {
   }
 }
 
+.domain-label {
+  color: $main;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
 .domain-icons {
   display: flex;
-  margin-top: 21px;
+  justify-content: space-between;
+  margin-top: 30px;
   text-align: center;
 
   .domain {
     color: $main;
     cursor: pointer;
-    flex: 1;
     position: relative;
     text-decoration: none;
 
     > div:first-of-type {
-      height: 50px;
+      height: 75px;
       margin: auto;
-      width: 80px;
       transition: 0.25s ease-in-out;
+      width: 75px;
 
       &.spending-ico {
         @include enterspending-ico($iconfill);
@@ -236,11 +244,10 @@ div.home {
 
     div {
       transition: 0.25s ease-in-out;
+      font-size: 13px;
 
       &.label {
-        font-size: 13px;
-        font-weight: bold;
-        margin-top: 10px;
+        margin-top: 20px;
         text-transform: uppercase;
         transition: 0.25s ease-in-out;
       }
