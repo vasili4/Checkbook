@@ -134,11 +134,10 @@
       </div>
     </div>
   <div class="footer__right-links">
-    <div class="comptroller-logo"></div>
     <div>Office&nbsp;of&nbsp;the&nbsp;Comptroller - City&nbsp;of&nbsp;New&nbsp;York
       <br> One&nbsp;Centre&nbsp;Street, New&nbsp;York,&nbsp;NY | Phone:&nbsp;212.669.3916
     </div>
-
+    <div class="comptroller-logo"></div>
   </div>
   </div>
   <div class="footer__bottom-links">

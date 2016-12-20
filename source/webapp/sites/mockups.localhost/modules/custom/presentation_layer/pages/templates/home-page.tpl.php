@@ -24,49 +24,35 @@
       <span>total nyc contracts</span>
     </div>
   </div>
-
-  <div class="home__front-links">
-    <div class="home__front-links--domains">
-      <div class="domains-img"></div>
-      <div class="domain-text">
-        <span>How does the city spend your money?<span><br>
-          <span class="enter">Enter domains</span>
-      </div>
-    </div>
-    <div class="domain-select">
-      <span>select a domain</span>
-      <div class="domain-select-close">&times;</div>
-      <div class="domain-icons">
-        <a href="/spending_landing" class="domain">
-          <div class="spending-ico"></div>
-          <span>spending</span>
-        </a>
-        <a href="javascript:void(0);" class="domain">
-          <div class="budget-ico"></div>
-          <span>budget</span>
-        </a>
-        <a href="javascript:void(0);" class="domain">
-          <div class="revenue-ico"></div>
-          <span>revenue</span>
-        </a>
-        <a href="javascript:void(0);" class="domain">
-          <div class="contracts-ico"></div>
-          <span>contract</span>
-        </a>
-        <a href="javascript:void(0);" class="domain">
-          <div class="payroll-ico"></div>
-          <span>payroll</span>
-        </a>
-      </div>
-    </div>
-    <div class="home__front-links--bonds">
-      <div class="bonds-img"></div>
-      <div class="domain-text">
-        <span>How does lending impact our budget?</span><br>
-        <span class="enter">Enter bonds</span>
-      </div>
-    </div>
+  <?php $domains = MockData::SpendingByDomains(); ?>
+  <div class="domain-icons">
+    <a href="/spending_landing" class="domain">
+      <div class="spending-ico"></div>
+      <div class="label">spending</div>
+      <div><?php echo($domains[0]["value"]); ?></div>
+    </a>
+    <a href="javascript:void(0);" class="domain">
+      <div class="budget-ico"></div>
+      <div class="label">budget</div>
+      <div><?php echo($domains[1]["value"]); ?></div>
+    </a>
+    <a href="javascript:void(0);" class="domain">
+      <div class="revenue-ico"></div>
+      <div class="label">revenue</div>
+      <div><?php echo($domains[2]["value"]); ?></div>
+    </a>
+    <a href="javascript:void(0);" class="domain">
+      <div class="contracts-ico"></div>
+      <div class="label">contract</div>
+      <div><?php echo($domains[3]["value"]); ?></div>
+    </a>
+    <a href="javascript:void(0);" class="domain">
+      <div class="payroll-ico"></div>
+      <div class="label">payroll</div>
+      <div><?php echo($domains[4]["value"]); ?></div>
+    </a>
   </div>
+
 </div>
 
 <footer>

@@ -113,7 +113,6 @@ nav {
     > div,
     a {
       color: $navlink;
-      // flex: 1;
       margin-top: 5px;
       text-align: center;
       text-decoration: none;
@@ -137,6 +136,7 @@ nav {
   }
 }
 
+.nav-domains,
 .nav-help,
 .nav-search-tools,
 .nav-trends {

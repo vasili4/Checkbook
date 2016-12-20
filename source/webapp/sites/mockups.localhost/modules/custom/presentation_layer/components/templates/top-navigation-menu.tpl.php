@@ -7,7 +7,6 @@
     </div>
     <div class="nav-home"><a href="/">home</a></div>
     <div class="nav-dropdown domain-select-nav"><a href="javascript:void(0);">domains</a></div>
-    <div class="nav-bonds"><a href="javascript:void(0);">bonds</a></div>
     <div class="nav-dropdown trends-select"><a href="javascript:void(0);">trends</a></div>
     <div class="nav-dropdown search-tools-select"><a href="javascript:void(0);">search&nbsp;tools</a></div>
     <div class="nav-dropdown help-select"><a href="javascript:void(0);">help</a></div>
@@ -16,23 +15,18 @@
 <div class="nav-submenu nav-domains">
     <div class="nav-dropdown__list">
         <a href="javascript:void(0);" class="budget">
-            <div><?php echo($domains[0]["value"]); ?></div>
             <div><?php echo($domains[0]["name"]); ?></div>
         </a>
         <a href="javascript:void(0);" class="revenue">
-            <div><?php echo($domains[1]["value"]); ?></div>
             <div><?php echo($domains[1]["name"]); ?></div>
         </a>
         <a href="/spending_landing" class="spending">
-            <div><?php echo($domains[2]["value"]); ?></div>
             <div><?php echo($domains[2]["name"]); ?></div>
         </a>
         <a href="javascript:void(0);" class="contracts">
-            <div><?php echo($domains[3]["value"]); ?></div>
             <div><?php echo($domains[3]["name"]); ?></div>
         </a>
         <a href="javascript:void(0);" class="payroll">
-            <div><?php echo($domains[4]["value"]); ?></div>
             <div><?php echo($domains[4]["name"]); ?></div>
         </a>
     </div>
