@@ -24,7 +24,6 @@
       <span>total nyc contracts</span>
     </div>
   </div>
-  <div class="domain-label">explore domains</div>
   <?php $domains = MockData::SpendingByDomains(); ?>
   <div class="domain-icons">
     <a href="/spending_landing" class="domain">

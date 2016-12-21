@@ -335,13 +335,6 @@ div.home {
           transform: rotate(45deg);
           width: 0; }
 
-.domain-label {
-  color: #697884;
-  font-size: 1.2em;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin-bottom: 10px; }
-
 .domain-icons {
   display: flex;
   justify-content: space-between;
