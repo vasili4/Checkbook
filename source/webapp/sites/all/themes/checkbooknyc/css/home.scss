@@ -64,7 +64,7 @@ div.home {
         height: 21px;
         line-height: 2;
         margin-left: 5px;
-        letter-spacing: 0.7px;
+        letter-spacing: 0.5px;
         font-weight: 600;
         padding: 0 4px 0 5px;
         transition: 0.25s ease-in-out;
@@ -159,22 +159,32 @@ div.home {
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
+  padding: 0 17px;
   text-align: center;
 
   .domain {
-    color: $main;
+    color: $search-link;
     cursor: pointer;
     position: relative;
     text-decoration: none;
 
+    &.spending {
+      div.label {
+        margin-top: 7px;
+      }
+    }
+
     > div:first-of-type {
-      height: 75px;
+      height: 50px;
       margin: auto;
       transition: 0.25s ease-in-out;
-      width: 75px;
+      width: 50px;
 
       &.spending-ico {
         @include enterspending-ico($iconfill);
+        height: 73px;
+        width: 75px;
+        margin-top: -10px;
 
         &:hover {
           @include enterspending-ico($iconhover);
@@ -237,6 +247,9 @@ div.home {
     div {
       transition: 0.25s ease-in-out;
       font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .4px;
+      margin-top: 1px;
 
       &.label {
         margin-top: 20px;

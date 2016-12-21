@@ -26,7 +26,7 @@
   </div>
   <?php $domains = MockData::SpendingByDomains(); ?>
   <div class="domain-icons">
-    <a href="/spending_landing" class="domain">
+    <a href="/spending_landing" class="domain spending">
       <div class="spending-ico"></div>
       <div class="label">spending</div>
       <div><?php echo($domains[0]["value"]); ?></div>
@@ -43,7 +43,7 @@
     </a>
     <a href="javascript:void(0);" class="domain">
       <div class="contracts-ico"></div>
-      <div class="label">contract</div>
+      <div class="label">contracts</div>
       <div><?php echo($domains[3]["value"]); ?></div>
     </a>
     <a href="javascript:void(0);" class="domain">
