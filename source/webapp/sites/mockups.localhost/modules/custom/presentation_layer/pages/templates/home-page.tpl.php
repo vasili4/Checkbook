@@ -34,12 +34,12 @@
     <a href="javascript:void(0);" class="domain">
       <div class="revenue-ico"></div>
       <div class="label">revenue</div>
-      <div><?php echo($domains[2]["value"]); ?></div>
+      <div><?php echo($domains[1]["value"]); ?></div>
     </a>
     <a href="/spending_landing" class="domain spending">
       <div class="spending-ico"></div>
       <div class="label">spending</div>
-      <div><?php echo($domains[1]["value"]); ?></div>
+      <div><?php echo($domains[2]["value"]); ?></div>
     </a>
     <a href="javascript:void(0);" class="domain">
       <div class="contracts-ico"></div>
