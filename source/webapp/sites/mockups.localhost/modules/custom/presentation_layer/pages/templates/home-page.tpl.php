@@ -29,7 +29,7 @@
     <a href="javascript:void(0);" class="domain">
       <div class="budget-ico"></div>
       <div class="label">budget</div>
-      <div><?php echo($domains[1]["value"]); ?></div>
+      <div><?php echo($domains[0]["value"]); ?></div>
     </a>
     <a href="javascript:void(0);" class="domain">
       <div class="revenue-ico"></div>
@@ -39,7 +39,7 @@
     <a href="/spending_landing" class="domain spending">
       <div class="spending-ico"></div>
       <div class="label">spending</div>
-      <div><?php echo($domains[0]["value"]); ?></div>
+      <div><?php echo($domains[1]["value"]); ?></div>
     </a>
     <a href="javascript:void(0);" class="domain">
       <div class="contracts-ico"></div>
