@@ -34,6 +34,10 @@
                 "widget_config":"spending_by_contracts_view",
                 "legacy_node_id": 20,
                 "visibility_parameters":["-category:2"]
+            },
+            "transaction_table":{
+                "widget_config":"mwbe_spending_transaction_data_table",
+                "legacy_node_id": 706
             }
         }
     },

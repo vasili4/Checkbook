@@ -316,4 +316,64 @@
             GROUP BY s0.agency_id, s0.year_id, s0.type_of_year, a.agency_name
         </sql>
     </statement>
+    <statement name="GetSpendingTransactionData" datasource="checkbook">
+        <param name="year" required ="true" type="int" />
+        <param name="yeartype" required ="true" type="string"/>
+        <param name="agency" type="int" />
+        <param name="vendor" type="int" />
+        <param name="fvendor" type="int" />
+        <param name="category" type="int" />
+        <param name="industry" type="int" />
+        <param name="mwbe"/>
+        <param name="prime_or_sub" />
+        <sql>
+            SELECT a.disbursement_number,
+            a.agency_id,
+            a.vendor_id,
+            a.vendor_name,
+            a.vendor_type,
+            a.prime_vendor_id,
+            a.prime_vendor_name,
+            a.check_eft_issued_date,
+            a.agency_name,
+            a.department_name,
+            a.department_short_name,
+            a.check_amount,
+            a.expenditure_object_name,
+            a.budget_name,
+            a.reference_document_number,
+            a.purpose,
+            a.purpose_cy,
+            a.reporting_code,
+            a.spending_category_name,
+            a.expenditure_object_id,
+            a.department_id,
+            a.spending_category_id,
+            a.agreement_id,
+            a.reference_document_code,
+            a.sub_contract_id,
+            a.industry_type_id,
+            a.industry_type_name,
+            a.minority_type_id,
+            a.is_prime_or_sub,
+            b.original_agreement_id AS original_agreement_id_checkbook_sub_vendor_agid
+            FROM all_disbursement_transactions a
+            JOIN (
+            SELECT distinct original_agreement_id,
+            contract_number
+            FROM agreement_snapshot
+            <where>
+                <exp op="=" dbField="latest_flag">'Y'</exp>
+            </where>
+            )b ON b.contract_number = a.reference_document_number
+            <where>
+                <exp op="AND">
+                    <exp op="IN" dbField="a.is_prime_or_sub">('P','S')</exp>
+                    <exp op="=" dbField="a.check_eft_issued_nyc_year_id" paramName="year"/>
+                    <exp op="=" dbField="a.spending_category_id" paramName="category"/>
+                </exp>
+            </where>
+            ORDER BY check_amount DESC, disbursement_line_item_id DESC
+        </sql>
+    </statement>
 </statements>

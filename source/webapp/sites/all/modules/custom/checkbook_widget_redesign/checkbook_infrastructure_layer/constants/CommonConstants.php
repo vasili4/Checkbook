@@ -41,7 +41,7 @@ abstract class CheckbookDomain {
             preg_match('/contracts_pending/',$urlPath) || preg_match('/contracts_pending/',$urlPath)) {
             $domain = self::CONTRACTS;
         }
-        else if(preg_match('/spending_landing/',$urlPath) || preg_match('/spending_landing/',$ajaxPath)) {
+        else if(preg_match('/spending_landing/',$urlPath) || preg_match('/spending_landing/',$ajaxPath) || preg_match('/spending_transactions/',$urlPath) || preg_match('/spending_transactions/',$ajaxPath) ) {
             $domain = self::SPENDING;
         }
         else if(preg_match('/revenue/',$urlPath) || preg_match('/revenue/',$ajaxPath)) {
