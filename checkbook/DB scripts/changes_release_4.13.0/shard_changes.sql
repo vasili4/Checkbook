@@ -1321,7 +1321,12 @@ DROP TABLE IF EXISTS subcontract_status_by_prime_contract_id;
             effective_begin_year_id smallint,
             effective_end_year_id smallint,
             sort_order smallint,
-            latest_flag char(1)
+            latest_flag char(1),
+            award_method_id smallint,
+            award_method_name character varying,
+            industry_type_id smallint,
+            industry_type_name character varying(50),
+            award_size_id smallint
             )
             DISTRIBUTED BY (original_agreement_id);
 
@@ -1359,7 +1364,12 @@ DROP TABLE IF EXISTS subcontract_status_by_prime_contract_id;
             effective_begin_year_id smallint,
             effective_end_year_id smallint,
             sort_order smallint,
-            latest_flag char(1)
+            latest_flag char(1),
+            award_method_id smallint,
+            award_method_name character varying,
+            industry_type_id smallint,
+            industry_type_name character varying(50),
+            award_size_id smallint
             )
             EXECUTE E' psql -h mdw1 -p 5432  checkbook -c "copy public.subcontract_status_by_prime_contract_id to stdout csv"' ON SEGMENT 0 
             FORMAT 'csv' (delimiter E',' null E'' escape E'"' quote E'"')
@@ -1395,7 +1405,12 @@ DROP TABLE IF EXISTS subcontract_status_by_prime_contract_id;
             subcontract_status_by_prime_contract_id__0.effective_begin_year_id,
             subcontract_status_by_prime_contract_id__0.effective_end_year_id,
             subcontract_status_by_prime_contract_id__0.sort_order,
-            subcontract_status_by_prime_contract_id__0.latest_flag
+            subcontract_status_by_prime_contract_id__0.latest_flag,
+            subcontract_status_by_prime_contract_id__0.award_method_id,
+            subcontract_status_by_prime_contract_id__0.award_method_name,
+            subcontract_status_by_prime_contract_id__0.industry_type_id,
+            subcontract_status_by_prime_contract_id__0.industry_type_name,
+            subcontract_status_by_prime_contract_id__0.award_size_id
             FROM  subcontract_status_by_prime_contract_id__0;
 
     SET search_path = public;
