@@ -317,8 +317,7 @@ INSERT INTO agreement_snapshot(
 UPDATE agreement_snapshot a
 SET scntrc_status = 1
 FROM ref_document_code c
-WHERE a.latest_flag='Y' 
-AND a.effective_end_date >= '2015-07-01'
+WHERE a.effective_end_date >= '2015-07-01'
 AND a.document_code_id=c.document_code_id 
 AND c.document_code in ('CT1','CTA1','CT2');
 
@@ -328,7 +327,6 @@ SET scntrc_status = b.scntrc_status
 FROM subcontract_status b, ref_document_code c
 WHERE a.contract_number = b.contract_number 
 AND a.document_code_id=c.document_code_id
-AND a.latest_flag='Y' 
 AND a.effective_end_date >= '2015-07-01'
 AND c.document_code in ('CT1','CTA1','CT2');
 
@@ -463,8 +461,7 @@ INSERT INTO agreement_snapshot_cy(
 UPDATE agreement_snapshot_cy a
 SET scntrc_status = 1
 FROM ref_document_code c
-WHERE a.latest_flag='Y' 
-AND a.effective_end_date >= '2015-07-01'
+WHERE a.effective_end_date >= '2015-07-01'
 AND a.document_code_id=c.document_code_id 
 AND c.document_code in ('CT1','CTA1','CT2');
 
@@ -474,7 +471,6 @@ SET scntrc_status = b.scntrc_status
 FROM subcontract_status b, ref_document_code c
 WHERE a.contract_number = b.contract_number 
 AND a.document_code_id=c.document_code_id
-AND a.latest_flag='Y' 
 AND a.effective_end_date >= '2015-07-01'
 AND c.document_code in ('CT1','CTA1','CT2');
 

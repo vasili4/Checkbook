@@ -2196,7 +2196,12 @@ SELECT  original_agreement_id ,
 	minority_type_name,
 	master_agreement_yn,
 	status_flag,
-	scntrc_status
+	CASE
+ 		WHEN (scntrc_status IS NULL OR scntrc_status = 0) AND (fiscal_year >= 2016) then 1
+		WHEN (scntrc_status = 1) AND (fiscal_year < 2016) then 0
+		WHEN (scntrc_status IS NULL) then 0
+		ELSE scntrc_status
+	END as scntrc_status
 FROM	
 (SELECT original_agreement_id,
 	agreement_id,
@@ -2412,7 +2417,12 @@ SELECT  original_agreement_id ,
 	minority_type_name,
 	master_agreement_yn,
 	status_flag,
-	scntrc_status
+	CASE
+		WHEN (scntrc_status IS NULL OR scntrc_status = 0) AND (fiscal_year >= 2016) then 1
+		WHEN (scntrc_status = 1) AND (fiscal_year < 2016) then 0
+		WHEN (scntrc_status IS NULL) then 0
+		ELSE scntrc_status
+	END as scntrc_status
 FROM	
 (SELECT original_agreement_id,
 	agreement_id,
