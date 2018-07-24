@@ -565,79 +565,57 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
     function _checkbook_smart_search_autocomplete()
     {
 
-        $search_term = htmlspecialchars_decode($_REQUEST['term'], ENT_QUOTES);
+        $search_term = trim(htmlspecialchars_decode($_REQUEST['term'], ENT_QUOTES));//eco
 
-        $regex1 = escapeRegex('(.* ');
-        $regex2 = escapeRegex('.*)|(^');
-        $regex3 = escapeRegex('.*)');
-        $search_term = _checkbook_autocomplete_escapeSolrValue(strtolower($search_term));
 
-        $search_term = $regex1 . $search_term . $regex2 . $search_term . $regex3; //  (.* educ.*)|(^educ .*)
+        $hosts = [
 
-        $query = "terms/?terms.fl=agency_name"
-            . "&terms.fl=oge_agency_name"
-            . "&terms.fl=vendor_name"
-            . "&terms.fl=minority_type_name"
-            . "&terms.fl=revenue_category_name"
-            . "&terms.fl=expenditure_object_name"
-            . "&terms.regex=" . $search_term . "&wt=php";
+            'http://elk-checkbook-nyc.reisys.com:9200'
+        ];
 
-        $contents = _checkbook_smart_search_solr_results($query);
-
+        $client = Elasticsearch\ClientBuilder::create()
+            ->setHosts($hosts)
+            ->build();
+        $params['index'] = 'checkbook';
+        $params['type'] = 'payroll';
+        $params['body']['_source'] = ['agency_name'];
         $matches = array();
-        $count = 0;
-        foreach ($contents['terms'] as $key => $value) {
-            switch ($key) {
-                case 'agency_name':
-                    foreach ($value as $a => $b) {
-                        if (!in_array($a, $contents['terms']['oge_agency_name'])) {
-                            $count++;
-                            $url = "/smart_search?search_term=*|*agency_names=";
-                            $matches[] = array("url" => $url, "category" => "Agencies", "label" => $a, "value" => urlencode($a));
-                        }
-                    }
-                    break;
-                case 'oge_agency_name':
-                    foreach ($value as $a => $b) {
-                        $count++;
-                        $url = "/smart_search?search_term=*|*oge_agency_names=";
-                        $matches[] = array("url" => $url, "category" => "Other Government Entities", "label" => $a, "value" => urlencode($a));
-                    }
-                    break;
-                case 'vendor_name':
-                    foreach ($value as $a => $b) {
-                        $count++;
-                        $url = "/smart_search?search_term=*|*vendor_names=";
-                        array_push($matches, array("url" => $url, "category" => "Vendors (Prime Vendor, Sub Vendor, M/WBE Vendor)", "label" => $a, "value" => urlencode($a)));
-                    }
-                    break;
-                case 'minority_type_name':
-                    foreach ($value as $a => $b) {
-                        $count++;
-                        $url = "/smart_search?search_term=*|*minority_type_name=";
-                        array_push($matches, array("url" => $url, "category" => "M/WBE Category", "label" => $a, "value" => urlencode($a)));
-                    }
-                    break;
-                /*case 'revenue_category_name':
-                    foreach ($value as $a=>$b){
-                        $count++
-                        $url = "/smart_search?search_term=*|*revenue_categories=";
-                        array_push($matches, array("url"=>$url,"category"=>"Revenue Categories" ,"label" => $a, "value" => urlencode($a)));
-                    }
-                    break;*/
-                case 'expenditure_object_name':
-                    foreach ($value as $a => $b) {
-                        $count++;
-                        $url = "/smart_search?search_term=*|*expense_categories=";
-                        array_push($matches, array("url" => $url, "category" => "Expense Categories", "label" => $a, "value" => urlencode($a)));
-                    }
-                    break;
+
+        $regex1 = '(.* ';
+        $regex2 = '.*)|(^';
+        $regex3 = '.*)';
+
+        $search_term = '(.*' . $search_term . '.*)';
+        $search_term = str_replace('%20', ' ', $search_term);
+
+        if (!empty($search_term)) {
+
+            $params['body']['query']['regexp']['agency_name']['value'] = $search_term;
+            $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
+
+            try {
+                $response = $client->search($params);
+            } catch (Exception $e) {
+                var_dump($e->getMessage());
             }
 
+            $values = $response['aggregations']['names']['buckets'];
+            if(empty($values)){
+                $matches[]= array("url" => "", "label" => '<span>' . "No matches found" . '</span>', 'value' => 'No matches found');
+            }
+            else {
+                foreach ($values as $key => $value) {
+                    $a = strtolower($value['key']);
+                    $url = "/smart_search?search_term=*|*agency_names=";
+                    $matches[] = array("url" => $url, "category" => "Agencies", "label" => $a, "value" => urlencode($a));
+                }
+            }
+
+
+
         }
-        if ($count == 0) {
-            array_push($matches, array("url" => "", "label" => '<span>' . "No matches found" . '</span>', 'value' => 'No matches found'));
-        }
+
+
 
         return drupal_json_output($matches);
     }
@@ -685,15 +663,21 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             }
 
             $values = $response['aggregations']['names']['buckets'];
-            foreach ($values as $key => $value) {
-                $a = strtolower($value['key']);
-                $url = "/smart_search?search_term=*|*agency_names=";
-                $matches[] = array("url" => $url, "category" => "Agencies", "label" => $a, "value" => urlencode($a));
+            if(empty($values)){
+                $matches[]= array("url" => "", "label" =>  "No matches found", 'value' => 'No matches found');
+            }
+            else {
+                foreach ($values as $key => $value) {
+                    $a = strtolower($value['key']);
+                    $url = "/smart_search?search_term=*|*agency_names=";
+                    $matches[] = array("url" => $url, "category" => "Agencies", "label" => $a, "value" => urlencode($a));
+                }
             }
 
-            return drupal_json_output($matches);
-
         }
+
+        return drupal_json_output($matches);
+
 
     }
 
