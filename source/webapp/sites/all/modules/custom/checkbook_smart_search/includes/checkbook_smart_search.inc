@@ -38,7 +38,7 @@ function _checkbook_smart_search_get_results(){
     $oges = _checkbook_smart_search_get_facet_results($search_terms, "oge_agency_names", NULL, -1);
     $agencies =  _checkbook_search_get_facet_results($search_terms, "agency_names", NULL, -1);
     $vendors = _checkbook_smart_search_get_facet_results($search_terms, "vendor_names", NULL, 100);
-   $vendor_type = _checkbook_smart_search_get_facet_results($search_terms, "vendor_type", NULL, 100);
+    $vendor_type = _checkbook_smart_search_get_facet_results($search_terms, "vendor_type", NULL, 100);
     $all_vendors = _checkbook_smart_search_get_facet_results($search_terms, "vendor_names", NULL, -1);
     $vendor_number = count($all_vendors['facet_counts']['facet_fields']['vendor_name']);
     $vendor_pages = floor($vendor_number / 100);
@@ -437,26 +437,87 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
     function _checkbook_search_get_facet_results($search_terms, $facet_name, $offset = null, $limit = null, $exclude = FALSE, $fromScroll = FALSE)
     {
-
+        $parameter_mapping = array(
+            "oge_agency_names" => "oge_agency_name",
+            "agency_names" => "agency_name",
+            "fiscal_years" => "fiscal_year",
+            "registered_fiscal_years" => "registered_fiscal_year",
+            "domains" => "domain",
+            "vendor_names" => "vendor_name",
+            "vendor_type" => "vendor_type",
+            "expense_categories" => "expenditure_object_name",
+            "revenue_categories" => "revenue_category_name",
+            "spending_categories" => "spending_category_name",
+            "contract_categories" => "contract_category_name",
+            "contract_status" => "contract_status",
+            "minority_type_name" => "minority_type_name",
+            "industry_type_name" => "industry_type_name",
+            "payroll_type" => "payroll_type"
+        );
         $hosts = [
 
             'http://elk-checkbook-nyc.reisys.com:9200'
         ];
-
         $client = Elasticsearch\ClientBuilder::create()
             ->setHosts($hosts)
             ->build();
         $params['index'] = 'checkbook';
         $params['type'] = 'payroll';
-        $params['body']['_source'] = ['agency_name'];
+        $params['body']['_source'] = 'agency_name';
         $matches = array();
+        $search_string = [];
+        $termcount = 0;
+        if($search_terms[0]=='*:*'){
+            $params['body']['aggs']['names']['terms']['field'] = $parameter_mapping[$facet_name].'.keyword';
+            $params['body']['aggs']['names']['terms']['size'] = 10000;
+        }
+        else{
+            for ($i = 1; $i < count($search_terms); $i++) {
+                $req_params = explode('=', $search_terms[$i]);
+                $filters = explode('~', urldecode($req_params[1]));
+                $sub_query = "";
 
-        $regex1 = '(.* ';
-        $regex2 = '.*)|(^';
-        $regex3 = '.*)';
+                foreach ($filters as $value) {
+                    if ($req_params[0] != $facet_name) {
+                        $sub_query .= "(" . $parameter_mapping[$req_params[0]] . ":" .
+                            _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . ")%20OR%20";
+                    } elseif ($req_params[0] == $facet_name && $exclude == TRUE) {
+                        $sub_query .= "-" . $parameter_mapping[$req_params[0]] . ":" . _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . "%20OR%20";
+                    } elseif ($req_params[0] == $facet_name) {
+                        $termcount++;
+                    }
+                }
 
-        $search_term = '(.*' . 'de' . '.*)';
-        $search_term = str_replace('%20', ' ', $search_term);
+                $sub_query = substr($sub_query, 0, -8);
+                if (strlen($sub_query) > 0)
+                    $search_string .= "&fq=" . $sub_query;
+            }
+        }
+
+
+       // $search_term = '(.*' . 'de' . '.*)';
+       // $search_term = str_replace('%20', ' ', $search_term);
+        for ($i = 1; $i < count($search_terms); $i++) {
+
+            $req_params = explode('=', $search_terms[$i]);
+            $filters = explode('~', urldecode($req_params[1]));
+            $sub_query = "";
+
+            foreach ($filters as $value) {
+                if ($req_params[0] != $facet_name) {
+                    $sub_query .= "(" . $parameter_mapping[$req_params[0]] . ":" .
+                        _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . ")%20OR%20";
+                } elseif ($req_params[0] == $facet_name && $exclude == TRUE) {
+                    $sub_query .= "-" . $parameter_mapping[$req_params[0]] . ":" . _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . "%20OR%20";
+                } elseif ($req_params[0] == $facet_name) {
+                    $termcount++;
+                }
+            }
+
+            $sub_query = substr($sub_query, 0, -8);
+            if (strlen($sub_query) > 0)
+                $search_string .= "&fq=" . $sub_query;
+        }
 
         if (!empty($search_term)) {
 
@@ -508,15 +569,6 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         for ($i = 1; $i < count($search_terms); $i++) {
 
             $req_params = explode('=', $search_terms[$i]);
-
-            if ($req_params[0] == 'vendor_type') {
-                $req_params[1] = get_vendor_type_mapping($req_params[1]);
-            }
-            if ($req_params[0] == 'contract_status') {
-                if ($req_params[1] == 'active') {
-                    $req_params[1] = 'registered';
-                }
-            }
 
             $filters = explode('~', urldecode($req_params[1]));
             $sub_query = "";
