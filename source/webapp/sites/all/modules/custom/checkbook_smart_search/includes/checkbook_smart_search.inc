@@ -81,23 +81,9 @@ function _checkbook_smart_search_get_results(){
             }
     }
 
-    $reg_flag = false;
-    $act_flag = false;
-    foreach($search_terms as $id => $keyvaluepair){
-        $keys = explode("=", $keyvaluepair);
-        if($keys[1] == 'registered'){
-            $reg_flag = true;
-        }
-        else{
-            $act_flag = true;
-        }
-    }
 
-    if($reg_flag){
-        $fiscal_years = _checkbook_smart_search_get_facet_results($search_terms, "registered_fiscal_years");
-    }else {
-        $fiscal_years = _checkbook_smart_search_get_facet_results($search_terms, "fiscal_years");
-    }
+        $fiscal_years = _checkbook_search_get_facet_results($search_terms, "fiscal_years");
+
 
 
 
@@ -108,7 +94,7 @@ function _checkbook_smart_search_get_results(){
         "vendor_name" => $vendors['facet_counts']['facet_fields'],
         "vendor_type" => $vendor_type['facet_counts']['facet_fields'],
         "expenditure_object_name" => $expense_categories['facet_counts']['facet_fields'],
-        "fiscal_year" => $fiscal_years['facet_counts']['facet_fields'],
+        "fiscal_year" =>  $fiscal_years['aggregations']['names']['buckets'],
         "registered_fiscal_year" => $fiscal_years['facet_counts']['facet_fields'],
         "spending_category_name" => $spending_categories['facet_counts']['facet_fields'],
         "contract_category_name" => $contract_categories['facet_counts']['facet_fields'],
@@ -475,54 +461,32 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             for ($i = 1; $i < count($search_terms); $i++) {
                 $req_params = explode('=', $search_terms[$i]);
                 $filters = explode('~', urldecode($req_params[1]));
-                $sub_query = "";
+                $sub_query = [];
 
                 foreach ($filters as $value) {
                     if ($req_params[0] != $facet_name) {
-                        $sub_query .= "(" . $parameter_mapping[$req_params[0]] . ":" .
-                            _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . ")%20OR%20";
+                        $sub_query['terms'][$parameter_mapping[$req_params[0]]][]= $value;
                     } elseif ($req_params[0] == $facet_name && $exclude == TRUE) {
-                        $sub_query .= "-" . $parameter_mapping[$req_params[0]] . ":" . _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . "%20OR%20";
+                        $sub_query['terms'][$parameter_mapping[$req_params[0]]][]= $value;
                     } elseif ($req_params[0] == $facet_name) {
                         $termcount++;
                     }
                 }
+                $params['body']['query']['constant_score']['filter']['bool']['should'][]=$sub_query;
 
-                $sub_query = substr($sub_query, 0, -8);
-                if (strlen($sub_query) > 0)
-                    $search_string .= "&fq=" . $sub_query;
             }
+            $params['body']['aggs']['names']['terms']['field'] ='fiscal_year.keyword';
+            //$parameter_mapping[$facet_name].'.keyword';
+            $params['body']['aggs']['names']['terms']['size'] = '';
         }
 
 
        // $search_term = '(.*' . 'de' . '.*)';
        // $search_term = str_replace('%20', ' ', $search_term);
-        for ($i = 1; $i < count($search_terms); $i++) {
 
-            $req_params = explode('=', $search_terms[$i]);
-            $filters = explode('~', urldecode($req_params[1]));
-            $sub_query = "";
 
-            foreach ($filters as $value) {
-                if ($req_params[0] != $facet_name) {
-                    $sub_query .= "(" . $parameter_mapping[$req_params[0]] . ":" .
-                        _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . ")%20OR%20";
-                } elseif ($req_params[0] == $facet_name && $exclude == TRUE) {
-                    $sub_query .= "-" . $parameter_mapping[$req_params[0]] . ":" . _checkbook_smart_search_escapeSolrValue('"' . $value . '"') . "%20OR%20";
-                } elseif ($req_params[0] == $facet_name) {
-                    $termcount++;
-                }
-            }
 
-            $sub_query = substr($sub_query, 0, -8);
-            if (strlen($sub_query) > 0)
-                $search_string .= "&fq=" . $sub_query;
-        }
 
-        if (!empty($search_term)) {
-
-            $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
-            $params['body']['aggs']['names']['terms']['size'] = 10000;
 
             try {
                 $response = $client->search($params);
@@ -538,7 +502,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             }
 
             return $response;
-        }
+
 
     }
 

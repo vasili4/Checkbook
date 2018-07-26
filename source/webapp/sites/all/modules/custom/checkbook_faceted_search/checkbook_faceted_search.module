@@ -718,7 +718,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         $ogeAgencies[] = $value[$key];
         break;
       case 'fiscal_year':
-        $fiscalYears[] = $value[$key];
+        $fiscalYears = $value;
         break;
       case 'registered_fiscal_year':
         $regfiscalYears[] = $value[$key];
@@ -941,16 +941,17 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
     }
   }
  // Active fiscal year
-  if (count($fiscalYears[0]) > 0) {
-    krsort($fiscalYears[0]);
-    foreach ($fiscalYears[0] as $fiscalYear => $count) {
-      if ($count > 0) {
-        $checked = in_array($fiscalYear, array_values_recursive($reqFiscalYears[0]));
-        if ($checked) {
-          $output['Fiscal Year']['checked'][] = array($fiscalYear, $fiscalYear, $count);
+  if (count($fiscalYears) > 0) {
+    krsort($fiscalYears);
+    foreach ($fiscalYears as $fiscalYear => $count) {
+       if ($count['doc_count'] > 0) {
+        $checked =  in_array($count['key'], array_values_recursive($reqAgencies[0]));
+            $fiscalYear= urlencode($count['key']);
+            if ($checked) {
+          $output['Fiscal Year']['checked'][] = array($fiscalYear, $count['key'], $count['doc_count']);
         }
         else {
-          $output['Fiscal Year']['unchecked'][] = array($fiscalYear, $fiscalYear, $count);
+          $output['Fiscal Year']['unchecked'][] = array($fiscalYear, $count['key'], $count['doc_count']);
         }
       }
     }
@@ -963,8 +964,9 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
       }
     }
   }
+
     // Registered fiscal year
-    if (!empty($regfiscalYears[0])) {
+   /* if (!empty($regfiscalYears[0])) {
         krsort($regfiscalYears[0]);
         foreach ($regfiscalYears[0] as $fiscalYear => $count) {
             if ($count > 0) {
@@ -984,6 +986,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
             }
         }
     }
+   */
     //Industry
     if (count($industryType) > 0) {
         foreach ($industryType[0] as $industryTypeName => $count) {
