@@ -449,56 +449,30 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             ->build();
         $params['index'] = 'checkbook';
         $params['type'] = 'payroll';
-        $params['body']['_source'] = 'agency_name';
-        $matches = array();
-        $search_string = [];
-        $termcount = 0;
-        if($search_terms[0]=='*:*'){
-            $params['body']['aggs']['names']['terms']['field'] = $parameter_mapping[$facet_name].'.keyword';
-            $params['body']['aggs']['names']['terms']['size'] = 10000;
+
+        for ($i = 1; $i < count($search_terms); $i++) {
+            $req_params = explode('=', $search_terms[$i]);
+
+            $filters = explode('~', urldecode($req_params[1]));
+
+         if ($req_params[0] != $facet_name) {
+
+          $params['body']['query']['constant_score']['filter']['bool']['must'][]['terms'][$parameter_mapping[$req_params[0]]] = array_map('strtolower', $filters);
+
+          }
         }
-        else{
-            for ($i = 1; $i < count($search_terms); $i++) {
-                $req_params = explode('=', $search_terms[$i]);
-                $filters = explode('~', urldecode($req_params[1]));
-                $sub_query = [];
 
-                foreach ($filters as $value) {
-                    if ($req_params[0] != $facet_name) {
-                        $sub_query['terms'][$parameter_mapping[$req_params[0]]][]= $value;
-                    } elseif ($req_params[0] == $facet_name && $exclude == TRUE) {
-                        $sub_query['terms'][$parameter_mapping[$req_params[0]]][]= $value;
-                    } elseif ($req_params[0] == $facet_name) {
-                        $termcount++;
-                    }
-                }
-                $params['body']['query']['constant_score']['filter']['bool']['should'][]=$sub_query;
-
-            }
-            $params['body']['aggs']['names']['terms']['field'] ='fiscal_year.keyword';
+            $params['body']['aggs']['names']['terms']['field'] =$parameter_mapping[$facet_name].'.keyword';
             //$parameter_mapping[$facet_name].'.keyword';
-            $params['body']['aggs']['names']['terms']['size'] = '';
-        }
-
-
-       // $search_term = '(.*' . 'de' . '.*)';
-       // $search_term = str_replace('%20', ' ', $search_term);
-
-
+            $params['body']['aggs']['names']['terms']['size'] = 1000;
 
 
 
             try {
                 $response = $client->search($params);
+
             } catch (Exception $e) {
-                var_dump($e->getMessage());
-            }
-
-            $values = $response['aggregations']['names']['buckets'];
-            foreach ($values as $key => $value) {
-                $a = strtolower($value['key']);
-
-                $matches[] = $a;
+                var_dump($params);
             }
 
             return $response;
