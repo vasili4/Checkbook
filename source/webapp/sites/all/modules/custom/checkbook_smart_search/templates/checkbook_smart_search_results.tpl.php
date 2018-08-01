@@ -184,9 +184,9 @@ if($noOfTotalResults > 0){
     if($domain_display == "budget"){
       $domain_display = "Expense Budget";
     }
-    print "<h3 class='title'>Transaction #". '1'.": ". $domain_display ."</h3>";
-    $transaction_no++;
-    switch('payroll'){
+      print "<h3 class='title'>Transaction #". $transaction_no .": ". $domain_display ."</h3>";
+      $transaction_no++;
+    switch( 'payroll'){
       case "revenue":
 
         print theme('revenue', array('revenue_results'=> $value, 'SearchTerm' => $searchTerms[0]));
