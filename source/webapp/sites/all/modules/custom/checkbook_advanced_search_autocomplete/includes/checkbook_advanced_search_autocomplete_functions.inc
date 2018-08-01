@@ -509,7 +509,7 @@ function _checkbook_advanced_search_autocomplete_payroll_name($pay_frequency, $a
 
     if (!empty($searchTerm)) {
 
-        $params['body']['query']['bool']['must'][]['regexp']['civil_service_title']['value']=$searchTerm;
+        $params['body']['query']['bool']['must'][]['match_phrase']['civil_service_title']=$searchTerm;
         if($pay_frequency){
             $params['body']['query']['bool']['must'][]['term']['pay_frequency']= $pay_frequency;
         }

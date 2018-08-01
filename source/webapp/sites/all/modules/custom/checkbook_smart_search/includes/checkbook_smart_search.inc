@@ -222,11 +222,12 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
     // $params['body']['size']=($page_no*$no_of_results)+10;
 
     if (!empty($search_term)) {
-        if($search_term=="*:*"){
+        if($search_term=="*:*" ){
             $params['body']['query']['match_all']['boost'] = 1.2;
             $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
         }
         else {
+
             $params['body']['query']['bool'] = $search_term;
             $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
             $params['body']['sort']['pay_date']['order'] = 'desc';
@@ -235,7 +236,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         try {
             $search_results = $client->search($params);
         } catch (Exception $e) {
-            var_dump($e->getMessage());
+            var_dump($params);
         }
 
 
@@ -274,7 +275,8 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             "payroll_type" => "payroll_type"
         );
 
-        $searchTerm = $search_terms[0];
+            $searchTerm = $search_terms[0];
+        
 
         for ($i = 1; $i < count($search_terms); $i++) {
             $reqParams = explode('=', $search_terms[$i]);
@@ -560,7 +562,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
@@ -623,7 +625,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
@@ -643,7 +645,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
         if (!empty($search_term)) {
 
-            $params['body']['query']['regexp']['agency_name']['value'] = $search_term;
+            $params['body']['query']['bool']['must']['match_phrase']['agency_name.autocomplete'] = $search_term;
             $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
 
             try {
