@@ -751,7 +751,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         $industryType[] = $value['industry_type_name'];
         break;
       case 'payroll_type':
-        $payrollType[] = $value['payroll_type'];
+        $payrollType = $value;
         break;
     }
   }
@@ -945,7 +945,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
     krsort($fiscalYears);
     foreach ($fiscalYears as $fiscalYear => $count) {
        if ($count['doc_count'] > 0) {
-        $checked =  in_array($count['key'], array_values_recursive($reqAgencies[0]));
+        $checked =  in_array($count['key'], array_values_recursive($reqFiscalYears[0]));
             $fiscalYear= urlencode($count['key']);
             if ($checked) {
           $output['Fiscal Year']['checked'][] = array($fiscalYear, $count['key'], $count['doc_count']);
@@ -955,6 +955,8 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         }
       }
     }
+
+
     $output['Fiscal Year']['name'] = 'fyear';
     if (!empty($reqFiscalYears[0])) {
       foreach($reqFiscalYears[0] as $key => $value){
@@ -1037,15 +1039,15 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
     }
     //Payroll Type
     if (count($payrollType) > 0) {
-        foreach ($payrollType[0] as $payrollTypeName => $count) {
-            if ($count > 0) {
-                $checked = in_array($payrollTypeName, array_values_recursive($reqpayrollType[0]));
-                $payrollTypeValue = urlencode($payrollTypeName);
+        foreach ($payrollType as $payrollTypeName => $count) {
+            if ($count['doc_count'] > 0) {
+                $checked = in_array($count['key'], array_values_recursive($reqpayrollType[0]));
+                $payrollTypeValue = urlencode($count['key']);
                 if ($checked) {
-                    $output['Payroll Type']['checked'][] = array($payrollTypeValue, $payrollTypeName, $count);
+                    $output['Payroll Type']['checked'][] = array($payrollTypeValue,  $count['key'], $count['doc_count']);
                 }
                 else {
-                    $output['Payroll Type']['unchecked'][] = array($payrollTypeValue, $payrollTypeName, $count);
+                    $output['Payroll Type']['unchecked'][] = array($payrollTypeValue, $count['key'], $count['doc_count']);
                 }
             }
         }

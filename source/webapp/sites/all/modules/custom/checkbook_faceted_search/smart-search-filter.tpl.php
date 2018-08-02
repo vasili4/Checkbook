@@ -304,7 +304,7 @@ foreach ($render_array as $title => $value) {
                 $checked_index = 0;
                 foreach ($value['checked'] as $row) {
                     $id = $id_title.$checked_index.'_checked';
-                   /* $yearID = _getYearIDFromValue($row[0]);
+                    $yearID = _getYearIDFromValue($row[0]);
                     if($title == 'Fiscal Year'){
                         if($yearID <= _getFiscalYearID()){
                             echo '<div class="row">';
@@ -313,13 +313,13 @@ foreach ($render_array as $title => $value) {
                             echo '<div class="number"><span class="active">' . number_format($row[2]) . '</span></div>';
                             echo '</div>';
                         }
-                    }else{*/
+                    }else{
                         echo '<div class="row">';
                         echo '<div class="checkbox"><input type="checkbox" id="'.$id.'" value="' . $row[0] . '" name="' . $value['name'] . '" checked="checked" onClick="javascript:applySearchFilters();"><label for="'.$id.'"></label></div>';
                         echo '<div class="name">' . htmlentities($row[1]) . '</div>';
                         echo '<div class="number"><span class="active">' . number_format($row[2]) . '</span></div>';
                         echo '</div>';
-                    //}
+                    }
                     $checked_index++;
                 }
             }

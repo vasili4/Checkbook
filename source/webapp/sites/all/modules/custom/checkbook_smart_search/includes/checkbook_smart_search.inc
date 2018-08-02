@@ -50,7 +50,7 @@ function _checkbook_smart_search_get_results(){
     drupal_add_js(array('checkbook_smart_search' => array('expense_category_pages' => $expense_category_pages)), 'setting');
     $mwbe_category = _checkbook_smart_search_get_facet_results($search_terms, "minority_type_name");
     $industry_type_name = _checkbook_smart_search_get_facet_results($search_terms, "industry_type_name");
-    $payroll_type = _checkbook_smart_search_get_facet_results($search_terms, "payroll_type"); //payroll_type
+    $payroll_type =  _checkbook_search_get_facet_results($search_terms, "payroll_type"); //payroll_type
 
 
    foreach($search_terms as $id => $keyvaluepair){
@@ -101,7 +101,7 @@ function _checkbook_smart_search_get_results(){
         "contract_status" => $contract_status['facet_counts']['facet_fields'],
         "mwbe_category" => $mwbe_category['facet_counts']['facet_fields'],
         "industry_type_name" => $industry_type_name['facet_counts']['facet_fields'],
-        "payroll_type" => $payroll_type['facet_counts']['facet_fields']
+        "payroll_type" => $payroll_type['aggregations']['names']['buckets']
 
     );
 
@@ -203,12 +203,12 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
 
     //$current_date = date("c").'Z';
-     $search_term = _checkbook_smart_search_get_results_query_search_term($search_terms);
+     $search_term = _checkbook_smart_search_get_results_query_search_term1($search_terms);
   //  $search_term['agency_name'];
 
     $hosts = [
 
-       'http://elk-checkbook-nyc.reisys.com:9200'
+       'http://localhost:9200'
 
     ];
 
@@ -221,27 +221,30 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
      $params['body']['from']=$page_no*$no_of_results;
     // $params['body']['size']=($page_no*$no_of_results)+10;
 
-    if (!empty($search_term)) {
+
         if($search_term=="*:*" ){
             $params['body']['query']['match_all']['boost'] = 1.2;
             $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
         }
         else {
 
-            $params['body']['query']['bool'] = $search_term;
+            $params['body']['query'] =$search_term;
             $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
             $params['body']['sort']['pay_date']['order'] = 'desc';
         }
 
         try {
+
             $search_results = $client->search($params);
+            var_dump($params);
+
         } catch (Exception $e) {
             var_dump($params);
         }
 
 
         return array('search_results' => $search_results, 'active_contracts' => null, 'registered_contracts' => null);
-    }
+
 }
 
 
@@ -274,29 +277,92 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             "industry_type_name" => "industry_type_name",
             "payroll_type" => "payroll_type"
         );
+        $searchTerm = $search_terms[0];
+          if(count($search_terms)==1) {
+              if($search_terms[0]!=="*:*"){
+                  $subQuery['multi_match']['query']='department';
+                  $subQuery['multi_match']['fields']=["agency_name.autocomplete"];
 
-            $searchTerm = $search_terms[0];
-        
+                  $searchTerm = $subQuery;
+              }
 
-        for ($i = 1; $i < count($search_terms); $i++) {
-            $reqParams = explode('=', $search_terms[$i]);
+          }
+          else {
 
-            $filters = explode('~', urldecode($reqParams[1]));
+              for ($i = 1; $i < count($search_terms); $i++) {
+                  $reqParams = explode('=', $search_terms[$i]);
 
+                  $filters = explode('~', urldecode($reqParams[1]));
 
-            foreach ($filters as $value) {
-                $terms = strtolower($value);
+                  foreach ($filters as $value) {
+                      $terms = strtolower($value);
 
-                $subQuery['should'][]['term'][$parameterMapping[$reqParams[0]]] = str_replace('%20', ' ', $terms);
-            }
-            $params= $subQuery;
-            $searchTerm = $params;
-        }
+                      $subQuery['bool']['should'][]['term'][$parameterMapping[$reqParams[0]]] = str_replace('%20', ' ', $terms);
+                  }
+                  $params = $subQuery;
+                  $searchTerm = $params;
+              }
+          }
 
         return $searchTerm;
     }
+function _checkbook_smart_search_get_results_query_search_term1($search_terms)
+{
+    $parameterMapping = array(
+        "oge_agency_names" => "oge_agency_name",
+        "agency_names" => "agency_name",
+        "fiscal_years" => "fiscal_year",
+        "registered_fiscal_years" => "registered_fiscal_year",
+        "domains" => "domain",
+        "vendor_names" => "vendor_name",
+        "vendor_type" => "vendor_type",
+        "expense_categories" => "expenditure_object_name",
+        "revenue_categories" => "revenue_category_name",
+        "spending_categories" => "spending_category_name",
+        "contract_categories" => "contract_category_name",
+        "contract_status" => "contract_status",
+        "minority_type_name" => "minority_type_name",
+        "industry_type_name" => "industry_type_name",
+        "payroll_type" => "payroll_type"
+    );
+    $searchTerm = $search_terms[0];
+    if(count($search_terms)==1) {
+        if($search_terms[0]!=="*:*"){
+            $subQuery['multi_match']['query']='department';
+            $subQuery['multi_match']['fields']=["agency_name.autocomplete"];
 
-    /**
+            $searchTerm = $subQuery;
+        }
+
+    }
+    else {
+        for ($i = 1; $i < count($search_terms); $i++) {
+            $req_params = explode('=', $search_terms[$i]);
+
+            $filters = explode('~', urldecode($req_params[1]));
+
+
+
+            $params['constant_score']['filter']['bool']['must'][]['terms'][$parameterMapping[$req_params[0]]] = array_map('strtolower', $filters);
+
+
+        }
+        $searchTerm = $params;
+
+
+
+
+
+
+
+
+    }
+
+    return $searchTerm;
+}
+
+
+/**
      *  Outputs the solr query result for the input query.
      * @param $query
      * @return the solr result in PHP array format.
@@ -344,7 +410,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
@@ -361,8 +427,8 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
        $search_term  = _checkbook_smart_search_get_results_query_search_term($search_terms);
         $facetname= $parameter_mapping[$facet_name];
 
-       if(isset($search_term['should'])){
-           foreach ($search_term['should'] as $key=>$value){
+       if(isset($search_term['bool']['should'])){
+           foreach ($search_term['bool']['should'] as $key=>$value){
                $request_facet_param[] = $value['term'][$facetname];
            }
 
@@ -386,8 +452,8 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
 
         if ($count>0) {
-            $params['body']['query']['bool']= $search_term;
-            $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
+            $params['body']['query']= $search_term;
+            $params['body']['aggs']['names']['terms']['field'] = $parameter_mapping[$facet_name].'.keyword';
             $params['body']['aggs']['names']['terms']['size'] = 10000;
 
             try {
@@ -444,7 +510,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         );
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
         $client = Elasticsearch\ClientBuilder::create()
             ->setHosts($hosts)
@@ -640,13 +706,13 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         $regex2 = '.*)|(^';
         $regex3 = '.*)';
 
-        $search_term = '(.*' . $search_term . '.*)';
+     //   $search_term = '(.*' . $search_term . '.*)';
         $search_term = str_replace('%20', ' ', $search_term);
 
         if (!empty($search_term)) {
 
-            $params['body']['query']['bool']['must']['match_phrase']['agency_name.autocomplete'] = $search_term;
-            $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
+            $params['body']['query']['bool']['must']['match_phrase'][$facet_autocomplete_field] = $search_term;
+            $params['body']['aggs']['names']['terms']['field'] = $facet_name.'.keyword';
 
             try {
                 $response = $client->search($params);
@@ -680,7 +746,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
      **/
     function _checkbook_smart_search_agency_autocomplete()
     {
-        $agencies = _checkbook_smart_search_get_searchstring_autocomplete("agency_names", "agency_name_autocomplete");
+        $agencies = _checkbook_smart_search_get_searchstring_autocomplete("agency_name", "agency_name.autocomplete");
         return $agencies;
     }
 
@@ -724,7 +790,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
      **/
     function _checkbook_smart_search_fiscalyear_autocomplete()
     {
-        $fiscal_years = _checkbook_smart_search_get_searchstring_autocomplete("fiscal_years", "fiscal_year");
+        $fiscal_years = _checkbook_smart_search_get_searchstring_autocomplete("fiscal_year", "fiscal_year.autocomplete");
         return $fiscal_years;
     }
 
