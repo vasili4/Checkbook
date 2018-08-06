@@ -493,7 +493,7 @@ function _checkbook_advanced_search_autocomplete_payroll_name($pay_frequency, $a
 {
 
     $matches = array();
-    $searchTerm = _get_seach_term();
+    $searchTerm = trim(htmlspecialchars_decode($_REQUEST['term'], ENT_QUOTES));
     $hosts = [
 
         'http://localhost:9200'
@@ -505,8 +505,8 @@ function _checkbook_advanced_search_autocomplete_payroll_name($pay_frequency, $a
     $params['index']='checkbook';
     $params['type']='payroll';
     $params['body']['size']=0;
-   // $searchTerm = '(.*' . $searchTerm . '.*)';
 
+    $searchTerm = str_replace('%20', ' ', $searchTerm);
     if (!empty($searchTerm)) {
 
         $params['body']['query']['bool']['must'][]['match_phrase']['civil_service_title']=$searchTerm;
