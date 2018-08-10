@@ -496,7 +496,7 @@ function _checkbook_advanced_search_autocomplete_payroll_name($pay_frequency, $a
     $searchTerm = trim(htmlspecialchars_decode($_REQUEST['term'], ENT_QUOTES));
     $hosts = [
 
-        'http://localhost:9200'
+        'http://elk-checkbook-nyc.reisys.com:9200'
     ];
 
     $client = Elasticsearch\ClientBuilder::create()
