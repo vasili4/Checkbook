@@ -638,15 +638,9 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
        // $params['body']['_source'] = ['agency_name'];
         $params['body']['size']=0;
         $matches = array();
-
-
-
-        $search_term = '(.*' . $search_term . '.*)';
-        $search_term = str_replace('%20', ' ', $search_term);
-
         if (!empty($search_term)) {
 
-            $params['body']['query']['regexp']['agency_name']['value'] = $search_term;
+            $params['body']['query']['bool']['filter']['match_phrase']['agency_name.autocomplete'] = $search_term;
             $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
 
             try {
@@ -702,12 +696,11 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
         $matches = array();
 
 
-        $search_term = '(.*' . $search_term . '.*)';
+
         $search_term = str_replace('%20', ' ', $search_term);
 
         if (!empty($search_term)) {
-
-            $params['body']['query']['regexp'][$facet_name]['value'] = $search_term;
+            $params['body']['query']['bool']['filter']['match_phrase'][$facet_autocomplete_field] = $search_term;
             $params['body']['aggs']['names']['terms']['field'] = $facet_name.'.keyword';
 
             try {
