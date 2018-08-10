@@ -236,10 +236,10 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         try {
 
             $search_results = $client->search($params);
-            var_dump($params);
+
 
         } catch (Exception $e) {
-            var_dump($params);
+            var_dump($e->getMessage());
         }
 
 
@@ -697,7 +697,7 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
             ->build();
         $params['index'] = 'checkbook';
         $params['type'] = 'payroll';
-        $params['body']['_source'] = ['agency_name'];
+        //$params['body']['_source'] = ['agency_name'];
         $params['body']['size']=0;
         $matches = array();
 
