@@ -645,6 +645,87 @@ function _get_contracts_advanced_search_autocomplete_results($facet, $query, $st
     $matches = _checkbook_autocomplete_solr_results($query, $facet);
     return $matches;
 }
+function _get_contracts_advanced_search_elastic_autocomplete_results($facet, $params, $status = null, $category = null, $contract_type = null, $agency = null, $award_method = null, $year = null, $mwbe_category = null, $industry = null, $includes_sub_vendors = null, $sub_vendor_status = null, $data_source = 'checkbook') {
+
+    $hosts = [
+
+        'http://localhost:9200'
+    ];
+    if($category){
+        if($category == 'all'){
+            $params=_get_autocomplete_query_term($params,'contract_category_name','expense~revenue');
+        }
+
+        else{
+            //contract_category_name
+            $params=_get_autocomplete_query_term($params,'category',$category);
+
+        }
+    }
+    if ($agency) {
+        $field = $data_source == 'checkbook_oge' ? 'oge_agency_id' : 'agency_id';
+        $params = _get_autocomplete_query_term($params,'category',$category);
+    }
+    if($award_method){
+        $code_id_array = _checkbook_advanced_search_autocomplete_get_code_id($award_method);
+        $params = _get_autocomplete_query_term($params,'award_method_id',$code_id_array['id']);
+
+    }
+    if(!in_array($contract_type, array('No Contract Type Selected', '0'))){
+        $code_id_array = _checkbook_advanced_search_autocomplete_get_code_id($contract_type);
+        if($status == 'P'){
+            $params = _get_autocomplete_query_term($params,'document_code',$code_id_array['code']);
+        }else{
+            $params = _get_autocomplete_query_term($params,'agreement_type_id',$code_id_array['id']);
+
+        }
+    }
+    if($status == 'P'){
+        //contract_status
+        $params = _get_autocomplete_query_term($params,'status','pending');
+    }
+    if($status == 'A'){
+        //contract_status
+        $params = _get_autocomplete_query_term($params,'status','registered');
+
+        if(isset($year)) {
+            $params = _checkbook_autocomplete_elastic_get_start_end_dates($year,$params, 'contracts', 'A');
+        }
+
+
+
+    }
+
+    if($status == 'R'){
+        $params= _get_autocomplete_query_term($params,'status','registered');
+        if(isset($year)){
+            $params= _checkbook_autocomplete_get_start_end_dates($year, 'contracts', 'R');
+        }
+    }
+
+    if ($mwbe_category) {
+        $value = _checkbook_advanced_search_autocomplete_get_mwbe_category($mwbe_category);
+       $params=  _get_autocomplete_query_term($params,'minority_type_id',$value);
+
+    }
+
+    if ($industry) {
+        $params=  _get_autocomplete_query_term($params,'industry_type_id',$industry);
+
+    }
+
+    if ($includes_sub_vendors) {
+        $params=  _get_autocomplete_query_term($params,'scntrc_status',$includes_sub_vendors);
+
+
+    }
+    if ($sub_vendor_status) {
+        $params=  _get_autocomplete_query_term($params,'aprv_sta',$sub_vendor_status);
+
+    }
+    $matches = _checkbook_autocomplete_elastic_results($hosts,$params, $facet);
+    return $matches;
+}
 
 /**
  * Get autocomplete results for vendor from Solr.
@@ -673,11 +754,18 @@ function _get_contracts_advanced_search_autocomplete_results($facet, $query, $st
  *   Data source (checkbook, checkbook_oge)
  */
 function _checkbook_advanced_search_autocomplete_contracts_vendor_name($status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source = 'checkbook') {
-    $searchTerm = _get_autocomplete_search_term();
+    $searchTerm = _get_autocomplete_elastic_search_term();
+    $params = _get_config_params('contracts','doc',0);
+
     if(!empty($searchTerm)){
-        $query = 'select/?q=vendor_name_autocomplete:'.$searchTerm.'&facet=true&facet.field=vendor_name&fq=domain:contracts&facet.limit=10&wt=php';
-        $query .= $data_source == 'checkbook_oge' ? '&fq=agency_type:oge' : '&fq=-agency_type:oge';
-        $matches = _get_contracts_advanced_search_autocomplete_results('vendor_name', $query, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+        $params['body']['query']['bool']['must'][]['match_phrase']['vendor_name.autocomplete']=$searchTerm;
+        $params['body']['aggs']['names']['terms']['field']='vendor_name.keyword';
+
+        if( $data_source== 'checkbook_oge') {
+            $params =_get_autocomplete_query_term($params,'agency_type','oge');
+
+        }
+        $matches =_get_contracts_advanced_search_elastic_autocomplete_results('vendor_name', $params, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
         drupal_json_output($matches);
     }
 }
@@ -709,11 +797,19 @@ function _checkbook_advanced_search_autocomplete_contracts_vendor_name($status, 
  *   Data source (checkbook, checkbook_oge)
  */
 function _checkbook_advanced_search_autocomplete_contracts_contract_number($status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source = 'checkbook') {
-    $searchTerm = _get_autocomplete_search_term();
+    $searchTerm =  _get_autocomplete_elastic_search_term();
+   $params = _get_config_params('contracts','doc',0);;
     if(!empty($searchTerm)){
-        $query = 'select/?q=contract_number:'.$searchTerm.'&facet=true&facet.field=contract_number&fq=domain:contracts&facet.limit=10&wt=php';
-        $query .= $data_source == 'checkbook_oge' ? '&fq=agency_type:oge' : '&fq=-agency_type:oge';
-        $matches = _get_contracts_advanced_search_autocomplete_results('contract_number', $query, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+        $params['body']['query']['bool']['must'][]['match_phrase']['contract_number.autocomplete']=$searchTerm;
+        $params['body']['aggs']['names']['terms']['field']='contract_number.keyword';
+
+
+        if( $data_source== 'checkbook_oge') {
+            $params = _get_autocomplete_query_term($params,'agency_type','oge');
+
+        }
+        $matches = _get_contracts_advanced_search_elastic_autocomplete_results('contract_number', $params, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+      // $matches =_checkbook_autocomplete_elastic_results($hosts,$params, 'contract_number');
         drupal_json_output($matches);
     }
 }
@@ -745,12 +841,18 @@ function _checkbook_advanced_search_autocomplete_contracts_contract_number($stat
  *   Data source (checkbook, checkbook_oge)
  */
 function _checkbook_advanced_search_autocomplete_contracts_apt_pin($status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source = 'checkbook') {
-    $searchTerm = _get_autocomplete_search_term();
-    if(strlen($searchTerm) > 0){
-        $apt_pin = $data_source == 'checkbook_oge' ? 'apt_pin' : 'prime_apt_pin';
-        $query = 'select/?q='.$apt_pin.':'. $searchTerm .'&facet=true&facet.field='.$apt_pin.'&fq=domain:contracts&facet.limit=10&wt=php';
-        $query .= $data_source == 'checkbook_oge' ? '&fq=agency_type:oge' : '&fq=-agency_type:oge';
-        $matches = _get_contracts_advanced_search_autocomplete_results($apt_pin, $query, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+    $searchTerm = _get_autocomplete_elastic_search_term();
+    $params = _get_config_params('contracts','doc',0);;
+    if(!empty($searchTerm)){
+        $apt_pin = $data_source == 'checkbook_oge' ? 'apt_pin.autocomplete' : 'prime_apt_pin';
+        $params['body']['query']['bool']['must'][]['match_phrase'][$apt_pin]=$searchTerm;
+        $params['body']['aggs']['names']['terms']['field']='apt_pin.keyword';
+
+        if( $data_source== 'checkbook_oge') {
+            $params = _get_autocomplete_query_term($params,'agency_type','oge');
+
+        }
+        $matches = _get_contracts_advanced_search_elastic_autocomplete_results($apt_pin, $params, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
         drupal_json_output($matches);
     }
 }
@@ -782,12 +884,18 @@ function _checkbook_advanced_search_autocomplete_contracts_apt_pin($status, $cat
  *   Data source (checkbook, checkbook_oge)
  */
 function _checkbook_advanced_search_autocomplete_contracts_pin($status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source = 'checkbook') {
-    $searchTerm = _get_autocomplete_search_term();
+    $searchTerm = _get_autocomplete_elastic_search_term();
     if(strlen($searchTerm) > 0){
-        $pin = $data_source == 'checkbook_oge' ? 'pin' : 'prime_pin';
-        $query = 'select/?q='.$pin.':'. $searchTerm .'&facet=true&facet.field='.$pin.'&fq=domain:contracts&facet.limit=10&wt=php';
-        $query .= $data_source == 'checkbook_oge' ? '&fq=agency_type:oge' : '&fq=-agency_type:oge';
-        $matches = _get_contracts_advanced_search_autocomplete_results($pin, $query, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+        $pin = $data_source == 'checkbook_oge' ? 'pin.autocomplete' : 'prime_pin';
+
+        $params['body']['query']['bool']['must'][]['match_phrase'][$pin]=$searchTerm;
+        $params['body']['aggs']['names']['terms']['field']='pin.keyword';
+
+        if( $data_source== 'checkbook_oge') {
+            $params = _get_autocomplete_query_term($params,'agency_type','oge');
+
+        }
+        $matches = _get_contracts_advanced_search_elastic_autocomplete_results($pin, $params, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
         drupal_json_output($matches);
     }
 }
@@ -819,12 +927,18 @@ function _checkbook_advanced_search_autocomplete_contracts_pin($status, $categor
  *   Data source (checkbook, checkbook_oge)
  */
 function _checkbook_advanced_search_autocomplete_contracts_entitycontractnum($status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source = 'checkbook') {
-    $searchTerm = _get_autocomplete_search_term();
+    $searchTerm = _get_autocomplete_elastic_search_term();
     $facet_prefix = _get_autocomplete_search_term_facet_prefix();
     if(strlen($searchTerm) > 0){
-        $query = 'select/?q=contract_entity_contract_number:'. $searchTerm .'&facet=true&facet.field=contract_entity_contract_number&facet.prefix='. $facet_prefix .'&fq=domain:contracts&facet.limit=10&wt=php';
-        $query .= $data_source == 'checkbook_oge' ? '&fq=agency_type:oge' : '&fq=-agency_type:oge';
-        $matches = _get_contracts_advanced_search_autocomplete_results('contract_entity_contract_number', $query, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+        //entity_contract_number
+        $params['body']['query']['bool']['must'][]['match_phrase']['entity_contract_number.autocomplete']=$searchTerm;
+        $params['body']['aggs']['names']['terms']['field']='entity_contract_number.keyword';
+
+        if( $data_source== 'checkbook_oge') {
+            $params = _get_autocomplete_query_term($params,'agency_type','oge');
+
+        }
+        $matches = _get_contracts_advanced_search_elastic_autocomplete_results('entity_contract_number', $params, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
         drupal_json_output($matches);
     }
 }
@@ -856,12 +970,18 @@ function _checkbook_advanced_search_autocomplete_contracts_entitycontractnum($st
  *   Data source (checkbook, checkbook_oge)
  */
 function _checkbook_advanced_search_autocomplete_contracts_commodityline($status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source = 'checkbook') {
-    $searchTerm = _get_autocomplete_search_term();
+    $searchTerm =_get_autocomplete_elastic_search_term();
     $facet_prefix = _get_autocomplete_search_term_facet_prefix();
     if(strlen($searchTerm) > 0){
-        $query = 'select/?q=contract_commodity_line:'. $searchTerm .'&facet=true&facet.field=contract_commodity_line&facet.prefix='. $facet_prefix .'&fq=domain:contracts&facet.limit=10&wt=php';
-        $query .= $data_source == 'checkbook_oge' ? '&fq=agency_type:oge' : '&fq=-agency_type:oge';
-        $matches = _get_contracts_advanced_search_autocomplete_results('contract_commodity_line', $query, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+        //entity_contract_number
+        $params['body']['query']['bool']['must'][]['match_phrase']['commodity_line.autocomplete']=$searchTerm;
+        $params['body']['aggs']['names']['terms']['field']='commodity_line.keyword';
+
+        if( $data_source== 'checkbook_oge') {
+            $params = _get_autocomplete_query_term($params,'agency_type','oge');
+
+        }
+        $matches = _get_contracts_advanced_search_elastic_autocomplete_results('commodity_line', $params, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
         drupal_json_output($matches);
     }
 }

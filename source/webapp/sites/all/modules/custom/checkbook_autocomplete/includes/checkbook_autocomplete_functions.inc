@@ -1196,6 +1196,60 @@ function _checkbook_autocomplete_get_start_end_dates($year, $domain = NULL, $sta
     $query = '&fq=(' . $query . ')';
     return $query;
 }
+function _checkbook_autocomplete_elastic_get_start_end_dates($year,$params=NULL, $domain = NULL, $status = NULL) {
+
+    if (strpos($year, '~')) {
+        if ($year == 'fy~all') {
+            return '';
+        }
+        $year_type = substr($year, 0, 2);
+        $year_id = substr($year, 3, strlen($year));
+        $year_value = _getYearValueFromID($year_id);
+    }
+    else {
+        if ($year == 'ALL') {
+            return '';
+        }
+        $year_type = substr($year, 0, 2);
+        $year_value = str_replace($year_type, '', $year);
+        $year_id = _getYearIDFromValue($year_value);
+    }
+    $query = "";
+    if ($domain == 'spending') {
+        if (strtolower($year_type) == 'fy') {
+            $query .= 'fiscal_year_id:'. $year_id;
+        }
+        elseif (strtolower($year_type) == 'cy') {
+            $query .= 'calendar_fiscal_year_id:'. $year_id;
+        }
+    }
+    else {
+        if ($status == 'A') {
+            if (strtolower($year_type) == 'fy') {
+                $params['body']['query']['bool']['filter'][]['term']['fiscal_year_id']= $year_id;
+            }
+            elseif (strtolower($year_type) == 'cy') {
+                $start_date = ($year_value) . "-12-31T23:59:59.999Z";
+                $end_date = ($year_value) . "-01-01T00:00:00.999Z";
+                $query .= '(start_date:[*%20TO%20' . $start_date . ']%20AND%20end_date:[' . $end_date . '%20TO%20*])';
+            }
+        }
+        else {
+            if ($status == 'R') {
+                if (strtolower($year_type) == 'fy') {
+                    $params['body']['query']['bool']['filter'][]['term']['registered_fiscal_year_id']= $year_id;
+                }
+                elseif (strtolower($year_type) == 'cy') {
+                    $start_date = ($year_value) . "-01-01T00:00:00.999Z";
+                    $end_date = ($year_value) . "-12-31T23:59:59.999Z";
+                    $query .= '(registration_date:[' . $start_date . '%20TO%20' . $end_date . '])';
+                }
+            }
+        }
+    }
+
+    return $params;
+}
 
 /**
  * Replaces and encodes the special characters in the given string.
@@ -1267,6 +1321,32 @@ function _get_autocomplete_search_term() {
     else {
         return '';
     }
+}
+function _get_autocomplete_elastic_search_term() {
+    $term = trim($_REQUEST['term']);
+    if (strlen($term) > 0) {
+        $autocomplete_text = trim(htmlspecialchars_decode($term, ENT_QUOTES));
+        $search_term =  strtolower($autocomplete_text);
+        }
+        else
+        {
+            $search_term='';
+        }
+
+
+        return $search_term;
+
+
+}
+function _get_config_params($index=NULL,$type=NULL, $size=0){
+    $params['index']=$index;
+    $params['type']=$type;
+    $params['body']['size']=$size;
+    return $params;
+}
+function  _get_autocomplete_query_term($params,$fieldname=NULL,$value=NULL){
+    $params['body']['query']['bool']['filter'][]['term'][$fieldname]=$value;
+    return $params;
 }
 function _get_seach_term(){
     $term = trim($_REQUEST['term']);
@@ -1373,6 +1453,34 @@ function _checkbook_autocomplete_solr_results($query, $facet = NULL) {
     else {
         $matches = array(array('label' => 'No Matches Found', 'value' => ''));
     }
+
+    return $matches;
+}
+function _checkbook_autocomplete_elastic_results($hosts,$params, $facet = NULL) {
+
+   $matches = array();
+
+    $client = Elasticsearch\ClientBuilder::create()
+        ->setHosts($hosts)
+        ->build();
+    try {
+        $response = $client->search($params);
+    } catch (Exception $e) {
+        var_dump($e->getMessage());
+    }
+    if($response['hits']['total']!=0) {
+
+        $values = $response['aggregations']['names']['buckets'];
+        foreach ($values as $key => $value) {
+            $matches[] = $value['key'];
+        }
+        $matches = array_map('strtolower', $matches);
+    }
+  else
+    {
+       $matches= array(array('label' => 'No Matches Found', 'value' => ''));
+    }
+
 
     return $matches;
 }
