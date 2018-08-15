@@ -933,6 +933,8 @@ function _checkbook_advanced_search_autocomplete_contracts_entitycontractnum($st
         //entity_contract_number
         $params['body']['query']['bool']['must'][]['match_phrase']['entity_contract_number.autocomplete']=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='entity_contract_number.keyword';
+        $params['body']['aggs']['names']['terms']['include']=$searchTerm.'.*';
+
 
         if( $data_source== 'checkbook_oge') {
             $params = _get_autocomplete_query_term($params,'agency_type','oge');
@@ -976,6 +978,8 @@ function _checkbook_advanced_search_autocomplete_contracts_commodityline($status
         //entity_contract_number
         $params['body']['query']['bool']['must'][]['match_phrase']['commodity_line.autocomplete']=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='commodity_line.keyword';
+        $params['body']['aggs']['names']['terms']['include']=$searchTerm.'.*';
+
 
         if( $data_source== 'checkbook_oge') {
             $params = _get_autocomplete_query_term($params,'agency_type','oge');
