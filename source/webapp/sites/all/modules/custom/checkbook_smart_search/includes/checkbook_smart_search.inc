@@ -385,6 +385,31 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
         }
         return $results;
     }
+function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL) {
+
+    $matches = array();
+
+    $client = Elasticsearch\ClientBuilder::create()
+        ->setHosts($hosts)
+        ->build();
+    try {
+        $response = $client->search($params);
+    } catch (Exception $e) {
+        var_dump($e->getMessage());
+    }
+    if($response['hits']['total']!=0) {
+
+        $values = $response['aggregations']['names']['buckets'];
+        foreach ($values as $key => $value) {
+        $matches[] = $value['key'];
+       }
+      $matches = array_map('strtolower', $matches);
+  }
+
+
+
+    return $matches;
+}
 
     /** Returns only selected facet values from current URL */
     function _checkbook_smart_search_get_selected_facet_results($search_terms, $facet_name)
@@ -623,51 +648,87 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
     {
 
         $search_term = trim(htmlspecialchars_decode($_REQUEST['term'], ENT_QUOTES));//eco
-
+        $groupTerms = ['agency_name', 'oge_agency_name', 'vendor_name', 'expenditure_object_names'];
 
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
 
-        $client = Elasticsearch\ClientBuilder::create()
-            ->setHosts($hosts)
-            ->build();
-        $params['index'] = 'checkbook';
-        $params['type'] = 'payroll';
-       // $params['body']['_source'] = ['agency_name'];
-        $params['body']['size']=0;
+
+        $params['index'] = 'checkbook,contracts';
+        //$params['type'] = 'payroll,doc';
+        $params['body']['size'] = 0;
+        $count = 0;
         $matches = array();
+        $results=array();
         if (!empty($search_term)) {
+            foreach ($groupTerms as $key) {
+                unset($params['body']['query']['bool']['filter']['match_phrase']);
+                switch ($key) {
+                    case 'agency_name':
+                        $params['body']['query']['bool']['filter']['match_phrase']['agency_name.autocomplete'] = $search_term;
+                        $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
+                        $results = _checkbook_autocomplete_elastic_results1($hosts, $params, null);
 
-            $params['body']['query']['bool']['filter']['match_phrase']['agency_name.autocomplete'] = $search_term;
-            $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
+                            foreach ($results as $a) {
+                                $count++;
+                                $url = "/smart_search?search_term=*|*agency_names=";
+                                array_push($matches, array("url" => $url, "category" => "Agencies", "label" => $a, "value" => urlencode($a)));
 
-            try {
-                $response = $client->search($params);
-            } catch (Exception $e) {
-                var_dump($e->getMessage());
-            }
+                            }
 
-            $values = $response['aggregations']['names']['buckets'];
-            if(empty($values)){
-                $matches[]= array("url" => "", "label" => '<span>' . "No matches found" . '</span>', 'value' => 'No matches found');
-            }
-            else {
-                foreach ($values as $key => $value) {
-                    $a = strtolower($value['key']);
-                    $url = "/smart_search?search_term=*|*agency_names=";
-                    $matches[] = array("url" => $url, "category" => "Agencies", "label" => $a, "value" => urlencode($a));
+                        break;
+                    case 'vendor_name':
+                        $params['body']['query']['bool']['filter']['match_phrase']['vendor_name.autocomplete'] = $search_term;
+                        $params['body']['aggs']['names']['terms']['field'] = 'vendor_name';
+
+                        $results = _checkbook_autocomplete_elastic_results1($hosts, $params, null);
+
+                        foreach ($results as $a) {
+                            $count++;
+                            $url = "/smart_search?search_term=*|*vendor_names=";
+                            array_push($matches, array("url" => $url, "category" => "Vendors (Prime Vendor, Sub Vendor, M/WBE Vendor)", "label" => $a, "value" => urlencode($a)));
+
+                        }
+                        break;
+                    case 'expenditure_object_names':
+                        $params['body']['query']['bool']['filter']['match_phrase']['expenditure_object_names.autocomplete'] = $search_term;
+                        $params['body']['aggs']['names']['terms']['field'] = 'expenditure_object_names.keyword';
+                        $params['body']['aggs']['names']['terms']['exclude'] = ' .*';
+                        $results = _checkbook_autocomplete_elastic_results1($hosts, $params, null);
+
+                        foreach ($results as $a) {
+                            $count++;
+                            $url = "/smart_search?search_term=*|*expense_categories=";
+                            array_push($matches, array("url" => $url, "category" => "Expense Categories", "label" => $a, "value" => urlencode($a)));
+                        }
+                        break;
+                    case 'oge_agency_name':
+                        $params['body']['query']['bool']['filter']['match_phrase']['oge_agency_name.autocomplete'] = $search_term;
+                        $params['body']['aggs']['names']['terms']['field'] = 'oge_agency_name.keyword';
+
+                        $results = _checkbook_autocomplete_elastic_results1($hosts, $params, null);
+
+                        foreach ($results as $a) {
+                            $count++;
+                            $url = "/smart_search?search_term=*|*oge_agency_names=";
+                            $matches[] = array("url" => $url, "category" => "Other Government Entities", "label" => $a, "value" => urlencode($a));
+                        }
+                        break;
+
                 }
+
             }
-
-
-
         }
 
+            if ($count == 0) {
+                array_push($matches, array("url" => "", "label" => '<span>' . "No matches found" . '</span>', 'value' => 'No matches found'));
+            }
+
+            return drupal_json_output($matches);
 
 
-        return drupal_json_output($matches);
     }
 
     /**
