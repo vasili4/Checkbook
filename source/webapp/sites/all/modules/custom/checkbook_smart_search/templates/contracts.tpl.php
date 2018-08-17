@@ -1,6 +1,6 @@
 <?php
 /**
-*	GNU AFFERO GENERAL PUBLIC LICENSE 
+*	GNU AFFERO GENERAL PUBLIC LICENSE
 *	   Version 3, 19 November 2007
 * This software is licensed under the GNU AGPL Version 3
 * 	(see the file LICENSE for details)
@@ -8,7 +8,7 @@
 
 
 
-$contracts_parameter_mapping = _checkbook_smart_search_domain_fields('contracts', $IsOge);
+$contracts_parameter_mapping = _checkbook_smart_search_domain_fields('contracts','true');
 
 if(strtolower($contracts_results['contract_status']) == 'registered'){
 
@@ -51,7 +51,7 @@ if(strtolower($contracts_results['contract_status']) == 'registered'){
         $fiscal_year_id = _getCurrentYearID();
     }
 
-    if(strtolower($contracts_results['contract_category_name']) == 'expense'){
+    if(strtolower($contracts_results['category']) == 'expense'){
         if($IsOge){
             $vendor_link = "/contracts_landing/status/" .$status."/yeartype/B/datasource/checkbook_oge/year/". _getFiscalYearID() . '/agency/' . $contracts_results['agency_id'] .'/vendor/'.$contracts_results['vendor_id'];
             $agency_link = "/contracts_landing/status/" .$status."/yeartype/B/datasource/checkbook_oge/year/"._getFiscalYearID().'/agency/'.$contracts_results['agency_id'];
@@ -138,7 +138,7 @@ if(strtolower($contracts_results['contract_status']) == 'registered'){
         if($contracts_results['document_code'] == 'MA1' || $contracts_results['document_code'] == 'MMA1' || $contracts_results['document_code'] == 'RCT1'){
             $contract_Id_link .= "/magid/".$contracts_results['original_agreement_id']."/doctype/".$contracts_results["document_code"];
         }else{
-        	$master_contract_Id_link = $contract_Id_link . "/magid/".$contracts_results['master_agreement_id']."/doctype/MMA1";        	 
+        	$master_contract_Id_link = $contract_Id_link . "/magid/".$contracts_results['master_agreement_id']."/doctype/MMA1";
         	$contract_Id_link .= "/agid/".$contracts_results['original_agreement_id']."/doctype/".$contracts_results["document_code"];
         }
         $contracts_results['contract_number'] = "<a href='".$contract_Id_link ."'>".$contracts_results['contract_number']."</a>";
@@ -165,7 +165,7 @@ if($IsOge && !in_array($contracts_results['contract_type_code'],array('MMA1', 'M
 			"agency_name" => $agency_link,
 			"vendor_name" => $vendor_link,
 	);
-	
+
 }
 // for contracts with fiscal year 2009 and earlier, links should be disabled
 if(($contract_status == 'Registered' && $reg_fiscal_year < 2010) || ($effective_end_year_id < 111)){
@@ -182,7 +182,7 @@ $contracts_results["registration_date"] = ($IsOge)? "N/A" : $contracts_results["
 $date_fields = array("start_date_orig","end_date_orig","received_date","registration_date");
 $amount_fields = array("current_amount", "original_amount");
 
-$name_fields = array("agency_name", "vendor_name", "award_method_name", "contract_purpose", "expenditure_object_name");
+$name_fields = array("agency_name", "vendor_name", "award_method_name", "contract_purpose", "expenditure_object_names");
 
 $count = 1;
 $rows = array();

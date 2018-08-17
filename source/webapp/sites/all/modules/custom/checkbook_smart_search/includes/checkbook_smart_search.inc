@@ -34,10 +34,10 @@ function _checkbook_smart_search_get_results(){
     /* Facet Results
        These represent the side facet numbers and each is independent of what you select
     */
-    $domains = _checkbook_smart_search_get_facet_results($search_terms, "domains");
-    $oges = _checkbook_smart_search_get_facet_results($search_terms, "oge_agency_names", NULL, -1);
-    $agencies =  _checkbook_search_get_facet_results($search_terms, "agency_names", NULL, -1);
-    $vendors = _checkbook_smart_search_get_facet_results($search_terms, "vendor_names", NULL, 100);
+    $domains =   _checkbook_search_get_facet_results($search_terms, "domains");
+    $oges = _checkbook_search_get_facet_results($search_terms, "oge_agency_names", NULL, -1);
+    $agencies = _checkbook_search_get_facet_results($search_terms, "agency_names", NULL, -1);
+    $vendors = _checkbook_search_get_facet_results($search_terms, "vendor_names", NULL, 100);
     $vendor_type = _checkbook_smart_search_get_facet_results($search_terms, "vendor_type", NULL, 100);
     $all_vendors = _checkbook_smart_search_get_facet_results($search_terms, "vendor_names", NULL, -1);
     $vendor_number = count($all_vendors['facet_counts']['facet_fields']['vendor_name']);
@@ -88,10 +88,10 @@ function _checkbook_smart_search_get_results(){
 
 
     $facetResults = array(
-        "domain" => $domains['facet_counts']['facet_fields'],
+        "domain" => $domains['aggregations']['names']['buckets'],
         "agency_name" => $agencies['aggregations']['names']['buckets'],
-        "oge_agency_name" => $oges['facet_counts']['facet_fields'],
-        "vendor_name" => $vendors['facet_counts']['facet_fields'],
+        "oge_agency_name" => $oges['aggregations']['names']['buckets'],
+        "vendor_name" => $vendors['aggregations']['names']['buckets'],
         "vendor_type" => $vendor_type['facet_counts']['facet_fields'],
         "expenditure_object_name" => $expense_categories['facet_counts']['facet_fields'],
         "fiscal_year" =>  $fiscal_years['aggregations']['names']['buckets'],
@@ -208,15 +208,15 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
     $hosts = [
 
-        'http://elk-checkbook-nyc.reisys.com:9200'
+        'http://localhost:9200'
 
     ];
 
     $client = Elasticsearch\ClientBuilder::create()
         ->setHosts($hosts)
         ->build();
-    $params['index'] = 'checkbook';
-    $params['type'] = 'payroll';
+    $params['index'] = 'checkbook,contracts';
+ //   $params['type'] = 'payroll';
 
      $params['body']['from']=$page_no*$no_of_results;
     // $params['body']['size']=($page_no*$no_of_results)+10;
@@ -229,8 +229,8 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         else {
 
             $params['body']['query'] =$search_term;
-            $params['body']['aggs']['names']['terms']['field'] = 'agency_name.keyword';
-            $params['body']['sort']['pay_date']['order'] = 'desc';
+            $params['body']['aggs']['names']['terms']['field'] = 'vendor_name.keyword';
+           // $params['body']['sort']['pay_date']['order'] = 'desc';
         }
 
         try {
@@ -435,14 +435,14 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
 
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
             ->setHosts($hosts)
             ->build();
-        $params['index'] = 'checkbook';
-        $params['type'] = 'payroll';
+        $params['index'] = 'checkbook,contracts';
+       // $params['type'] = 'payroll';
 
 
         $result = array();
@@ -510,7 +510,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
 
         }
             else
-            return null;
+            return $result;
 
     }
 
@@ -535,13 +535,14 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
         );
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
         $client = Elasticsearch\ClientBuilder::create()
             ->setHosts($hosts)
             ->build();
-        $params['index'] = 'checkbook';
-        $params['type'] = 'payroll';
+        $params['index'] = 'checkbook,contracts';
+        $params['size']=0;
+        //$params['type'] = 'payroll';
 
         for ($i = 1; $i < count($search_terms); $i++) {
             $req_params = explode('=', $search_terms[$i]);
@@ -562,6 +563,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
 
             try {
                 $response = $client->search($params);
+                LogHelper::log_debug($response);
 
             } catch (Exception $e) {
                 var_dump($e->getMessage());
@@ -681,7 +683,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
                         break;
                     case 'vendor_name':
                         $params['body']['query']['bool']['filter']['match_phrase']['vendor_name.autocomplete'] = $search_term;
-                        $params['body']['aggs']['names']['terms']['field'] = 'vendor_name';
+                        $params['body']['aggs']['names']['terms']['field'] = 'vendor_name.keyword';
 
                         $results = _checkbook_autocomplete_elastic_results1($hosts, $params, null);
 
@@ -744,7 +746,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
 
         $hosts = [
 
-            'http://elk-checkbook-nyc.reisys.com:9200'
+            'http://localhost:9200'
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
@@ -1103,14 +1105,14 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
             case "contracts":
                 if ($IsOge) {
                     $parameter_mapping = array(
-                        "contract_status" => "Status",
-                        "contract_category_name" => "Category",
+                        "status" => "Status",
+                        "category_name" => "Category",
                         "vendor_name" => "Prime Vendor",
                         "oge_contracting_agency_name" => "Agency",
                         "contract_number" => "Contract ID",
-                        "contract_commodity_line" => "Commodity Line",
-                        "contract_purpose" => "Purpose",
-                        "parent_contract_number" => "Parent Contract ID",
+                        "commodity_line" => "Commodity Line",
+                        "description" => "Purpose",
+                        "master_contract_number" => "Parent Contract ID",
                         "award_method_name" => "Award Method",
                         "contract_type" => "Contract type",
                         "current_amount" => "Current Amount",
@@ -1119,9 +1121,9 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
                         "end_date_orig" => "End Date",
                         "pin" => "PIN",
                         "apt_pin" => "APT PIN",
-                        "expense_category_name" => "Expense Category",
-                        "contract_entity_contract_number" => "Entity Contract#",
-                        "contract_budget_name" => "Budget Name",
+                        "expenditure_object_names" => "Expense Category",
+                        "entity_contract_number" => "Entity Contract#",
+                        "budget_name" => "Budget Name",
                         "" => ""
                     );
                 } else {

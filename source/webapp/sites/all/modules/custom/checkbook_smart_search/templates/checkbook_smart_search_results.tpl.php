@@ -180,13 +180,13 @@ if($noOfTotalResults > 0){
 
   foreach($search_results['hits']['hits'] as $key=>$value){
     print "<li>";
-    $domain_display = 'payroll';
+      $domain_display = $value['_source']['domain'];
     if($domain_display == "budget"){
       $domain_display = "Expense Budget";
     }
       print "<h3 class='title'>Transaction #". $transaction_no .": ". $domain_display ."</h3>";
       $transaction_no++;
-    switch( 'payroll'){
+    switch( $domain_display){
       case "revenue":
 
         print theme('revenue', array('revenue_results'=> $value, 'SearchTerm' => $searchTerms[0]));
@@ -201,7 +201,7 @@ if($noOfTotalResults > 0){
         print theme('payroll', array('payroll_results'=> $value, 'SearchTerm' => $searchTerms[0]));
         break;
       case "contracts":
-        print theme('contracts', array('contracts_results'=> $value, 'SearchTerm' => $searchTerms[0], 'IsOge' => isset($value["oge_agency_name"]) ));
+        print theme('contracts', array('contracts_results'=> $value['_source'], 'SearchTerm' => $searchTerms[0], 'IsOge' => 'true' ));
         break;
     }
     print "</li>";

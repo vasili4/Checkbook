@@ -715,7 +715,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         $agencies = $value;
         break;
       case 'oge_agency_name':
-        $ogeAgencies[] = $value[$key];
+        $ogeAgencies = $value;
         break;
       case 'fiscal_year':
         $fiscalYears = $value;
@@ -724,10 +724,10 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         $regfiscalYears[] = $value[$key];
         break;
       case 'domain':
-        $domains[] = $value[$key];
+        $domains = $value;
         break;
       case 'vendor_name':
-        $vendors[] = $value[$key];
+        $vendors = $value;
         break;
       case 'vendor_type':
         $vendor_type[] = $value['vendor_type'];
@@ -758,10 +758,11 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
     $contractStatus[0]['active'] = $active_contracts['response']['numFound'];
 
   if (count($domains) > 0) {
-    foreach ($domains[0] as $domainName => $count) {
-      if ($count > 0) {
-        $checked = (in_array($domainName, array_values_recursive($reqDomains[0]))) ? 'checked' : '';
-        $output['Type of Data'][] = array($domainName, $domainName, $count, $checked);
+    foreach ($domains as $domainName => $count) {
+
+        if ($count['doc_count'] > 0) {
+        $checked = (in_array($count['key'], array_values_recursive($reqDomains[0]))) ? 'checked' : '';
+        $output['Type of Data'][] = array($count['key'], $count['key'], $count['doc_count'], $checked);
         $output['Type of Data']['name'] = 'fdomainName';
         if ($domainName == 'spending' && $checked == 'checked') {
           foreach ($spendingCategory[0] as $spendingName => $spendingCount) {
@@ -831,15 +832,15 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
     }
   }
     if (count($ogeAgencies) > 0) {
-        foreach ($ogeAgencies[0] as $agencyName => $count) {
-          if ($count > 0) {
-            $checked = in_array($agencyName, array_values_recursive($reqOGEAgencies[0]));
-            $agencyValue = urlencode($agencyName);
+        foreach ($ogeAgencies as $agencyName => $count) {
+          if ($count['doc_count'] > 0) {
+            $checked = in_array($count['key'], array_values_recursive($reqOGEAgencies[0]));
+            $agencyValue = urlencode($count['key']);
             if ($checked) {
-              $output['Other Government Entity']['checked'][] = array($agencyValue, $agencyName, $count);
+              $output['Other Government Entity']['checked'][] = array($agencyValue, $count['key'], $count['doc_count']);
             }
             else {
-              $output['Other Government Entity']['unchecked'][] = array($agencyValue, $agencyName, $count);
+              $output['Other Government Entity']['unchecked'][] = array($agencyValue, $count['key'], $count['doc_count']);
             }
           }
         }
@@ -852,16 +853,16 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
       }
 
   if (count($vendors) > 0) {
-    foreach ($vendors[0] as $vendorName => $count) {
-      if ($count > 0) {
+    foreach ($vendors as $vendorName => $count) {
+      if ($count['doc_count'] > 0) {
         //use strict param=true search so that integer values don't get mistaken as strings.
-        $checked = in_array($vendorName, array_values_recursive($reqVendors[0]), true);
-        $vendorValue = urlencode($vendorName);
+        $checked = in_array($count['key'], array_values_recursive($reqVendors[0]), true);
+        $vendorValue = urlencode($count['key']);
         if ($checked) {
-          $output['Vendor']['checked'][] = array($vendorValue, $vendorName, $count);
+          $output['Vendor']['checked'][] = array($vendorValue, $count['key'], $count['doc_count']);
         }
         else {
-          $output['Vendor']['unchecked'][] = array($vendorValue, $vendorName, $count);
+          $output['Vendor']['unchecked'][] = array($vendorValue, $count['key'], $count['doc_count']);
         }
       }
     }
