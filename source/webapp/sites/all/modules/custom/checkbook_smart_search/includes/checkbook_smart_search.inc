@@ -230,7 +230,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
             $params['body']['query'] =$search_term;
             $params['body']['aggs']['names']['terms']['field'] = 'vendor_name.keyword';
-           // $params['body']['sort']['pay_date']['order'] = 'desc';
+            $params['body']['sort']['date_ordering']['order'] = 'desc';
         }
 
         try {
