@@ -43,7 +43,7 @@ function _checkbook_smart_search_get_results(){
     $vendor_number = count($all_vendors['facet_counts']['facet_fields']['vendor_name']);
     $vendor_pages = floor($vendor_number / 100);
     drupal_add_js(array('checkbook_smart_search' => array('vendor_pages' => $vendor_pages)), 'setting');
-    $expense_categories = _checkbook_smart_search_get_facet_results($search_terms, "expense_categories", NULL, 100);
+    $expense_categories = _checkbook_search_get_facet_results($search_terms, "expense_categories", NULL, 100);
     $all_expense_categories = _checkbook_smart_search_get_facet_results($search_terms, "expense_categories", NULL, -1);
     $expense_categories_number = count($all_expense_categories['facet_counts']['facet_fields']['expenditure_object_name']);
     $expense_category_pages = floor($expense_categories_number / 100);
@@ -61,8 +61,8 @@ function _checkbook_smart_search_get_results(){
                     $domain = explode('~',$keys[1]);
                     foreach($domain as $key => $value){
                         if($value == 'contracts'){
-                            $contract_categories = _checkbook_smart_search_get_facet_results($search_terms, "contract_categories");
-                            $contract_status = _checkbook_smart_search_get_facet_results($search_terms, "contract_status");
+                            $contract_categories =  _checkbook_search_get_facet_results($search_terms, "contract_categories");
+                            $contract_status =  _checkbook_search_get_facet_results($search_terms, "contract_status");
                         }
                         if($value == 'spending'){
                             $spending_categories = _checkbook_smart_search_get_facet_results($search_terms, "spending_categories");
@@ -71,8 +71,8 @@ function _checkbook_smart_search_get_results(){
                 }
                 else{
                     if($keys[1] == 'contracts'){
-                        $contract_categories = _checkbook_smart_search_get_facet_results($search_terms, "contract_categories");
-                        $contract_status = _checkbook_smart_search_get_facet_results($search_terms, "contract_status");
+                        $contract_categories =  _checkbook_search_get_facet_results($search_terms, "contract_categories");
+                        $contract_status =  _checkbook_search_get_facet_results($search_terms, "contract_status");
                     }
                     if($keys[1] == 'spending'){
                         $spending_categories = _checkbook_smart_search_get_facet_results($search_terms, "spending_categories");
@@ -93,12 +93,12 @@ function _checkbook_smart_search_get_results(){
         "oge_agency_name" => $oges['aggregations']['names']['buckets'],
         "vendor_name" => $vendors['aggregations']['names']['buckets'],
         "vendor_type" => $vendor_type['facet_counts']['facet_fields'],
-        "expenditure_object_name" => $expense_categories['facet_counts']['facet_fields'],
+        "expenditure_object_name" => $expense_categories['aggregations']['names']['buckets'],
         "fiscal_year" =>  $fiscal_years['aggregations']['names']['buckets'],
         "registered_fiscal_year" => $fiscal_years['facet_counts']['facet_fields'],
         "spending_category_name" => $spending_categories['facet_counts']['facet_fields'],
-        "contract_category_name" => $contract_categories['facet_counts']['facet_fields'],
-        "contract_status" => $contract_status['facet_counts']['facet_fields'],
+        "contract_category_name" => $contract_categories['aggregations']['names']['buckets'],
+        "contract_status" => $contract_status['aggregations']['names']['buckets'],
         "mwbe_category" => $mwbe_category['facet_counts']['facet_fields'],
         "industry_type_name" => $industry_type_name['facet_counts']['facet_fields'],
         "payroll_type" => $payroll_type['aggregations']['names']['buckets']
@@ -216,10 +216,10 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         ->setHosts($hosts)
         ->build();
     $params['index'] = 'checkbook,contracts';
- //   $params['type'] = 'payroll';
+  // $params['type'] = 'payroll';
 
      $params['body']['from']=$page_no*$no_of_results;
-    // $params['body']['size']=($page_no*$no_of_results)+10;
+
 
 
         if($search_term=="*:*" ){
@@ -268,11 +268,11 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             "domains" => "domain",
             "vendor_names" => "vendor_name",
             "vendor_type" => "vendor_type",
-            "expense_categories" => "expenditure_object_name",
+            "expense_categories" => "expenditure_object_names",
             "revenue_categories" => "revenue_category_name",
             "spending_categories" => "spending_category_name",
-            "contract_categories" => "contract_category_name",
-            "contract_status" => "contract_status",
+            "contract_categories" => "category",
+            "contract_status" => "status",
             "minority_type_name" => "minority_type_name",
             "industry_type_name" => "industry_type_name",
             "payroll_type" => "payroll_type"
@@ -316,11 +316,11 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
         "domains" => "domain",
         "vendor_names" => "vendor_name",
         "vendor_type" => "vendor_type",
-        "expense_categories" => "expenditure_object_name",
+        "expense_categories" => "expenditure_object_names",
         "revenue_categories" => "revenue_category_name",
         "spending_categories" => "spending_category_name",
-        "contract_categories" => "contract_category_name",
-        "contract_status" => "contract_status",
+        "contract_categories" => "category",
+        "contract_status" => "status",
         "minority_type_name" => "minority_type_name",
         "industry_type_name" => "industry_type_name",
         "payroll_type" => "payroll_type"
@@ -423,11 +423,11 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
             "domains" => "domain",
             "vendor_names" => "vendor_name",
             "vendor_type" => "vendor_type",
-            "expense_categories" => "expenditure_object_name",
+            "expense_categories" => "expenditure_object_names",
             "revenue_categories" => "revenue_category_name",
             "spending_categories" => "spending_category_name",
-            "contract_categories" => "contract_category_name",
-            "contract_status" => "contract_status",
+            "contract_categories" => "category",
+            "contract_status" => "status",
             "minority_type_name" => "minority_type_name",
             "industry_type_name" => "industry_type_name",
             "payroll_type" => "payroll_type"
@@ -524,11 +524,11 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
             "domains" => "domain",
             "vendor_names" => "vendor_name",
             "vendor_type" => "vendor_type",
-            "expense_categories" => "expenditure_object_name",
+            "expense_categories" => "expenditure_object_names",
             "revenue_categories" => "revenue_category_name",
             "spending_categories" => "spending_category_name",
-            "contract_categories" => "contract_category_name",
-            "contract_status" => "contract_status",
+            "contract_categories" => "category",
+            "contract_status" => "status",
             "minority_type_name" => "minority_type_name",
             "industry_type_name" => "industry_type_name",
             "payroll_type" => "payroll_type"
@@ -557,6 +557,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
         }
 
             $params['body']['aggs']['names']['terms']['field'] =$parameter_mapping[$facet_name].'.keyword';
+            $params['body']['aggs']['names']['terms']['exclude'] =' .*';
             $params['body']['aggs']['names']['terms']['size'] = 1000;
 
 
@@ -752,8 +753,8 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
         $client = Elasticsearch\ClientBuilder::create()
             ->setHosts($hosts)
             ->build();
-        $params['index'] = 'checkbook';
-        $params['type'] = 'payroll';
+        $params['index'] = 'checkbook,contracts';
+       // $params['type'] = 'payroll';
         //$params['body']['_source'] = ['agency_name'];
         $params['body']['size']=0;
         $matches = array();
@@ -765,6 +766,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
         if (!empty($search_term)) {
             $params['body']['query']['bool']['filter']['match_phrase'][$facet_autocomplete_field] = $search_term;
             $params['body']['aggs']['names']['terms']['field'] = $facet_name.'.keyword';
+            $params['body']['aggs']['names']['terms']['exclude'] = ' .*';
 
             try {
                 $response = $client->search($params);
@@ -809,7 +811,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
      **/
     function _checkbook_smart_search_oge_autocomplete()
     {
-        $oges = _checkbook_smart_search_get_searchstring_autocomplete("oge_agency_names", "oge_agency_name_autocomplete"); // ln 422
+        $oges = _checkbook_smart_search_get_searchstring_autocomplete("oge_agency_name", "oge_agency_name.autocomplete"); // ln 422
         return $oges;
     }
 
@@ -820,7 +822,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
      **/
     function _checkbook_smart_search_vendor_autocomplete()
     {
-        $vendors = _checkbook_smart_search_get_searchstring_autocomplete("vendor_names", "vendor_name_autocomplete");
+        $vendors = _checkbook_smart_search_get_searchstring_autocomplete("vendor_name", "vendor_name.autocomplete");
         return $vendors;
     }
 
@@ -831,7 +833,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
      **/
     function _checkbook_smart_search_expensecategory_autocomplete()
     {
-        $expense_categories = _checkbook_smart_search_get_searchstring_autocomplete("expense_categories", "expenditure_object_name_autocomplete");
+        $expense_categories = _checkbook_smart_search_get_searchstring_autocomplete("expenditure_object_names", "expenditure_object_names.autocomplete");
         return $expense_categories;
     }
 
@@ -1106,7 +1108,7 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
                 if ($IsOge) {
                     $parameter_mapping = array(
                         "status" => "Status",
-                        "category_name" => "Category",
+                        "category" => "Category",
                         "vendor_name" => "Prime Vendor",
                         "oge_contracting_agency_name" => "Agency",
                         "contract_number" => "Contract ID",
@@ -1117,8 +1119,8 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
                         "contract_type" => "Contract type",
                         "current_amount" => "Current Amount",
                         "original_amount" => "Original Amount",
-                        "start_date_orig" => "Start date",
-                        "end_date_orig" => "End Date",
+                        "effective_begin_date_orig" => "Start date",
+                        "effective_end_date_orig" => "End Date",
                         "pin" => "PIN",
                         "apt_pin" => "APT PIN",
                         "expenditure_object_names" => "Expense Category",

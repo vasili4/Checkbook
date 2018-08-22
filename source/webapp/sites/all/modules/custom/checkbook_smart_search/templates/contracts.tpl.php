@@ -10,7 +10,7 @@
 
 $contracts_parameter_mapping = _checkbook_smart_search_domain_fields('contracts','true');
 
-if(strtolower($contracts_results['contract_status']) == 'registered'){
+if(strtolower($contracts_results['status']) == 'registered'){
 
     $search_terms = explode('*|*', $_REQUEST['search_term']);
     $contract_status = '';
@@ -23,24 +23,24 @@ if(strtolower($contracts_results['contract_status']) == 'registered'){
             $contract_status = 'Active';
 
         }
-        if($keys[0] == 'contract_status' && $keys[1] == 'registered'){
+        if($keys[0] == 'contract_status' && strtolower($keys[1]) == 'registered'){
             $contract_status = 'Registered';
         }
     }
    $act_fiscal_year = $contracts_results['fiscal_year'];
    $reg_fiscal_year = $contracts_results['registered_fiscal_year'];
    $current_date = date("c").'Z';
-   $start_date = date("c", strtotime($contracts_results['start_date']));
-   $end_date = date("c", strtotime($contracts_results['end_date']));
+   $start_date = date("c", strtotime($contracts_results['effective_begin_date']));
+   $end_date = date("c", strtotime($contracts_results['effective_end_date']));
 
     /*if($contract_status == 'Active'){
            $contracts_results['contract_status'] = 'Active';
            $status = "A";
    }*/ if($contract_status == 'Registered'){
-           $contracts_results['contract_status'] =  'Registered';
+           $contracts_results['status'] =  'Registered';
            $status = "R";
    }else{
-       $contracts_results['contract_status'] =  'Active';
+       $contracts_results['status'] =  'Active';
        $status = "A";
    }
     $effective_end_year_id = $contracts_results['effective_end_year_id'];
@@ -120,9 +120,9 @@ if(strtolower($contracts_results['contract_status']) == 'registered'){
         $contracts_results['parent_contract_number'] = "<a href='". $master_contract_Id_link."'>".$contracts_results['parent_contract_number']."</a>";
     }
 
-}else if(strtolower($contracts_results['contract_status']) == 'pending'){
+}else if(strtolower($contracts_results['status']) == 'pending'){
     $current_year = "/yeartype/B/year/". _getFiscalYearID();
-    if(strtolower($contracts_results['contract_category_name']) == 'expense'){
+    if(strtolower($contracts_results['category']) == 'expense'){
         $agency_link = "/contracts_pending_exp_landing".$current_year."/agency/".$contracts_results['agency_id'];
         $vendor_link = "/contracts_pending_exp_landing".$current_year."/vendor/".$contracts_results['vendor_id'];
         $contract_Id_link = "/contracts_pending_exp_landing";
@@ -179,11 +179,9 @@ if($IsOge && in_array($contracts_results['contract_type_code'],array('MMA1'))){
 
 $contracts_results["registration_date"] = ($IsOge)? "N/A" : $contracts_results["registration_date"];
 
-$date_fields = array("start_date_orig","end_date_orig","received_date","registration_date");
+$date_fields = array("effective_begin_date_orig","effective_end_date_orig","received_date","registration_date");
 $amount_fields = array("current_amount", "original_amount");
-
-$name_fields = array("agency_name", "vendor_name", "award_method_name", "contract_purpose", "expenditure_object_names");
-
+$name_fields = array("agency_name", "vendor_name", "award_method_name", "description", "expenditure_object_names");
 $count = 1;
 $rows = array();
 $row = array();
@@ -206,8 +204,8 @@ foreach ($contracts_parameter_mapping as $key => $title){
   }
   if($key =="contract_number"){
     $value = "<a href='".$contract_Id_link ."'>".$contracts_results['contract_number']."</a>";
-  }else if($key =="parent_contract_number"){
-    $value = "<a href='".$master_contract_Id_link ."'>".$contracts_results['parent_contract_number']."</a>";
+  }else if($key =="master_contract_number"){
+    $value = "<a href='".$master_contract_Id_link ."'>".$contracts_results['master_contract_number']."</a>";
   }else{
   	$value = str_ireplace($SearchTerm,'<em>'. $temp . '</em>', $value);
   }
