@@ -755,7 +755,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         break;
     }
   }
-    $contractStatus[0]['active'] = $active_contracts['hits']['total'];
+    $contractStatus[] = array('key'=>'active','doc_count'=>$active_contracts['hits']['total']);
 
   if (count($domains) > 0) {
     foreach ($domains as $domainName => $count) {
@@ -789,19 +789,19 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
 
                 $checked = (in_array($value['key'], array_values_recursive($reqContStatus[0]))) ? 'checked' : '';
                 //$subCat['contracts']['Status'][] = array($status, $status, $statusCount, $checked);
-               /*  if (strtolower($value['key']) == 'registered') {
-                     if($registered_contracts['response']['numFound'] > 0){
-                         $subCat['contracts']['Status'][] = array('registered', 'Registered', $registered_contracts['response']['numFound'], $checked);
+                 if (strtolower($value['key']) == 'registered') {
+                     if($registered_contracts['hits']['total'] > 0){
+                         $subCat['contracts']['Status'][] = array('registered', 'Registered', $registered_contracts['hits']['total'], $checked);
                      }
                  }else if(strtolower($value['key']) == 'active'){
                      if($active_contracts['hits']['total'] > 0){
                          $subCat['contracts']['Status'][] = array('active', 'Active', $active_contracts['hits']['total'], $checked);
                      }
-                 }else{
-                    */
-               $subCat['contracts']['Status'][] = array($value['key'],$value['key'], $active_contracts['hits']['total'], $checked);
+                 }else {
 
-                // }
+                     $subCat['contracts']['Status'][] = array($value['key'], $value['key'], $value['doc_count'], $checked);
+
+                 }
 
 
 

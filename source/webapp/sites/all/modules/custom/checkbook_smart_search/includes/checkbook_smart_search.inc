@@ -219,10 +219,7 @@ function _checkbook_smart_search_escapeSolrValue($string){
 function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results)
 {
 
-
-    //$current_date = date("c").'Z';
      $search_term = _checkbook_smart_search_get_results_query_search_term1($search_terms);
-  //  $search_term['agency_name'];
 
     $hosts = [
 
@@ -231,8 +228,6 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
     ];
 
     $params['index'] = 'checkbook,contracts';
-  // $params['type'] = 'payroll';
-
      $params['body']['from']=$page_no*$no_of_results;
 
      $search_results = _checkbook_autocomplete_elastic_results2($hosts,$params,  $search_term);
@@ -280,25 +275,25 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         $active_contracts = _checkbook_autocomplete_elastic_results2($hosts,$params,$active_contracts_query);
 
         // Registered Contracts count
-        /*$reg_search_string = str_replace('&fq=(contract_status:"pending")','',$search_string);
-        foreach($search_terms as $id => $keyvaluepair){
+        $reg_search_terms = $search_terms;
+       // $reg_search_string = str_replace('&fq=(contract_status:"pending")','',$search_string);
+        foreach($reg_search_terms as $id => $keyvaluepair){
             $keys = explode("=", $keyvaluepair);
             if($keys[0] == 'fiscal_years'){
-                $reg_search_string = str_replace('fiscal_year','registered_fiscal_year',$reg_search_string);
+                $reg_search_terms[$id] = str_replace('registered_fiscal_years', 'fiscal_years', $keyvaluepair);
             }
         }
-        $registered_contracts_query = "select/?q=" . $reg_search_string
-            ."&fq=contract_status:registered"
-            ."&wt=php";
+        $registered_contracts_query =  _checkbook_smart_search_get_results_query_search_term1( $reg_search_terms);
 
-        $registered_contracts = _checkbook_smart_search_solr_results($registered_contracts_query);
-       */
+
+        $registered_contracts = _checkbook_autocomplete_elastic_results2($hosts,$params,$registered_contracts_query);
+
     }
 
 
 
 
-    return array('search_results' => $search_results, 'active_contracts' =>  $active_contracts, 'registered_contracts' => null);
+    return array('search_results' => $search_results, 'active_contracts' =>  $active_contracts, 'registered_contracts' => $registered_contracts);
 
 }
 
@@ -525,6 +520,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
             ->setHosts($hosts)
             ->build();
         $params['index'] = 'checkbook,contracts';
+        $params['size']=0;
        // $params['type'] = 'payroll';
 
 
