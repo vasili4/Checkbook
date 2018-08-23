@@ -506,7 +506,7 @@
         if((fiscalYears && !contractStatus) || (fiscalYears && contractStatus==="active") || (regfiscalYears && contractStatus==="active")){
             cUrl += "fiscal_years=" + encodeURIComponent((fiscalYears) ? fiscalYears : regfiscalYears) + '*|*';
         }
-        if((regfiscalYears && !contractStatus && domainNames === 'contracts') || (regfiscalYears && contractStatus==="registered" && domainNames === 'contracts' ) || (fiscalYears && contractStatus==="registered" && domainNames === 'contracts')){
+        if((regfiscalYears && !contractStatus && domainNames === 'contracts') || (regfiscalYears && contractStatus==="Registered" && domainNames === 'contracts' ) || (fiscalYears && contractStatus==="Registered" && domainNames === 'contracts')){
             cUrl += "registered_fiscal_years=" + encodeURIComponent((regfiscalYears) ? regfiscalYears : fiscalYears) + '*|*';
         }
         if(expenseCategories){

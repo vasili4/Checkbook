@@ -704,7 +704,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         $keys = explode("=", $keyvaluepair);
         if($keys[1] == 'active'){
             $reqContStatus[0][0]['name'] = 'active';
-            $reqContStatus[0][0]['count'] = $active_contracts['response']['numFound'];
+            $reqContStatus[0][0]['count'] = $active_contracts['hits']['total'];
         }
     }
 
@@ -755,7 +755,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         break;
     }
   }
-    $contractStatus[0]['active'] = $active_contracts['response']['numFound'];
+    $contractStatus[0]['active'] = $active_contracts['hits']['total'];
 
   if (count($domains) > 0) {
     foreach ($domains as $domainName => $count) {
@@ -789,18 +789,20 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
 
                 $checked = (in_array($value['key'], array_values_recursive($reqContStatus[0]))) ? 'checked' : '';
                 //$subCat['contracts']['Status'][] = array($status, $status, $statusCount, $checked);
-                /* if (strtolower($value['key']) == 'registered') {
+               /*  if (strtolower($value['key']) == 'registered') {
                      if($registered_contracts['response']['numFound'] > 0){
                          $subCat['contracts']['Status'][] = array('registered', 'Registered', $registered_contracts['response']['numFound'], $checked);
                      }
-                 }else if(strtolower($status) == 'active'){
-                     if($active_contracts['response']['numFound'] > 0){
-                         $subCat['contracts']['Status'][] = array('active', 'Active', $active_contracts['response']['numFound'], $checked);
+                 }else if(strtolower($value['key']) == 'active'){
+                     if($active_contracts['hits']['total'] > 0){
+                         $subCat['contracts']['Status'][] = array('active', 'Active', $active_contracts['hits']['total'], $checked);
                      }
                  }else{
-                }
-                */
-             $subCat['contracts']['Status'][] = array($value['key'],$value['key'], $value['doc_count'], $checked);
+                    */
+               $subCat['contracts']['Status'][] = array($value['key'],$value['key'], $active_contracts['hits']['total'], $checked);
+
+                // }
+
 
 
             }
@@ -983,28 +985,26 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
   }
 
     // Registered fiscal year
-   if (count($regfiscalYears) > 0) {
-       krsort($regfiscalYears);
-       foreach ($regfiscalYears as $fiscalYear => $count) {
-           if ($count['doc_count'] > 0) {
-               $checked = in_array($count['key'], array_values_recursive($regreqFiscalYears[0]));
-               $fiscalYear= urlencode($count['key']);
-               if ($checked) {
-                   $output['Fiscal Year']['checked'][] = array($fiscalYear, $count['key'], $count['doc_count']);
-               } else {
-                   $output['Fiscal Year']['unchecked'][] = array($fiscalYear, $count['key'], $count['doc_count']);
-               }
-           }
-       }
-       $output['Fiscal Year']['name'] = 'regfyear';
-       if (!empty($regreqFiscalYears[0])) {
-           foreach ($regreqFiscalYears[0] as $key => $value) {
-               if (!in_array($value['name'], array_values_recursive($output['Fiscal Year']['checked']))) {
-                   $output['Fiscal Year']['checked'][] = array(urlencode($value['name']), $value['name'], $value['count']);
-               }
-           }
-       }
-   }
+    if (!empty($regfiscalYears)) {
+        krsort($regfiscalYears);
+        foreach ($regfiscalYears as $fiscalYear => $count) {
+            if ($count['doc_count'] > 0) {
+                $checked = in_array($count['key'], array_values_recursive($regreqFiscalYears[0]));
+                if ($checked) {
+                    $output['Fiscal Year']['checked'][] = array($count['key'],$count['key'], $count['doc_count']);
+                }
+                else {
+                    $output['Fiscal Year']['unchecked'][] = array($count['key'],$count['key'], $count['doc_count']);
+                }
+            }
+        }
+        $output['Fiscal Year']['name'] = 'regfyear';
+        foreach($regreqFiscalYears[0] as $key => $value){
+            if(!in_array($value['name'], array_values_recursive($output['Fiscal Year']['checked']))){
+                $output['Fiscal Year']['checked'][] = array(urlencode($value['name']), $value['name'], $value['count']);
+            }
+        }
+    }
 
     //Industry
     if (count($industryType) > 0) {

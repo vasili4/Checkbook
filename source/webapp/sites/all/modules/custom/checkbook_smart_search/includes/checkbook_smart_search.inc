@@ -104,7 +104,6 @@ function _checkbook_smart_search_get_results(){
 
 
 
-
     $facetResults = array(
         "domain" => $domains['aggregations']['names']['buckets'],
         "agency_name" => $agencies['aggregations']['names']['buckets'],
@@ -113,7 +112,7 @@ function _checkbook_smart_search_get_results(){
         "vendor_type" => $vendor_type['facet_counts']['facet_fields'],
         "expenditure_object_name" => $expense_categories['aggregations']['names']['buckets'],
         "fiscal_year" =>  $fiscal_years['aggregations']['names']['buckets'],
-        "registered_fiscal_year" =>  $registered_fiscal_years['aggregations']['names']['buckets'],
+       "registered_fiscal_year" =>  $registered_fiscal_years['aggregations']['names']['buckets'],
         "spending_category_name" => $spending_categories['facet_counts']['facet_fields'],
         "contract_category_name" => $contract_categories['aggregations']['names']['buckets'],
         "contract_status" => $contract_status['aggregations']['names']['buckets'],
@@ -142,12 +141,13 @@ function _checkbook_smart_search_get_results(){
         }
     }
     if($reg_flag){
-        $selected_registered_fiscal_years = _checkbook_smart_search_get_selected_facet_results($search_terms, "registered_fiscal_years");
+        $selected_fiscal_years = _checkbook_smart_search_get_selected_facet_results($search_terms, "registered_fiscal_years");
     }
     else{
+
         $selected_fiscal_years = _checkbook_smart_search_get_selected_facet_results($search_terms, "fiscal_years");
     }
-
+    $selected_fiscal_years = _checkbook_smart_search_get_selected_facet_results($search_terms, "fiscal_years");
     $selected_spending_categories = _checkbook_smart_search_get_selected_facet_results($search_terms, "spending_categories");
     $selected_contract_status = _checkbook_smart_search_get_selected_facet_results($search_terms, "contract_status");
     $selected_contract_categories = _checkbook_smart_search_get_selected_facet_results($search_terms, "contract_categories");
@@ -163,7 +163,7 @@ function _checkbook_smart_search_get_results(){
         "vendor_type" => $selected_vendor_type,
         "expenditure_object_name" => $selected_expense_categories,
         "fiscal_year" => $selected_fiscal_years,
-        "registered_fiscal_year" => $selected_registered_fiscal_years,
+        "registered_fiscal_year" => $selected_fiscal_years,
         "spending_category_name" => $selected_spending_categories,
         "contract_category_name" => $selected_contract_categories,
         "contract_status" => $selected_contract_status,
@@ -259,25 +259,23 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         }
     }
 
-    if($contract_flag){
+    if($contract_flag) {
         //Active contracts count
-       $active_search_terms = $search_terms;
-     //   $act_search_string = str_replace('&fq=(contract_status:"pending")','',$search_string);
-        foreach($active_search_terms as $id => $keyvaluepair){
+        $active_search_terms = $search_terms;
+        //   $act_search_string = str_replace('&fq=(contract_status:"pending")','',$search_string);
+        foreach ($active_search_terms as $id => $keyvaluepair) {
             $keys = explode("=", $keyvaluepair);
-            if($keys[0] == 'registered_fiscal_years'){
-                $active_search_terms[$id] = str_replace('registered_fiscal_years','fiscal_years',$keyvaluepair);
+            if ($keys[0] == 'registered_fiscal_years') {
+                $active_search_terms[$id] = str_replace('registered_fiscal_years', 'fiscal_years', $keyvaluepair);
             }
 
-
         }
-        $active_contracts_query = _checkbook_smart_search_get_results_query_search_term1( $active_search_terms);
+        $active_contracts_query = _checkbook_smart_search_get_results_query_search_term1($active_search_terms);
 
-
-       /* $active_contracts_query = "select/?q=" . $act_search_string
-            ."&fq=contract_status:registered"
-            ."&wt=php";
-       */
+        /* $active_contracts_query = "select/?q=" . $act_search_string
+             ."&fq=contract_status:registered"
+             ."&wt=php";
+        */
 
         $active_contracts = _checkbook_autocomplete_elastic_results2($hosts,$params,$active_contracts_query);
 
@@ -294,9 +292,10 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             ."&wt=php";
 
         $registered_contracts = _checkbook_smart_search_solr_results($registered_contracts_query);
-        */
-
+       */
     }
+
+
 
 
     return array('search_results' => $search_results, 'active_contracts' =>  $active_contracts, 'registered_contracts' => null);
