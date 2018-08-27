@@ -225,6 +225,8 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
         'http://elk-checkbook-nyc.reisys.com:9200'
 
+
+
     ];
 
      $params['index'] = 'checkbook,contracts';
@@ -328,10 +330,11 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
         $searchTerm = $search_terms[0];
           if(count($search_terms)==1) {
               if($search_terms[0]!=="*:*"){
-                  $subQuery['multi_match']['query']='department';
-                  $subQuery['multi_match']['fields']=["agency_name.autocomplete"];
-
+                  $subQuery['query_string']['query']= $search_terms[0];
                   $searchTerm = $subQuery;
+
+
+                
               }
 
           }
@@ -382,10 +385,8 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
     $searchTerm = $search_terms[0];
     if(count($search_terms)==1) {
         if($search_terms[0]!=="*:*"){
-            $subQuery['multi_match']['query']='department';
-            $subQuery['multi_match']['fields']=["agency_name.autocomplete"];
-
-            $searchTerm = $subQuery;
+          $subQuery['query_string']['query']= $search_terms[0];
+          $searchTerm = $subQuery;
         }
 
     }
@@ -449,6 +450,7 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
 function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL) {
 
     $matches = array();
+    $params['body']['size'] = 0;
 
     $client = Elasticsearch\ClientBuilder::create()
         ->setHosts($hosts)
@@ -755,20 +757,17 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
         $groupTerms = ['agency_name', 'oge_agency_name', 'vendor_name', 'expenditure_object_names'];
 
         $hosts = [
-
             'http://elk-checkbook-nyc.reisys.com:9200'
         ];
 
 
         $params['index'] = 'checkbook,contracts';
-        //$params['type'] = 'payroll,doc';
-        $params['body']['size'] = 0;
+        $params['size'] = 0;
         $count = 0;
         $matches = array();
         $results=array();
-        if (!empty($search_term)) {
+
             foreach ($groupTerms as $key) {
-                unset($params['body']['query']['bool']['filter']['match_phrase']);
                 switch ($key) {
                     case 'agency_name':
                         $params['body']['query']['bool']['filter']['match_phrase']['agency_name.autocomplete'] = $search_term;
@@ -822,9 +821,10 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
                         break;
 
                 }
+                unset($params);
 
             }
-        }
+
 
             if ($count == 0) {
                 array_push($matches, array("url" => "", "label" => '<span>' . "No matches found" . '</span>', 'value' => 'No matches found'));
@@ -855,8 +855,6 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
             ->setHosts($hosts)
             ->build();
         $params['index'] = 'checkbook,contracts';
-       // $params['type'] = 'payroll';
-        //$params['body']['_source'] = ['agency_name'];
         $params['body']['size']=0;
         $matches = array();
 
