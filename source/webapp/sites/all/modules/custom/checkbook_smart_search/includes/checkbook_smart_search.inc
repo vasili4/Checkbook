@@ -223,13 +223,12 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
     $hosts = [
 
-        'http://localhost:9200'
+        'http://elk-checkbook-nyc.reisys.com:9200'
 
     ];
 
-    $params['index'] = 'checkbook,contracts';
+     $params['index'] = 'checkbook,contracts';
      $params['body']['from']=$page_no*$no_of_results;
-
      $search_results = _checkbook_autocomplete_elastic_results2($hosts,$params,  $search_term);
 
 
@@ -252,35 +251,34 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
                 }
             }
         }
-    }
+     }
 
     if($contract_flag) {
-        //Active contracts count
         $active_search_terms = $search_terms;
-        //   $act_search_string = str_replace('&fq=(contract_status:"pending")','',$search_string);
         foreach ($active_search_terms as $id => $keyvaluepair) {
             $keys = explode("=", $keyvaluepair);
             if ($keys[0] == 'registered_fiscal_years') {
                 $active_search_terms[$id] = str_replace('registered_fiscal_years', 'fiscal_years', $keyvaluepair);
             }
+            else if($keys[0] == 'contract_status'){
+                $active_search_terms[$id] = str_replace('active', 'registered', $keyvaluepair);
+            }
 
         }
         $active_contracts_query = _checkbook_smart_search_get_results_query_search_term1($active_search_terms);
 
-        /* $active_contracts_query = "select/?q=" . $act_search_string
-             ."&fq=contract_status:registered"
-             ."&wt=php";
-        */
 
         $active_contracts = _checkbook_autocomplete_elastic_results2($hosts,$params,$active_contracts_query);
 
         // Registered Contracts count
         $reg_search_terms = $search_terms;
-       // $reg_search_string = str_replace('&fq=(contract_status:"pending")','',$search_string);
         foreach($reg_search_terms as $id => $keyvaluepair){
             $keys = explode("=", $keyvaluepair);
             if($keys[0] == 'fiscal_years'){
                 $reg_search_terms[$id] = str_replace('registered_fiscal_years', 'fiscal_years', $keyvaluepair);
+            }
+            else if($keys[0] == 'contract_status'){
+                $reg_search_terms[$id] = str_replace('active', 'registered', $keyvaluepair);
             }
         }
         $registered_contracts_query =  _checkbook_smart_search_get_results_query_search_term1( $reg_search_terms);
@@ -341,6 +339,12 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
               for ($i = 1; $i < count($search_terms); $i++) {
                   $reqParams = explode('=', $search_terms[$i]);
+                  if($reqParams[0] == 'vendor_type'){
+                      $reqParams[1] = get_vendor_type_mapping($reqParams[1]);
+                  }
+                  if($reqParams[0] == 'contract_status'){
+                      $reqParams[1] = get_contract_status_mapping($reqParams[1]);
+                  }
 
                   $filters = explode('~', urldecode($reqParams[1]));
 
@@ -388,6 +392,13 @@ function _checkbook_smart_search_get_results_query_search_term1($search_terms)
     else {
         for ($i = 1; $i < count($search_terms); $i++) {
             $req_params = explode('=', $search_terms[$i]);
+            if($req_params[0] == 'vendor_type'){
+                $req_params[1] = get_vendor_type_mapping($req_params[1]);
+            }
+            if($req_params[0] == 'contract_status'){
+                $req_params[1] = get_contract_status_mapping($req_params[1]);
+            }
+
 
             $filters = explode('~', urldecode($req_params[1]));
 
@@ -462,7 +473,6 @@ function _checkbook_autocomplete_elastic_results1($hosts,$params, $facet = NULL)
 }
 function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term = NULL) {
 
-    $matches = array();
 
     $client = Elasticsearch\ClientBuilder::create()
         ->setHosts($hosts)
@@ -513,7 +523,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
 
         $hosts = [
 
-            'http://localhost:9200'
+            'http://elk-checkbook-nyc.reisys.com:9200'
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
@@ -521,7 +531,6 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
             ->build();
         $params['index'] = 'checkbook,contracts';
         $params['size']=0;
-       // $params['type'] = 'payroll';
 
 
         $result = array();
@@ -540,6 +549,13 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
 
         for ($i = 1; $i < count($search_terms); $i++) {
             $req_params = explode('=', $search_terms[$i]); // ("domains", "payroll~spending") ("fiscal_years", "2014~2013")
+            if($req_params[0] == 'vendor_type'){
+                $req_params[1] = get_vendor_type_mapping($req_params[1]);
+            }
+            if($req_params[0] == 'contract_status'){
+                $req_params[1] = get_contract_status_mapping($req_params[1]);
+            }
+
 
             $filters = explode('~', urldecode($req_params[1]));
 
@@ -558,7 +574,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
         if ($count>0) {
             $params['body']['query']= $search_term;
             $params['body']['aggs']['names']['terms']['field'] = $parameter_mapping[$facet_name].'.keyword';
-            $params['body']['aggs']['names']['terms']['size'] = 10000;
+            $params['body']['aggs']['names']['terms']['size'] = 1000;
 
             try {
                 $response = $client->search($params);
@@ -614,7 +630,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
         );
         $hosts = [
 
-            'http://localhost:9200'
+            'http://elk-checkbook-nyc.reisys.com:9200'
         ];
         $client = Elasticsearch\ClientBuilder::create()
             ->setHosts($hosts)
@@ -625,6 +641,12 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
 
         for ($i = 1; $i < count($search_terms); $i++) {
             $req_params = explode('=', $search_terms[$i]);
+            if($req_params[0] == 'vendor_type'){
+                $req_params[1] = get_vendor_type_mapping($req_params[1]);
+            }
+            if($req_params[0] == 'contract_status'){
+                $req_params[1] = get_contract_status_mapping($req_params[1]);
+            }
 
             $filters = explode('~', urldecode($req_params[1]));
 
@@ -734,7 +756,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
 
         $hosts = [
 
-            'http://localhost:9200'
+            'http://elk-checkbook-nyc.reisys.com:9200'
         ];
 
 
@@ -826,7 +848,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
 
         $hosts = [
 
-            'http://localhost:9200'
+            'http://elk-checkbook-nyc.reisys.com:9200'
         ];
 
         $client = Elasticsearch\ClientBuilder::create()

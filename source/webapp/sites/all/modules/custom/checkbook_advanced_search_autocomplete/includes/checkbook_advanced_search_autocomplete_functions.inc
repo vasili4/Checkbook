@@ -649,7 +649,7 @@ function _get_contracts_advanced_search_elastic_autocomplete_results($facet, $pa
 
     $hosts = [
 
-        'http://localhost:9200'
+        'http://elk-checkbook-nyc.reisys.com:9200'
     ];
     if($category){
         if($category == 'all'){
@@ -723,7 +723,7 @@ function _get_contracts_advanced_search_elastic_autocomplete_results($facet, $pa
         $params=  _get_autocomplete_query_term($params,'aprv_sta',$sub_vendor_status);
 
     }
-    $matches = _checkbook_autocomplete_elastic_results($hosts,$params, $facet);
+    $matches = _checkbook_autocompllete_elastic_results($hosts,$params, $facet);
     return $matches;
 }
 
