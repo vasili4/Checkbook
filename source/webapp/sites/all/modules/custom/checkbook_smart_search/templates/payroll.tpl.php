@@ -44,10 +44,10 @@ $row = array();
 $rows = array();
 foreach ($payroll_parameter_mapping as $key => $title){
   $value = $payroll_results['_source'][$key];
-
-  $temp = substr($value, strpos(strtoupper($value), strtoupper($SearchTerm)),strlen($SearchTerm));
-  $value = str_ireplace($SearchTerm,'<em>'. $temp . '</em>', $value);
-
+  if(!empty($SearchTerm)) {
+      $temp = substr($value, strpos(strtoupper($value), strtoupper($SearchTerm)), strlen($SearchTerm));
+      $value = str_ireplace($SearchTerm, '<em>' . $temp . '</em>', $value);
+  }
   if(in_array($key, $amount_fields)){
     $value = custom_number_formatter_format($value, 2 , '$');
   }else if(in_array($key, $date_fields)){

@@ -227,6 +227,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
 
 
 
+
     ];
 
      $params['index'] = 'checkbook,contracts';
@@ -334,7 +335,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
                   $searchTerm = $subQuery;
 
 
-                
+
               }
 
           }
@@ -526,6 +527,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
         $hosts = [
 
             'http://elk-checkbook-nyc.reisys.com:9200'
+
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
@@ -533,7 +535,6 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
             ->build();
         $params['index'] = 'checkbook,contracts';
         $params['size']=0;
-
 
         $result = array();
 
@@ -633,6 +634,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
         $hosts = [
 
             'http://elk-checkbook-nyc.reisys.com:9200'
+
         ];
         $client = Elasticsearch\ClientBuilder::create()
             ->setHosts($hosts)
@@ -758,6 +760,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
 
         $hosts = [
             'http://elk-checkbook-nyc.reisys.com:9200'
+
         ];
 
 
@@ -849,6 +852,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
         $hosts = [
 
             'http://elk-checkbook-nyc.reisys.com:9200'
+
         ];
 
         $client = Elasticsearch\ClientBuilder::create()
