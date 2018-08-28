@@ -38,18 +38,18 @@ function _checkbook_smart_search_get_results(){
     $oges = _checkbook_search_get_facet_results($search_terms, "oge_agency_names", NULL, -1);
     $agencies = _checkbook_search_get_facet_results($search_terms, "agency_names", NULL, -1);
     $vendors = _checkbook_search_get_facet_results($search_terms, "vendor_names", NULL, 100);
-    $vendor_type = _checkbook_smart_search_get_facet_results($search_terms, "vendor_type", NULL, 100);
-    $all_vendors = _checkbook_smart_search_get_facet_results($search_terms, "vendor_names", NULL, -1);
-    $vendor_number = count($all_vendors['facet_counts']['facet_fields']['vendor_name']);
+    $vendor_type = _checkbook_search_get_facet_results($search_terms, "vendor_type", NULL, 100);
+    $all_vendors = _checkbook_search_get_facet_results($search_terms, "vendor_names", NULL, -1);
+    $vendor_number = count($all_vendors['hits']['total']);
     $vendor_pages = floor($vendor_number / 100);
     drupal_add_js(array('checkbook_smart_search' => array('vendor_pages' => $vendor_pages)), 'setting');
     $expense_categories = _checkbook_search_get_facet_results($search_terms, "expense_categories", NULL, 100);
-    $all_expense_categories = _checkbook_smart_search_get_facet_results($search_terms, "expense_categories", NULL, -1);
-    $expense_categories_number = count($all_expense_categories['facet_counts']['facet_fields']['expenditure_object_name']);
+    $all_expense_categories = _checkbook_search_get_facet_results($search_terms, "expense_categories", NULL, -1);
+    $expense_categories_number = count($all_expense_categories['hits']['total']);
     $expense_category_pages = floor($expense_categories_number / 100);
     drupal_add_js(array('checkbook_smart_search' => array('expense_category_pages' => $expense_category_pages)), 'setting');
-    $mwbe_category = _checkbook_smart_search_get_facet_results($search_terms, "minority_type_name");
-    $industry_type_name = _checkbook_smart_search_get_facet_results($search_terms, "industry_type_name");
+    $mwbe_category = _checkbook_search_get_facet_results($search_terms, "minority_type_name");
+    $industry_type_name =  _checkbook_search_get_facet_results($search_terms, "industry_type_name");
     $payroll_type =  _checkbook_search_get_facet_results($search_terms, "payroll_type"); //payroll_type
 
 
@@ -109,15 +109,15 @@ function _checkbook_smart_search_get_results(){
         "agency_name" => $agencies['aggregations']['names']['buckets'],
         "oge_agency_name" => $oges['aggregations']['names']['buckets'],
         "vendor_name" => $vendors['aggregations']['names']['buckets'],
-        "vendor_type" => $vendor_type['facet_counts']['facet_fields'],
+        "vendor_type" => $vendor_type['aggregations']['names']['buckets'],
         "expenditure_object_name" => $expense_categories['aggregations']['names']['buckets'],
         "fiscal_year" =>  $fiscal_years['aggregations']['names']['buckets'],
        "registered_fiscal_year" =>  $registered_fiscal_years['aggregations']['names']['buckets'],
         "spending_category_name" => $spending_categories['facet_counts']['facet_fields'],
         "contract_category_name" => $contract_categories['aggregations']['names']['buckets'],
         "contract_status" => $contract_status['aggregations']['names']['buckets'],
-        "mwbe_category" => $mwbe_category['facet_counts']['facet_fields'],
-        "industry_type_name" => $industry_type_name['facet_counts']['facet_fields'],
+        "mwbe_category" => $mwbe_category['aggregations']['names']['buckets'],
+        "industry_type_name" => $industry_type_name['aggregations']['names']['buckets'],
         "payroll_type" => $payroll_type['aggregations']['names']['buckets']
 
     );
@@ -147,7 +147,6 @@ function _checkbook_smart_search_get_results(){
 
         $selected_fiscal_years = _checkbook_smart_search_get_selected_facet_results($search_terms, "fiscal_years");
     }
-    $selected_fiscal_years = _checkbook_smart_search_get_selected_facet_results($search_terms, "fiscal_years");
     $selected_spending_categories = _checkbook_smart_search_get_selected_facet_results($search_terms, "spending_categories");
     $selected_contract_status = _checkbook_smart_search_get_selected_facet_results($search_terms, "contract_status");
     $selected_contract_categories = _checkbook_smart_search_get_selected_facet_results($search_terms, "contract_categories");
@@ -329,17 +328,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
             "payroll_type" => "payroll_type"
         );
         $searchTerm = $search_terms[0];
-          if(count($search_terms)==1) {
-              if($search_terms[0]!=="*:*"){
-                  $subQuery['query_string']['query']= $search_terms[0];
-                  $searchTerm = $subQuery;
 
-
-
-              }
-
-          }
-          else {
 
               for ($i = 1; $i < count($search_terms); $i++) {
                   $reqParams = explode('=', $search_terms[$i]);
@@ -360,7 +349,7 @@ function _checkbook_smart_search_results($search_terms, $page_no, $no_of_results
                   $params = $subQuery;
                   $searchTerm = $params;
               }
-          }
+
 
         return $searchTerm;
     }
@@ -536,11 +525,13 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
         $params['index'] = 'checkbook,contracts';
         $params['size']=0;
 
+        $search_string = $search_terms[0];
+        $request_facet_param = array();
         $result = array();
 
 
 
-       $search_term  = _checkbook_smart_search_get_results_query_search_term($search_terms);
+         $search_term  = _checkbook_smart_search_get_results_query_search_term($search_terms);
         $facetname= $parameter_mapping[$facet_name];
 
        if(isset($search_term['bool']['should'])){
@@ -575,7 +566,7 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
 
 
         if ($count>0) {
-            $params['body']['query']= $search_term;
+            $params['body']['query']['constant_score']['filter']= $search_term;
             $params['body']['aggs']['names']['terms']['field'] = $parameter_mapping[$facet_name].'.keyword';
             $params['body']['aggs']['names']['terms']['size'] = 1000;
 
@@ -641,7 +632,6 @@ function _checkbook_autocomplete_elastic_results2($hosts,$params, $search_term =
             ->build();
         $params['index'] = 'checkbook,contracts';
         $params['size']=0;
-        //$params['type'] = 'payroll';
 
         for ($i = 1; $i < count($search_terms); $i++) {
             $req_params = explode('=', $search_terms[$i]);

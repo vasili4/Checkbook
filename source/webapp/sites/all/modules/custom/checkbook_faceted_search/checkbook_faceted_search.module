@@ -730,7 +730,7 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         $vendors = $value;
         break;
       case 'vendor_type':
-        $vendor_type[] = $value['vendor_type'];
+        $vendor_type = $value;
         break;
       case 'expenditure_object_name':
         $expenseCategories = $value;
@@ -745,10 +745,10 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         $contractStatus = $value;
         break;
       case 'mwbe_category':
-        $MWBECategory[] = $value['minority_type_name'];
+        $MWBECategory = $value;
         break;
       case 'industry_type_name':
-        $industryType[] = $value['industry_type_name'];
+        $industryType = $value;
         break;
       case 'payroll_type':
         $payrollType = $value;
@@ -910,6 +910,9 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
            }
        }
   }
+  else{
+      $output['Vendor Type']['name'] = 'fvendorType';
+  }
 
   if (count($expenseCategories) > 0) {
     foreach ($expenseCategories as $expenseCategoryName => $count) {
@@ -935,8 +938,8 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
 
   }
   else{
-      $output['Expense Category']['name'] = 'fexpenseCategoryName';
-  }
+        $output['Expense Category']['name'] = 'fexpenseCategoryName';
+    }
   if (count($revenueCategories) > 0) {
     foreach ($revenueCategories[0] as $revenueCategoryName => $count) {
       if ($count > 0) {
@@ -959,7 +962,6 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
   }
  // Active fiscal year
   if (count($fiscalYears) > 0) {
-    krsort($fiscalYears);
     foreach ($fiscalYears as $fiscalYear => $count) {
        if ($count['doc_count'] > 0) {
         $checked =  in_array($count['key'], array_values_recursive($reqFiscalYears[0]));
@@ -986,7 +988,6 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
 
     // Registered fiscal year
     if (!empty($regfiscalYears)) {
-        krsort($regfiscalYears);
         foreach ($regfiscalYears as $fiscalYear => $count) {
             if ($count['doc_count'] > 0) {
                 $checked = in_array($count['key'], array_values_recursive($regreqFiscalYears[0]));
@@ -1008,15 +1009,15 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
 
     //Industry
     if (count($industryType) > 0) {
-        foreach ($industryType[0] as $industryTypeName => $count) {
-            if ($count > 0) {
-                $checked = in_array($industryTypeName, array_values_recursive($reqIndustryType[0]));
-                $industryTypeValue = urlencode($industryTypeName);
+        foreach ($industryType as $industryTypeName => $count) {
+            if ($count['doc_count'] > 0) {
+                $checked = in_array($count['key'], array_values_recursive($reqIndustryType[0]));
+                $industryTypeValue = urlencode($count['key']);
                 if ($checked) {
-                    $output['Industry']['checked'][] = array($industryTypeValue, $industryTypeName, $count);
+                    $output['Industry']['checked'][] = array($industryTypeValue,$count['key'], $count['doc_count']);
                 }
                 else {
-                    $output['Industry']['unchecked'][] = array($industryTypeValue, $industryTypeName, $count);
+                    $output['Industry']['unchecked'][] = array($industryTypeValue, $count['key'], $count['doc_count']);
                 }
             }
         }
@@ -1030,18 +1031,21 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
         }
 
     }
+    else{
+        $output['Industry']['name'] = 'findustryTypeName';
+    }
 
 
     if (count($MWBECategory) > 0) {
-        foreach ($MWBECategory[0] as $MWBECategoryName => $count) {
-            if ($count > 0) {
-                $checked = in_array($MWBECategoryName, array_values_recursive($reqMWBECategory[0]));
-                $MWBECategoryValue = urlencode($MWBECategoryName);
+        foreach ($MWBECategory as $MWBECategoryName => $count) {
+            if ($count['doc_count'] > 0) {
+                $checked = in_array($count['key'], array_values_recursive($reqMWBECategory[0]));
+                $MWBECategoryValue = urlencode($count['key']);
                 if ($checked) {
-                    $output['M/WBE Category']['checked'][] = array($MWBECategoryValue, $MWBECategoryName, $count);
+                    $output['M/WBE Category']['checked'][] = array($MWBECategoryValue, $count['key'], $count['doc_count']);
                 }
                 else {
-                    $output['M/WBE Category']['unchecked'][] = array($MWBECategoryValue, $MWBECategoryName, $count);
+                    $output['M/WBE Category']['unchecked'][] = array($MWBECategoryValue, $count['key'], $count['doc_count']);
                 }
             }
         }
@@ -1053,6 +1057,9 @@ function checkbook_faceted_search_preprocess_smart_search_filter(&$variables) {
             }
           }
         }
+    }
+    else{
+        $output['M/WBE Category']['name'] = 'fmwbeCategory';
     }
     //Payroll Type
     if (count($payrollType) > 0) {
