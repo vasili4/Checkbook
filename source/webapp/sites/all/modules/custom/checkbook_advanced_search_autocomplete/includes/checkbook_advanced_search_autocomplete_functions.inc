@@ -650,6 +650,7 @@ function _get_contracts_advanced_search_elastic_autocomplete_results($facet, $pa
     $hosts = [
 
         'http://elk-checkbook-nyc.reisys.com:9200'
+
     ];
     if($category){
         if($category == 'all'){
@@ -689,7 +690,10 @@ function _get_contracts_advanced_search_elastic_autocomplete_results($facet, $pa
         $params = _get_autocomplete_query_term($params,'status','registered');
 
         if(isset($year)) {
-            $params = _checkbook_autocomplete_elastic_get_start_end_dates($year,$params, 'contracts', 'A');
+            $query = _checkbook_autocomplete_elastic_get_start_end_dates($year,$params, 'contracts', 'A');
+            if($query!=''){
+                $params=$query;
+            }
         }
 
 
@@ -699,7 +703,10 @@ function _get_contracts_advanced_search_elastic_autocomplete_results($facet, $pa
     if($status == 'R'){
         $params= _get_autocomplete_query_term($params,'status','registered');
         if(isset($year)){
-            $params= _checkbook_autocomplete_get_start_end_dates($year, 'contracts', 'R');
+            $query = _checkbook_autocomplete_elastic_get_start_end_dates($year,$params, 'contracts', 'R');
+            if($query!=''){
+                $params=$query;
+            }
         }
     }
 
@@ -758,6 +765,7 @@ function _checkbook_advanced_search_autocomplete_contracts_vendor_name($status, 
     $params = _get_config_params('contracts','doc',0);
 
     if(!empty($searchTerm)){
+        $params['body']['size']=0;
         $params['body']['query']['bool']['must'][]['match_phrase']['vendor_name.autocomplete']=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='vendor_name.keyword';
 
@@ -800,6 +808,7 @@ function _checkbook_advanced_search_autocomplete_contracts_contract_number($stat
     $searchTerm =  _get_autocomplete_elastic_search_term();
    $params = _get_config_params('contracts','doc',0);;
     if(!empty($searchTerm)){
+        $params['body']['size']=0;
         $params['body']['query']['bool']['must'][]['match_phrase']['contract_number.autocomplete']=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='contract_number.keyword';
 
@@ -845,6 +854,7 @@ function _checkbook_advanced_search_autocomplete_contracts_apt_pin($status, $cat
     $params = _get_config_params('contracts','doc',0);;
     if(!empty($searchTerm)){
         $apt_pin = $data_source == 'checkbook_oge' ? 'apt_pin.autocomplete' : 'prime_apt_pin';
+        $params['body']['size']=0;
         $params['body']['query']['bool']['must'][]['match_phrase'][$apt_pin]=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='apt_pin.keyword';
 
@@ -887,7 +897,7 @@ function _checkbook_advanced_search_autocomplete_contracts_pin($status, $categor
     $searchTerm = _get_autocomplete_elastic_search_term();
     if(strlen($searchTerm) > 0){
         $pin = $data_source == 'checkbook_oge' ? 'pin.autocomplete' : 'prime_pin';
-
+        $params['body']['size']=0;
         $params['body']['query']['bool']['must'][]['match_phrase'][$pin]=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='pin.keyword';
 
@@ -931,6 +941,7 @@ function _checkbook_advanced_search_autocomplete_contracts_entitycontractnum($st
     $facet_prefix = _get_autocomplete_search_term_facet_prefix();
     if(strlen($searchTerm) > 0){
         //entity_contract_number
+        $params['body']['size']=0;
         $params['body']['query']['bool']['must'][]['match_phrase']['entity_contract_number.autocomplete']=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='entity_contract_number.keyword';
         $params['body']['aggs']['names']['terms']['include']=$searchTerm.'.*';
@@ -976,6 +987,7 @@ function _checkbook_advanced_search_autocomplete_contracts_commodityline($status
     $facet_prefix = _get_autocomplete_search_term_facet_prefix();
     if(strlen($searchTerm) > 0){
         //entity_contract_number
+        $params['body']['size']=0;
         $params['body']['query']['bool']['must'][]['match_phrase']['commodity_line.autocomplete']=$searchTerm;
         $params['body']['aggs']['names']['terms']['field']='commodity_line.keyword';
         $params['body']['aggs']['names']['terms']['include']=$searchTerm.'.*';
@@ -1017,24 +1029,31 @@ function _checkbook_advanced_search_autocomplete_contracts_commodityline($status
  *   Data source (checkbook, checkbook_oge)
  */
 function _checkbook_advanced_search_autocomplete_contracts_budgetname($status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source = 'checkbook') {
-    $searchTerm = _get_autocomplete_search_term();
+    $searchTerm =_get_autocomplete_elastic_search_term();
     if (!empty($searchTerm)) {
-        $query = 'select/?q=contract_budget_name_autocomplete:' . $searchTerm . '&q.op=AND&rows=0&facet=true&facet.field=contract_budget_name&facet.mincount=1&facet.limit=50&wt=php';
-        $query .= $data_source == 'checkbook_oge' ? '&fq=agency_type:oge' : '&fq=-agency_type:oge';
-        $matches = _get_contracts_advanced_search_autocomplete_results('contract_budget_name', $query, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+        $params['body']['size']=0;
+        $params['body']['query']['bool']['must'][]['match_phrase']['budget_name.autocomplete']=$searchTerm;
+        $params['body']['aggs']['names']['terms']['field']='budget_name.keyword';
+
+        if( $data_source== 'checkbook_oge') {
+            $params = _get_autocomplete_query_term($params,'agency_type','oge');
+
+        }
+        $matches = _get_contracts_advanced_search_elastic_autocomplete_results('budget_name', $params, $status, $category, $contract_type, $agency, $award_method, $year, $mwbe_category, $industry, $includes_sub_vendors, $sub_vendor_status, $data_source);
+
 
         //Need to filter out fields in doc that should not be returned
-        if($matches[0]['label'] == 'No Matches Found') {
+       if($matches[0]['label'] == 'No Matches Found') {
             drupal_json_output($matches);
         }
         else {
-            $searchTerm = trim(htmlspecialchars_decode($_REQUEST['term'], ENT_QUOTES));
+            $searchterm = trim(htmlspecialchars_decode($_REQUEST['term'], ENT_QUOTES));
             $unique_matches = array();
             $result_count = 0;
             foreach($matches as $key => $value) {
                 if($result_count == 10) break;
-                if (stripos(strtolower($value), strtolower($searchTerm)) !== false) {
-                    $unique_matches[] = $matches[$key];
+                if (stripos(strtolower($value), strtolower($searchterm)) !== false) {
+                    $unique_matches[] =$matches[$key];
                     $result_count++;
                 }
             }
@@ -1043,6 +1062,9 @@ function _checkbook_advanced_search_autocomplete_contracts_budgetname($status, $
             else
                 drupal_json_output(array('label' => 'No Matches Found','value' => ''));
         }
+
+
+
     }
 }
 
