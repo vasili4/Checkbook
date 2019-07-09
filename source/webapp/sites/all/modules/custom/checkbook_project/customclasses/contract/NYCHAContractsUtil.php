@@ -22,6 +22,7 @@ class NYCHAContractUtil
 {
     static function adjustYearParams(&$node, &$parameters) {
         if(isset($parameters['release_year_id'])){
+            LogHelper::log_debug('Adjusting release_year_id');
             $year_id = $parameters['release_year_id'];
             $data_controller_instance = data_controller_get_operator_factory_instance();
             $parameters['release_approved_year_id'] = $data_controller_instance->initiateHandler(EqualOperatorHandler::$OPERATOR__NAME, $year_id);
